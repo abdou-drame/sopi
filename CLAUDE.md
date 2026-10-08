@@ -18,7 +18,7 @@ Tu es développeur sur **Sopi**, plateforme de réservation de services de proxi
 
 ## Structure du dépôt (monorepo public)
 ```
-backend/     Laravel 11 (API REST)
+backend/     Laravel 12 (API REST)
 admin-web/   React 18 + Vite + TypeScript + Tailwind (back-office administrateur)
 mobile/      Flutter 3 (application client + prestataire, Android APK)
 docs/        cahier-des-charges.pdf, décisions d'architecture
@@ -33,7 +33,7 @@ docs/        cahier-des-charges.pdf, décisions d'architecture
 - Si tu constates qu'un secret a été committé, arrête-toi et signale-le immédiatement.
 
 ## Stack et décisions
-- **Backend :** PHP 8.3, Laravel 11, PostgreSQL 16, Eloquent. Authentification par **Laravel Sanctum** (jetons). Mots de passe Bcrypt. Tests avec **Pest**. Files d'attente : driver `database`. Tâches planifiées : scheduler Laravel.
+- **Backend :** PHP 8.3, Laravel 12, PostgreSQL 16, Eloquent. Authentification par **Laravel Sanctum** (jetons). Mots de passe Bcrypt. Tests avec **Pest**. Files d'attente : driver `database`. Tâches planifiées : scheduler Laravel.
 - **Clés primaires UUID** partout. Montants en `decimal(12,2)`, devise **XOF (FCFA)**. Dates stockées en UTC, fuseau applicatif `Africa/Dakar`.
 - **API :** préfixe `/api/v1`, JSON uniquement, messages d'erreur en français. Format d'erreur : `{ "message": "...", "errors": { "champ": ["..."] } }`. Pagination `?page=` (20 par page). Documentation OpenAPI (Scribe ou L5-Swagger) générée à chaque module.
 - **Architecture backend :** Controllers fins → FormRequests (validation) → Services métier (ReservationService, PaiementService, PortefeuilleService...) → Models. Autorisations par Policies et middleware de rôle (`client`, `prestataire`, `admin`).

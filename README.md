@@ -8,7 +8,7 @@ Le cahier des charges complet est dans [docs/cahier-des-charges.pdf](docs/cahier
 
 | Dossier | Contenu | État |
 |---|---|---|
-| `backend/` | API REST Laravel 11 (`/api/v1`), PostgreSQL, Sanctum, Pest | en cours (Phase 0) |
+| `backend/` | API REST Laravel 12 (`/api/v1`), PostgreSQL, Sanctum, Pest | en cours (Phase 0) |
 | `admin-web/` | Back-office administrateur : React 18, Vite, TypeScript, Tailwind | à venir |
 | `mobile/` | Application client + prestataire : Flutter 3 (APK Android) | à venir |
 | `docs/` | Cahier des charges, décisions d'architecture | — |

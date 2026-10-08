@@ -23,3 +23,13 @@ it('utilise le fuseau Africa/Dakar et la langue française', function () {
     expect(config('app.timezone'))->toBe('Africa/Dakar')
         ->and(config('app.locale'))->toBe('fr');
 });
+
+it('renvoie 503 et database « erreur » quand la base est indisponible', function () {
+    config(['database.connections.sqlite.database' => '/dossier/inexistant/sopi.sqlite']);
+    DB::purge();
+
+    $this->getJson('/api/v1/health')
+        ->assertStatus(503)
+        ->assertJson(['status' => 'ok', 'app' => 'Sopi', 'database' => 'erreur'])
+        ->assertJsonStructure(['status', 'app', 'version', 'database', 'time']);
+});
