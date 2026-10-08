@@ -59,6 +59,7 @@ Coller le contenu de `.secrets/backend.env` dans l'onglet « Environment » du s
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Premier administrateur créé par le seeder (**secret**, vides pour l'instant) |
 | `ACOMPTE_RATE`, `COMMISSION_RATE`, `SLOT_LOCK_MINUTES` | Valeurs initiales des règles métier (30 %, 10 %, 5 min) |
 | `NIXPACKS_PHP_VERSION=8.3` | Force PHP 8.3 au build |
+| `CORS_ALLOWED_ORIGINS` | Origines autorisées à appeler l'API depuis un navigateur, séparées par des virgules (ex. `https://sopi-admin.duckdns.org`). Sans cette variable : `http://localhost:5173` |
 
 ### Domaine HTTPS
 
@@ -76,7 +77,38 @@ Onglet « Domains » : ajouter le domaine du backend, port `80`, **HTTPS activé
 
 Si `database` vaut `"erreur"` (HTTP 503) : contrôler `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD` et que le backend est dans le même réseau que `sopi-db`.
 
-## 5. Sécurité
+## 5. Application frontend (back-office)
+
+| Réglage | Valeur |
+|---|---|
+| Nom de l'application | `frontend` |
+| Source | Git, dépôt `abdou-drame/sopi` (`https://github.com/abdou-drame/sopi`) |
+| Branche | `main` |
+| Build Path | `/admin-web` |
+| Type de build | **Nixpacks** (aucun Dockerfile) |
+| Port exposé | `3000` (Caddy écoute sur `$PORT`, 3000 par défaut) |
+| Domaine | `https://sopi-admin.duckdns.org` (port `3000`, HTTPS activé, Let's Encrypt) |
+| Déploiement automatique | activé (redéploiement à chaque push sur `main`) |
+
+Nixpacks détecte tout seul une application Vite + React : `npm ci`, `npm run build`, puis service du dossier `dist` en statique par Caddy, avec repli vers `index.html` pour toutes les routes. `admin-web/nixpacks.toml` ne fixe que la version de Node (22).
+
+### Variable de build
+
+| Variable | Valeur | Rôle |
+|---|---|---|
+| `VITE_API_BASE_URL` | `https://sopi-api.duckdns.org` | URL publique de l'API. **Lue au moment du build** : Vite l'intègre dans le JavaScript généré. |
+
+À saisir dans l'onglet « Environment » du service `frontend` (pas de valeur secrète). Changer cette valeur ne suffit pas : il faut **relancer un déploiement** pour reconstruire le site. Si ta version de Dokploy propose « Build Args » ou « Build-time variables », la saisir là aussi.
+
+### CORS
+
+Le backend doit autoriser le domaine du back-office : sur le service `backend`, définir `CORS_ALLOWED_ORIGINS=https://sopi-admin.duckdns.org` puis redéployer le backend.
+
+### Vérification
+
+Ouvrir `https://sopi-admin.duckdns.org` : la page « Sopi — Back-office » affiche l'état de l'API et de la base (deux pastilles « OK »). Une actualisation sur une autre route (ex. `/nimporte`) doit afficher la même page, sans erreur 404.
+
+## 6. Sécurité
 
 - Le dépôt est public : ne jamais committer de secrets. Les valeurs vont uniquement dans Dokploy.
 - Ne pas exposer le port PostgreSQL à l'extérieur.
