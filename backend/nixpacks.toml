@@ -1,10 +1,13 @@
 # Configuration Nixpacks pour Dokploy (service « backend », Build Path : /backend).
 # Les extensions PHP (dont pdo_pgsql) sont déduites des « ext-* » de composer.json.
+#
+# Nginx : ne PAS définir NIXPACKS_PHP_ROOT_DIR ni NIXPACKS_PHP_FALLBACK_PATH.
+# Nixpacks détecte Laravel (fichier « artisan ») et configure seul la racine /app/public
+# et le « location / » vers index.php. Ajouter NIXPACKS_PHP_FALLBACK_PATH crée un second
+# « location / » et nginx refuse de démarrer (« duplicate location "/" »).
 
 [variables]
 NIXPACKS_PHP_VERSION = "8.3"
-NIXPACKS_PHP_ROOT_DIR = "/app/public"
-NIXPACKS_PHP_FALLBACK_PATH = "/index.php"
 
 [phases.build]
 cmds = [
