@@ -54,3 +54,6 @@ mobile/ios/Pods/
 .DS_Store
 Thumbs.db
 *.log
+
+# --- Secrets locaux (jamais committés) ---
+.secrets/
