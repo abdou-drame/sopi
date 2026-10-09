@@ -33,3 +33,20 @@ it('renvoie 503 et database « erreur » quand la base est indisponible', functi
         ->assertJson(['status' => 'ok', 'app' => 'Sopi', 'database' => 'erreur'])
         ->assertJsonStructure(['status', 'app', 'version', 'database', 'time']);
 });
+
+it('renvoie la version lue depuis la variable d\'environnement APP_VERSION', function () {
+    // phpunit.xml définit APP_VERSION=1.2.3-test.
+    $this->getJson('/api/v1/health')
+        ->assertOk()
+        ->assertJsonPath('version', '1.2.3-test');
+});
+
+it('utilise « 0.0.0-dev » comme version par défaut quand APP_VERSION est absente', function () {
+    $script = 'require "vendor/autoload.php"; echo (require "config/app.php")["version"];';
+    $env = ['APP_VERSION' => false]; // false = retire la variable de l'environnement hérité
+
+    $process = new Symfony\Component\Process\Process([PHP_BINARY, '-r', $script], base_path(), $env);
+    $process->mustRun();
+
+    expect($process->getOutput())->toBe('0.0.0-dev');
+});

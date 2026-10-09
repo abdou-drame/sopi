@@ -90,6 +90,7 @@ void main() {
 
     expect(find.text('Base de données'), findsOneWidget);
     expect(find.text('OK'), findsNWidgets(2));
+    expect(find.text('Version'), findsOneWidget);
     expect(find.text('0.1.0'), findsOneWidget);
   });
 

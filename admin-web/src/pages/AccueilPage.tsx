@@ -56,13 +56,13 @@ export default function AccueilPage() {
                 <Pastille ok={data.database === 'ok'} />
               </dd>
             </div>
-            <div className="flex items-center justify-between text-sm text-gray-600">
-              <dt>Version</dt>
-              <dd>{data.version}</dd>
-            </div>
           </dl>
         )}
       </section>
+
+      <footer className="mt-8 border-t border-gray-200 pt-4 text-sm text-gray-600">
+        {data ? <p>Version {data.version}</p> : <p>Version indisponible</p>}
+      </footer>
     </main>
   )
 }

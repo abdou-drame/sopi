@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'Sopi'),
 
-    'version' => env('APP_VERSION', '0.1.0'),
+    'version' => env('APP_VERSION', '0.0.0-dev'),
 
     /*
     |--------------------------------------------------------------------------
