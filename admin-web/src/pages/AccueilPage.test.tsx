@@ -36,13 +36,14 @@ describe('AccueilPage', () => {
     afficher()
     expect(await screen.findByText('Base de données')).toBeInTheDocument()
     expect(screen.getAllByText('OK')).toHaveLength(2)
-    expect(screen.getByText('0.1.0')).toBeInTheDocument()
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Version 0.1.0')
   })
 
   it("signale une erreur quand l'API répond 503", async () => {
     simulerReponse({ status: 'ok', app: 'Sopi', version: '0.1.0', database: 'erreur', time: 'x' }, 503)
     afficher()
     expect(await screen.findByRole('alert')).toHaveTextContent(/indisponible/i)
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Version indisponible')
   })
 
   it('affiche une erreur claire quand le serveur est injoignable', async () => {
