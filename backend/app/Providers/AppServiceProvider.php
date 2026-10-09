@@ -19,8 +19,9 @@ class AppServiceProvider extends ServiceProvider
         // 5 inscriptions par minute et par adresse IP.
         RateLimiter::for('inscription', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
 
-        // 5 tentatives de connexion par minute et par couple téléphone + adresse IP.
-        RateLimiter::for('connexion', fn (Request $request) => Limit::perMinute(5)
-            ->by(mb_strtolower((string) $request->input('telephone')).'|'.$request->ip()));
+        // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
+        // par BlocageConnexionService.
+        RateLimiter::for('connexion', fn (Request $request) => Limit::perMinute(config('securite.connexion.max_par_minute_par_ip'))
+            ->by($request->ip()));
     }
 }

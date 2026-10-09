@@ -9,6 +9,7 @@ use App\Http\Requests\Auth\ConnexionRequest;
 use App\Http\Requests\Auth\InscriptionRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Services\BlocageConnexionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -30,9 +31,17 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function connexion(ConnexionRequest $request): JsonResponse
+    public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage): JsonResponse
     {
-        $user = User::where('telephone', $request->validated('telephone'))->first();
+        $telephone = $request->validated('telephone');
+
+        // Pendant le blocage, même le bon mot de passe est refusé (et sans consulter la base).
+        $secondes = $blocage->secondesRestantes($telephone);
+        if ($secondes > 0) {
+            return response()->json(['message' => $blocage->message($secondes)], 429, ['Retry-After' => $secondes]);
+        }
+
+        $user = User::where('telephone', $telephone)->first();
 
         // Le contrôle du mot de passe est fait même quand le compte n'existe pas, pour garder
         // un temps de réponse comparable et ne pas révéler quels numéros sont inscrits.
@@ -41,8 +50,13 @@ class AuthController extends Controller
             $user?->password ?? $this->empreinteFactice(),
         );
         if (! $user || ! $motDePasseValide) {
+            // Même traitement que le compte existe ou non.
+            $blocage->enregistrerEchec($telephone);
+
             return response()->json(['message' => 'Téléphone ou mot de passe incorrect.'], 401);
         }
+        $blocage->reinitialiser($telephone);
+
         // Seul un compte actif s'authentifie ; le statut n'est révélé qu'avec le bon mot de passe.
         if (! $user->estActif()) {
             return response()->json(['message' => $user->statut->messageRefus()], 403);

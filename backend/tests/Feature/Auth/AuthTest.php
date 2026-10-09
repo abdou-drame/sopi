@@ -199,6 +199,6 @@ it('renvoie les erreurs courantes de l\'API en français', function () {
     }
     $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'x'])
         ->assertStatus(429)
-        ->assertJsonPath('message', 'Trop de tentatives. Réessayez dans quelques instants.')
+        ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes.")
         ->assertHeader('Retry-After');
 });
