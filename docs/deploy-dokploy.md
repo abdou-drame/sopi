@@ -56,7 +56,7 @@ Coller le contenu de `.secrets/backend.env` dans l'onglet « Environment » du s
 | `DEXPAY_BASE_URL`, `DEXPAY_API_KEY`, `DEXPAY_WEBHOOK_SECRET` | Paiement DexPay (**secrets**, vides pour l'instant) |
 | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | E-mail SMTP (`log` tant que le SMTP n'est pas configuré) |
 | `FCM_CREDENTIALS` | Identifiants Firebase pour les notifications push (**secret**, vide pour l'instant) |
-| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Premier administrateur créé par le seeder (**secret**, vides pour l'instant) |
+| `ADMIN_NOM`, `ADMIN_PRENOM`, `ADMIN_TELEPHONE`, `ADMIN_EMAIL` (optionnel), `ADMIN_PASSWORD` | Premier administrateur, lu uniquement par la commande `php artisan sopi:creer-admin` (**secret** pour le mot de passe) ; voir la section 4b |
 | `ACOMPTE_RATE`, `COMMISSION_RATE`, `SLOT_LOCK_MINUTES` | Valeurs initiales des règles métier (30 %, 10 %, 5 min) |
 | `NIXPACKS_PHP_VERSION=8.3` | Force PHP 8.3 au build |
 | `CORS_ALLOWED_ORIGINS` | Origines autorisées à appeler l'API depuis un navigateur, séparées par des virgules (ex. `https://sopi-admin.duckdns.org`). Sans cette variable : `http://localhost:5173` |
@@ -76,6 +76,20 @@ Onglet « Domains » : ajouter le domaine du backend, port `80`, **HTTPS activé
 ```
 
 Si `database` vaut `"erreur"` (HTTP 503) : contrôler `DB_HOST`, `DB_USERNAME`, `DB_PASSWORD` et que le backend est dans le même réseau que `sopi-db`.
+
+## 4b. Créer le premier administrateur
+
+La commande n'est jamais lancée automatiquement : elle se lance à la main, une seule fois.
+
+1. Dans Dokploy, service backend, onglet *Environment*, ajouter `ADMIN_NOM`, `ADMIN_PRENOM`, `ADMIN_TELEPHONE` (mobile sénégalais, ex. `77 123 45 67`), `ADMIN_PASSWORD` (8 caractères minimum) et, si voulu, `ADMIN_EMAIL`.
+2. Redéployer le backend, pour que ces variables soient prises en compte.
+3. Ouvrir le terminal du service backend (onglet *Terminal* de Dokploy, ou `docker exec -it <conteneur> sh`) puis lancer :
+   ```bash
+   php artisan sopi:creer-admin
+   ```
+   Résultat attendu : `Administrateur créé.` Relancée, la commande répond que l'administrateur existe déjà et ne change rien. En cas d'erreur, elle indique la variable à corriger et ne crée rien.
+4. Se connecter avec `POST /api/v1/auth/connexion` (téléphone + mot de passe) : la réponse doit contenir `"role": "administrateur"`.
+5. Supprimer `ADMIN_PASSWORD` des variables Dokploy, puis redéployer.
 
 ## 5. Application frontend (back-office)
 
