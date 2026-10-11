@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "7b58c7d1-f9e9-41a2-a090-9a70e17578b9",
+        "_postman_id": "791667e9-2b14-4c1b-9863-f5e3b81b54d0",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -290,6 +290,105 @@
             ]
         },
         {
+            "name": "Client \u2014 recherche de prestataires",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`).",
+            "item": [
+                {
+                    "name": "Rechercher des prestataires",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires",
+                            "query": [
+                                {
+                                    "key": "metier",
+                                    "value": "mecanique",
+                                    "description": "M\u00e9tier : mecanique, coiffure ou pressing.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "quartier",
+                                    "value": "Malika",
+                                    "description": "Quartier (\u00e9galit\u00e9 exacte, sans tenir compte de la casse ni des espaces superflus). Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "vidange",
+                                    "description": "Texte contenu dans le nom de l'entreprise ou dans le nom d'une prestation active (sans tenir compte de la casse ; les accents comptent). Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "prix_min",
+                                    "value": "5000",
+                                    "description": "Le prestataire a une prestation active \u00e0 ce prix ou plus (FCFA). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 0. Le champ value ne doit pas d\u00e9passer 9999999999.99.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "prix_max",
+                                    "value": "20000",
+                                    "description": "Le prestataire a une prestation active \u00e0 ce prix ou moins (FCFA), et \u2265 prix_min. Le champ value doit \u00eatre au moins \u00e9gal \u00e0 0. Le champ value ne doit pas d\u00e9passer 9999999999.99.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "tri",
+                                    "value": "prix_asc",
+                                    "description": "nom (d\u00e9faut), prix_asc ou prix_desc (selon le prix minimal des prestations actives).",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires?metier=mecanique&quartier=Malika&q=vidange&prix_min=5000&prix_max=20000&tri=prix_asc&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.\nTous les filtres sont optionnels et combinables. Aucune donn\u00e9e personnelle n'est renvoy\u00e9e, et pas de note (les avis n'existent pas encore).\nLa recherche ignore la casse mais pas les accents. `prixMin` et `nombrePrestations` portent sur toutes les prestations actives du prestataire."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"prixMin\":5000,\"nombrePrestations\":3}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le prix maximum doit \u00eatre sup\u00e9rieur ou \u00e9gal au prix minimum.\",\"errors\":{\"prix_max\":[\"Le prix maximum doit \u00eatre sup\u00e9rieur ou \u00e9gal au prix minimum.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Endpoints",
             "description": "",
             "item": [
@@ -336,7 +435,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T17:29:22+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T23:43:29+00:00\"}",
                             "name": ""
                         }
                     ]
