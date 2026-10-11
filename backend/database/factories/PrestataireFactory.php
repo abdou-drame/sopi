@@ -3,11 +3,13 @@
 namespace Database\Factories;
 
 use App\Enums\Metier;
+use App\Enums\StatutCompte;
+use App\Models\Prestataire;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Prestataire>
+ * @extends Factory<Prestataire>
  */
 class PrestataireFactory extends Factory
 {
@@ -25,5 +27,14 @@ class PrestataireFactory extends Factory
     public function metier(Metier $metier): static
     {
         return $this->state(['metier' => $metier]);
+    }
+
+    /** Dossier refusé par un administrateur, avec son motif. */
+    public function refuse(string $motif = 'Pièces illisibles.'): static
+    {
+        return $this->state([
+            'user_id' => User::factory()->prestataire()->statut(StatutCompte::Refuse),
+            'motif_refus' => $motif,
+        ]);
     }
 }

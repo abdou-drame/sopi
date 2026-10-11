@@ -44,7 +44,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T13:57:58+00:00'
+                  time: '2026-10-11T14:25:52+00:00'
                 properties:
                   status:
                     type: string
@@ -60,7 +60,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T13:57:58+00:00'
+                    example: '2026-10-11T14:25:52+00:00'
       tags:
         - Endpoints
       security: []
@@ -359,6 +359,103 @@ paths:
                 - adresse
                 - justificatifs
       security: []
+  '/api/v1/suivi/{jeton}':
+    get:
+      summary: "Suivi du dossier d'inscription"
+      operationId: suiviDuDossierDinscription
+      description: "Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription.\nNe renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.\nUn jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  nomEntreprise: 'Garage Moussa'
+                  metier: mecanique
+                  statutCompte: en_attente
+                  motifRefus: null
+                  dateSoumission: '2026-10-12T09:30:00+00:00'
+                  justificatifs:
+                    -
+                      typeDocument: cni
+                      statut: en_attente
+                    -
+                      typeDocument: diplome
+                      statut: en_attente
+                properties:
+                  nomEntreprise:
+                    type: string
+                    example: 'Garage Moussa'
+                  metier:
+                    type: string
+                    example: mecanique
+                  statutCompte:
+                    type: string
+                    example: en_attente
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  dateSoumission:
+                    type: string
+                    example: '2026-10-12T09:30:00+00:00'
+                  justificatifs:
+                    type: array
+                    example:
+                      -
+                        typeDocument: cni
+                        statut: en_attente
+                      -
+                        typeDocument: diplome
+                        statut: en_attente
+                    items:
+                      type: object
+                      properties:
+                        typeDocument:
+                          type: string
+                          example: cni
+                        statut:
+                          type: string
+                          example: en_attente
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Lien de suivi invalide ou expiré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Lien de suivi invalide ou expiré.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Prestataires
+      security: []
+    parameters:
+      -
+        in: path
+        name: jeton
+        description: "Jeton de suivi reçu à l'inscription."
+        example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+        required: true
+        schema:
+          type: string
   /api/v1/me:
     get:
       summary: 'Voir mon profil'

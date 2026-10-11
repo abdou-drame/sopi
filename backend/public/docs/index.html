@@ -96,6 +96,9 @@
                                                     <li class="tocify-item level-2" data-unique="prestataires-POSTapi-v1-prestataires-inscription">
                                 <a href="#prestataires-POSTapi-v1-prestataires-inscription">Inscription d'un prestataire</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataires-GETapi-v1-suivi--jeton-">
+                                <a href="#prestataires-GETapi-v1-suivi--jeton-">Suivi du dossier d'inscription</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-profil" class="tocify-header">
@@ -206,7 +209,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-11T13:57:58+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-11T14:25:52+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -888,7 +891,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpDDBB.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php6688.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1189,11 +1192,178 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpDDBB.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php6688.tmp</code></p>
                     </div>
                                     </details>
         </div>
         </form>
+
+                    <h2 id="prestataires-GETapi-v1-suivi--jeton-">Suivi du dossier d&#039;inscription</h2>
+
+<p>
+</p>
+
+<p>Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription.
+Ne renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.
+Un jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP.</p>
+
+<span id="example-requests-GETapi-v1-suivi--jeton-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-suivi--jeton-">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;nomEntreprise&quot;: &quot;Garage Moussa&quot;,
+    &quot;metier&quot;: &quot;mecanique&quot;,
+    &quot;statutCompte&quot;: &quot;en_attente&quot;,
+    &quot;motifRefus&quot;: null,
+    &quot;dateSoumission&quot;: &quot;2026-10-12T09:30:00+00:00&quot;,
+    &quot;justificatifs&quot;: [
+        {
+            &quot;typeDocument&quot;: &quot;cni&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;
+        },
+        {
+            &quot;typeDocument&quot;: &quot;diplome&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Lien de suivi invalide ou expir&eacute;.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-suivi--jeton-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-suivi--jeton-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-suivi--jeton-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-suivi--jeton-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-suivi--jeton-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-suivi--jeton-" data-method="GET"
+      data-path="api/v1/suivi/{jeton}"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-suivi--jeton-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-suivi--jeton-"
+                    onclick="tryItOut('GETapi-v1-suivi--jeton-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-suivi--jeton-"
+                    onclick="cancelTryOut('GETapi-v1-suivi--jeton-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-suivi--jeton-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/suivi/{jeton}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-suivi--jeton-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-suivi--jeton-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>jeton</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="jeton"                data-endpoint="GETapi-v1-suivi--jeton-"
+               value="jeton-de-suivi-exemple-0123456789-abcdefghijklmnop"
+               data-component="url">
+    <br>
+<p>Jeton de suivi reçu à l'inscription. Example: <code>jeton-de-suivi-exemple-0123456789-abcdefghijklmnop</code></p>
+            </div>
+                    </form>
 
                 <h1 id="profil">Profil</h1>
 
