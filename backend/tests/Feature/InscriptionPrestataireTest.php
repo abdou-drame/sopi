@@ -242,6 +242,22 @@ describe('POST /prestataires/inscription', function () {
         }
     });
 
+    it("enregistre le nom d'origine nettoyé, le type et la taille de chaque justificatif", function () {
+        $reponse = $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire([
+            'justificatifs' => [
+                ['type_document' => 'cni', 'fichier' => fichierJustificatif('png', '..\\..\\ma-cni.png')],
+                ['type_document' => 'diplome', 'fichier' => fichierJustificatif('pdf', 'diplôme.pdf')],
+            ],
+        ]))->assertCreated();
+
+        $pieces = Justificatif::where('prestataire_id', $reponse->json('id'))->get()->keyBy('type_document');
+        expect($pieces['cni']->nom_original)->toBe('ma-cni.png')
+            ->and($pieces['cni']->type_mime)->toBe('image/png')
+            ->and($pieces['diplome']->nom_original)->toBe('diplôme.pdf')
+            ->and($pieces['diplome']->type_mime)->toBe('application/pdf')
+            ->and($pieces['diplome']->taille)->toBeGreaterThan(0);
+    });
+
     it("empêche la connexion d'un compte en attente de validation", function () {
         $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire())->assertCreated();
 

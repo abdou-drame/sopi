@@ -8,6 +8,9 @@ servers:
     url: 'http://localhost:8000'
 tags:
   -
+    name: "Administration — demandes d'inscription"
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`)."
+  -
     name: Endpoints
     description: ''
   -
@@ -26,6 +29,357 @@ security:
   -
     default: []
 paths:
+  /api/v1/admin/prestataires/demandes:
+    get:
+      summary: 'Liste des demandes des prestataires'
+      operationId: listeDesDemandesDesPrestataires
+      description: 'Paginée (20 par page). Par défaut les demandes `en_attente`, de la plus ancienne à la plus récente.'
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'en_attente (défaut), actif, refuse ou tous.'
+          example: en_attente
+          required: false
+          schema:
+            type: string
+            description: 'en_attente (défaut), actif, refuse ou tous.'
+            example: en_attente
+            enum:
+              - en_attente
+              - actif
+              - refuse
+              - tous
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000002
+                      nom: Diop
+                      prenom: Moussa
+                      nomEntreprise: 'Garage Moussa'
+                      metier: mecanique
+                      quartier: Malika
+                      statutCompte: en_attente
+                      dateSoumission: '2026-10-12T09:30:00+00:00'
+                      nombreJustificatifs: 2
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000002
+                        nom: Diop
+                        prenom: Moussa
+                        nomEntreprise: 'Garage Moussa'
+                        metier: mecanique
+                        quartier: Malika
+                        statutCompte: en_attente
+                        dateSoumission: '2026-10-12T09:30:00+00:00'
+                        nombreJustificatifs: 2
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000002
+                        nom:
+                          type: string
+                          example: Diop
+                        prenom:
+                          type: string
+                          example: Moussa
+                        nomEntreprise:
+                          type: string
+                          example: 'Garage Moussa'
+                        metier:
+                          type: string
+                          example: mecanique
+                        quartier:
+                          type: string
+                          example: Malika
+                        statutCompte:
+                          type: string
+                          example: en_attente
+                        dateSoumission:
+                          type: string
+                          example: '2026-10-12T09:30:00+00:00'
+                        nombreJustificatifs:
+                          type: integer
+                          example: 2
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le statut doit être en_attente, actif, refuse ou tous.'
+                  errors:
+                    statut:
+                      - 'Le statut doit être en_attente, actif, refuse ou tous.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le statut doit être en_attente, actif, refuse ou tous.'
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - 'Le statut doit être en_attente, actif, refuse ou tous.'
+                        items:
+                          type: string
+      tags:
+        - "Administration — demandes d'inscription"
+  '/api/v1/admin/prestataires/{id}':
+    get:
+      summary: "Détail d'une demande"
+      operationId: dtailDuneDemande
+      description: 'Coordonnées du prestataire et liste de ses justificatifs (sans chemin de stockage).'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000002
+                  nom: Diop
+                  prenom: Moussa
+                  telephone: '+221771234567'
+                  email: moussa@example.com
+                  nomEntreprise: 'Garage Moussa'
+                  metier: mecanique
+                  quartier: Malika
+                  adresse: 'Rue 10, près du marché'
+                  statutCompte: en_attente
+                  motifRefus: null
+                  dateSoumission: '2026-10-12T09:30:00+00:00'
+                  justificatifs:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000010
+                      typeDocument: cni
+                      statut: en_attente
+                      nomOriginal: cni.png
+                      typeMime: image/png
+                      taille: 184320
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  nom:
+                    type: string
+                    example: Diop
+                  prenom:
+                    type: string
+                    example: Moussa
+                  telephone:
+                    type: string
+                    example: '+221771234567'
+                  email:
+                    type: string
+                    example: moussa@example.com
+                  nomEntreprise:
+                    type: string
+                    example: 'Garage Moussa'
+                  metier:
+                    type: string
+                    example: mecanique
+                  quartier:
+                    type: string
+                    example: Malika
+                  adresse:
+                    type: string
+                    example: 'Rue 10, près du marché'
+                  statutCompte:
+                    type: string
+                    example: en_attente
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  dateSoumission:
+                    type: string
+                    example: '2026-10-12T09:30:00+00:00'
+                  justificatifs:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000010
+                        typeDocument: cni
+                        statut: en_attente
+                        nomOriginal: cni.png
+                        typeMime: image/png
+                        taille: 184320
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000010
+                        typeDocument:
+                          type: string
+                          example: cni
+                        statut:
+                          type: string
+                          example: en_attente
+                        nomOriginal:
+                          type: string
+                          example: cni.png
+                        typeMime:
+                          type: string
+                          example: image/png
+                        taille:
+                          type: integer
+                          example: 184320
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Demande introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Demande introuvable.'
+      tags:
+        - "Administration — demandes d'inscription"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du prestataire.'
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/justificatifs/{id}/telecharger':
+    get:
+      summary: 'Télécharger un justificatif'
+      operationId: tlchargerUnJustificatif
+      description: 'Renvoie le fichier en flux depuis le stockage privé (affichage direct pour les PDF et images).'
+      parameters: []
+      responses:
+        200:
+          description: Fichier
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: 'Contenu binaire du fichier (Content-Type: application/pdf, image/jpeg ou image/png)'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Justificatif introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Justificatif introuvable.'
+      tags:
+        - "Administration — demandes d'inscription"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du justificatif.'
+        example: 0198a1b2-0000-7000-8000-000000000010
+        required: true
+        schema:
+          type: string
   /api/v1/health:
     get:
       summary: ''
@@ -44,7 +398,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T14:25:52+00:00'
+                  time: '2026-10-11T14:39:21+00:00'
                 properties:
                   status:
                     type: string
@@ -60,7 +414,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T14:25:52+00:00'
+                    example: '2026-10-11T14:39:21+00:00'
       tags:
         - Endpoints
       security: []

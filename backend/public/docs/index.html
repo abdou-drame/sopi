@@ -66,6 +66,22 @@
                     <a href="#authenticating-requests">Authenticating requests</a>
                 </li>
                             </ul>
+                    <ul id="tocify-header-administration-demandes-dinscription" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="administration-demandes-dinscription">
+                    <a href="#administration-demandes-dinscription">Administration — demandes d'inscription</a>
+                </li>
+                                    <ul id="tocify-subheader-administration-demandes-dinscription" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="administration-demandes-dinscription-GETapi-v1-admin-prestataires-demandes">
+                                <a href="#administration-demandes-dinscription-GETapi-v1-admin-prestataires-demandes">Liste des demandes des prestataires</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="administration-demandes-dinscription-GETapi-v1-admin-prestataires--id-">
+                                <a href="#administration-demandes-dinscription-GETapi-v1-admin-prestataires--id-">Détail d'une demande</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="administration-demandes-dinscription-GETapi-v1-admin-justificatifs--id--telecharger">
+                                <a href="#administration-demandes-dinscription-GETapi-v1-admin-justificatifs--id--telecharger">Télécharger un justificatif</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="endpoints">
                     <a href="#endpoints">Endpoints</a>
@@ -151,7 +167,569 @@ You can switch the language used with the tabs at the top right (or from the nav
 <p>All authenticated endpoints are marked with a <code>requires authentication</code> badge in the documentation below.</p>
 <p>Le jeton est renvoyé par <code>POST /api/v1/auth/connexion</code> ou <code>/auth/inscription</code>.</p>
 
-        <h1 id="endpoints">Endpoints</h1>
+        <h1 id="administration-demandes-dinscription">Administration — demandes d'inscription</h1>
+
+    <p>Routes réservées aux administrateurs (jeton Sanctum + rôle <code>administrateur</code>).</p>
+
+                                <h2 id="administration-demandes-dinscription-GETapi-v1-admin-prestataires-demandes">Liste des demandes des prestataires</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Paginée (20 par page). Par défaut les demandes <code>en_attente</code>, de la plus ancienne à la plus récente.</p>
+
+<span id="example-requests-GETapi-v1-admin-prestataires-demandes">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/admin/prestataires/demandes?statut=en_attente&amp;page=1" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/admin/prestataires/demandes"
+);
+
+const params = {
+    "statut": "en_attente",
+    "page": "1",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-admin-prestataires-demandes">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000002&quot;,
+            &quot;nom&quot;: &quot;Diop&quot;,
+            &quot;prenom&quot;: &quot;Moussa&quot;,
+            &quot;nomEntreprise&quot;: &quot;Garage Moussa&quot;,
+            &quot;metier&quot;: &quot;mecanique&quot;,
+            &quot;quartier&quot;: &quot;Malika&quot;,
+            &quot;statutCompte&quot;: &quot;en_attente&quot;,
+            &quot;dateSoumission&quot;: &quot;2026-10-12T09:30:00+00:00&quot;,
+            &quot;nombreJustificatifs&quot;: 2
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le statut doit &ecirc;tre en_attente, actif, refuse ou tous.&quot;,
+    &quot;errors&quot;: {
+        &quot;statut&quot;: [
+            &quot;Le statut doit &ecirc;tre en_attente, actif, refuse ou tous.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-admin-prestataires-demandes" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-admin-prestataires-demandes"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-admin-prestataires-demandes"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-admin-prestataires-demandes" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-admin-prestataires-demandes">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-admin-prestataires-demandes" data-method="GET"
+      data-path="api/v1/admin/prestataires/demandes"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-admin-prestataires-demandes', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-admin-prestataires-demandes"
+                    onclick="tryItOut('GETapi-v1-admin-prestataires-demandes');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-admin-prestataires-demandes"
+                    onclick="cancelTryOut('GETapi-v1-admin-prestataires-demandes');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-admin-prestataires-demandes"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/admin/prestataires/demandes</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-admin-prestataires-demandes"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-admin-prestataires-demandes"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-admin-prestataires-demandes"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>statut</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="statut"                data-endpoint="GETapi-v1-admin-prestataires-demandes"
+               value="en_attente"
+               data-component="query">
+    <br>
+<p>en_attente (défaut), actif, refuse ou tous. Example: <code>en_attente</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>en_attente</code></li> <li><code>actif</code></li> <li><code>refuse</code></li> <li><code>tous</code></li></ul>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>page</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="page"                data-endpoint="GETapi-v1-admin-prestataires-demandes"
+               value="1"
+               data-component="query">
+    <br>
+<p>Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1. Example: <code>1</code></p>
+            </div>
+                </form>
+
+                    <h2 id="administration-demandes-dinscription-GETapi-v1-admin-prestataires--id-">Détail d&#039;une demande</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Coordonnées du prestataire et liste de ses justificatifs (sans chemin de stockage).</p>
+
+<span id="example-requests-GETapi-v1-admin-prestataires--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/admin/prestataires/0198a1b2-0000-7000-8000-000000000002" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/admin/prestataires/0198a1b2-0000-7000-8000-000000000002"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-admin-prestataires--id-">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000002&quot;,
+    &quot;nom&quot;: &quot;Diop&quot;,
+    &quot;prenom&quot;: &quot;Moussa&quot;,
+    &quot;telephone&quot;: &quot;+221771234567&quot;,
+    &quot;email&quot;: &quot;moussa@example.com&quot;,
+    &quot;nomEntreprise&quot;: &quot;Garage Moussa&quot;,
+    &quot;metier&quot;: &quot;mecanique&quot;,
+    &quot;quartier&quot;: &quot;Malika&quot;,
+    &quot;adresse&quot;: &quot;Rue 10, pr&egrave;s du march&eacute;&quot;,
+    &quot;statutCompte&quot;: &quot;en_attente&quot;,
+    &quot;motifRefus&quot;: null,
+    &quot;dateSoumission&quot;: &quot;2026-10-12T09:30:00+00:00&quot;,
+    &quot;justificatifs&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000010&quot;,
+            &quot;typeDocument&quot;: &quot;cni&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;,
+            &quot;nomOriginal&quot;: &quot;cni.png&quot;,
+            &quot;typeMime&quot;: &quot;image/png&quot;,
+            &quot;taille&quot;: 184320
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Demande introuvable.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-admin-prestataires--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-admin-prestataires--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-admin-prestataires--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-admin-prestataires--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-admin-prestataires--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-admin-prestataires--id-" data-method="GET"
+      data-path="api/v1/admin/prestataires/{id}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-admin-prestataires--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-admin-prestataires--id-"
+                    onclick="tryItOut('GETapi-v1-admin-prestataires--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-admin-prestataires--id-"
+                    onclick="cancelTryOut('GETapi-v1-admin-prestataires--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-admin-prestataires--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/admin/prestataires/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-admin-prestataires--id-"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-admin-prestataires--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-admin-prestataires--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="GETapi-v1-admin-prestataires--id-"
+               value="0198a1b2-0000-7000-8000-000000000002"
+               data-component="url">
+    <br>
+<p>Identifiant du prestataire. Example: <code>0198a1b2-0000-7000-8000-000000000002</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="administration-demandes-dinscription-GETapi-v1-admin-justificatifs--id--telecharger">Télécharger un justificatif</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Renvoie le fichier en flux depuis le stockage privé (affichage direct pour les PDF et images).</p>
+
+<span id="example-requests-GETapi-v1-admin-justificatifs--id--telecharger">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/admin/justificatifs/0198a1b2-0000-7000-8000-000000000010/telecharger" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/admin/justificatifs/0198a1b2-0000-7000-8000-000000000010/telecharger"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-admin-justificatifs--id--telecharger">
+            <blockquote>
+            <p>Example response (200, Fichier):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">Contenu binaire du fichier (Content-Type: application/pdf, image/jpeg ou image/png)</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Justificatif introuvable.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-admin-justificatifs--id--telecharger" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-admin-justificatifs--id--telecharger"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-admin-justificatifs--id--telecharger"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-admin-justificatifs--id--telecharger" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-admin-justificatifs--id--telecharger">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-admin-justificatifs--id--telecharger" data-method="GET"
+      data-path="api/v1/admin/justificatifs/{id}/telecharger"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-admin-justificatifs--id--telecharger', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-admin-justificatifs--id--telecharger"
+                    onclick="tryItOut('GETapi-v1-admin-justificatifs--id--telecharger');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-admin-justificatifs--id--telecharger"
+                    onclick="cancelTryOut('GETapi-v1-admin-justificatifs--id--telecharger');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-admin-justificatifs--id--telecharger"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/admin/justificatifs/{id}/telecharger</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-admin-justificatifs--id--telecharger"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-admin-justificatifs--id--telecharger"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-admin-justificatifs--id--telecharger"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="GETapi-v1-admin-justificatifs--id--telecharger"
+               value="0198a1b2-0000-7000-8000-000000000010"
+               data-component="url">
+    <br>
+<p>Identifiant du justificatif. Example: <code>0198a1b2-0000-7000-8000-000000000010</code></p>
+            </div>
+                    </form>
+
+                <h1 id="endpoints">Endpoints</h1>
 
     
 
@@ -209,7 +787,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-11T14:25:52+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-11T14:39:21+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -891,7 +1469,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php6688.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpBE05.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -1192,7 +1770,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php6688.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpBE05.tmp</code></p>
                     </div>
                                     </details>
         </div>

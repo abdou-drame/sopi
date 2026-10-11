@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
+use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
@@ -13,6 +15,13 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/prestataires/inscription', InscriptionPrestataireController::class)->middleware('throttle:inscription-prestataire');
     Route::get('/suivi/{jeton}', SuiviDossierController::class)->middleware('throttle:suivi-dossier');
+
+    // Administration : jeton Sanctum + rôle administrateur (alias 'admin', voir bootstrap/app.php).
+    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+        Route::get('/prestataires/demandes', [DemandePrestataireController::class, 'index']);
+        Route::get('/prestataires/{id}', [DemandePrestataireController::class, 'show'])->whereUuid('id');
+        Route::get('/justificatifs/{id}/telecharger', [JustificatifController::class, 'telecharger'])->whereUuid('id');
+    });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {
         Route::get('/', 'afficher');

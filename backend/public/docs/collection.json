@@ -10,11 +10,172 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "866bb2f4-0d78-496f-8b34-06823a6bc87a",
+        "_postman_id": "6db1420f-3786-4f22-8600-ac5f895765d7",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
     "item": [
+        {
+            "name": "Administration \u2014 demandes d'inscription",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`).",
+            "item": [
+                {
+                    "name": "Liste des demandes des prestataires",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/prestataires\/demandes",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "en_attente",
+                                    "description": "en_attente (d\u00e9faut), actif, refuse ou tous.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/prestataires\/demandes?statut=en_attente&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page). Par d\u00e9faut les demandes `en_attente`, de la plus ancienne \u00e0 la plus r\u00e9cente."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"statutCompte\":\"en_attente\",\"dateSoumission\":\"2026-10-12T09:30:00+00:00\",\"nombreJustificatifs\":2}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/prestataires\/demandes?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/prestataires\/demandes?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre en_attente, actif, refuse ou tous.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre en_attente, actif, refuse ou tous.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/prestataires\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/prestataires\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Coordonn\u00e9es du prestataire et liste de ses justificatifs (sans chemin de stockage)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221771234567\",\"email\":\"moussa@example.com\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"statutCompte\":\"en_attente\",\"motifRefus\":null,\"dateSoumission\":\"2026-10-12T09:30:00+00:00\",\"justificatifs\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000010\",\"typeDocument\":\"cni\",\"statut\":\"en_attente\",\"nomOriginal\":\"cni.png\",\"typeMime\":\"image\/png\",\"taille\":184320}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Demande introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "T\u00e9l\u00e9charger un justificatif",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/justificatifs\/:id\/telecharger",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/justificatifs\/:id\/telecharger",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000010",
+                                    "description": "Identifiant du justificatif."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie le fichier en flux depuis le stockage priv\u00e9 (affichage direct pour les PDF et images)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "Contenu binaire du fichier (Content-Type: application\/pdf, image\/jpeg ou image\/png)",
+                            "name": "Fichier"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Justificatif introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
         {
             "name": "Endpoints",
             "description": "",
@@ -62,7 +223,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T14:25:52+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T14:39:21+00:00\"}",
                             "name": ""
                         }
                     ]
