@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
         // 5 inscriptions par minute et par adresse IP.
         RateLimiter::for('inscription', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('inscription-prestataire', fn (Request $request) => Limit::perHour(10)->by($request->ip()));
+        RateLimiter::for('suivi-dossier', fn (Request $request) => Limit::perMinute(30)->by($request->ip()));
 
         // Profil : limites par utilisateur connecté (par IP en secours). Le changement de mot de passe
         // est le plus strict (protège l'ancien mot de passe contre les essais répétés avec un jeton volé).
