@@ -156,6 +156,158 @@ endpoints:
   -
     custom: []
     httpMethods:
+      - POST
+    uri: 'api/v1/admin/prestataires/{id}/accepter'
+    metadata:
+      custom: []
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Accepter une demande'
+      description: |-
+        Le compte passe à `actif` (le prestataire peut se connecter) et ses justificatifs à `valide`.
+        Seule une demande `en_attente` peut être décidée. Aucune notification n'est envoyée : le prestataire consulte son lien de suivi.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du prestataire.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000002
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"actif","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"valide","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Demande introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette demande a déjà été traitée."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/prestataires/{id}/refuser'
+    metadata:
+      custom: []
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Refuser une demande'
+      description: |-
+        Le compte passe à `refuse`, ses justificatifs à `rejete` et le motif est enregistré (visible sur le lien de suivi du prestataire).
+        Seule une demande `en_attente` peut être décidée.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du prestataire.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000002
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      motif:
+        custom: []
+        name: motif
+        description: 'Raison du refus, communiquée au prestataire (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+        required: true
+        example: 'La photocopie de la CNI est illisible.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      motif: 'La photocopie de la CNI est illisible.'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"refuse","motifRefus":"La photocopie de la CNI est illisible.","dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"rejete","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Demande introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette demande a déjà été traitée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le motif du refus doit contenir au moins 10 caractères.","errors":{"motif":["Le motif du refus doit contenir au moins 10 caractères."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
       - GET
     uri: 'api/v1/admin/justificatifs/{id}/telecharger'
     metadata:

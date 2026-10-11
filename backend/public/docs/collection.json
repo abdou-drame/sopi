@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "6db1420f-3786-4f22-8600-ac5f895765d7",
+        "_postman_id": "7d3a585b-7902-4b04-8ac9-33afe3b5f996",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -129,6 +129,119 @@
                     ]
                 },
                 {
+                    "name": "Accepter une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/prestataires\/:id\/accepter",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/prestataires\/:id\/accepter",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Le compte passe \u00e0 `actif` (le prestataire peut se connecter) et ses justificatifs \u00e0 `valide`.\nSeule une demande `en_attente` peut \u00eatre d\u00e9cid\u00e9e. Aucune notification n'est envoy\u00e9e : le prestataire consulte son lien de suivi."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221771234567\",\"email\":\"moussa@example.com\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"statutCompte\":\"actif\",\"motifRefus\":null,\"dateSoumission\":\"2026-10-12T09:30:00+00:00\",\"justificatifs\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000010\",\"typeDocument\":\"cni\",\"statut\":\"valide\",\"nomOriginal\":\"cni.png\",\"typeMime\":\"image\/png\",\"taille\":184320}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Demande introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cette demande a d\u00e9j\u00e0 \u00e9t\u00e9 trait\u00e9e.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Refuser une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/prestataires\/:id\/refuser",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/prestataires\/:id\/refuser",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"La photocopie de la CNI est illisible.\"}"
+                        },
+                        "description": "Le compte passe \u00e0 `refuse`, ses justificatifs \u00e0 `rejete` et le motif est enregistr\u00e9 (visible sur le lien de suivi du prestataire).\nSeule une demande `en_attente` peut \u00eatre d\u00e9cid\u00e9e."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221771234567\",\"email\":\"moussa@example.com\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"statutCompte\":\"refuse\",\"motifRefus\":\"La photocopie de la CNI est illisible.\",\"dateSoumission\":\"2026-10-12T09:30:00+00:00\",\"justificatifs\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000010\",\"typeDocument\":\"cni\",\"statut\":\"rejete\",\"nomOriginal\":\"cni.png\",\"typeMime\":\"image\/png\",\"taille\":184320}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Demande introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cette demande a d\u00e9j\u00e0 \u00e9t\u00e9 trait\u00e9e.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif du refus doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"motif\":[\"Le motif du refus doit contenir au moins 10 caract\u00e8res.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
                     "name": "T\u00e9l\u00e9charger un justificatif",
                     "request": {
                         "url": {
@@ -223,7 +336,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T14:39:21+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T16:03:50+00:00\"}",
                             "name": ""
                         }
                     ]
