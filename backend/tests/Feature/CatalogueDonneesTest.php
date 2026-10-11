@@ -3,80 +3,62 @@
 use App\Enums\Metier;
 use App\Models\Prestataire;
 use App\Models\Prestation;
-use App\Models\Service;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
-use Database\Seeders\ServiceSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 uses(RefreshDatabase::class);
 
-describe('services (référentiel)', function () {
-    it('est créé par sa factory avec un UUID et un métier typé', function () {
-        $service = Service::factory()->metier(Metier::Coiffure)->create();
-
-        expect($service->id)->toBeString()->toHaveLength(36)
-            ->and($service->fresh()->metier)->toBe(Metier::Coiffure);
-    });
-
-    it('refuse deux fois le même nom dans un même métier, mais pas dans deux métiers', function () {
-        Service::factory()->metier(Metier::Mecanique)->create(['nom' => 'Diagnostic']);
-        Service::factory()->metier(Metier::Coiffure)->create(['nom' => 'Diagnostic']);
-
-        expect(fn () => Service::factory()->metier(Metier::Mecanique)->create(['nom' => 'Diagnostic']))
-            ->toThrow(QueryException::class);
-    });
-
-    it('expose les prestations qui le proposent', function () {
-        $service = Service::factory()->create();
-        Prestation::factory()->count(2)->create(['service_id' => $service->id]);
-
-        expect($service->prestations)->toHaveCount(2);
-    });
-
-    it('ne peut pas être supprimé tant qu\'un prestataire le propose', function () {
+describe('prestations', function () {
+    it('est créée par sa factory avec un UUID et le domaine de son prestataire', function () {
         $prestation = Prestation::factory()->create();
 
-        expect(fn () => $prestation->service->delete())->toThrow(QueryException::class);
+        expect($prestation->id)->toBeString()->toHaveLength(36)
+            ->and($prestation->fresh()->domaine)->toBe($prestation->prestataire->metier)
+            ->and($prestation->actif)->toBeTrue();
     });
-});
 
-describe('prestations (offre d\'un prestataire)', function () {
-    it('relie un prestataire et un service, avec ses valeurs par défaut', function () {
-        $prestataire = Prestataire::factory()->create();
-        $service = Service::factory()->create();
+    it('garde, avec la factory, un domaine égal au métier du prestataire fourni', function (Metier $metier) {
+        $prestataire = Prestataire::factory()->metier($metier)->create();
 
-        $prestation = $prestataire->prestations()->create(['service_id' => $service->id, 'tarif' => 7500, 'duree_minutes' => 45]);
+        $prestations = Prestation::factory()->count(3)->create(['prestataire_id' => $prestataire->id]);
+
+        expect($prestations->every(fn (Prestation $p) => $p->fresh()->domaine === $metier))->toBeTrue();
+    })->with(Metier::cases());
+
+    it('est rattachée à son prestataire et reprend son métier comme domaine', function () {
+        $prestataire = Prestataire::factory()->metier(Metier::Coiffure)->create();
+
+        $prestation = $prestataire->prestations()->create(['nom' => 'Coupe homme', 'duree_minutes' => 45, 'prix' => 7500]);
 
         expect($prestation->fresh())
-            ->actif->toBeTrue()
-            ->tarif->toBe('7500.00')
+            ->nom->toBe('Coupe homme')
+            ->domaine->toBe(Metier::Coiffure)
+            ->prix->toBe('7500.00')
             ->duree_minutes->toBe(45)
-            ->description->toBeNull()
+            ->actif->toBeTrue()
             ->and($prestation->prestataire->is($prestataire))->toBeTrue()
-            ->and($prestation->service->is($service))->toBeTrue()
             ->and($prestataire->prestations)->toHaveCount(1);
     });
 
-    it('conserve un tarif décimal avec deux décimales', function () {
-        $prestation = Prestation::factory()->create(['tarif' => 12500.5]);
-
-        expect($prestation->fresh()->tarif)->toBe('12500.50');
+    it('conserve un prix décimal avec deux décimales', function () {
+        expect(Prestation::factory()->create(['prix' => 12500.5])->fresh()->prix)->toBe('12500.50');
     });
 
-    it('refuse un tarif nul ou négatif', function (float $tarif) {
-        expect(fn () => Prestation::factory()->create(['tarif' => $tarif]))
+    it('refuse un prix nul ou négatif', function (float $prix) {
+        expect(fn () => Prestation::factory()->create(['prix' => $prix]))
             ->toThrow(InvalidArgumentException::class, 'supérieur à 0');
         expect(Prestation::count())->toBe(0);
     })->with([0, -1, -2500.50]);
 
-    it('refuse un tarif ramené à 0 lors d\'une modification', function () {
-        $prestation = Prestation::factory()->create(['tarif' => 5000]);
+    it('refuse un prix ramené à 0 lors d\'une modification', function () {
+        $prestation = Prestation::factory()->create(['prix' => 5000]);
 
-        expect(fn () => $prestation->update(['tarif' => 0]))->toThrow(InvalidArgumentException::class);
-        expect($prestation->fresh()->tarif)->toBe('5000.00');
+        expect(fn () => $prestation->update(['prix' => 0]))->toThrow(InvalidArgumentException::class);
+        expect($prestation->fresh()->prix)->toBe('5000.00');
     });
 
     it('refuse une durée nulle', function () {
@@ -84,23 +66,38 @@ describe('prestations (offre d\'un prestataire)', function () {
             ->toThrow(InvalidArgumentException::class, 'durée');
     });
 
-    it('refuse le même service deux fois chez un prestataire, mais l\'accepte chez un autre', function () {
-        $service = Service::factory()->create();
-        $premier = Prestataire::factory()->create();
-        Prestation::factory()->create(['prestataire_id' => $premier->id, 'service_id' => $service->id]);
-
-        expect(fn () => Prestation::factory()->create(['prestataire_id' => $premier->id, 'service_id' => $service->id]))
-            ->toThrow(QueryException::class);
-
-        Prestation::factory()->create(['prestataire_id' => Prestataire::factory()->create()->id, 'service_id' => $service->id]);
-        expect(Prestation::count())->toBe(2);
+    it('refuse un domaine qui n\'est pas une valeur de l\'enum Metier', function () {
+        expect(fn () => Prestation::factory()->create(['domaine' => 'plomberie']))->toThrow(ValueError::class);
+        expect(Prestation::count())->toBe(0);
     });
 
-    it('permet de proposer plusieurs services différents', function () {
-        $prestataire = Prestataire::factory()->create();
-        Prestation::factory()->count(3)->create(['prestataire_id' => $prestataire->id]);
+    it('refuse un domaine différent du métier du prestataire', function () {
+        $prestataire = Prestataire::factory()->metier(Metier::Mecanique)->create();
 
-        expect($prestataire->prestations)->toHaveCount(3);
+        expect(fn () => Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'domaine' => Metier::Pressing]))
+            ->toThrow(InvalidArgumentException::class, 'métier de son prestataire');
+        expect(Prestation::count())->toBe(0);
+    });
+
+    it('ne laisse pas modifier le domaine par assignation de masse', function () {
+        $prestation = Prestation::factory()->create();
+        $domaine = $prestation->domaine;
+
+        $prestation->update(['domaine' => Metier::cases()[0] === $domaine ? 'pressing' : 'mecanique']);
+
+        expect($prestation->fresh()->domaine)->toBe($domaine);
+    });
+
+    it('refuse deux prestations de même nom chez un prestataire, mais l\'accepte chez un autre', function () {
+        $premier = Prestataire::factory()->metier(Metier::Mecanique)->create();
+        Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Vidange']);
+
+        expect(fn () => Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Vidange']))
+            ->toThrow(QueryException::class);
+
+        Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Freinage']);
+        Prestation::factory()->create(['prestataire_id' => Prestataire::factory()->metier(Metier::Mecanique)->create()->id, 'nom' => 'Vidange']);
+        expect(Prestation::count())->toBe(3);
     });
 
     it('est supprimée avec son prestataire', function () {
@@ -108,7 +105,7 @@ describe('prestations (offre d\'un prestataire)', function () {
 
         $prestation->prestataire->delete();
 
-        expect(Prestation::count())->toBe(0)->and(Service::count())->toBe(1);
+        expect(Prestation::count())->toBe(0);
     });
 
     it('distingue les prestations actives', function () {
@@ -123,59 +120,75 @@ describe('prestations (offre d\'un prestataire)', function () {
         $autre = Prestataire::factory()->create();
         $prestataire = Prestataire::factory()->create();
 
-        $prestation = $prestataire->prestations()->create([
-            'prestataire_id' => $autre->id, 'service_id' => Service::factory()->create()->id, 'tarif' => 1000, 'duree_minutes' => 30,
-        ]);
+        $prestation = $prestataire->prestations()->create(['prestataire_id' => $autre->id, 'nom' => 'Test', 'duree_minutes' => 30, 'prix' => 1000]);
 
         expect($prestation->prestataire_id)->toBe($prestataire->id);
     });
 });
 
-describe('index de recherche', function () {
-    it('existent sur les tables du catalogue et sur prestataires', function () {
+describe('structure de la base', function () {
+    it('n\'a plus de table services ni de colonnes obsolètes', function () {
+        expect(Schema::hasTable('services'))->toBeFalse()
+            ->and(Schema::hasColumns('prestations', ['id', 'prestataire_id', 'nom', 'domaine', 'duree_minutes', 'prix', 'actif']))->toBeTrue()
+            ->and(Schema::hasColumn('prestations', 'service_id'))->toBeFalse()
+            ->and(Schema::hasColumn('prestations', 'tarif'))->toBeFalse()
+            ->and(Schema::hasColumn('prestations', 'description'))->toBeFalse();
+    });
+
+    it('a les index de recherche et d\'unicité attendus', function () {
         $colonnes = fn (string $table) => collect(Schema::getIndexes($table))->map(fn ($i) => $i['columns'])->all();
 
-        expect($colonnes('services'))->toContain(['metier', 'nom'])
-            ->and($colonnes('prestations'))->toContain(['service_id', 'actif'])->toContain(['prestataire_id', 'service_id'])
+        expect($colonnes('prestations'))->toContain(['prestataire_id', 'nom'])->toContain(['domaine', 'actif'])
             ->and($colonnes('prestataires'))->toContain(['metier', 'quartier']);
     });
 });
 
-describe('ServiceSeeder', function () {
-    it('crée les 12 services de départ', function () {
-        $this->seed(ServiceSeeder::class);
+describe('migration d\'alignement', function () {
+    it('reprend le nom et le domaine depuis le service lié, puis supprime services', function () {
+        $prestataire = Prestataire::factory()->metier(Metier::Mecanique)->create();
 
-        expect(Service::count())->toBe(12)
-            ->and(Service::where('metier', Metier::Mecanique)->pluck('nom')->sort()->values()->all())
-            ->toBe(['Diagnostic', 'Freinage', 'Pneumatiques', 'Vidange'])
-            ->and(Service::where('metier', Metier::Coiffure)->pluck('nom')->sort()->values()->all())
-            ->toBe(['Coloration', 'Coupe femme', 'Coupe homme', 'Tresses'])
-            ->and(Service::where('metier', Metier::Pressing)->pluck('nom')->sort()->values()->all())
-            ->toBe(['Chemise', 'Couette', 'Nettoyage à sec', 'Repassage']);
+        // Retour à l'ancien schéma (M3.1), avec une prestation existante.
+        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+        expect(Schema::hasTable('services'))->toBeTrue()->and(Schema::hasColumn('prestations', 'service_id'))->toBeTrue();
+
+        DB::table('services')->insert(['id' => 'a0000000-0000-7000-8000-000000000001', 'metier' => 'mecanique', 'nom' => 'Vidange', 'created_at' => now(), 'updated_at' => now()]);
+        DB::table('prestations')->insert([
+            'id' => 'b0000000-0000-7000-8000-000000000001', 'prestataire_id' => $prestataire->id, 'service_id' => 'a0000000-0000-7000-8000-000000000001',
+            'tarif' => 15000, 'duree_minutes' => 60, 'description' => 'Huile moteur', 'actif' => false, 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $this->artisan('migrate')->assertSuccessful();
+
+        $prestation = Prestation::findOrFail('b0000000-0000-7000-8000-000000000001');
+        expect(Schema::hasTable('services'))->toBeFalse()
+            ->and($prestation)->nom->toBe('Vidange')->domaine->toBe(Metier::Mecanique)
+            ->prix->toBe('15000.00')->duree_minutes->toBe(60)->actif->toBeFalse()
+            ->and($prestation->prestataire_id)->toBe($prestataire->id);
     });
 
-    it('est idempotent : relancé, il ne crée aucun doublon ni ne change les identifiants', function () {
-        $this->seed(ServiceSeeder::class);
-        $ids = Service::orderBy('nom')->pluck('id')->all();
+    it('revient en arrière en recréant un service par couple domaine/nom', function () {
+        $prestataire = Prestataire::factory()->metier(Metier::Coiffure)->create();
+        $autre = Prestataire::factory()->metier(Metier::Coiffure)->create();
+        Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Tresses', 'prix' => 8000]);
+        Prestation::factory()->create(['prestataire_id' => $autre->id, 'nom' => 'Tresses', 'prix' => 9000]);
 
-        $this->seed(ServiceSeeder::class);
+        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+
+        expect(DB::table('services')->count())->toBe(1)
+            ->and(DB::table('services')->value('nom'))->toBe('Tresses')
+            ->and(DB::table('prestations')->count())->toBe(2)
+            ->and((float) DB::table('prestations')->orderBy('tarif')->value('tarif'))->toBe(8000.0);
+
+        $this->artisan('migrate')->assertSuccessful();
+        expect(Prestation::count())->toBe(2);
+    });
+});
+
+describe('DatabaseSeeder', function () {
+    it('ne crée aucune donnée factice et peut être relancé', function () {
+        $this->seed(DatabaseSeeder::class);
         $this->seed(DatabaseSeeder::class);
 
-        expect(Service::count())->toBe(12)->and(Service::orderBy('nom')->pluck('id')->all())->toBe($ids);
-    });
-
-    it('conserve les prestations existantes quand il est relancé', function () {
-        $this->seed(ServiceSeeder::class);
-        $prestation = Prestation::factory()->create(['service_id' => Service::where('nom', 'Vidange')->first()->id]);
-
-        $this->seed(ServiceSeeder::class);
-
-        expect(Prestation::find($prestation->id))->not->toBeNull();
-    });
-
-    it('est appelé par le seeder par défaut sans créer d\'utilisateur', function () {
-        $this->seed(DatabaseSeeder::class);
-
-        expect(Service::count())->toBe(12)->and(User::count())->toBe(0);
+        expect(User::count())->toBe(0)->and(Prestataire::count())->toBe(0)->and(Prestation::count())->toBe(0);
     });
 });
