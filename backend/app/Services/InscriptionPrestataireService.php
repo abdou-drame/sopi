@@ -72,6 +72,9 @@ class InscriptionPrestataireService
                         'type_document' => $piece['type_document'],
                         'chemin_fichier' => $this->enregistrerFichier($piece['fichier'], $dossier),
                         'date_soumission' => now(),
+                        'nom_original' => $this->nettoyerNom($piece['fichier']->getClientOriginalName()),
+                        'type_mime' => $piece['fichier']->getMimeType(),
+                        'taille' => $piece['fichier']->getSize(),
                     ]);
                     $justificatif->prestataire_id = $prestataire->id;
                     $justificatif->save();
@@ -90,6 +93,15 @@ class InscriptionPrestataireService
 
             throw $erreur;
         }
+    }
+
+    /** Nom d'origine conservé pour affichage seulement : sans chemin ni caractère de contrôle. */
+    private function nettoyerNom(string $nom): string
+    {
+        $nom = basename(str_replace('\\', '/', $nom));
+        $nom = preg_replace('#[\x00-\x1F\x7F"/\\\\]+#u', '', $nom);
+
+        return mb_substr(trim((string) $nom), 0, 150) ?: 'document';
     }
 
     /** Écrit le fichier sous un nom aléatoire (UUID + extension tirée du contenu) et renvoie son chemin. */

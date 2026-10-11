@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // Désactivé : aucune route /storage/... (même signée) ne doit exposer les justificatifs.
+            // Les fichiers ne sortent que par les routes d'administration authentifiées.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

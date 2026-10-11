@@ -1,23 +1,23 @@
-name: Profil
+name: "Administration — demandes d'inscription"
 description: |-
 
-  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/me
+    uri: api/v1/admin/prestataires/demandes
     metadata:
       custom: []
-      groupName: Profil
+      groupName: "Administration — demandes d'inscription"
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
       subgroup: ''
       subgroupDescription: ''
-      title: 'Voir mon profil'
-      description: ''
+      title: 'Liste des demandes des prestataires'
+      description: 'Paginée (20 par page). Par défaut les demandes `en_attente`, de la plus ancienne à la plus récente.'
       authenticated: true
       deprecated: false
     headers:
@@ -26,6 +26,107 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
+    queryParameters:
+      statut:
+        custom: []
+        name: statut
+        description: 'en_attente (défaut), actif, refuse ou tous.'
+        required: false
+        example: en_attente
+        type: string
+        enumValues:
+          - en_attente
+          - actif
+          - refuse
+          - tous
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      statut: en_attente
+      page: 1
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","statutCompte":"en_attente","dateSoumission":"2026-10-12T09:30:00+00:00","nombreJustificatifs":2}],"links":{"first":"https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1","last":"https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le statut doit être en_attente, actif, refuse ou tous.","errors":{"statut":["Le statut doit être en_attente, actif, refuse ou tous."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/prestataires/{id}'
+    metadata:
+      custom: []
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: |-
+
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Détail d'une demande"
+      description: 'Coordonnées du prestataire et liste de ses justificatifs (sans chemin de stockage).'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du prestataire.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -35,104 +136,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"en_attente","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"en_attente","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
         headers: []
         description: ''
       -
         custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Modifier mon profil'
-      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      nom:
-        custom: []
-        name: nom
-        description: Nom.
-        required: true
-        example: Diop
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      prenom:
-        custom: []
-        name: prenom
-        description: Prénom.
-        required: true
-        example: Awa
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      telephone:
-        custom: []
-        name: telephone
-        description: 'Mobile sénégalais, avec ou sans +221.'
-        required: true
-        example: '77 123 45 67'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: Diop
-      prenom: Awa
-      telephone: '77 123 45 67'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
+        status: 404
+        content: '{"message":"Demande introuvable."}'
         headers: []
         description: ''
     responseFields: []
@@ -146,151 +156,52 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me/mot-de-passe
+      - GET
+    uri: 'api/v1/admin/justificatifs/{id}/telecharger'
     metadata:
       custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Changer mon mot de passe'
-      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
+      title: 'Télécharger un justificatif'
+      description: 'Renvoie le fichier en flux depuis le stockage privé (affichage direct pour les PDF et images).'
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du justificatif.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000010
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000010
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      mot_de_passe_actuel:
-        custom: []
-        name: mot_de_passe_actuel
-        description: 'Mot de passe actuel.'
-        required: true
-        example: ancienmotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      nouveau_mot_de_passe:
-        custom: []
-        name: nouveau_mot_de_passe
-        description: '8 caractères minimum.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      confirmation:
-        custom: []
-        name: confirmation
-        description: 'Identique au nouveau mot de passe.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      mot_de_passe_actuel: ancienmotdepasse
-      nouveau_mot_de_passe: nouveaumotdepasse
-      confirmation: nouveaumotdepasse
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Votre mot de passe a été modifié."}'
+        content: 'Contenu binaire du fichier (Content-Type: application/pdf, image/jpeg ou image/png)'
         headers: []
-        description: ''
+        description: Fichier
       -
         custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/jeton-push
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Enregistrer mon jeton push'
-      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      jetonPush:
-        custom: []
-        name: jetonPush
-        description: 'Jeton FCM.'
-        required: true
-        example: fcm-jeton-exemple
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      jetonPush: fcm-jeton-exemple
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Jeton de notification enregistré."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
+        status: 404
+        content: '{"message":"Justificatif introuvable."}'
         headers: []
         description: ''
     responseFields: []

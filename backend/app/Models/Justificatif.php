@@ -24,6 +24,9 @@ class Justificatif extends Model
         'type_document',
         'chemin_fichier',
         'date_soumission',
+        'nom_original',
+        'type_mime',
+        'taille',
     ];
 
     protected $attributes = [

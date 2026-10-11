@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\RoleAdministrateur;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // API seule : pas de page de connexion vers laquelle rediriger (401 JSON).
         $middleware->redirectGuestsTo(fn () => null);
+
+        // Routes réservées aux administrateurs : ->middleware(['auth:sanctum', 'admin']).
+        $middleware->alias(['admin' => RoleAdministrateur::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // L'API ne répond qu'en JSON, y compris sans en-tête Accept: application/json.
