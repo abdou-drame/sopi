@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
@@ -26,6 +27,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/prestataires/{id}/refuser', [DecisionDemandeController::class, 'refuser'])->whereUuid('id');
         Route::get('/justificatifs/{id}/telecharger', [JustificatifController::class, 'telecharger'])->whereUuid('id');
     });
+
+    // Espace client : jeton Sanctum + rôle client.
+    Route::get('/prestataires', RecherchePrestatairesController::class)->middleware(['auth:sanctum', 'role:client']);
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
     Route::middleware(['auth:sanctum', 'prestataire'])->prefix('prestataire')->group(function () {

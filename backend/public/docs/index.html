@@ -88,6 +88,16 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-client-recherche-de-prestataires" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="client-recherche-de-prestataires">
+                    <a href="#client-recherche-de-prestataires">Client — recherche de prestataires</a>
+                </li>
+                                    <ul id="tocify-subheader-client-recherche-de-prestataires" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="client-recherche-de-prestataires-GETapi-v1-prestataires">
+                                <a href="#client-recherche-de-prestataires-GETapi-v1-prestataires">Rechercher des prestataires</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="endpoints">
                     <a href="#endpoints">Endpoints</a>
@@ -1162,6 +1172,302 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
+                <h1 id="client-recherche-de-prestataires">Client — recherche de prestataires</h1>
+
+    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>).</p>
+
+                                <h2 id="client-recherche-de-prestataires-GETapi-v1-prestataires">Rechercher des prestataires</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Paginée (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.
+Tous les filtres sont optionnels et combinables. Aucune donnée personnelle n'est renvoyée, et pas de note (les avis n'existent pas encore).
+La recherche ignore la casse mais pas les accents. <code>prixMin</code> et <code>nombrePrestations</code> portent sur toutes les prestations actives du prestataire.</p>
+
+<span id="example-requests-GETapi-v1-prestataires">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataires?metier=mecanique&amp;quartier=Malika&amp;q=vidange&amp;prix_min=5000&amp;prix_max=20000&amp;tri=prix_asc&amp;page=1" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataires"
+);
+
+const params = {
+    "metier": "mecanique",
+    "quartier": "Malika",
+    "q": "vidange",
+    "prix_min": "5000",
+    "prix_max": "20000",
+    "tri": "prix_asc",
+    "page": "1",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataires">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000002&quot;,
+            &quot;nomEntreprise&quot;: &quot;Garage Moussa&quot;,
+            &quot;metier&quot;: &quot;mecanique&quot;,
+            &quot;quartier&quot;: &quot;Malika&quot;,
+            &quot;adresse&quot;: &quot;Rue 10, pr&egrave;s du march&eacute;&quot;,
+            &quot;prixMin&quot;: 5000,
+            &quot;nombrePrestations&quot;: 3
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/prestataires?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/prestataires?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le prix maximum doit &ecirc;tre sup&eacute;rieur ou &eacute;gal au prix minimum.&quot;,
+    &quot;errors&quot;: {
+        &quot;prix_max&quot;: [
+            &quot;Le prix maximum doit &ecirc;tre sup&eacute;rieur ou &eacute;gal au prix minimum.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataires" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataires"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataires"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataires" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataires">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataires" data-method="GET"
+      data-path="api/v1/prestataires"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataires', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataires"
+                    onclick="tryItOut('GETapi-v1-prestataires');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataires"
+                    onclick="cancelTryOut('GETapi-v1-prestataires');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataires"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataires</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataires"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataires"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataires"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>metier</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="metier"                data-endpoint="GETapi-v1-prestataires"
+               value="mecanique"
+               data-component="query">
+    <br>
+<p>Métier : mecanique, coiffure ou pressing. Example: <code>mecanique</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>mecanique</code></li> <li><code>coiffure</code></li> <li><code>pressing</code></li></ul>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>quartier</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quartier"                data-endpoint="GETapi-v1-prestataires"
+               value="Malika"
+               data-component="query">
+    <br>
+<p>Quartier (égalité exacte, sans tenir compte de la casse ni des espaces superflus). Le champ value ne doit pas dépasser 100 caractères. Example: <code>Malika</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>q</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="q"                data-endpoint="GETapi-v1-prestataires"
+               value="vidange"
+               data-component="query">
+    <br>
+<p>Texte contenu dans le nom de l'entreprise ou dans le nom d'une prestation active (sans tenir compte de la casse ; les accents comptent). Le champ value ne doit pas dépasser 100 caractères. Example: <code>vidange</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>prix_min</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="prix_min"                data-endpoint="GETapi-v1-prestataires"
+               value="5000"
+               data-component="query">
+    <br>
+<p>Le prestataire a une prestation active à ce prix ou plus (FCFA). Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 9999999999.99. Example: <code>5000</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>prix_max</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="prix_max"                data-endpoint="GETapi-v1-prestataires"
+               value="20000"
+               data-component="query">
+    <br>
+<p>Le prestataire a une prestation active à ce prix ou moins (FCFA), et ≥ prix_min. Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 9999999999.99. Example: <code>20000</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>tri</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="tri"                data-endpoint="GETapi-v1-prestataires"
+               value="prix_asc"
+               data-component="query">
+    <br>
+<p>nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives). Example: <code>prix_asc</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>nom</code></li> <li><code>prix_asc</code></li> <li><code>prix_desc</code></li></ul>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>page</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="page"                data-endpoint="GETapi-v1-prestataires"
+               value="1"
+               data-component="query">
+    <br>
+<p>Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1. Example: <code>1</code></p>
+            </div>
+                </form>
+
                 <h1 id="endpoints">Endpoints</h1>
 
     
@@ -1220,7 +1526,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-11T17:29:22+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-11T23:43:29+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -1902,7 +2208,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php6781.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpE983.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2203,7 +2509,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php6781.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpE983.tmp</code></p>
                     </div>
                                     </details>
         </div>
