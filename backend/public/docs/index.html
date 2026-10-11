@@ -88,6 +88,16 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-prestataires" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="prestataires">
+                    <a href="#prestataires">Prestataires</a>
+                </li>
+                                    <ul id="tocify-subheader-prestataires" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="prestataires-POSTapi-v1-prestataires-inscription">
+                                <a href="#prestataires-POSTapi-v1-prestataires-inscription">Inscription d'un prestataire</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-profil" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="profil">
                     <a href="#profil">Profil</a>
@@ -196,7 +206,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-11T12:57:53+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-11T13:57:58+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -844,6 +854,346 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>application/json</code></p>
             </div>
                         </form>
+
+                <h1 id="prestataires">Prestataires</h1>
+
+    
+
+                                <h2 id="prestataires-POSTapi-v1-prestataires-inscription">Inscription d&#039;un prestataire</h2>
+
+<p>
+</p>
+
+<p>Envoi en <code>multipart/form-data</code>. Crée le compte (statut <code>en_attente</code>, il ne peut pas se connecter avant validation
+par un administrateur), le profil et les justificatifs. Le dossier doit contenir au moins une CNI et un diplôme
+ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à 10 requêtes par heure et par adresse IP.</p>
+<p>Le <code>jeton_suivi</code> n'est renvoyé qu'une seule fois : seul son hachage est conservé. Les chemins des fichiers ne sont jamais renvoyés.</p>
+
+<span id="example-requests-POSTapi-v1-prestataires-inscription">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/prestataires/inscription" \
+    --header "Content-Type: multipart/form-data" \
+    --header "Accept: application/json" \
+    --form "nom=Diop"\
+    --form "prenom=Moussa"\
+    --form "telephone=77 123 45 67"\
+    --form "email=moussa@example.com"\
+    --form "mot_de_passe=mot-de-passe-exemple"\
+    --form "nom_entreprise=Garage Moussa"\
+    --form "metier=mecanique"\
+    --form "quartier=Malika"\
+    --form "adresse=Rue 10, près du marché"\
+    --form "justificatifs[][type_document]=cni"\
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpDDBB.tmp" </code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataires/inscription"
+);
+
+const headers = {
+    "Content-Type": "multipart/form-data",
+    "Accept": "application/json",
+};
+
+const body = new FormData();
+body.append('nom', 'Diop');
+body.append('prenom', 'Moussa');
+body.append('telephone', '77 123 45 67');
+body.append('email', 'moussa@example.com');
+body.append('mot_de_passe', 'mot-de-passe-exemple');
+body.append('nom_entreprise', 'Garage Moussa');
+body.append('metier', 'mecanique');
+body.append('quartier', 'Malika');
+body.append('adresse', 'Rue 10, près du marché');
+body.append('justificatifs[][type_document]', 'cni');
+body.append('justificatifs[][fichier]', document.querySelector('input[name="justificatifs[][fichier]"]').files[0]);
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-prestataires-inscription">
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000002&quot;,
+    &quot;nom&quot;: &quot;Diop&quot;,
+    &quot;prenom&quot;: &quot;Moussa&quot;,
+    &quot;nomEntreprise&quot;: &quot;Garage Moussa&quot;,
+    &quot;metier&quot;: &quot;mecanique&quot;,
+    &quot;statutCompte&quot;: &quot;en_attente&quot;,
+    &quot;jeton_suivi&quot;: &quot;jeton-de-suivi-exemple-0123456789-abcdefghijklmnop&quot;,
+    &quot;lien_suivi&quot;: &quot;https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop&quot;,
+    &quot;justificatifs&quot;: [
+        {
+            &quot;type&quot;: &quot;cni&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;
+        },
+        {
+            &quot;type&quot;: &quot;diplome&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le dossier doit contenir une copie de votre CNI.&quot;,
+    &quot;errors&quot;: {
+        &quot;justificatifs&quot;: [
+            &quot;Le dossier doit contenir une copie de votre CNI.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-prestataires-inscription" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-prestataires-inscription"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-prestataires-inscription"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-prestataires-inscription" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-prestataires-inscription">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-prestataires-inscription" data-method="POST"
+      data-path="api/v1/prestataires/inscription"
+      data-authed="0"
+      data-hasfiles="1"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-prestataires-inscription', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-prestataires-inscription"
+                    onclick="tryItOut('POSTapi-v1-prestataires-inscription');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-prestataires-inscription"
+                    onclick="cancelTryOut('POSTapi-v1-prestataires-inscription');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-prestataires-inscription"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/prestataires/inscription</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="multipart/form-data"
+               data-component="header">
+    <br>
+<p>Example: <code>multipart/form-data</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nom</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="nom"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="Diop"
+               data-component="body">
+    <br>
+<p>Nom. Le champ value ne doit pas dépasser 100 caractères. Example: <code>Diop</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>prenom</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="prenom"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="Moussa"
+               data-component="body">
+    <br>
+<p>Prénom. Le champ value ne doit pas dépasser 100 caractères. Example: <code>Moussa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>telephone</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="telephone"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="77 123 45 67"
+               data-component="body">
+    <br>
+<p>Mobile sénégalais (avec ou sans +221), unique. Must match the regex /^+2217[05678]\d{7}$/. Example: <code>77 123 45 67</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="moussa@example.com"
+               data-component="body">
+    <br>
+<p>Adresse e-mail, unique. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères. Example: <code>moussa@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>mot_de_passe</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="mot_de_passe"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="mot-de-passe-exemple"
+               data-component="body">
+    <br>
+<p>8 caractères minimum. Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères. Example: <code>mot-de-passe-exemple</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nom_entreprise</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="nom_entreprise"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="Garage Moussa"
+               data-component="body">
+    <br>
+<p>Nom de l'entreprise ou de l'atelier. Le champ value ne doit pas dépasser 150 caractères. Example: <code>Garage Moussa</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>metier</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="metier"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="mecanique"
+               data-component="body">
+    <br>
+<p>mecanique, coiffure ou pressing. Example: <code>mecanique</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>mecanique</code></li> <li><code>coiffure</code></li> <li><code>pressing</code></li></ul>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>quartier</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="quartier"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="Malika"
+               data-component="body">
+    <br>
+<p>Quartier de Keur Massar. Le champ value ne doit pas dépasser 100 caractères. Example: <code>Malika</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>adresse</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="adresse"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="Rue 10, près du marché"
+               data-component="body">
+    <br>
+<p>Adresse. Le champ value ne doit pas dépasser 255 caractères. Example: <code>Rue 10, près du marché</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>justificatifs</code></b>&nbsp;&nbsp;
+<small>object[]</small>&nbsp;
+ &nbsp;
+ &nbsp;
+<br>
+<p>De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation. Le champ value doit contenir au moins 2 éléments. Le champ value ne doit pas contenir plus de 5 éléments.</p>
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>type_document</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="justificatifs.0.type_document"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value="cni"
+               data-component="body">
+    <br>
+<p>cni, diplome ou attestation. Example: <code>cni</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>cni</code></li> <li><code>diplome</code></li> <li><code>attestation</code></li></ul>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>fichier</code></b>&nbsp;&nbsp;
+<small>file</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="file" style="display: none"
+                              name="justificatifs.0.fichier"                data-endpoint="POSTapi-v1-prestataires-inscription"
+               value=""
+               data-component="body">
+    <br>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpDDBB.tmp</code></p>
+                    </div>
+                                    </details>
+        </div>
+        </form>
 
                 <h1 id="profil">Profil</h1>
 

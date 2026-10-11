@@ -11,6 +11,9 @@ tags:
     name: Endpoints
     description: ''
   -
+    name: Prestataires
+    description: ''
+  -
     name: Profil
     description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
 components:
@@ -41,7 +44,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T12:57:53+00:00'
+                  time: '2026-10-11T13:57:58+00:00'
                 properties:
                   status:
                     type: string
@@ -57,7 +60,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T12:57:53+00:00'
+                    example: '2026-10-11T13:57:58+00:00'
       tags:
         - Endpoints
       security: []
@@ -163,6 +166,198 @@ paths:
                     example: 'Authentification requise.'
       tags:
         - Endpoints
+      security: []
+  /api/v1/prestataires/inscription:
+    post:
+      summary: "Inscription d'un prestataire"
+      operationId: inscriptionDunPrestataire
+      description: "Envoi en `multipart/form-data`. Crée le compte (statut `en_attente`, il ne peut pas se connecter avant validation\npar un administrateur), le profil et les justificatifs. Le dossier doit contenir au moins une CNI et un diplôme\nou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à 10 requêtes par heure et par adresse IP.\n\nLe `jeton_suivi` n'est renvoyé qu'une seule fois : seul son hachage est conservé. Les chemins des fichiers ne sont jamais renvoyés."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000002
+                  nom: Diop
+                  prenom: Moussa
+                  nomEntreprise: 'Garage Moussa'
+                  metier: mecanique
+                  statutCompte: en_attente
+                  jeton_suivi: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+                  lien_suivi: 'https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
+                  justificatifs:
+                    -
+                      type: cni
+                      statut: en_attente
+                    -
+                      type: diplome
+                      statut: en_attente
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  nom:
+                    type: string
+                    example: Diop
+                  prenom:
+                    type: string
+                    example: Moussa
+                  nomEntreprise:
+                    type: string
+                    example: 'Garage Moussa'
+                  metier:
+                    type: string
+                    example: mecanique
+                  statutCompte:
+                    type: string
+                    example: en_attente
+                  jeton_suivi:
+                    type: string
+                    example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+                  lien_suivi:
+                    type: string
+                    example: 'https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
+                  justificatifs:
+                    type: array
+                    example:
+                      -
+                        type: cni
+                        statut: en_attente
+                      -
+                        type: diplome
+                        statut: en_attente
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: cni
+                        statut:
+                          type: string
+                          example: en_attente
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le dossier doit contenir une copie de votre CNI.'
+                  errors:
+                    justificatifs:
+                      - 'Le dossier doit contenir une copie de votre CNI.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le dossier doit contenir une copie de votre CNI.'
+                  errors:
+                    type: object
+                    properties:
+                      justificatifs:
+                        type: array
+                        example:
+                          - 'Le dossier doit contenir une copie de votre CNI.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Prestataires
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  description: 'Nom. Le champ value ne doit pas dépasser 100 caractères.'
+                  example: Diop
+                prenom:
+                  type: string
+                  description: 'Prénom. Le champ value ne doit pas dépasser 100 caractères.'
+                  example: Moussa
+                telephone:
+                  type: string
+                  description: 'Mobile sénégalais (avec ou sans +221), unique. Must match the regex /^\+2217[05678]\d{7}$/.'
+                  example: '77 123 45 67'
+                email:
+                  type: string
+                  description: 'Adresse e-mail, unique. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: moussa@example.com
+                mot_de_passe:
+                  type: string
+                  description: '8 caractères minimum. Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: mot-de-passe-exemple
+                nom_entreprise:
+                  type: string
+                  description: "Nom de l'entreprise ou de l'atelier. Le champ value ne doit pas dépasser 150 caractères."
+                  example: 'Garage Moussa'
+                metier:
+                  type: string
+                  description: 'mecanique, coiffure ou pressing.'
+                  example: mecanique
+                  enum:
+                    - mecanique
+                    - coiffure
+                    - pressing
+                quartier:
+                  type: string
+                  description: 'Quartier de Keur Massar. Le champ value ne doit pas dépasser 100 caractères.'
+                  example: Malika
+                adresse:
+                  type: string
+                  description: 'Adresse. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: 'Rue 10, près du marché'
+                justificatifs:
+                  type: array
+                  description: 'De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation. Le champ value doit contenir au moins 2 éléments. Le champ value ne doit pas contenir plus de 5 éléments.'
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      type_document:
+                        type: string
+                        description: 'cni, diplome ou attestation.'
+                        example: cni
+                        enum:
+                          - cni
+                          - diplome
+                          - attestation
+                      fichier:
+                        type: string
+                        format: binary
+                        description: 'PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
+                    required:
+                      - type_document
+                      - fichier
+              required:
+                - nom
+                - prenom
+                - telephone
+                - email
+                - mot_de_passe
+                - nom_entreprise
+                - metier
+                - quartier
+                - adresse
+                - justificatifs
       security: []
   /api/v1/me:
     get:

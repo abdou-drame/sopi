@@ -37,6 +37,14 @@ La configuration de build et de démarrage est dans `backend/nixpacks.toml` :
 - build : `composer install --no-dev`, création des dossiers `storage` et `bootstrap/cache`, droits d'écriture ;
 - démarrage : `php artisan migrate --force`, `config:cache`, `route:cache`, puis nginx + php-fpm.
 
+### Dépôt des justificatifs (limites d'envoi et stockage)
+
+L'inscription d'un prestataire envoie jusqu'à 5 fichiers de 5 Mo. Les limites par défaut (nginx 1 Mo, PHP 2 Mo par fichier / 8 Mo par requête) les refuseraient ; `backend/nixpacks.toml` les relève au démarrage :
+- nginx : `client_max_body_size 30m;` ajouté à chaque bloc `server {` de `/etc/nginx.conf` ;
+- PHP-FPM : `upload_max_filesize=6M` et `post_max_size=30M`.
+
+Les fichiers sont écrits sur le disque **privé** de Laravel (`storage/app/private/justificatifs/{prestataire_id}/`), jamais exposé publiquement. Ce dossier est dans le conteneur : **il est perdu à chaque redéploiement** tant qu'aucun volume n'est monté. Dans Dokploy : service backend → Advanced → Volumes → ajouter un volume (type « Volume mount ») monté sur `/app/storage/app/private`.
+
 ### Variables d'environnement
 
 Coller le contenu de `.secrets/backend.env` dans l'onglet « Environment » du service. Rôle de chaque variable :
