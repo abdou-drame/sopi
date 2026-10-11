@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Metier;
+use Database\Factories\PrestataireFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Prestataire extends Model
 {
-    /** @use HasFactory<\Database\Factories\PrestataireFactory> */
+    /** @use HasFactory<PrestataireFactory> */
     use HasFactory, HasUuids;
 
     protected $table = 'prestataires';
@@ -56,5 +57,10 @@ class Prestataire extends Model
     public function justificatifs(): HasMany
     {
         return $this->hasMany(Justificatif::class);
+    }
+
+    public function prestations(): HasMany
+    {
+        return $this->hasMany(Prestation::class);
     }
 }
