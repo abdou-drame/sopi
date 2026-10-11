@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Middleware\RoleAdministrateur;
+use App\Http\Middleware\RoleRequis;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -23,8 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // API seule : pas de page de connexion vers laquelle rediriger (401 JSON).
         $middleware->redirectGuestsTo(fn () => null);
 
-        // Routes réservées aux administrateurs : ->middleware(['auth:sanctum', 'admin']).
-        $middleware->alias(['admin' => RoleAdministrateur::class]);
+        // Routes réservées à un rôle : ->middleware(['auth:sanctum', 'admin']) ou ['auth:sanctum', 'prestataire'].
+        // Un seul mécanisme (RoleRequis) ; 'role:client,prestataire' combine plusieurs rôles.
+        $middleware->alias([
+            'role' => RoleRequis::class,
+            'admin' => RoleRequis::class.':administrateur',
+            'prestataire' => RoleRequis::class.':prestataire',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // L'API ne répond qu'en JSON, y compris sans en-tête Accept: application/json.

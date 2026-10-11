@@ -17,6 +17,9 @@ tags:
     name: Prestataires
     description: ''
   -
+    name: 'Prestataire — catalogue de prestations'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est\ntoujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive."
+  -
     name: Profil
     description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
 components:
@@ -710,7 +713,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T16:03:50+00:00'
+                  time: '2026-10-11T17:29:22+00:00'
                 properties:
                   status:
                     type: string
@@ -726,7 +729,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T16:03:50+00:00'
+                    example: '2026-10-11T17:29:22+00:00'
       tags:
         - Endpoints
       security: []
@@ -1119,6 +1122,330 @@ paths:
         name: jeton
         description: "Jeton de suivi reçu à l'inscription."
         example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+        required: true
+        schema:
+          type: string
+  /api/v1/prestataire/prestations:
+    get:
+      summary: 'Mes prestations'
+      operationId: mesPrestations
+      description: "Toutes les prestations du prestataire connecté, actives et inactives, les plus récentes d'abord (sans pagination)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000020
+                      nom: 'Vidange complète'
+                      domaine: mecanique
+                      dureeMinutes: 60
+                      prix: 15000
+                      actif: true
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000020
+                        nom: 'Vidange complète'
+                        domaine: mecanique
+                        dureeMinutes: 60
+                        prix: 15000
+                        actif: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000020
+                        nom:
+                          type: string
+                          example: 'Vidange complète'
+                        domaine:
+                          type: string
+                          example: mecanique
+                        dureeMinutes:
+                          type: integer
+                          example: 60
+                        prix:
+                          type: integer
+                          example: 15000
+                        actif:
+                          type: boolean
+                          example: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — catalogue de prestations'
+    post:
+      summary: 'Ajouter une prestation'
+      operationId: ajouterUnePrestation
+      description: "Le domaine est déduit du métier du prestataire (tout champ `domaine` envoyé est ignoré).\nLe nom doit être unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000020
+                  nom: 'Vidange complète'
+                  domaine: mecanique
+                  dureeMinutes: 60
+                  prix: 15000
+                  actif: true
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000020
+                  nom:
+                    type: string
+                    example: 'Vidange complète'
+                  domaine:
+                    type: string
+                    example: mecanique
+                  dureeMinutes:
+                    type: integer
+                    example: 60
+                  prix:
+                    type: integer
+                    example: 15000
+                  actif:
+                    type: boolean
+                    example: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Vous proposez déjà une prestation avec ce nom.'
+                  errors:
+                    nom:
+                      - 'Vous proposez déjà une prestation avec ce nom.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Vous proposez déjà une prestation avec ce nom.'
+                  errors:
+                    type: object
+                    properties:
+                      nom:
+                        type: array
+                        example:
+                          - 'Vous proposez déjà une prestation avec ce nom.'
+                        items:
+                          type: string
+      tags:
+        - 'Prestataire — catalogue de prestations'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  description: 'Nom de la prestation (2 à 100 caractères, unique chez le prestataire sans tenir compte de la casse). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
+                  example: 'Vidange complète'
+                duree_minutes:
+                  type: integer
+                  description: 'Durée estimée en minutes (1 à 1440). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+                  example: 60
+                prix:
+                  type: number
+                  description: 'Prix en FCFA (XOF), supérieur à 0, 2 décimales au plus. Le champ value ne doit pas dépasser 9999999999.99.'
+                  example: 15000.0
+              required:
+                - nom
+                - duree_minutes
+                - prix
+  '/api/v1/prestataire/prestations/{id}':
+    patch:
+      summary: 'Modifier une prestation'
+      operationId: modifierUnePrestation
+      description: "Modification partielle : nom, durée, prix et/ou `actif` (`false` désactive, `true` réactive). Au moins un champ est requis.\nLa prestation d'un autre prestataire répond 404, comme une prestation inexistante."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000020
+                  nom: 'Vidange complète'
+                  domaine: mecanique
+                  dureeMinutes: 75
+                  prix: 17500
+                  actif: false
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000020
+                  nom:
+                    type: string
+                    example: 'Vidange complète'
+                  domaine:
+                    type: string
+                    example: mecanique
+                  dureeMinutes:
+                    type: integer
+                    example: 75
+                  prix:
+                    type: integer
+                    example: 17500
+                  actif:
+                    type: boolean
+                    example: false
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Prestation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Prestation introuvable.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le prix doit être supérieur à 0.'
+                  errors:
+                    prix:
+                      - 'Le prix doit être supérieur à 0.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le prix doit être supérieur à 0.'
+                  errors:
+                    type: object
+                    properties:
+                      prix:
+                        type: array
+                        example:
+                          - 'Le prix doit être supérieur à 0.'
+                        items:
+                          type: string
+      tags:
+        - 'Prestataire — catalogue de prestations'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  description: 'Nouveau nom (2 à 100 caractères). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
+                  example: 'Vidange + filtre'
+                duree_minutes:
+                  type: integer
+                  description: 'Nouvelle durée en minutes. Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+                  example: 75
+                prix:
+                  type: number
+                  description: 'Nouveau prix en FCFA, supérieur à 0. Le champ value ne doit pas dépasser 9999999999.99.'
+                  example: 17500.0
+                actif:
+                  type: boolean
+                  description: "false pour désactiver la prestation (elle n'est jamais supprimée), true pour la réactiver."
+                  example: false
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la prestation.'
+        example: 0198a1b2-0000-7000-8000-000000000020
         required: true
         schema:
           type: string

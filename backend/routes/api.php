@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
+use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/prestataires/{id}/accepter', [DecisionDemandeController::class, 'accepter'])->whereUuid('id');
         Route::post('/prestataires/{id}/refuser', [DecisionDemandeController::class, 'refuser'])->whereUuid('id');
         Route::get('/justificatifs/{id}/telecharger', [JustificatifController::class, 'telecharger'])->whereUuid('id');
+    });
+
+    // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
+    Route::middleware(['auth:sanctum', 'prestataire'])->prefix('prestataire')->group(function () {
+        Route::get('/prestations', [PrestationController::class, 'index']);
+        Route::post('/prestations', [PrestationController::class, 'store']);
+        Route::patch('/prestations/{id}', [PrestationController::class, 'update'])->whereUuid('id');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

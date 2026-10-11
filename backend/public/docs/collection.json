@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "7d3a585b-7902-4b04-8ac9-33afe3b5f996",
+        "_postman_id": "7b58c7d1-f9e9-41a2-a090-9a70e17578b9",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -336,7 +336,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T16:03:50+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T17:29:22+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -652,6 +652,176 @@
                             "header": [],
                             "code": 429,
                             "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 catalogue de prestations",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Le domaine d'une prestation est\ntoujours le m\u00e9tier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se d\u00e9sactive.",
+            "item": [
+                {
+                    "name": "Mes prestations",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/prestations",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/prestations"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Toutes les prestations du prestataire connect\u00e9, actives et inactives, les plus r\u00e9centes d'abord (sans pagination)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":60,\"prix\":15000,\"actif\":true}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Ajouter une prestation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/prestations",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/prestations"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nom\":\"Vidange compl\u00e8te\",\"duree_minutes\":60,\"prix\":15000}"
+                        },
+                        "description": "Le domaine est d\u00e9duit du m\u00e9tier du prestataire (tout champ `domaine` envoy\u00e9 est ignor\u00e9).\nLe nom doit \u00eatre unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":60,\"prix\":15000,\"actif\":true}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Vous proposez d\u00e9j\u00e0 une prestation avec ce nom.\",\"errors\":{\"nom\":[\"Vous proposez d\u00e9j\u00e0 une prestation avec ce nom.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Modifier une prestation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/prestations\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/prestations\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000020",
+                                    "description": "Identifiant de la prestation."
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"nom\":\"Vidange + filtre\",\"duree_minutes\":75,\"prix\":17500,\"actif\":false}"
+                        },
+                        "description": "Modification partielle : nom, dur\u00e9e, prix et\/ou `actif` (`false` d\u00e9sactive, `true` r\u00e9active). Au moins un champ est requis.\nLa prestation d'un autre prestataire r\u00e9pond 404, comme une prestation inexistante."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":75,\"prix\":17500,\"actif\":false}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Prestation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\",\"errors\":{\"prix\":[\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\"]}}",
                             "name": ""
                         }
                     ]
