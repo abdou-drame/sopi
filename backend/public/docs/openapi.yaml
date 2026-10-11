@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: 'Sopi API'
+  description: 'API REST de Sopi (réservation de services de proximité à Keur Massar). Préfixe /api/v1, JSON uniquement, erreurs en français : { "message": "...", "errors": { "champ": ["..."] } }.'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost:8000'
+tags:
+  -
+    name: Endpoints
+    description: ''
+  -
+    name: Profil
+    description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
+components:
+  securitySchemes:
+    default:
+      type: http
+      scheme: bearer
+      description: 'Le jeton est renvoyé par <code>POST /api/v1/auth/connexion</code> ou <code>/auth/inscription</code>.'
+security:
+  -
+    default: []
+paths:
+  /api/v1/health:
+    get:
+      summary: ''
+      operationId: getApiV1Health
+      description: ''
+      parameters: []
+      responses:
+        503:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  status: ok
+                  app: Sopi
+                  version: 0.1.0
+                  database: erreur
+                  time: '2026-10-11T12:54:11+00:00'
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  app:
+                    type: string
+                    example: Sopi
+                  version:
+                    type: string
+                    example: 0.1.0
+                  database:
+                    type: string
+                    example: erreur
+                  time:
+                    type: string
+                    example: '2026-10-11T12:54:11+00:00'
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/auth/inscription:
+    post:
+      summary: ''
+      operationId: postApiV1AuthInscription
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  description: 'Le champ value ne doit pas dépasser 100 caractères.'
+                  example: vmqeopfuudtdsufvyvddq
+                prenom:
+                  type: string
+                  description: 'Le champ value ne doit pas dépasser 100 caractères.'
+                  example: amniihfqcoynlazghdtqt
+                telephone:
+                  type: string
+                  description: 'Must match the regex /^\+2217[05678]\d{7}$/.'
+                  example: '+221705627717'
+                email:
+                  type: string
+                  description: 'Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: reichel.charity@example.net
+                  nullable: true
+                password:
+                  type: string
+                  description: 'Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: 'o,+]"OP>@;4[*UyPJ"}6'
+              required:
+                - nom
+                - prenom
+                - telephone
+                - password
+      security: []
+  /api/v1/auth/connexion:
+    post:
+      summary: ''
+      operationId: postApiV1AuthConnexion
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                telephone:
+                  type: string
+                  description: 'Le champ value ne doit pas dépasser 30 caractères.'
+                  example: vmqeopfuudtdsufvyvddq
+                password:
+                  type: string
+                  description: 'Le champ value ne doit pas dépasser 255 caractères.'
+                  example: OP>@;4
+              required:
+                - telephone
+                - password
+      security: []
+  /api/v1/auth/deconnexion:
+    post:
+      summary: ''
+      operationId: postApiV1AuthDeconnexion
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/auth/moi:
+    get:
+      summary: ''
+      operationId: getApiV1AuthMoi
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+      tags:
+        - Endpoints
+      security: []
+  /api/v1/me:
+    get:
+      summary: 'Voir mon profil'
+      operationId: voirMonProfil
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000001
+                  nom: Diop
+                  prenom: Awa
+                  email: awa@example.com
+                  telephone: '+221771234567'
+                  role: client
+                  statutCompte: actif
+                  dateCreation: '2026-10-11T09:30:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  nom:
+                    type: string
+                    example: Diop
+                  prenom:
+                    type: string
+                    example: Awa
+                  email:
+                    type: string
+                    example: awa@example.com
+                  telephone:
+                    type: string
+                    example: '+221771234567'
+                  role:
+                    type: string
+                    example: client
+                  statutCompte:
+                    type: string
+                    example: actif
+                  dateCreation:
+                    type: string
+                    example: '2026-10-11T09:30:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+      tags:
+        - Profil
+    put:
+      summary: 'Modifier mon profil'
+      operationId: modifierMonProfil
+      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000001
+                  nom: Diop
+                  prenom: Awa
+                  email: awa@example.com
+                  telephone: '+221771234567'
+                  role: client
+                  statutCompte: actif
+                  dateCreation: '2026-10-11T09:30:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  nom:
+                    type: string
+                    example: Diop
+                  prenom:
+                    type: string
+                    example: Awa
+                  email:
+                    type: string
+                    example: awa@example.com
+                  telephone:
+                    type: string
+                    example: '+221771234567'
+                  role:
+                    type: string
+                    example: client
+                  statutCompte:
+                    type: string
+                    example: actif
+                  dateCreation:
+                    type: string
+                    example: '2026-10-11T09:30:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Ce numéro de téléphone est déjà utilisé.'
+                  errors:
+                    telephone:
+                      - 'Ce numéro de téléphone est déjà utilisé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Ce numéro de téléphone est déjà utilisé.'
+                  errors:
+                    type: object
+                    properties:
+                      telephone:
+                        type: array
+                        example:
+                          - 'Ce numéro de téléphone est déjà utilisé.'
+                        items:
+                          type: string
+      tags:
+        - Profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nom:
+                  type: string
+                  description: Nom.
+                  example: Diop
+                prenom:
+                  type: string
+                  description: Prénom.
+                  example: Awa
+                telephone:
+                  type: string
+                  description: 'Mobile sénégalais, avec ou sans +221.'
+                  example: '77 123 45 67'
+              required:
+                - nom
+                - prenom
+                - telephone
+  /api/v1/me/mot-de-passe:
+    put:
+      summary: 'Changer mon mot de passe'
+      operationId: changerMonMotDePasse
+      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Votre mot de passe a été modifié.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Votre mot de passe a été modifié.'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le mot de passe actuel est incorrect.'
+                  errors:
+                    mot_de_passe_actuel:
+                      - 'Le mot de passe actuel est incorrect.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le mot de passe actuel est incorrect.'
+                  errors:
+                    type: object
+                    properties:
+                      mot_de_passe_actuel:
+                        type: array
+                        example:
+                          - 'Le mot de passe actuel est incorrect.'
+                        items:
+                          type: string
+      tags:
+        - Profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mot_de_passe_actuel:
+                  type: string
+                  description: 'Mot de passe actuel.'
+                  example: ancienmotdepasse
+                nouveau_mot_de_passe:
+                  type: string
+                  description: '8 caractères minimum.'
+                  example: nouveaumotdepasse
+                confirmation:
+                  type: string
+                  description: 'Identique au nouveau mot de passe.'
+                  example: nouveaumotdepasse
+              required:
+                - mot_de_passe_actuel
+                - nouveau_mot_de_passe
+                - confirmation
+  /api/v1/me/jeton-push:
+    put:
+      summary: 'Enregistrer mon jeton push'
+      operationId: enregistrerMonJetonPush
+      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Jeton de notification enregistré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Jeton de notification enregistré.'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le champ jeton push est obligatoire.'
+                  errors:
+                    jetonPush:
+                      - 'Le champ jeton push est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le champ jeton push est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      jetonPush:
+                        type: array
+                        example:
+                          - 'Le champ jeton push est obligatoire.'
+                        items:
+                          type: string
+      tags:
+        - Profil
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jetonPush:
+                  type: string
+                  description: 'Jeton FCM.'
+                  example: fcm-jeton-exemple
+              required:
+                - jetonPush

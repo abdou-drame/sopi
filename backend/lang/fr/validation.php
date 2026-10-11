@@ -38,5 +38,9 @@ return [
         'telephone' => 'téléphone',
         'email' => 'e-mail',
         'password' => 'mot de passe',
+        'mot_de_passe_actuel' => 'mot de passe actuel',
+        'nouveau_mot_de_passe' => 'nouveau mot de passe',
+        'confirmation' => 'confirmation',
+        'jetonPush' => 'jeton push',
     ],
 ];
