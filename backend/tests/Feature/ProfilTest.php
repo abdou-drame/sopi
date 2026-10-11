@@ -4,6 +4,7 @@ use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Sanctum\PersonalAccessToken;
 
 uses(RefreshDatabase::class);
@@ -203,5 +204,92 @@ describe('PUT /me/jeton-push', function () {
 
     it('renvoie 401 sans jeton', function () {
         $this->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'x'])->assertUnauthorized();
+    });
+});
+
+describe('limitation de débit', function () {
+    it('limite PUT /me/mot-de-passe à 5 requêtes par minute et par utilisateur', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'sanctum');
+        $faux = ['mot_de_passe_actuel' => 'faux', 'nouveau_mot_de_passe' => 'nouveau-mot-de-passe', 'confirmation' => 'nouveau-mot-de-passe'];
+
+        foreach (range(1, 5) as $i) {
+            $this->putJson('/api/v1/me/mot-de-passe', $faux)->assertUnprocessable();
+        }
+        $this->putJson('/api/v1/me/mot-de-passe', $faux)
+            ->assertStatus(429)
+            ->assertJsonPath('message', 'Trop de tentatives. Réessayez dans quelques instants.');
+
+        // Même avec le bon mot de passe actuel, la limite s'applique.
+        $this->putJson('/api/v1/me/mot-de-passe', array_merge($faux, ['mot_de_passe_actuel' => 'motdepasse']))->assertStatus(429);
+        expect(Hash::check('motdepasse', $user->fresh()->password))->toBeTrue();
+    });
+
+    it('applique la limite par utilisateur, pas globalement', function () {
+        $a = User::factory()->create();
+        $b = User::factory()->create();
+        $faux = ['mot_de_passe_actuel' => 'faux', 'nouveau_mot_de_passe' => 'nouveau-mot-de-passe', 'confirmation' => 'nouveau-mot-de-passe'];
+
+        foreach (range(1, 6) as $i) {
+            $this->actingAs($a, 'sanctum')->putJson('/api/v1/me/mot-de-passe', $faux);
+        }
+        $this->actingAs($a, 'sanctum')->putJson('/api/v1/me/mot-de-passe', $faux)->assertStatus(429);
+        $this->actingAs($b, 'sanctum')->putJson('/api/v1/me/mot-de-passe', $faux)->assertUnprocessable();
+    });
+
+    it('limite PUT /me à 30 requêtes par minute', function () {
+        $user = User::factory()->create();
+        $this->actingAs($user, 'sanctum');
+        $donnees = ['nom' => 'A', 'prenom' => 'B', 'telephone' => $user->telephone];
+
+        foreach (range(1, 30) as $i) {
+            $this->putJson('/api/v1/me', $donnees)->assertOk();
+        }
+        $this->putJson('/api/v1/me', $donnees)->assertStatus(429);
+    });
+
+    it('limite PUT /me/jeton-push à 30 requêtes par minute', function () {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+
+        foreach (range(1, 30) as $i) {
+            $this->putJson('/api/v1/me/jeton-push', ['jetonPush' => "jeton-$i"])->assertOk();
+        }
+        $this->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'jeton-31'])->assertStatus(429);
+    });
+
+    it('ne limite pas GET /me', function () {
+        $this->actingAs(User::factory()->create(), 'sanctum');
+
+        foreach (range(1, 40) as $i) {
+            $this->getJson('/api/v1/me')->assertOk();
+        }
+    });
+});
+
+describe('colonne jeton_push', function () {
+    it('est nullable, de type texte et non unique', function () {
+        $colonne = collect(Schema::getColumns('users'))->firstWhere('name', 'jeton_push');
+        expect($colonne)->not->toBeNull()
+            ->and($colonne['nullable'])->toBeTrue()
+            ->and($colonne['type_name'])->toBe('text');
+
+        $uniques = collect(Schema::getIndexes('users'))
+            ->filter(fn ($index) => $index['unique'] && in_array('jeton_push', $index['columns']));
+        expect($uniques)->toBeEmpty();
+    });
+
+    it('permet à deux utilisateurs d\'enregistrer le même jeton', function () {
+        $a = User::factory()->create();
+        $b = User::factory()->create();
+
+        $this->actingAs($a, 'sanctum')->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'jeton-partage'])->assertOk();
+        $this->actingAs($b, 'sanctum')->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'jeton-partage'])->assertOk();
+
+        expect($a->fresh()->jeton_push)->toBe('jeton-partage')
+            ->and($b->fresh()->jeton_push)->toBe('jeton-partage');
+    });
+
+    it('est vide par défaut (nullable)', function () {
+        expect(User::factory()->create()->fresh()->jeton_push)->toBeNull();
     });
 });

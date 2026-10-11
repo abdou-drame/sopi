@@ -41,7 +41,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T12:54:11+00:00'
+                  time: '2026-10-11T12:57:53+00:00'
                 properties:
                   status:
                     type: string
@@ -57,7 +57,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T12:54:11+00:00'
+                    example: '2026-10-11T12:57:53+00:00'
       tags:
         - Endpoints
       security: []

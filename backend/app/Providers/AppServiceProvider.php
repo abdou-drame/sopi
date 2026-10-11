@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
         // 5 inscriptions par minute et par adresse IP.
         RateLimiter::for('inscription', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
 
+        // Profil : limites par utilisateur connecté (par IP en secours). Le changement de mot de passe
+        // est le plus strict (protège l'ancien mot de passe contre les essais répétés avec un jeton volé).
+        $parUtilisateur = fn (Request $request) => $request->user()?->id ?? $request->ip();
+        RateLimiter::for('mot-de-passe', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
+        RateLimiter::for('profil', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
+        RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
+
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
         // par BlocageConnexionService.
         RateLimiter::for('connexion', fn (Request $request) => Limit::perMinute(config('securite.connexion.max_par_minute_par_ip'))

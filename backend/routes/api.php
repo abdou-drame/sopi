@@ -11,9 +11,9 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {
         Route::get('/', 'afficher');
-        Route::put('/', 'modifier');
-        Route::put('/mot-de-passe', 'changerMotDePasse');
-        Route::put('/jeton-push', 'enregistrerJetonPush');
+        Route::put('/', 'modifier')->middleware('throttle:profil');
+        Route::put('/mot-de-passe', 'changerMotDePasse')->middleware('throttle:mot-de-passe');
+        Route::put('/jeton-push', 'enregistrerJetonPush')->middleware('throttle:jeton-push');
     });
 
     Route::prefix('auth')->group(function () {
