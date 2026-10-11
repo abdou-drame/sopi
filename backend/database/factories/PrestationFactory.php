@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Prestataire;
 use App\Models\Prestation;
-use App\Models\Service;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,10 +15,11 @@ class PrestationFactory extends Factory
     {
         return [
             'prestataire_id' => Prestataire::factory(),
-            'service_id' => Service::factory(),
-            'tarif' => fake()->numberBetween(5, 100) * 500,
+            'nom' => fake()->unique()->words(3, true),
+            // Le domaine est celui du prestataire propriétaire.
+            'domaine' => fn (array $attributs) => Prestataire::findOrFail($attributs['prestataire_id'])->metier,
             'duree_minutes' => fake()->randomElement([15, 30, 45, 60, 90, 120]),
-            'description' => fake()->sentence(),
+            'prix' => fake()->numberBetween(5, 100) * 500,
             'actif' => true,
         ];
     }

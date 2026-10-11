@@ -7,11 +7,11 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Données de départ, toutes idempotentes. L'administrateur n'est volontairement pas créé ici
-     * (il a sa propre commande dédiée).
+     * Aucune donnée de départ à ce jour : le seeder ne crée rien de factice, et reste donc sans danger en production.
+     * L'administrateur a sa propre commande dédiée. Ajoutez ici, de façon idempotente, les futurs référentiels.
      */
     public function run(): void
     {
-        $this->call(ServiceSeeder::class);
+        //
     }
 }
