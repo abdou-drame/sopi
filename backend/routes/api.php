@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
@@ -20,6 +21,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
         Route::get('/prestataires/demandes', [DemandePrestataireController::class, 'index']);
         Route::get('/prestataires/{id}', [DemandePrestataireController::class, 'show'])->whereUuid('id');
+        Route::post('/prestataires/{id}/accepter', [DecisionDemandeController::class, 'accepter'])->whereUuid('id');
+        Route::post('/prestataires/{id}/refuser', [DecisionDemandeController::class, 'refuser'])->whereUuid('id');
         Route::get('/justificatifs/{id}/telecharger', [JustificatifController::class, 'telecharger'])->whereUuid('id');
     });
 
