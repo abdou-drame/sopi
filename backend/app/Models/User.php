@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Enums\StatutCompte;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -34,6 +35,12 @@ class User extends Authenticatable
             'role' => Role::class,
             'statut' => StatutCompte::class,
         ];
+    }
+
+    /** Profil professionnel (uniquement pour les utilisateurs de rôle prestataire). */
+    public function prestataire(): HasOne
+    {
+        return $this->hasOne(Prestataire::class);
     }
 
     public function estActif(): bool
