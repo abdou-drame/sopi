@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use Illuminate\Support\Facades\Route;
 
 // Toutes les routes de ce fichier sont préfixées par /api (voir bootstrap/app.php).
 Route::prefix('v1')->group(function () {
     Route::get('/health', HealthController::class);
+
+    Route::post('/prestataires/inscription', InscriptionPrestataireController::class)->middleware('throttle:inscription-prestataire');
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {
         Route::get('/', 'afficher');

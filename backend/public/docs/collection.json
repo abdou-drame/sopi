@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "24b248dd-f0e3-41b4-8400-3d1e543fcb6a",
+        "_postman_id": "3df6f1ff-60d1-4fb4-abc0-ce082ed6affc",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -62,7 +62,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T12:57:53+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T13:57:58+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -201,6 +201,128 @@
                             ],
                             "code": 401,
                             "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataires",
+            "description": "",
+            "item": [
+                {
+                    "name": "Inscription d'un prestataire",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires\/inscription",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires\/inscription"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "multipart\/form-data"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "nom",
+                                    "value": "Diop",
+                                    "type": "text",
+                                    "description": "Nom. Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res."
+                                },
+                                {
+                                    "key": "prenom",
+                                    "value": "Moussa",
+                                    "type": "text",
+                                    "description": "Pr\u00e9nom. Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res."
+                                },
+                                {
+                                    "key": "telephone",
+                                    "value": "77 123 45 67",
+                                    "type": "text",
+                                    "description": "Mobile s\u00e9n\u00e9galais (avec ou sans +221), unique. Must match the regex \/^\\+2217[05678]\\d{7}$\/."
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "moussa@example.com",
+                                    "type": "text",
+                                    "description": "Adresse e-mail, unique. Le champ value doit \u00eatre une adresse e-mail valide. Le champ value ne doit pas d\u00e9passer 255 caract\u00e8res."
+                                },
+                                {
+                                    "key": "mot_de_passe",
+                                    "value": "mot-de-passe-exemple",
+                                    "type": "text",
+                                    "description": "8 caract\u00e8res minimum. Le champ value doit contenir au moins 8 caract\u00e8res. Le champ value ne doit pas d\u00e9passer 255 caract\u00e8res."
+                                },
+                                {
+                                    "key": "nom_entreprise",
+                                    "value": "Garage Moussa",
+                                    "type": "text",
+                                    "description": "Nom de l'entreprise ou de l'atelier. Le champ value ne doit pas d\u00e9passer 150 caract\u00e8res."
+                                },
+                                {
+                                    "key": "metier",
+                                    "value": "mecanique",
+                                    "type": "text",
+                                    "description": "mecanique, coiffure ou pressing."
+                                },
+                                {
+                                    "key": "quartier",
+                                    "value": "Malika",
+                                    "type": "text",
+                                    "description": "Quartier de Keur Massar. Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res."
+                                },
+                                {
+                                    "key": "adresse",
+                                    "value": "Rue 10, pr\u00e8s du march\u00e9",
+                                    "type": "text",
+                                    "description": "Adresse. Le champ value ne doit pas d\u00e9passer 255 caract\u00e8res."
+                                },
+                                {
+                                    "key": "justificatifs[0][type_document]",
+                                    "value": "cni",
+                                    "type": "text",
+                                    "description": ""
+                                },
+                                {
+                                    "key": "justificatifs[][fichier]",
+                                    "src": [],
+                                    "type": "file"
+                                }
+                            ]
+                        },
+                        "description": "Envoi en `multipart\/form-data`. Cr\u00e9e le compte (statut `en_attente`, il ne peut pas se connecter avant validation\npar un administrateur), le profil et les justificatifs. Le dossier doit contenir au moins une CNI et un dipl\u00f4me\nou une attestation (5 fichiers au maximum, PDF\/JPG\/PNG, 5 Mo chacun). Limit\u00e9 \u00e0 10 requ\u00eates par heure et par adresse IP.\n\nLe `jeton_suivi` n'est renvoy\u00e9 qu'une seule fois : seul son hachage est conserv\u00e9. Les chemins des fichiers ne sont jamais renvoy\u00e9s.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"statutCompte\":\"en_attente\",\"jeton_suivi\":\"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"lien_suivi\":\"https:\/\/api.exemple.test\/api\/v1\/suivi\/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"justificatifs\":[{\"type\":\"cni\",\"statut\":\"en_attente\"},{\"type\":\"diplome\",\"statut\":\"en_attente\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le dossier doit contenir une copie de votre CNI.\",\"errors\":{\"justificatifs\":[\"Le dossier doit contenir une copie de votre CNI.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]

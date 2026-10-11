@@ -17,5 +17,10 @@ cmds = [
 ]
 
 # Au démarrage : migrations, caches Laravel, puis nginx + php-fpm (démarrage par défaut de Nixpacks PHP).
+#
+# Dépôt des justificatifs (jusqu'à 5 fichiers de 5 Mo) : les limites par défaut sont trop basses
+# (nginx client_max_body_size = 1m ; PHP upload_max_filesize = 2M, post_max_size = 8M).
+#  - nginx : après génération de /etc/nginx.conf, on ajoute « client_max_body_size 30m; » dans chaque bloc « server { ».
+#  - PHP-FPM : upload_max_filesize = 6M par fichier, post_max_size = 30M par requête (passés avec -d).
 [start]
-cmd = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && node /assets/scripts/prestart.mjs /assets/nginx.template.conf /etc/nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /etc/nginx.conf)"
+cmd = "php artisan migrate --force && php artisan config:cache && php artisan route:cache && node /assets/scripts/prestart.mjs /assets/nginx.template.conf /etc/nginx.conf && sed -i 's/server {/server { client_max_body_size 30m;/' /etc/nginx.conf && (php-fpm -y /assets/php-fpm.conf -d upload_max_filesize=6M -d post_max_size=30M & nginx -c /etc/nginx.conf)"
