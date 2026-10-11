@@ -123,6 +123,22 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-prestataire-catalogue-de-prestations" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="prestataire-catalogue-de-prestations">
+                    <a href="#prestataire-catalogue-de-prestations">Prestataire — catalogue de prestations</a>
+                </li>
+                                    <ul id="tocify-subheader-prestataire-catalogue-de-prestations" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="prestataire-catalogue-de-prestations-GETapi-v1-prestataire-prestations">
+                                <a href="#prestataire-catalogue-de-prestations-GETapi-v1-prestataire-prestations">Mes prestations</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-catalogue-de-prestations-POSTapi-v1-prestataire-prestations">
+                                <a href="#prestataire-catalogue-de-prestations-POSTapi-v1-prestataire-prestations">Ajouter une prestation</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-catalogue-de-prestations-PATCHapi-v1-prestataire-prestations--id-">
+                                <a href="#prestataire-catalogue-de-prestations-PATCHapi-v1-prestataire-prestations--id-">Modifier une prestation</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-profil" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="profil">
                     <a href="#profil">Profil</a>
@@ -1204,7 +1220,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-11T16:03:50+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-11T17:29:22+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -1886,7 +1902,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php17A7.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php6781.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2187,7 +2203,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php17A7.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php6781.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -2359,6 +2375,663 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Jeton de suivi reçu à l'inscription. Example: <code>jeton-de-suivi-exemple-0123456789-abcdefghijklmnop</code></p>
             </div>
                     </form>
+
+                <h1 id="prestataire-catalogue-de-prestations">Prestataire — catalogue de prestations</h1>
+
+    <p>Routes réservées aux prestataires (jeton Sanctum + rôle <code>prestataire</code>). Le domaine d'une prestation est
+toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.</p>
+
+                                <h2 id="prestataire-catalogue-de-prestations-GETapi-v1-prestataire-prestations">Mes prestations</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Toutes les prestations du prestataire connecté, actives et inactives, les plus récentes d'abord (sans pagination).</p>
+
+<span id="example-requests-GETapi-v1-prestataire-prestations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataire/prestations" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/prestations"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataire-prestations">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000020&quot;,
+            &quot;nom&quot;: &quot;Vidange compl&egrave;te&quot;,
+            &quot;domaine&quot;: &quot;mecanique&quot;,
+            &quot;dureeMinutes&quot;: 60,
+            &quot;prix&quot;: 15000,
+            &quot;actif&quot;: true
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataire-prestations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataire-prestations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataire-prestations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataire-prestations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataire-prestations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataire-prestations" data-method="GET"
+      data-path="api/v1/prestataire/prestations"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataire-prestations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataire-prestations"
+                    onclick="tryItOut('GETapi-v1-prestataire-prestations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataire-prestations"
+                    onclick="cancelTryOut('GETapi-v1-prestataire-prestations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataire-prestations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataire/prestations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataire-prestations"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataire-prestations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataire-prestations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="prestataire-catalogue-de-prestations-POSTapi-v1-prestataire-prestations">Ajouter une prestation</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Le domaine est déduit du métier du prestataire (tout champ <code>domaine</code> envoyé est ignoré).
+Le nom doit être unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus.</p>
+
+<span id="example-requests-POSTapi-v1-prestataire-prestations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/prestataire/prestations" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"nom\": \"Vidange complète\",
+    \"duree_minutes\": 60,
+    \"prix\": 15000
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/prestations"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "nom": "Vidange complète",
+    "duree_minutes": 60,
+    "prix": 15000
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-prestataire-prestations">
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000020&quot;,
+    &quot;nom&quot;: &quot;Vidange compl&egrave;te&quot;,
+    &quot;domaine&quot;: &quot;mecanique&quot;,
+    &quot;dureeMinutes&quot;: 60,
+    &quot;prix&quot;: 15000,
+    &quot;actif&quot;: true
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous proposez d&eacute;j&agrave; une prestation avec ce nom.&quot;,
+    &quot;errors&quot;: {
+        &quot;nom&quot;: [
+            &quot;Vous proposez d&eacute;j&agrave; une prestation avec ce nom.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-prestataire-prestations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-prestataire-prestations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-prestataire-prestations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-prestataire-prestations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-prestataire-prestations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-prestataire-prestations" data-method="POST"
+      data-path="api/v1/prestataire/prestations"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-prestataire-prestations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-prestataire-prestations"
+                    onclick="tryItOut('POSTapi-v1-prestataire-prestations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-prestataire-prestations"
+                    onclick="cancelTryOut('POSTapi-v1-prestataire-prestations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-prestataire-prestations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/prestataire/prestations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nom</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="nom"                data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="Vidange complète"
+               data-component="body">
+    <br>
+<p>Nom de la prestation (2 à 100 caractères, unique chez le prestataire sans tenir compte de la casse). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères. Example: <code>Vidange complète</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>duree_minutes</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="duree_minutes"                data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="60"
+               data-component="body">
+    <br>
+<p>Durée estimée en minutes (1 à 1440). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440. Example: <code>60</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>prix</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="prix"                data-endpoint="POSTapi-v1-prestataire-prestations"
+               value="15000"
+               data-component="body">
+    <br>
+<p>Prix en FCFA (XOF), supérieur à 0, 2 décimales au plus. Le champ value ne doit pas dépasser 9999999999.99. Example: <code>15000</code></p>
+        </div>
+        </form>
+
+                    <h2 id="prestataire-catalogue-de-prestations-PATCHapi-v1-prestataire-prestations--id-">Modifier une prestation</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Modification partielle : nom, durée, prix et/ou <code>actif</code> (<code>false</code> désactive, <code>true</code> réactive). Au moins un champ est requis.
+La prestation d'un autre prestataire répond 404, comme une prestation inexistante.</p>
+
+<span id="example-requests-PATCHapi-v1-prestataire-prestations--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request PATCH \
+    "http://localhost:8000/api/v1/prestataire/prestations/0198a1b2-0000-7000-8000-000000000020" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"nom\": \"Vidange + filtre\",
+    \"duree_minutes\": 75,
+    \"prix\": 17500,
+    \"actif\": false
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/prestations/0198a1b2-0000-7000-8000-000000000020"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "nom": "Vidange + filtre",
+    "duree_minutes": 75,
+    "prix": 17500,
+    "actif": false
+};
+
+fetch(url, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-PATCHapi-v1-prestataire-prestations--id-">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000020&quot;,
+    &quot;nom&quot;: &quot;Vidange compl&egrave;te&quot;,
+    &quot;domaine&quot;: &quot;mecanique&quot;,
+    &quot;dureeMinutes&quot;: 75,
+    &quot;prix&quot;: 17500,
+    &quot;actif&quot;: false
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Prestation introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le prix doit &ecirc;tre sup&eacute;rieur &agrave; 0.&quot;,
+    &quot;errors&quot;: {
+        &quot;prix&quot;: [
+            &quot;Le prix doit &ecirc;tre sup&eacute;rieur &agrave; 0.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-PATCHapi-v1-prestataire-prestations--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-PATCHapi-v1-prestataire-prestations--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-PATCHapi-v1-prestataire-prestations--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-PATCHapi-v1-prestataire-prestations--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-PATCHapi-v1-prestataire-prestations--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-PATCHapi-v1-prestataire-prestations--id-" data-method="PATCH"
+      data-path="api/v1/prestataire/prestations/{id}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('PATCHapi-v1-prestataire-prestations--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-PATCHapi-v1-prestataire-prestations--id-"
+                    onclick="tryItOut('PATCHapi-v1-prestataire-prestations--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-PATCHapi-v1-prestataire-prestations--id-"
+                    onclick="cancelTryOut('PATCHapi-v1-prestataire-prestations--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-PATCHapi-v1-prestataire-prestations--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-purple">PATCH</small>
+            <b><code>api/v1/prestataire/prestations/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="0198a1b2-0000-7000-8000-000000000020"
+               data-component="url">
+    <br>
+<p>Identifiant de la prestation. Example: <code>0198a1b2-0000-7000-8000-000000000020</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>nom</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="nom"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="Vidange + filtre"
+               data-component="body">
+    <br>
+<p>Nouveau nom (2 à 100 caractères). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères. Example: <code>Vidange + filtre</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>duree_minutes</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="duree_minutes"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="75"
+               data-component="body">
+    <br>
+<p>Nouvelle durée en minutes. Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440. Example: <code>75</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>prix</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="prix"                data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+               value="17500"
+               data-component="body">
+    <br>
+<p>Nouveau prix en FCFA, supérieur à 0. Le champ value ne doit pas dépasser 9999999999.99. Example: <code>17500</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>actif</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="PATCHapi-v1-prestataire-prestations--id-" style="display: none">
+            <input type="radio" name="actif"
+                   value="true"
+                   data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="PATCHapi-v1-prestataire-prestations--id-" style="display: none">
+            <input type="radio" name="actif"
+                   value="false"
+                   data-endpoint="PATCHapi-v1-prestataire-prestations--id-"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>false pour désactiver la prestation (elle n'est jamais supprimée), true pour la réactiver. Example: <code>false</code></p>
+        </div>
+        </form>
 
                 <h1 id="profil">Profil</h1>
 
