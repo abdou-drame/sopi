@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
+use App\Http\Controllers\Api\V1\Client\VerrouCreneauController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
@@ -38,6 +39,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/prestataires/{id}', [ProfilPublicController::class, 'show']);
         Route::get('/prestataires/{id}/photos/{photo}', [ProfilPublicController::class, 'photo'])->name('prestataires.photo');
         Route::get('/prestataires/{id}/agenda', AgendaPrestataireController::class);
+
+        // Verrou temporaire d'un créneau (RG08, RG09). Identifiant non contraint : un id invalide répond 404 en français.
+        Route::middleware('throttle:verrou-creneau')->group(function () {
+            Route::post('/creneaux/{id}/verrou', [VerrouCreneauController::class, 'verrouiller']);
+            Route::delete('/creneaux/{id}/verrou', [VerrouCreneauController::class, 'liberer']);
+        });
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.

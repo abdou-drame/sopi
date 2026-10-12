@@ -67,6 +67,56 @@ class Creneau extends Model
         };
     }
 
+    /**
+     * Verrouille le créneau pour un client, en UNE requête conditionnelle atomique (RG08, RG09) : libre, ou verrou expiré,
+     * et début dans le futur. Vrai si exactement une ligne a changé. Aucune lecture avant l'écriture.
+     */
+    public function verrouillerSiLibre(int $dureeSec, string $clientId): bool
+    {
+        $maintenant = now();
+
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('date_debut', '>', $maintenant)
+            ->where(function (Builder $q) use ($maintenant) {
+                $q->where('statut', StatutCreneau::Libre->value)
+                    ->orWhere(fn (Builder $v) => $v->where('statut', StatutCreneau::Verrouille->value)
+                        ->where('verrou_expire_a', '<=', $maintenant));
+            })
+            ->update([
+                'statut' => StatutCreneau::Verrouille->value,
+                'verrou_expire_a' => $maintenant->copy()->addSeconds($dureeSec),
+                'verrouille_par' => $clientId,
+            ]);
+
+        if ($modifies === 1) {
+            $this->refresh();
+        }
+
+        return $modifies === 1;
+    }
+
+    /** Remet le créneau à libre, uniquement s'il est verrouillé par ce client. Vrai si le verrou a été levé. */
+    public function libererVerrou(string $clientId): bool
+    {
+        return static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutCreneau::Verrouille->value)
+            ->where('verrouille_par', $clientId)
+            ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
+    }
+
+    /** Passe le créneau à réservé, uniquement s'il est verrouillé par ce client et que son verrou n'a pas expiré (M5). */
+    public function marquerReserve(string $clientId): bool
+    {
+        return static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutCreneau::Verrouille->value)
+            ->where('verrouille_par', $clientId)
+            ->where('verrou_expire_a', '>', now())
+            ->update(['statut' => StatutCreneau::Reserve->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
+    }
+
     /** Créneaux libres, au sens de estLibre(). */
     public function scopeLibres(Builder $requete): void
     {
