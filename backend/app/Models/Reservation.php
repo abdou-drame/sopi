@@ -135,6 +135,23 @@ class Reservation extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Annule une réservation active mais pas encore commencée (EN_ATTENTE, ACCEPTEE ou CONFIRMEE) parce que le prestataire
+     * a déclaré le créneau indisponible (M5.7). Une seule mise à jour conditionnelle. Vrai si exactement une ligne a changé.
+     *
+     * À faire en M6 : c'est ici, dans la même transaction que l'appelant, que le remboursement intégral de l'acompte
+     * (paiement REMBOURSE) sera ajouté.
+     */
+    public function annulerPourIndisponibilite(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'))
+            ->update(['statut' => StatutReservation::Annulee->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

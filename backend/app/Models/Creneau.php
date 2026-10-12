@@ -132,6 +132,15 @@ class Creneau extends Model
             ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
     }
 
+    /** Passe un créneau RÉSERVÉ à indisponible (réservation annulée par indisponibilité, M5.7). Vrai si une ligne a changé. */
+    public function bloquerSiReserve(): bool
+    {
+        return static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutCreneau::Reserve->value)
+            ->update(['statut' => StatutCreneau::Indisponible->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
+    }
+
     /** Passe le créneau à réservé, uniquement s'il est verrouillé par ce client et que son verrou n'a pas expiré (M5). */
     public function marquerReserve(string $clientId): bool
     {

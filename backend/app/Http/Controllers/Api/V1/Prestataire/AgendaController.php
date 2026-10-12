@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Prestataire;
 
+use App\Exceptions\ReservationImpossibleException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Prestataire\ConfigurerAgendaRequest;
 use App\Http\Requests\Prestataire\ConsulterAgendaRequest;
@@ -101,27 +102,37 @@ class AgendaController extends Controller
     /**
      * Déclarer une indisponibilité
      *
-     * Bloque immédiatement (statut `indisponible`) les créneaux libres qui chevauchent la plage, en une seule opération atomique.
-     * Un créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,
-     * il est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).
+     * Rend `indisponible` tous les créneaux qui chevauchent la plage, en une seule transaction (tout ou rien).
+     * Les créneaux libres (verrous expirés compris) sont bloqués ; un verrou en cours est supprimé puis le créneau est bloqué ;
+     * pour un créneau réservé, la réservation (en attente, acceptée ou confirmée) est annulée par le prestataire, puis le créneau est bloqué.
+     * Le client sera remboursé intégralement et prévenu (paiements et notifications : pas encore disponibles).
+     * Si une prestation est en cours dans la plage, rien n'est modifié (409). Un créneau réservé dont la prestation est terminée reste inchangé.
+     * Réponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprimés), `creneauxReserves` et `reservationsAnnulees` (réservations annulées).
      * Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
      *
      * @authenticated
      *
-     * @response 200 {"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0}
+     * @response 200 {"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0,"reservationsAnnulees":1}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     * @response 409 {"message":"Une prestation est en cours dans cette plage : l'indisponibilité ne peut pas être déclarée."}
      * @response 422 {"message":"La fin doit être après le début.","errors":{"fin":["La fin doit être après le début."]}}
      */
     public function declarerIndisponibilite(DeclarerIndisponibiliteRequest $request): JsonResponse
     {
         [$debut, $fin] = $request->plage();
-        $bilan = $this->indisponibilites->declarer($this->prestataire($request), $debut, $fin);
+
+        try {
+            $bilan = $this->indisponibilites->declarer($this->prestataire($request), $debut, $fin);
+        } catch (ReservationImpossibleException $e) {
+            return response()->json(['message' => $e->getMessage()], $e->statut);
+        }
 
         return response()->json([
             'creneauxBloques' => $bilan['bloques'],
             'creneauxReserves' => $bilan['reserves'],
             'creneauxVerrouilles' => $bilan['verrouilles'],
+            'reservationsAnnulees' => $bilan['reservationsAnnulees'],
         ]);
     }
 

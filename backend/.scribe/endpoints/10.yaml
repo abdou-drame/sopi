@@ -248,9 +248,12 @@ endpoints:
       subgroupDescription: ''
       title: 'Déclarer une indisponibilité'
       description: |-
-        Bloque immédiatement (statut `indisponible`) les créneaux libres qui chevauchent la plage, en une seule opération atomique.
-        Un créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,
-        il est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).
+        Rend `indisponible` tous les créneaux qui chevauchent la plage, en une seule transaction (tout ou rien).
+        Les créneaux libres (verrous expirés compris) sont bloqués ; un verrou en cours est supprimé puis le créneau est bloqué ;
+        pour un créneau réservé, la réservation (en attente, acceptée ou confirmée) est annulée par le prestataire, puis le créneau est bloqué.
+        Le client sera remboursé intégralement et prévenu (paiements et notifications : pas encore disponibles).
+        Si une prestation est en cours dans la plage, rien n'est modifié (409). Un créneau réservé dont la prestation est terminée reste inchangé.
+        Réponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprimés), `creneauxReserves` et `reservationsAnnulees` (réservations annulées).
         Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
       authenticated: true
       deprecated: false
@@ -305,7 +308,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0}'
+        content: '{"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0,"reservationsAnnulees":1}'
         headers: []
         description: ''
       -
@@ -318,6 +321,12 @@ endpoints:
         custom: []
         status: 403
         content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Une prestation est en cours dans cette plage : l''indisponibilité ne peut pas être déclarée."}'
         headers: []
         description: ''
       -

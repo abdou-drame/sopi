@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "0450a270-68a9-4e79-9ba2-3eac8232026e",
+        "_postman_id": "48629c20-7e4e-43be-a6d8-232cc3696e5c",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1048,7 +1048,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T15:48:48+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T16:54:59+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -1514,13 +1514,13 @@
                             "mode": "raw",
                             "raw": "{\"debut\":\"2030-01-15 08:00\",\"fin\":\"2030-01-20 18:00\",\"motif\":\"Cong\u00e9\"}"
                         },
-                        "description": "Bloque imm\u00e9diatement (statut `indisponible`) les cr\u00e9neaux libres qui chevauchent la plage, en une seule op\u00e9ration atomique.\nUn cr\u00e9neau verrouill\u00e9 dont le verrou a expir\u00e9 est bloqu\u00e9 ; un cr\u00e9neau r\u00e9serv\u00e9 ou verrouill\u00e9 avec un verrou valide n'est pas modifi\u00e9,\nil est seulement compt\u00e9 pour \u00eatre trait\u00e9 plus tard (annulation, remboursement et notification : pas encore disponibles).\nIdempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilit\u00e9."
+                        "description": "Rend `indisponible` tous les cr\u00e9neaux qui chevauchent la plage, en une seule transaction (tout ou rien).\nLes cr\u00e9neaux libres (verrous expir\u00e9s compris) sont bloqu\u00e9s ; un verrou en cours est supprim\u00e9 puis le cr\u00e9neau est bloqu\u00e9 ;\npour un cr\u00e9neau r\u00e9serv\u00e9, la r\u00e9servation (en attente, accept\u00e9e ou confirm\u00e9e) est annul\u00e9e par le prestataire, puis le cr\u00e9neau est bloqu\u00e9.\nLe client sera rembours\u00e9 int\u00e9gralement et pr\u00e9venu (paiements et notifications : pas encore disponibles).\nSi une prestation est en cours dans la plage, rien n'est modifi\u00e9 (409). Un cr\u00e9neau r\u00e9serv\u00e9 dont la prestation est termin\u00e9e reste inchang\u00e9.\nR\u00e9ponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprim\u00e9s), `creneauxReserves` et `reservationsAnnulees` (r\u00e9servations annul\u00e9es).\nIdempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilit\u00e9."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"creneauxBloques\":4,\"creneauxReserves\":1,\"creneauxVerrouilles\":0}",
+                            "body": "{\"creneauxBloques\":4,\"creneauxReserves\":1,\"creneauxVerrouilles\":0,\"reservationsAnnulees\":1}",
                             "name": ""
                         },
                         {
@@ -1533,6 +1533,12 @@
                             "header": [],
                             "code": 403,
                             "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Une prestation est en cours dans cette plage : l'indisponibilit\u00e9 ne peut pas \u00eatre d\u00e9clar\u00e9e.\"}",
                             "name": ""
                         },
                         {
