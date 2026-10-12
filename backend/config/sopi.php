@@ -45,6 +45,8 @@ return [
         'driver' => env('PAYMENT_DRIVER', 'fake'),
         // Secret de signature HMAC des webhooks ; vide = aucune signature acceptée.
         'webhook_secret' => env('DEXPAY_WEBHOOK_SECRET', ''),
+        // En-tête HTTP qui porte la signature HMAC-SHA256 du corps brut du webhook.
+        'signature_header' => env('PAYMENT_SIGNATURE_HEADER', 'X-Signature'),
 
         'acompte_taux' => (float) env('ACOMPTE_RATE', 0.30),
         'commission_taux' => (float) env('COMMISSION_RATE', 0.10),
