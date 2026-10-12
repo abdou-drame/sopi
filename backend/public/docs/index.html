@@ -170,6 +170,9 @@
                                                     <li class="tocify-item level-2" data-unique="prestataire-photos-datelier-GETapi-v1-prestataire-photos">
                                 <a href="#prestataire-photos-datelier-GETapi-v1-prestataire-photos">Mes photos</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-photos-datelier-GETapi-v1-prestataire-photos--photo-">
+                                <a href="#prestataire-photos-datelier-GETapi-v1-prestataire-photos--photo-">Afficher une de mes photos</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-photos-datelier-POSTapi-v1-prestataire-photos">
                                 <a href="#prestataire-photos-datelier-POSTapi-v1-prestataire-photos">Ajouter une photo</a>
                             </li>
@@ -1939,7 +1942,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T00:06:34+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T00:20:53+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -2621,7 +2624,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpBF9.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php28B9.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2922,7 +2925,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpBF9.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php28B9.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -3763,7 +3766,7 @@ Les clients voient ces photos sur le profil public du prestataire.</p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>Identifiants des photos du prestataire connecté, dans l'ordre d'ajout.</p>
+<p>Photos du prestataire connecté, dans l'ordre d'ajout. <code>url</code> est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.</p>
 
 <span id="example-requests-GETapi-v1-prestataire-photos">
 <blockquote>Example request:</blockquote>
@@ -3805,7 +3808,8 @@ fetch(url, {
 <code class="language-json" style="max-height: 300px;">{
     &quot;data&quot;: [
         {
-            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000030&quot;
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000030&quot;,
+            &quot;url&quot;: &quot;/api/v1/prestataire/photos/0198a1b2-0000-7000-8000-000000000030&quot;
         }
     ]
 }</code>
@@ -3914,6 +3918,179 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
+                    <h2 id="prestataire-photos-datelier-GETapi-v1-prestataire-photos--photo-">Afficher une de mes photos</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Renvoie l'image en flux (Content-Type réel, <code>nosniff</code>, <code>Cache-Control: private</code>). La photo d'un autre prestataire répond 404, comme une photo inexistante.</p>
+
+<span id="example-requests-GETapi-v1-prestataire-photos--photo-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataire/photos/0198a1b2-0000-7000-8000-000000000030" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/photos/0198a1b2-0000-7000-8000-000000000030"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataire-photos--photo-">
+            <blockquote>
+            <p>Example response (200, image):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">[Contenu binaire de l&#039;image]</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Photo introuvable.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataire-photos--photo-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataire-photos--photo-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataire-photos--photo-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataire-photos--photo-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataire-photos--photo-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataire-photos--photo-" data-method="GET"
+      data-path="api/v1/prestataire/photos/{photo}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataire-photos--photo-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataire-photos--photo-"
+                    onclick="tryItOut('GETapi-v1-prestataire-photos--photo-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataire-photos--photo-"
+                    onclick="cancelTryOut('GETapi-v1-prestataire-photos--photo-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataire-photos--photo-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataire/photos/{photo}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataire-photos--photo-"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataire-photos--photo-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataire-photos--photo-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>photo</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="photo"                data-endpoint="GETapi-v1-prestataire-photos--photo-"
+               value="0198a1b2-0000-7000-8000-000000000030"
+               data-component="url">
+    <br>
+<p>Identifiant de la photo. Example: <code>0198a1b2-0000-7000-8000-000000000030</code></p>
+            </div>
+                    </form>
+
                     <h2 id="prestataire-photos-datelier-POSTapi-v1-prestataire-photos">Ajouter une photo</h2>
 
 <p>
@@ -3932,7 +4109,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --form "photo=@C:\Users\Moi\AppData\Local\Temp\phpC69.tmp" </code></pre></div>
+    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php29E4.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -4094,7 +4271,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpC69.tmp</code></p>
+<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php29E4.tmp</code></p>
         </div>
         </form>
 

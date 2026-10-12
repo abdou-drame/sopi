@@ -21,7 +21,7 @@ endpoints:
       subgroup: ''
       subgroupDescription: ''
       title: 'Mes photos'
-      description: "Identifiants des photos du prestataire connecté, dans l'ordre d'ajout."
+      description: "Photos du prestataire connecté, dans l'ordre d'ajout. `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton."
       authenticated: true
       deprecated: false
     headers:
@@ -39,7 +39,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000030"}]}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataire/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
         headers: []
         description: ''
       -
@@ -52,6 +52,80 @@ endpoints:
         custom: []
         status: 403
         content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/prestataire/photos/{photo}'
+    metadata:
+      custom: []
+      groupName: "Prestataire — photos d'atelier"
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
+        Les clients voient ces photos sur le profil public du prestataire.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Afficher une de mes photos'
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`). La photo d'un autre prestataire répond 404, comme une photo inexistante."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      photo:
+        custom: []
+        name: photo
+        description: 'Identifiant de la photo.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000030
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      photo: 0198a1b2-0000-7000-8000-000000000030
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: "[Contenu binaire de l'image]"
+        headers: []
+        description: image
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Photo introuvable."}'
         headers: []
         description: ''
     responseFields: []

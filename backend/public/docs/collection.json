@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "b4032179-8056-4288-ac5b-11be7470f886",
+        "_postman_id": "cd1bcbc3-bfeb-46bd-8f13-115c5d34f285",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -563,7 +563,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:06:34+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:20:53+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -1080,13 +1080,13 @@
                             }
                         ],
                         "body": null,
-                        "description": "Identifiants des photos du prestataire connect\u00e9, dans l'ordre d'ajout."
+                        "description": "Photos du prestataire connect\u00e9, dans l'ordre d'ajout. `url` est un chemin de l'API \u00e0 compl\u00e9ter avec l'URL de base ; l'image se charge avec le jeton."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\"}]}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"url\":\"\/api\/v1\/prestataire\/photos\/0198a1b2-0000-7000-8000-000000000030\"}]}",
                             "name": ""
                         },
                         {
@@ -1099,6 +1099,64 @@
                             "header": [],
                             "code": 403,
                             "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une de mes photos",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/photos\/:photo",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/photos\/:photo",
+                            "variable": [
+                                {
+                                    "id": "photo",
+                                    "key": "photo",
+                                    "value": "0198a1b2-0000-7000-8000-000000000030",
+                                    "description": "Identifiant de la photo."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`). La photo d'un autre prestataire r\u00e9pond 404, comme une photo inexistante."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Photo introuvable.\"}",
                             "name": ""
                         }
                     ]
