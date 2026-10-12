@@ -11,6 +11,9 @@ tags:
     name: "Administration — demandes d'inscription"
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`)."
   -
+    name: "Client — agenda d'un prestataire"
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
+  -
     name: "Client — profil public d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -707,6 +710,138 @@ paths:
         required: true
         schema:
           type: string
+  '/api/v1/prestataires/{id}/agenda':
+    get:
+      summary: "Créneaux disponibles d'un prestataire"
+      operationId: crneauxDisponiblesDunPrestataire
+      description: "Uniquement les créneaux réservables : libres (ou dont le verrou a expiré) et qui commencent dans le futur.\nLes créneaux réservés, indisponibles ou verrouillés par un autre client n'apparaissent pas. Triés par début, sans pagination.\nPar défaut : de maintenant à 14 jours plus tard. Intervalle maximal : 31 jours. Réponse jamais mise en cache (`Cache-Control: no-store`)."
+      parameters:
+        -
+          in: query
+          name: du
+          description: "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>."
+          example: '2030-01-15'
+          required: false
+          schema:
+            type: string
+            description: "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>."
+            example: '2030-01-15'
+            nullable: true
+        -
+          in: query
+          name: au
+          description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+          example: '2030-01-29'
+          required: false
+          schema:
+            type: string
+            description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+            example: '2030-01-29'
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut: '2030-01-15T09:00:00+00:00'
+                      dateFin: '2030-01-15T10:00:00+00:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut: '2030-01-15T09:00:00+00:00'
+                        dateFin: '2030-01-15T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut:
+                          type: string
+                          example: '2030-01-15T09:00:00+00:00'
+                        dateFin:
+                          type: string
+                          example: '2030-01-15T10:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Prestataire introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Prestataire introuvable.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "L'intervalle ne peut pas dépasser 31 jours."
+                  errors:
+                    au:
+                      - "L'intervalle ne peut pas dépasser 31 jours."
+                properties:
+                  message:
+                    type: string
+                    example: "L'intervalle ne peut pas dépasser 31 jours."
+                  errors:
+                    type: object
+                    properties:
+                      au:
+                        type: array
+                        example:
+                          - "L'intervalle ne peut pas dépasser 31 jours."
+                        items:
+                          type: string
+      tags:
+        - "Client — agenda d'un prestataire"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du prestataire.'
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
   '/api/v1/prestataires/{id}':
     get:
       summary: "Profil d'un prestataire"
@@ -1165,7 +1300,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T01:03:34+00:00'
+                  time: '2026-10-12T01:14:40+00:00'
                 properties:
                   status:
                     type: string
@@ -1181,7 +1316,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T01:03:34+00:00'
+                    example: '2026-10-12T01:14:40+00:00'
       tags:
         - Endpoints
       security: []

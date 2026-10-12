@@ -88,6 +88,16 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-client-agenda-dun-prestataire" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="client-agenda-dun-prestataire">
+                    <a href="#client-agenda-dun-prestataire">Client — agenda d'un prestataire</a>
+                </li>
+                                    <ul id="tocify-subheader-client-agenda-dun-prestataire" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="client-agenda-dun-prestataire-GETapi-v1-prestataires--id--agenda">
+                                <a href="#client-agenda-dun-prestataire-GETapi-v1-prestataires--id--agenda">Créneaux disponibles d'un prestataire</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-client-profil-public-dun-prestataire" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="client-profil-public-dun-prestataire">
                     <a href="#client-profil-public-dun-prestataire">Client — profil public d'un prestataire</a>
@@ -1223,6 +1233,239 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
+                <h1 id="client-agenda-dun-prestataire">Client — agenda d'un prestataire</h1>
+
+    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>). Seuls les prestataires dont le compte est actif sont visibles.</p>
+
+                                <h2 id="client-agenda-dun-prestataire-GETapi-v1-prestataires--id--agenda">Créneaux disponibles d&#039;un prestataire</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Uniquement les créneaux réservables : libres (ou dont le verrou a expiré) et qui commencent dans le futur.
+Les créneaux réservés, indisponibles ou verrouillés par un autre client n'apparaissent pas. Triés par début, sans pagination.
+Par défaut : de maintenant à 14 jours plus tard. Intervalle maximal : 31 jours. Réponse jamais mise en cache (<code>Cache-Control: no-store</code>).</p>
+
+<span id="example-requests-GETapi-v1-prestataires--id--agenda">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/agenda?du=2030-01-15&amp;au=2030-01-29" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/agenda"
+);
+
+const params = {
+    "du": "2030-01-15",
+    "au": "2030-01-29",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataires--id--agenda">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+            &quot;dateDebut&quot;: &quot;2030-01-15T09:00:00+00:00&quot;,
+            &quot;dateFin&quot;: &quot;2030-01-15T10:00:00+00:00&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Prestataire introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;L&#039;intervalle ne peut pas d&eacute;passer 31 jours.&quot;,
+    &quot;errors&quot;: {
+        &quot;au&quot;: [
+            &quot;L&#039;intervalle ne peut pas d&eacute;passer 31 jours.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataires--id--agenda" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataires--id--agenda"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataires--id--agenda"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataires--id--agenda" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataires--id--agenda">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataires--id--agenda" data-method="GET"
+      data-path="api/v1/prestataires/{id}/agenda"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataires--id--agenda', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataires--id--agenda"
+                    onclick="tryItOut('GETapi-v1-prestataires--id--agenda');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataires--id--agenda"
+                    onclick="cancelTryOut('GETapi-v1-prestataires--id--agenda');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataires--id--agenda"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataires/{id}/agenda</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="0198a1b2-0000-7000-8000-000000000002"
+               data-component="url">
+    <br>
+<p>Identifiant du prestataire. Example: <code>0198a1b2-0000-7000-8000-000000000002</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>du</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="du"                data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="2030-01-15"
+               data-component="query">
+    <br>
+<p>Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>. Example: <code>2030-01-15</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>au</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="au"                data-endpoint="GETapi-v1-prestataires--id--agenda"
+               value="2030-01-29"
+               data-component="query">
+    <br>
+<p>Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>. Example: <code>2030-01-29</code></p>
+            </div>
+                </form>
+
                 <h1 id="client-profil-public-dun-prestataire">Client — profil public d'un prestataire</h1>
 
     <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>). Seuls les prestataires dont le compte est actif sont visibles.</p>
@@ -1961,7 +2204,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T01:03:34+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T01:14:40+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -2643,7 +2886,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php3B78.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php647C.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2944,7 +3187,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php3B78.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php647C.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -5024,7 +5267,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php3BF7.tmp" </code></pre></div>
+    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php650A.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -5186,7 +5429,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php3BF7.tmp</code></p>
+<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php650A.tmp</code></p>
         </div>
         </form>
 
