@@ -6,7 +6,6 @@ use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Exceptions\ReservationImpossibleException;
 use App\Models\Paiement;
-use App\Models\Prestation;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\Paiement\CalculPaiement;
@@ -21,7 +20,7 @@ use Throwable;
 
 /**
  * Initiation du paiement de l'acompte d'une réservation ACCEPTEE (M6.3). Ne change jamais le statut de la réservation et ne
- * génère aucun code : la confirmation vient du webhook (M6.4). Montants calculés par le serveur à partir du prix courant.
+ * génère aucun code : la confirmation vient du webhook (M6.4). Montants calculés par le serveur à partir du prix figé de la réservation (prix_applique).
  */
 class PaiementReservationService
 {
@@ -105,8 +104,7 @@ class PaiementReservationService
     /** @return array{0: Paiement, 1: bool} */
     private function ouvrir(Reservation $reservation): array
     {
-        $prix = Prestation::query()->findOrFail($reservation->prestation_id)->prix;
-        $montants = $this->calcul->calculer($prix);
+        $montants = $this->calcul->calculer($reservation->prix_applique);
 
         try {
             // Transaction imbriquée = point de sauvegarde : un refus de l'index ne casse pas la transaction (PostgreSQL).

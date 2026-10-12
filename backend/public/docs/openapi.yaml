@@ -858,7 +858,7 @@ paths:
     post:
       summary: "Payer l'acompte d'une réservation"
       operationId: payerLacompteDuneRservation
-      description: "Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le\nserveur à partir du prix courant de la prestation. La réservation reste `acceptee` : elle ne sera confirmée (et son code\ngénéré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours\npour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200."
+      description: "Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le\nserveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code\ngénéré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours\npour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200."
       parameters: []
       responses:
         200:
@@ -2391,7 +2391,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T21:44:29+00:00'
+                  time: '2026-10-12T23:22:35+00:00'
                 properties:
                   status:
                     type: string
@@ -2407,7 +2407,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T21:44:29+00:00'
+                    example: '2026-10-12T23:22:35+00:00'
       tags:
         - Endpoints
       security: []

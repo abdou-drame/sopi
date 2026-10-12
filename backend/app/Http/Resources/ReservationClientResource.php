@@ -40,7 +40,7 @@ class ReservationClientResource extends JsonResource
                 'id' => $prestation->id,
                 'nom' => $prestation->nom,
                 'dureeMinutes' => $prestation->duree_minutes,
-                'prix' => (float) $prestation->prix,
+                'prix' => (float) $this->prix_applique,
             ],
             'prestataire' => [
                 'id' => $prestataire->id,

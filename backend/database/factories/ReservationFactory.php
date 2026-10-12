@@ -24,6 +24,8 @@ class ReservationFactory extends Factory
             'creneau_id' => Creneau::factory(),
             // Même prestataire que le créneau.
             'prestation_id' => fn (array $attributs) => Prestation::factory()->for(Creneau::findOrFail($attributs['creneau_id'])->prestataire),
+            // Prix convenu figé : celui de la prestation de la réservation.
+            'prix_applique' => fn (array $attributs) => Prestation::findOrFail($attributs['prestation_id'])->prix,
             'statut' => StatutReservation::EnAttente,
             'motif_refus' => null,
             'code_reservation' => null,

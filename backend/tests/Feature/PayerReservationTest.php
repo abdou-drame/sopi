@@ -132,15 +132,15 @@ describe('paiement nominal', function () {
         expect($paiement->commission)->toBe('1500.00');
     });
 
-    it('suit le prix courant de la prestation', function () {
+    it('suit le prix figé de la réservation, pas le prix courant de la prestation', function () {
         $moi = clientQuiPaie();
         $reservation = reservationAPayer($moi, [], '15000.00');
         $reservation->prestation->update(['prix' => '20000.00']);
 
         $this->postJson(urlPayer($reservation))->assertCreated()
-            ->assertJsonPath('paiement.montantAcompte', '6000.00')
-            ->assertJsonPath('montantRestantSurPlace', '14000.00');
-        expect(Paiement::sole()->commission)->toBe('2000.00');
+            ->assertJsonPath('paiement.montantAcompte', '4500.00')
+            ->assertJsonPath('montantRestantSurPlace', '10500.00');
+        expect(Paiement::sole()->commission)->toBe('1500.00');
     });
 
     it('appelle le prestataire de paiement hors de toute transaction ouverte par le service', function () {
@@ -213,8 +213,8 @@ describe('idempotence', function () {
         $fait = false;
 
         // Un autre processus insère un paiement actif juste avant notre insertion (après la lecture des paiements actifs).
-        Prestation::retrieved(function (Prestation $prestation) use (&$fait, $reservation, $concurrent) {
-            if ($fait || $prestation->id !== $reservation->prestation_id) {
+        DB::listen(function ($requete) use (&$fait, $reservation, $concurrent) {
+            if ($fait || ! str_starts_with($requete->sql, 'select') || ! str_contains($requete->sql, 'from "paiements"')) {
                 return;
             }
             $fait = true;
