@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use InvalidArgumentException;
 
 /**
@@ -131,5 +132,10 @@ class Creneau extends Model
     public function scopeAVenir(Builder $requete): void
     {
         $requete->where('date_debut', '>', now());
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
     }
 }
