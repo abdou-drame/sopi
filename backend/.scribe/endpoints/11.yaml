@@ -356,3 +356,198 @@ endpoints:
     controller: null
     method: null
     route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/demarrer'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — demandes de réservation'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Démarrer la prestation avec le code du client'
+      description: |-
+        Le client communique son code de réservation (6 caractères alphanumériques) au prestataire, qui le saisit ici :
+        la réservation `confirmee` passe à `en_cours`. Minuscules et espaces autour du code sont acceptés. Limité à
+        5 essais par minute pour une même réservation. Le code n'est jamais renvoyé.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'Code de réservation communiqué par le client : 6 caractères alphanumériques (minuscules et espaces autour acceptés). Must match the regex /^[A-Z0-9]{6}$/.'
+        required: true
+        example: AB12CD
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      code: AB12CD
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_cours","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette réservation ne peut pas être démarrée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Code de réservation incorrect.","errors":{"code":["Code de réservation incorrect."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/terminer'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — demandes de réservation'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Terminer la prestation'
+      description: 'La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette réservation ne peut pas être terminée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
