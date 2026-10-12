@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "d607a682-862c-44bf-b1d1-e296c376e4e7",
+        "_postman_id": "94dba685-13c5-4613-b985-a39777863884",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -283,6 +283,89 @@
                             "header": [],
                             "code": 404,
                             "body": "{\"message\":\"Justificatif introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Client \u2014 agenda d'un prestataire",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont visibles.",
+            "item": [
+                {
+                    "name": "Cr\u00e9neaux disponibles d'un prestataire",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires\/:id\/agenda",
+                            "query": [
+                                {
+                                    "key": "du",
+                                    "value": "2030-01-15",
+                                    "description": "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par d\u00e9faut : maintenant. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "au",
+                                    "value": "2030-01-29",
+                                    "description": "Dernier jour inclus (AAAA-MM-JJ). Par d\u00e9faut : 14 jours apr\u00e8s le d\u00e9but. Intervalle maximal : 31 jours. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires\/:id\/agenda?du=2030-01-15&au=2030-01-29",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Uniquement les cr\u00e9neaux r\u00e9servables : libres (ou dont le verrou a expir\u00e9) et qui commencent dans le futur.\nLes cr\u00e9neaux r\u00e9serv\u00e9s, indisponibles ou verrouill\u00e9s par un autre client n'apparaissent pas. Tri\u00e9s par d\u00e9but, sans pagination.\nPar d\u00e9faut : de maintenant \u00e0 14 jours plus tard. Intervalle maximal : 31 jours. R\u00e9ponse jamais mise en cache (`Cache-Control: no-store`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-15T09:00:00+00:00\",\"dateFin\":\"2030-01-15T10:00:00+00:00\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Prestataire introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"L'intervalle ne peut pas d\u00e9passer 31 jours.\",\"errors\":{\"au\":[\"L'intervalle ne peut pas d\u00e9passer 31 jours.\"]}}",
                             "name": ""
                         }
                     ]
@@ -563,7 +646,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:53:25+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T01:09:19+00:00\"}",
                             "name": ""
                         }
                     ]

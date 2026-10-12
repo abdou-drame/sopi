@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -36,6 +37,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/prestataires', RecherchePrestatairesController::class);
         Route::get('/prestataires/{id}', [ProfilPublicController::class, 'show']);
         Route::get('/prestataires/{id}/photos/{photo}', [ProfilPublicController::class, 'photo'])->name('prestataires.photo');
+        Route::get('/prestataires/{id}/agenda', AgendaPrestataireController::class);
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
