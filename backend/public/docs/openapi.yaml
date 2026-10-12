@@ -2202,7 +2202,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T15:48:48+00:00'
+                  time: '2026-10-12T16:54:59+00:00'
                 properties:
                   status:
                     type: string
@@ -2218,7 +2218,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T15:48:48+00:00'
+                    example: '2026-10-12T16:54:59+00:00'
       tags:
         - Endpoints
       security: []
@@ -2882,7 +2882,7 @@ paths:
     post:
       summary: 'Déclarer une indisponibilité'
       operationId: dclarerUneIndisponibilit
-      description: "Bloque immédiatement (statut `indisponible`) les créneaux libres qui chevauchent la plage, en une seule opération atomique.\nUn créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,\nil est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).\nIdempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité."
+      description: "Rend `indisponible` tous les créneaux qui chevauchent la plage, en une seule transaction (tout ou rien).\nLes créneaux libres (verrous expirés compris) sont bloqués ; un verrou en cours est supprimé puis le créneau est bloqué ;\npour un créneau réservé, la réservation (en attente, acceptée ou confirmée) est annulée par le prestataire, puis le créneau est bloqué.\nLe client sera remboursé intégralement et prévenu (paiements et notifications : pas encore disponibles).\nSi une prestation est en cours dans la plage, rien n'est modifié (409). Un créneau réservé dont la prestation est terminée reste inchangé.\nRéponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprimés), `creneauxReserves` et `reservationsAnnulees` (réservations annulées).\nIdempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité."
       parameters: []
       responses:
         200:
@@ -2895,6 +2895,7 @@ paths:
                   creneauxBloques: 4
                   creneauxReserves: 1
                   creneauxVerrouilles: 0
+                  reservationsAnnulees: 1
                 properties:
                   creneauxBloques:
                     type: integer
@@ -2905,6 +2906,9 @@ paths:
                   creneauxVerrouilles:
                     type: integer
                     example: 0
+                  reservationsAnnulees:
+                    type: integer
+                    example: 1
         401:
           description: ''
           content:
@@ -2929,6 +2933,18 @@ paths:
                   message:
                     type: string
                     example: "Vous n'avez pas le droit d'effectuer cette action."
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Une prestation est en cours dans cette plage : l'indisponibilité ne peut pas être déclarée."
+                properties:
+                  message:
+                    type: string
+                    example: "Une prestation est en cours dans cette plage : l'indisponibilité ne peut pas être déclarée."
         422:
           description: ''
           content:

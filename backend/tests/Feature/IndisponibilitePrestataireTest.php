@@ -48,7 +48,7 @@ it('renvoie 401 sans jeton, puis 403 pour un client et un administrateur', funct
 });
 
 describe('blocage', function () {
-    it('bloque les créneaux libres de la plage et compte les autres', function () {
+    it('bloque les créneaux libres et les verrous de la plage, et laisse un créneau réservé sans réservation active', function () {
         $p = prestataireIndispo();
         $this->actingAs($p->user, 'sanctum');
         $a = creneauIndispo($p, 2, '09:00');
@@ -60,16 +60,18 @@ describe('blocage', function () {
 
         $this->postJson(URL_INDISPONIBILITES, plageIndispo() + ['motif' => 'Congé'])->assertOk()->assertExactJson([
             'creneauxBloques' => 3,
-            'creneauxReserves' => 1,
+            'creneauxReserves' => 0,
             'creneauxVerrouilles' => 1,
+            'reservationsAnnulees' => 0,
         ]);
 
         expect(statutDe($a))->toBe(StatutCreneau::Indisponible)
             ->and(statutDe($b))->toBe(StatutCreneau::Indisponible)
             ->and(statutDe($expire))->toBe(StatutCreneau::Indisponible)
             ->and($expire->fresh()->verrou_expire_a)->toBeNull()
-            ->and(statutDe($valide))->toBe(StatutCreneau::Verrouille)
-            ->and($valide->fresh()->verrou_expire_a)->not->toBeNull()
+            ->and(statutDe($valide))->toBe(StatutCreneau::Indisponible)
+            ->and($valide->fresh()->verrou_expire_a)->toBeNull()
+            ->and($valide->fresh()->verrouille_par)->toBeNull()
             ->and(statutDe($reserve))->toBe(StatutCreneau::Reserve);
     });
 
