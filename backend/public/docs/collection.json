@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "cd1bcbc3-bfeb-46bd-8f13-115c5d34f285",
+        "_postman_id": "d607a682-862c-44bf-b1d1-e296c376e4e7",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -563,7 +563,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:20:53+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:53:25+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -879,6 +879,192 @@
                             "header": [],
                             "code": 429,
                             "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 agenda",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). L'agenda est fait de cr\u00e9neaux ;\nles dates et heures sont celles du fuseau Africa\/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.",
+            "item": [
+                {
+                    "name": "Mon agenda",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/agenda",
+                            "query": [
+                                {
+                                    "key": "du",
+                                    "value": "2030-01-15",
+                                    "description": "Premier jour (AAAA-MM-JJ). Par d\u00e9faut : aujourd'hui. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "au",
+                                    "value": "2030-02-15",
+                                    "description": "Dernier jour inclus (AAAA-MM-JJ). Par d\u00e9faut : 30 jours apr\u00e8s `du`. Intervalle maximal : 62 jours. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/agenda?du=2030-01-15&au=2030-02-15"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Mes cr\u00e9neaux dont le d\u00e9but tombe entre `du` et `au` (inclus), tri\u00e9s par d\u00e9but, sans pagination.\nPar d\u00e9faut : d'aujourd'hui \u00e0 30 jours plus tard. Intervalle maximal : 62 jours."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-15T09:00:00+00:00\",\"dateFin\":\"2030-01-15T10:00:00+00:00\",\"statut\":\"libre\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"L'intervalle ne peut pas d\u00e9passer 62 jours.\",\"errors\":{\"au\":[\"L'intervalle ne peut pas d\u00e9passer 62 jours.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Configurer l'agenda",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/agenda\/plages",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/agenda\/plages"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"plages\":[{\"date\":\"2030-01-15\",\"heure_debut\":\"09:00\",\"heure_fin\":\"12:00\",\"duree_creneau_minutes\":60,\"repeter_semaines\":2}]}"
+                        },
+                        "description": "G\u00e9n\u00e8re des cr\u00e9neaux LIBRES, cons\u00e9cutifs, de `duree_creneau_minutes` entre `heure_debut` et `heure_fin` pour chaque plage,\npuis aux m\u00eames jours de la semaine pendant `repeter_semaines` semaines suppl\u00e9mentaires.\nTout ou rien : si un cr\u00e9neau en chevauche un autre (existant, quel que soit son statut, ou de la m\u00eame requ\u00eate), rien n'est cr\u00e9\u00e9 (422).\nLimites : 7 plages, cr\u00e9neaux de 15 \u00e0 480 minutes, 8 semaines de r\u00e9p\u00e9tition, 500 cr\u00e9neaux par requ\u00eate.\nLa liste `creneaux` n'est renvoy\u00e9e que si elle compte 200 cr\u00e9neaux au plus."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"nombreCreneaux\":2,\"creneaux\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-15T09:00:00+00:00\",\"dateFin\":\"2030-01-15T10:00:00+00:00\",\"statut\":\"libre\"},{\"id\":\"0198a1b2-0000-7000-8000-000000000041\",\"dateDebut\":\"2030-01-15T10:00:00+00:00\",\"dateFin\":\"2030-01-15T11:00:00+00:00\",\"statut\":\"libre\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le cr\u00e9neau du 15\/01\/2030 de 09:00 \u00e0 10:00 chevauche un cr\u00e9neau existant (09:30 \u00e0 10:30).\",\"errors\":{\"plages\":[\"Le cr\u00e9neau du 15\/01\/2030 de 09:00 \u00e0 10:00 chevauche un cr\u00e9neau existant (09:30 \u00e0 10:30).\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Supprimer un cr\u00e9neau libre",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/agenda\/creneaux\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/agenda\/creneaux\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000040",
+                                    "description": "Identifiant du cr\u00e9neau."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Uniquement si le cr\u00e9neau est libre. Le cr\u00e9neau d'un autre prestataire r\u00e9pond 404, comme un cr\u00e9neau inexistant."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 204,
+                            "body": "{}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Cr\u00e9neau introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Ce cr\u00e9neau n'est plus libre.\"}",
                             "name": ""
                         }
                     ]
