@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "94dba685-13c5-4613-b985-a39777863884",
+        "_postman_id": "218cbd71-fac8-464a-aac9-e3721b3a6f73",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -646,7 +646,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T01:09:19+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T01:14:40+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -1084,6 +1084,59 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le cr\u00e9neau du 15\/01\/2030 de 09:00 \u00e0 10:00 chevauche un cr\u00e9neau existant (09:30 \u00e0 10:30).\",\"errors\":{\"plages\":[\"Le cr\u00e9neau du 15\/01\/2030 de 09:00 \u00e0 10:00 chevauche un cr\u00e9neau existant (09:30 \u00e0 10:30).\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9clarer une indisponibilit\u00e9",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/agenda\/indisponibilites",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/agenda\/indisponibilites"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"debut\":\"2030-01-15 08:00\",\"fin\":\"2030-01-20 18:00\",\"motif\":\"Cong\u00e9\"}"
+                        },
+                        "description": "Bloque imm\u00e9diatement (statut `indisponible`) les cr\u00e9neaux libres qui chevauchent la plage, en une seule op\u00e9ration atomique.\nUn cr\u00e9neau verrouill\u00e9 dont le verrou a expir\u00e9 est bloqu\u00e9 ; un cr\u00e9neau r\u00e9serv\u00e9 ou verrouill\u00e9 avec un verrou valide n'est pas modifi\u00e9,\nil est seulement compt\u00e9 pour \u00eatre trait\u00e9 plus tard (annulation, remboursement et notification : pas encore disponibles).\nIdempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilit\u00e9."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"creneauxBloques\":4,\"creneauxReserves\":1,\"creneauxVerrouilles\":0}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La fin doit \u00eatre apr\u00e8s le d\u00e9but.\",\"errors\":{\"fin\":[\"La fin doit \u00eatre apr\u00e8s le d\u00e9but.\"]}}",
                             "name": ""
                         }
                     ]

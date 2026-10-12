@@ -167,6 +167,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-agenda-POSTapi-v1-prestataire-agenda-plages">
                                 <a href="#prestataire-agenda-POSTapi-v1-prestataire-agenda-plages">Configurer l'agenda</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-agenda-POSTapi-v1-prestataire-agenda-indisponibilites">
+                                <a href="#prestataire-agenda-POSTapi-v1-prestataire-agenda-indisponibilites">Déclarer une indisponibilité</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-agenda-DELETEapi-v1-prestataire-agenda-creneaux--id-">
                                 <a href="#prestataire-agenda-DELETEapi-v1-prestataire-agenda-creneaux--id-">Supprimer un créneau libre</a>
                             </li>
@@ -2201,7 +2204,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T01:09:19+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T01:14:40+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -2883,7 +2886,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php7E75.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php647C.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -3184,7 +3187,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php7E75.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php647C.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -3848,6 +3851,227 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Nombre de semaines supplémentaires où répéter la plage (0 à 8, 0 par défaut). Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 8. Example: <code>2</code></p>
                     </div>
                                     </details>
+        </div>
+        </form>
+
+                    <h2 id="prestataire-agenda-POSTapi-v1-prestataire-agenda-indisponibilites">Déclarer une indisponibilité</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Bloque immédiatement (statut <code>indisponible</code>) les créneaux libres qui chevauchent la plage, en une seule opération atomique.
+Un créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,
+il est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).
+Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.</p>
+
+<span id="example-requests-POSTapi-v1-prestataire-agenda-indisponibilites">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/prestataire/agenda/indisponibilites" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"debut\": \"2030-01-15 08:00\",
+    \"fin\": \"2030-01-20 18:00\",
+    \"motif\": \"Congé\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/agenda/indisponibilites"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "debut": "2030-01-15 08:00",
+    "fin": "2030-01-20 18:00",
+    "motif": "Congé"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-prestataire-agenda-indisponibilites">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;creneauxBloques&quot;: 4,
+    &quot;creneauxReserves&quot;: 1,
+    &quot;creneauxVerrouilles&quot;: 0
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;La fin doit &ecirc;tre apr&egrave;s le d&eacute;but.&quot;,
+    &quot;errors&quot;: {
+        &quot;fin&quot;: [
+            &quot;La fin doit &ecirc;tre apr&egrave;s le d&eacute;but.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-prestataire-agenda-indisponibilites" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-prestataire-agenda-indisponibilites"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-prestataire-agenda-indisponibilites"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-prestataire-agenda-indisponibilites" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-prestataire-agenda-indisponibilites">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-prestataire-agenda-indisponibilites" data-method="POST"
+      data-path="api/v1/prestataire/agenda/indisponibilites"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-prestataire-agenda-indisponibilites', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-prestataire-agenda-indisponibilites"
+                    onclick="tryItOut('POSTapi-v1-prestataire-agenda-indisponibilites');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-prestataire-agenda-indisponibilites"
+                    onclick="cancelTryOut('POSTapi-v1-prestataire-agenda-indisponibilites');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-prestataire-agenda-indisponibilites"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/prestataire/agenda/indisponibilites</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>debut</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="debut"                data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="2030-01-15 08:00"
+               data-component="body">
+    <br>
+<p>Début (AAAA-MM-JJ HH:MM, fuseau Africa/Dakar). Peut être passé ou présent. Must be a valid date in the format <code>Y-m-d H:i</code>. Example: <code>2030-01-15 08:00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>fin</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="fin"                data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="2030-01-20 18:00"
+               data-component="body">
+    <br>
+<p>Fin (AAAA-MM-JJ HH:MM), après le début et dans le futur. Plage de 90 jours au maximum. Must be a valid date in the format <code>Y-m-d H:i</code>. Example: <code>2030-01-20 18:00</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>motif</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="motif"                data-endpoint="POSTapi-v1-prestataire-agenda-indisponibilites"
+               value="Congé"
+               data-component="body">
+    <br>
+<p>Motif (congé, urgence...). Facultatif, non conservé. Le champ value ne doit pas dépasser 255 caractères. Example: <code>Congé</code></p>
         </div>
         </form>
 
@@ -5043,7 +5267,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php7F13.tmp" </code></pre></div>
+    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php650A.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -5205,7 +5429,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php7F13.tmp</code></p>
+<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php650A.tmp</code></p>
         </div>
         </form>
 

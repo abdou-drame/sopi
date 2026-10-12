@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\V1\Prestataire;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Prestataire\ConfigurerAgendaRequest;
 use App\Http\Requests\Prestataire\ConsulterAgendaRequest;
+use App\Http\Requests\Prestataire\DeclarerIndisponibiliteRequest;
 use App\Http\Resources\CreneauResource;
 use App\Models\Prestataire;
 use App\Services\AgendaService;
+use App\Services\IndisponibiliteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as ReponseVide;
@@ -22,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class AgendaController extends Controller
 {
-    public function __construct(private readonly AgendaService $service) {}
+    public function __construct(private readonly AgendaService $service, private readonly IndisponibiliteService $indisponibilites) {}
 
     /**
      * Configurer l'agenda
@@ -94,6 +96,33 @@ class AgendaController extends Controller
             false => response()->json(['message' => 'Ce créneau n\'est plus libre.'], Response::HTTP_CONFLICT),
             null => response()->json(['message' => 'Créneau introuvable.'], Response::HTTP_NOT_FOUND),
         };
+    }
+
+    /**
+     * Déclarer une indisponibilité
+     *
+     * Bloque immédiatement (statut `indisponible`) les créneaux libres qui chevauchent la plage, en une seule opération atomique.
+     * Un créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,
+     * il est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).
+     * Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
+     *
+     * @authenticated
+     *
+     * @response 200 {"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0}
+     * @response 401 {"message":"Authentification requise."}
+     * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     * @response 422 {"message":"La fin doit être après le début.","errors":{"fin":["La fin doit être après le début."]}}
+     */
+    public function declarerIndisponibilite(DeclarerIndisponibiliteRequest $request): JsonResponse
+    {
+        [$debut, $fin] = $request->plage();
+        $bilan = $this->indisponibilites->declarer($this->prestataire($request), $debut, $fin);
+
+        return response()->json([
+            'creneauxBloques' => $bilan['bloques'],
+            'creneauxReserves' => $bilan['reserves'],
+            'creneauxVerrouilles' => $bilan['verrouilles'],
+        ]);
     }
 
     private function prestataire(Request $request): Prestataire
