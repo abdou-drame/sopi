@@ -36,4 +36,13 @@ return [
         'annulation_client_heures' => (int) env('RESERVATION_ANNULATION_CLIENT_HEURES', 2),
     ],
 
+    /*
+    | Acompte et commission de la plateforme, en fraction du tarif de la prestation. Le serveur calcule toujours
+    | les montants à partir de ces taux. Valeurs initiales : un réglage administrable pourra venir plus tard.
+    */
+    'paiement' => [
+        'acompte_taux' => (float) env('ACOMPTE_RATE', 0.30),
+        'commission_taux' => (float) env('COMMISSION_RATE', 0.10),
+    ],
+
 ];
