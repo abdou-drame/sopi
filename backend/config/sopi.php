@@ -41,6 +41,11 @@ return [
     | les montants à partir de ces taux. Valeurs initiales : un réglage administrable pourra venir plus tard.
     */
     'paiement' => [
+        // fake (tests, démonstration) ou dexpay (production, à partir de M6.6).
+        'driver' => env('PAYMENT_DRIVER', 'fake'),
+        // Secret de signature HMAC des webhooks ; vide = aucune signature acceptée.
+        'webhook_secret' => env('DEXPAY_WEBHOOK_SECRET', ''),
+
         'acompte_taux' => (float) env('ACOMPTE_RATE', 0.30),
         'commission_taux' => (float) env('COMMISSION_RATE', 0.10),
     ],
