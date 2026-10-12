@@ -108,6 +108,33 @@ class Reservation extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Annule une demande restée EN_ATTENTE depuis $limite ou avant (RG10). Une seule mise à jour conditionnelle :
+     * si le prestataire a répondu entre-temps, rien ne change. Vrai si exactement une ligne a changé.
+     */
+    public function expirerSiSansReponse(CarbonInterface $limite): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::EnAttente->value)
+            ->where('created_at', '<=', $limite)
+            ->update(['statut' => StatutReservation::Annulee->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Annule une réservation ACCEPTEE non payée depuis $limite ou avant, comptée depuis acceptee_le (RG11). */
+    public function expirerSiImpayee(CarbonInterface $limite): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::Acceptee->value)
+            ->where('acceptee_le', '<=', $limite)
+            ->update(['statut' => StatutReservation::Annulee->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
