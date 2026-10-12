@@ -143,12 +143,20 @@ describe('structure de la base', function () {
     });
 });
 
+/** Nombre de migrations à annuler pour revenir juste avant la migration d'alignement (elle et toutes celles qui la suivent). */
+function pasJusquaAlignement(): int
+{
+    $noms = array_map(fn ($f) => basename($f, '.php'), glob(database_path('migrations/*.php')));
+
+    return count(array_filter($noms, fn ($n) => $n >= '2026_10_14_000001_aligne_prestations_sur_diagramme_classes'));
+}
+
 describe('migration d\'alignement', function () {
     it('reprend le nom et le domaine depuis le service lié, puis supprime services', function () {
         $prestataire = Prestataire::factory()->metier(Metier::Mecanique)->create();
 
         // Retour à l'ancien schéma (M3.1), avec une prestation existante.
-        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+        $this->artisan('migrate:rollback', ['--step' => pasJusquaAlignement()])->assertSuccessful();
         expect(Schema::hasTable('services'))->toBeTrue()->and(Schema::hasColumn('prestations', 'service_id'))->toBeTrue();
 
         DB::table('services')->insert(['id' => 'a0000000-0000-7000-8000-000000000001', 'metier' => 'mecanique', 'nom' => 'Vidange', 'created_at' => now(), 'updated_at' => now()]);
@@ -172,7 +180,7 @@ describe('migration d\'alignement', function () {
         Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Tresses', 'prix' => 8000]);
         Prestation::factory()->create(['prestataire_id' => $autre->id, 'nom' => 'Tresses', 'prix' => 9000]);
 
-        $this->artisan('migrate:rollback', ['--step' => 1])->assertSuccessful();
+        $this->artisan('migrate:rollback', ['--step' => pasJusquaAlignement()])->assertSuccessful();
 
         expect(DB::table('services')->count())->toBe(1)
             ->and(DB::table('services')->value('nom'))->toBe('Tresses')
