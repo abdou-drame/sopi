@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use Carbon\CarbonInterface;
 use Database\Factories\ReservationFactory;
@@ -10,6 +11,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Réservation d'un créneau par un client pour une prestation (diagramme de classes).
@@ -165,5 +168,16 @@ class Reservation extends Model
     public function prestation(): BelongsTo
     {
         return $this->belongsTo(Prestation::class);
+    }
+
+    public function paiements(): HasMany
+    {
+        return $this->hasMany(Paiement::class);
+    }
+
+    /** Paiement en cours ou réussi (lecture seule) ; null si aucun. Au plus un, garanti par la base. */
+    public function paiementActif(): HasOne
+    {
+        return $this->hasOne(Paiement::class)->whereIn('statut', array_column(StatutPaiement::ACTIFS, 'value'));
     }
 }
