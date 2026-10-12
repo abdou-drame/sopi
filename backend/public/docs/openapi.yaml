@@ -20,6 +20,9 @@ tags:
     name: 'Client — recherche de prestataires'
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`)."
   -
+    name: 'Client — réservations'
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur."
+  -
     name: "Client — verrou d'un créneau"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.\nUn client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver."
   -
@@ -1285,6 +1288,193 @@ paths:
                           type: string
       tags:
         - 'Client — recherche de prestataires'
+  /api/v1/reservations:
+    post:
+      summary: 'Réserver un créneau'
+      operationId: rserverUnCrneau
+      description: "Confirme la demande du client sur un créneau qu'il a verrouillé (voir « Verrouiller un créneau ») avant l'expiration\ndu verrou. La réservation est créée au statut `en_attente` (le prestataire a 12 h pour répondre) et le créneau passe\nà « réservé ». La réponse ne contient aucune donnée personnelle du prestataire ni code de réservation."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: en_attente
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000030
+                    nomEntreprise: 'Garage Exemple'
+                    quartier: 'Keur Massar Nord'
+                    adresse: 'Rue 10, Keur Massar'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: en_attente
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000030
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                      quartier:
+                        type: string
+                        example: 'Keur Massar Nord'
+                      adresse:
+                        type: string
+                        example: 'Rue 10, Keur Massar'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Créneau introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Créneau introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Délai dépassé. Veuillez sélectionner de nouveau un créneau.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Délai dépassé. Veuillez sélectionner de nouveau un créneau.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Cette prestation n'est pas proposée sur ce créneau."
+                  errors:
+                    prestation_id:
+                      - "Cette prestation n'est pas proposée sur ce créneau."
+                properties:
+                  message:
+                    type: string
+                    example: "Cette prestation n'est pas proposée sur ce créneau."
+                  errors:
+                    type: object
+                    properties:
+                      prestation_id:
+                        type: array
+                        example:
+                          - "Cette prestation n'est pas proposée sur ce créneau."
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Client — réservations'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                creneau_id:
+                  type: string
+                  description: 'Identifiant du créneau, que le client a verrouillé. validation.uuid.'
+                  example: 0198a1b2-0000-7000-8000-000000000040
+                prestation_id:
+                  type: string
+                  description: 'Identifiant de la prestation, active et proposée par le prestataire du créneau. validation.uuid.'
+                  example: 0198a1b2-0000-7000-8000-000000000050
+              required:
+                - creneau_id
+                - prestation_id
   '/api/v1/creneaux/{id}/verrou':
     post:
       summary: 'Verrouiller un créneau'
@@ -1461,7 +1651,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T01:33:21+00:00'
+                  time: '2026-10-12T14:32:16+00:00'
                 properties:
                   status:
                     type: string
@@ -1477,7 +1667,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T01:33:21+00:00'
+                    example: '2026-10-12T14:32:16+00:00'
       tags:
         - Endpoints
       security: []
