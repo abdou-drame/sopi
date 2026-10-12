@@ -28,7 +28,7 @@ class PaiementReservationResource extends JsonResource
                 'montantAcompte' => $this->montant_acompte,
                 'devise' => 'XOF',
             ],
-            'montantRestantSurPlace' => CalculPaiement::soustraire($reservation->prestation->prix, $this->montant_acompte),
+            'montantRestantSurPlace' => CalculPaiement::soustraire($reservation->prix_applique, $this->montant_acompte),
             'urlPaiement' => $this->url_paiement,
             'reservation' => [
                 'id' => $reservation->id,

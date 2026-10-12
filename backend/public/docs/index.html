@@ -1545,7 +1545,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <p>Pour une réservation <code>acceptee</code> dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
 l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
-serveur à partir du prix courant de la prestation. La réservation reste <code>acceptee</code> : elle ne sera confirmée (et son code
+serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste <code>acceptee</code> : elle ne sera confirmée (et son code
 généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
 pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.</p>
 
@@ -3790,7 +3790,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T21:44:29+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T23:22:35+00:00&quot;
 }</code>
  </pre>
     </span>

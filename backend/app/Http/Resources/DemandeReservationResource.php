@@ -32,7 +32,7 @@ class DemandeReservationResource extends JsonResource
                 'id' => $this->prestation->id,
                 'nom' => $this->prestation->nom,
                 'dureeMinutes' => $this->prestation->duree_minutes,
-                'prix' => (float) $this->prestation->prix,
+                'prix' => (float) $this->prix_applique,
             ],
             'client' => [
                 'prenom' => $this->client->prenom,

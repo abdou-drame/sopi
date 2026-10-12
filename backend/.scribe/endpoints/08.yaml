@@ -20,7 +20,7 @@ endpoints:
       description: |-
         Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
         l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
-        serveur à partir du prix courant de la prestation. La réservation reste `acceptee` : elle ne sera confirmée (et son code
+        serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code
         généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
         pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.
       authenticated: true

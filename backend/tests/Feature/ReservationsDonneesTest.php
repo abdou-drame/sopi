@@ -15,7 +15,7 @@ uses(RefreshDatabase::class);
 describe('table reservations', function () {
     it('a les colonnes prévues', function () {
         expect(Schema::getColumnListing('reservations'))->toEqualCanonicalizing([
-            'id', 'client_id', 'creneau_id', 'prestation_id', 'statut', 'motif_refus', 'code_reservation', 'acceptee_le', 'created_at', 'updated_at',
+            'id', 'client_id', 'creneau_id', 'prestation_id', 'prix_applique', 'statut', 'motif_refus', 'code_reservation', 'acceptee_le', 'created_at', 'updated_at',
         ]);
     });
 
@@ -24,7 +24,9 @@ describe('table reservations', function () {
         $reservation = new Reservation;
         $reservation->client_id = User::factory()->create()->id;
         $reservation->creneau_id = $creneau->id;
-        $reservation->prestation_id = Prestation::factory()->for($creneau->prestataire)->create()->id;
+        $prestation = Prestation::factory()->for($creneau->prestataire)->create();
+        $reservation->prestation_id = $prestation->id;
+        $reservation->prix_applique = $prestation->prix;
         $reservation->save();
 
         $recharge = $reservation->fresh();

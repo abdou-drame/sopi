@@ -25,7 +25,7 @@ class Reservation extends Model
 
     protected $table = 'reservations';
 
-    // Clés étrangères, statut, motif, code et acceptee_le sont posés par le métier, jamais en masse.
+    // Clés étrangères, prix_applique (prix convenu, figé à la création), statut, motif, code et acceptee_le sont posés par le métier, jamais en masse.
     protected $fillable = [];
 
     protected $attributes = [
@@ -36,6 +36,7 @@ class Reservation extends Model
     {
         return [
             'statut' => StatutReservation::class,
+            'prix_applique' => 'decimal:2',
             'acceptee_le' => 'datetime',
         ];
     }

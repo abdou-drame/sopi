@@ -55,6 +55,8 @@ class ReservationService
                     'client_id' => $client->id,
                     'creneau_id' => $creneau->id,
                     'prestation_id' => $prestation->id,
+                    // Prix convenu, figé ici (jamais fourni par le client) : relu dans la transaction, à l'insertion.
+                    'prix_applique' => Prestation::query()->whereKey($prestation->id)->value('prix'),
                     'statut' => StatutReservation::EnAttente,
                 ])->save();
 
