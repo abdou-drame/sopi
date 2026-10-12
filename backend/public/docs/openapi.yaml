@@ -11,6 +11,9 @@ tags:
     name: "Administration — demandes d'inscription"
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`)."
   -
+    name: "Client — profil public d'un prestataire"
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
+  -
     name: 'Client — recherche de prestataires'
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`)."
   -
@@ -22,6 +25,9 @@ tags:
   -
     name: 'Prestataire — catalogue de prestations'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est\ntoujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive."
+  -
+    name: "Prestataire — photos d'atelier"
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.\nLes clients voient ces photos sur le profil public du prestataire."
   -
     name: Profil
     description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
@@ -698,6 +704,210 @@ paths:
         required: true
         schema:
           type: string
+  '/api/v1/prestataires/{id}':
+    get:
+      summary: "Profil d'un prestataire"
+      operationId: profilDunPrestataire
+      description: "Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle et pas de note\n(les avis n'existent pas encore). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000002
+                  nomEntreprise: 'Garage Moussa'
+                  metier: mecanique
+                  quartier: Malika
+                  adresse: 'Rue 10, près du marché'
+                  prestations:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000020
+                      nom: 'Vidange complète'
+                      domaine: mecanique
+                      dureeMinutes: 60
+                      prix: 15000
+                  photos:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000030
+                      url: /api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  nomEntreprise:
+                    type: string
+                    example: 'Garage Moussa'
+                  metier:
+                    type: string
+                    example: mecanique
+                  quartier:
+                    type: string
+                    example: Malika
+                  adresse:
+                    type: string
+                    example: 'Rue 10, près du marché'
+                  prestations:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000020
+                        nom: 'Vidange complète'
+                        domaine: mecanique
+                        dureeMinutes: 60
+                        prix: 15000
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000020
+                        nom:
+                          type: string
+                          example: 'Vidange complète'
+                        domaine:
+                          type: string
+                          example: mecanique
+                        dureeMinutes:
+                          type: integer
+                          example: 60
+                        prix:
+                          type: integer
+                          example: 15000
+                  photos:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000030
+                        url: /api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000030
+                        url:
+                          type: string
+                          example: /api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Prestataire introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Prestataire introuvable.'
+      tags:
+        - "Client — profil public d'un prestataire"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du prestataire.'
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/prestataires/{id}/photos/{photo}':
+    get:
+      summary: "Photo d'atelier"
+      operationId: photoDatelier
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      parameters: []
+      responses:
+        200:
+          description: image
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "[Contenu binaire de l'image]"
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Photo introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Photo introuvable.'
+      tags:
+        - "Client — profil public d'un prestataire"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du prestataire.'
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: photo
+        description: 'Identifiant de la photo.'
+        example: 0198a1b2-0000-7000-8000-000000000030
+        required: true
+        schema:
+          type: string
   /api/v1/prestataires:
     get:
       summary: 'Rechercher des prestataires'
@@ -952,7 +1162,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-11T23:43:29+00:00'
+                  time: '2026-10-12T00:06:34+00:00'
                 properties:
                   status:
                     type: string
@@ -968,7 +1178,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-11T23:43:29+00:00'
+                    example: '2026-10-12T00:06:34+00:00'
       tags:
         - Endpoints
       security: []
@@ -1685,6 +1895,204 @@ paths:
         name: id
         description: 'Identifiant de la prestation.'
         example: 0198a1b2-0000-7000-8000-000000000020
+        required: true
+        schema:
+          type: string
+  /api/v1/prestataire/photos:
+    get:
+      summary: 'Mes photos'
+      operationId: mesPhotos
+      description: "Identifiants des photos du prestataire connecté, dans l'ordre d'ajout."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000030
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000030
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000030
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - "Prestataire — photos d'atelier"
+    post:
+      summary: 'Ajouter une photo'
+      operationId: ajouterUnePhoto
+      description: "Envoi multipart, champ `photo`. Le type réel est vérifié sur le contenu. Au-delà de 6 photos, l'envoi est refusé."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000030
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000030
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Vous ne pouvez pas ajouter plus de 6 photos.'
+                  errors:
+                    photo:
+                      - 'Vous ne pouvez pas ajouter plus de 6 photos.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Vous ne pouvez pas ajouter plus de 6 photos.'
+                  errors:
+                    type: object
+                    properties:
+                      photo:
+                        type: array
+                        example:
+                          - 'Vous ne pouvez pas ajouter plus de 6 photos.'
+                        items:
+                          type: string
+      tags:
+        - "Prestataire — photos d'atelier"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: 'Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
+              required:
+                - photo
+  '/api/v1/prestataire/photos/{photo}':
+    delete:
+      summary: 'Supprimer une photo'
+      operationId: supprimerUnePhoto
+      description: "Supprime l'entrée et le fichier. La photo d'un autre prestataire répond 404, comme une photo inexistante."
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {  }
+                properties: {  }
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Photo introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Photo introuvable.'
+      tags:
+        - "Prestataire — photos d'atelier"
+    parameters:
+      -
+        in: path
+        name: photo
+        description: 'Identifiant de la photo.'
+        example: 0198a1b2-0000-7000-8000-000000000030
         required: true
         schema:
           type: string
