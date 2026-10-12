@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Role;
+use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationAnnulee;
 use App\Exceptions\ReservationImpossibleException;
@@ -23,6 +24,7 @@ class SuiviReservationService
     {
         return $client->reservations()
             ->with(['creneau', 'prestation.prestataire'])
+            ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
             ->when($statut, fn ($q) => $q->where('statut', $statut->value))
             ->orderByDesc('created_at')
             ->orderByDesc('id')
@@ -36,7 +38,9 @@ class SuiviReservationService
             return null;
         }
 
-        return $client->reservations()->with(['creneau', 'prestation.prestataire'])->find($id);
+        return $client->reservations()->with(['creneau', 'prestation.prestataire'])
+            ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
+            ->find($id);
     }
 
     /** Mêmes règles que l'annulation : statut annulable et début du créneau à au moins le délai configuré. */

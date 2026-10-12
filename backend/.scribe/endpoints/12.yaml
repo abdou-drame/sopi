@@ -1,23 +1,27 @@
-name: Profil
+name: 'Prestataire — demandes de réservation'
 description: |-
 
-  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+  de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+  que par son prénom et l'initiale de son nom.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/me
+    uri: api/v1/prestataire/reservations
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — demandes de réservation'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Voir mon profil'
-      description: ''
+      title: 'Mes demandes de réservation'
+      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`.'
       authenticated: true
       deprecated: false
     headers:
@@ -26,6 +30,100 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
+    queryParameters:
+      statut:
+        custom: []
+        name: statut
+        description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+        required: false
+        example: en_attente
+        type: string
+        enumValues:
+          - en_attente
+          - acceptee
+          - confirmee
+          - en_cours
+          - terminee
+          - refusee
+          - annulee
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      statut: en_attente
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","last":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.","errors":{"statut":["Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/prestataire/reservations/{id}'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — demandes de réservation'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Détail d'une demande"
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -35,13 +133,25 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
         headers: []
         description: ''
       -
         custom: []
         status: 401
         content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
         headers: []
         description: ''
     responseFields: []
@@ -55,72 +165,52 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/accepter'
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — demandes de réservation'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Modifier mon profil'
-      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
+      title: 'Accepter une demande'
+      description: |-
+        Possible seulement pour une demande `en_attente` reçue il y a moins de 12 h. Elle passe à `acceptee` (le client a
+        alors 2 h pour payer) et le créneau reste réservé.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      nom:
-        custom: []
-        name: nom
-        description: Nom.
-        required: true
-        example: Diop
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      prenom:
-        custom: []
-        name: prenom
-        description: Prénom.
-        required: true
-        example: Awa
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      telephone:
-        custom: []
-        name: telephone
-        description: 'Mobile sénégalais, avec ou sans +221.'
-        required: true
-        example: '77 123 45 67'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: Diop
-      prenom: Awa
-      telephone: '77 123 45 67'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
         headers: []
         description: ''
       -
@@ -131,8 +221,26 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette demande a déjà reçu une réponse."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []
@@ -146,72 +254,62 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me/mot-de-passe
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/refuser'
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — demandes de réservation'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Changer mon mot de passe'
-      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
+      title: 'Refuser une demande'
+      description: "Mêmes conditions que l'acceptation. La demande passe à `refusee` avec le motif et le créneau est libéré."
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      mot_de_passe_actuel:
+      motif:
         custom: []
-        name: mot_de_passe_actuel
-        description: 'Mot de passe actuel.'
+        name: motif
+        description: 'Raison du refus, transmise au client (3 à 500 caractères). Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 500 caractères.'
         required: true
-        example: ancienmotdepasse
+        example: 'Je ne suis pas disponible à cette heure.'
         type: string
         enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      nouveau_mot_de_passe:
-        custom: []
-        name: nouveau_mot_de_passe
-        description: '8 caractères minimum.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      confirmation:
-        custom: []
-        name: confirmation
-        description: 'Identique au nouveau mot de passe.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      mot_de_passe_actuel: ancienmotdepasse
-      nouveau_mot_de_passe: nouveaumotdepasse
-      confirmation: nouveaumotdepasse
+      motif: 'Je ne suis pas disponible à cette heure.'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Votre mot de passe a été modifié."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"refusee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Je ne suis pas disponible à cette heure.","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
         headers: []
         description: ''
       -
@@ -222,8 +320,32 @@ endpoints:
         description: ''
       -
         custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Le délai de réponse est dépassé."}'
+        headers: []
+        description: ''
+      -
+        custom: []
         status: 422
-        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
+        content: '{"message":"Le motif du refus est obligatoire.","errors":{"motif":["Le motif du refus est obligatoire."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []
@@ -237,48 +359,65 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me/jeton-push
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/demarrer'
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — demandes de réservation'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Enregistrer mon jeton push'
-      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
+      title: 'Démarrer la prestation avec le code du client'
+      description: |-
+        Le client communique son code de réservation (6 caractères alphanumériques) au prestataire, qui le saisit ici :
+        la réservation `confirmee` passe à `en_cours`. Minuscules et espaces autour du code sont acceptés. Limité à
+        5 essais par minute pour une même réservation. Le code n'est jamais renvoyé.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      jetonPush:
+    urlParameters:
+      id:
         custom: []
-        name: jetonPush
-        description: 'Jeton FCM.'
+        name: id
+        description: 'Identifiant de la réservation.'
         required: true
-        example: fcm-jeton-exemple
+        example: 0198a1b2-0000-7000-8000-000000000060
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      code:
+        custom: []
+        name: code
+        description: 'Code de réservation communiqué par le client : 6 caractères alphanumériques (minuscules et espaces autour acceptés). Must match the regex /^[A-Z0-9]{6}$/.'
+        required: true
+        example: AB12CD
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      jetonPush: fcm-jeton-exemple
+      code: AB12CD
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Jeton de notification enregistré."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_cours","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
         headers: []
         description: ''
       -
@@ -289,8 +428,119 @@ endpoints:
         description: ''
       -
         custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette réservation ne peut pas être démarrée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
         status: 422
-        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
+        content: '{"message":"Code de réservation incorrect.","errors":{"code":["Code de réservation incorrect."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/prestataire/reservations/{id}/terminer'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — demandes de réservation'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations
+        de ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié
+        que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Terminer la prestation'
+      description: 'La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette réservation ne peut pas être terminée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []

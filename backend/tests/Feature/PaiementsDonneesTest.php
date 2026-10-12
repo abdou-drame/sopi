@@ -15,7 +15,7 @@ uses(RefreshDatabase::class);
 describe('table paiements', function () {
     it('a les colonnes prévues', function () {
         expect(Schema::getColumnListing('paiements'))->toEqualCanonicalizing([
-            'id', 'reservation_id', 'montant_acompte', 'commission', 'statut', 'reference_dexpay', 'paye_le', 'rembourse_le', 'created_at', 'updated_at',
+            'id', 'reservation_id', 'montant_acompte', 'commission', 'statut', 'reference_dexpay', 'url_paiement', 'paye_le', 'rembourse_le', 'created_at', 'updated_at',
         ]);
     });
 
