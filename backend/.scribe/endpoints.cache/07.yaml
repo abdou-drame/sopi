@@ -237,6 +237,108 @@ endpoints:
   -
     custom: []
     httpMethods:
+      - POST
+    uri: api/v1/prestataire/agenda/indisponibilites
+    metadata:
+      custom: []
+      groupName: 'Prestataire — agenda'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+        les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Déclarer une indisponibilité'
+      description: |-
+        Bloque immédiatement (statut `indisponible`) les créneaux libres qui chevauchent la plage, en une seule opération atomique.
+        Un créneau verrouillé dont le verrou a expiré est bloqué ; un créneau réservé ou verrouillé avec un verrou valide n'est pas modifié,
+        il est seulement compté pour être traité plus tard (annulation, remboursement et notification : pas encore disponibles).
+        Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      debut:
+        custom: []
+        name: debut
+        description: 'Début (AAAA-MM-JJ HH:MM, fuseau Africa/Dakar). Peut être passé ou présent. Must be a valid date in the format <code>Y-m-d H:i</code>.'
+        required: true
+        example: '2030-01-15 08:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      fin:
+        custom: []
+        name: fin
+        description: 'Fin (AAAA-MM-JJ HH:MM), après le début et dans le futur. Plage de 90 jours au maximum. Must be a valid date in the format <code>Y-m-d H:i</code>.'
+        required: true
+        example: '2030-01-20 18:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      motif:
+        custom: []
+        name: motif
+        description: 'Motif (congé, urgence...). Facultatif, non conservé. Le champ value ne doit pas dépasser 255 caractères.'
+        required: false
+        example: Congé
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      debut: '2030-01-15 08:00'
+      fin: '2030-01-20 18:00'
+      motif: Congé
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"La fin doit être après le début.","errors":{"fin":["La fin doit être après le début."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
       - DELETE
     uri: 'api/v1/prestataire/agenda/creneaux/{id}'
     metadata:
