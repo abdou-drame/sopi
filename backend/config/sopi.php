@@ -28,6 +28,10 @@ return [
     'reservations' => [
         'delai_reponse_heures' => (int) env('RESERVATION_DELAI_REPONSE_HEURES', 12),
 
+        // RG11 : délai laissé au client pour payer après acceptation (compté depuis acceptee_le). Passé ce délai, la
+        // réservation ACCEPTEE est annulée par la tâche planifiée.
+        'delai_paiement_heures' => (int) env('RESERVATION_DELAI_PAIEMENT_HEURES', 2),
+
         // RG13 : le client peut annuler jusqu'à ce nombre d'heures avant le début du créneau (borne incluse).
         'annulation_client_heures' => (int) env('RESERVATION_ANNULATION_CLIENT_HEURES', 2),
     ],

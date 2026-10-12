@@ -108,6 +108,18 @@ class Creneau extends Model
     }
 
     /**
+     * Libère en une seule requête tous les créneaux dont le verrou a expiré (RG09) : VERROUILLE vers LIBRE, verrou vidé.
+     * Un verrou encore valide, un créneau réservé ou indisponible ne sont jamais touchés. Renvoie le nombre libéré.
+     */
+    public static function libererVerrousExpires(): int
+    {
+        return static::query()
+            ->where('statut', StatutCreneau::Verrouille->value)
+            ->where('verrou_expire_a', '<', now())
+            ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]);
+    }
+
+    /**
      * Libère un créneau réservé quand sa réservation est refusée : RESERVE vers LIBRE, verrou vidé, et seulement s'il est
      * encore réservé ET lié à cette réservation. Vrai si le créneau a été libéré.
      */
