@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Exceptions\ConfigurationPaiementInvalide;
+use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\FakePaiementService;
+use App\Services\Paiement\PaiementService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -11,7 +15,14 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Pilote de paiement choisi par PAYMENT_DRIVER (fake ou dexpay). DexPay arrive en M6.6.
+        $this->app->singleton(PaiementService::class, fn () => match ($pilote = (string) config('sopi.paiement.driver')) {
+            'fake' => new FakePaiementService(config('sopi.paiement.webhook_secret')),
+            'dexpay' => throw new ConfigurationPaiementInvalide('Le prestataire de paiement DexPay n\'est pas encore disponible.'),
+            default => throw new ConfigurationPaiementInvalide("Le pilote de paiement « {$pilote} » est inconnu (valeurs possibles : fake, dexpay)."),
+        });
+
+        $this->app->bind(CalculPaiement::class, fn () => CalculPaiement::depuisConfiguration());
     }
 
     public function boot(): void
