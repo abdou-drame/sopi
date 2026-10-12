@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
         $parUtilisateur = fn (Request $request) => $request->user()?->id ?? $request->ip();
         RateLimiter::for('mot-de-passe', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
         RateLimiter::for('profil', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
+        RateLimiter::for('verrou-creneau', fn (Request $request) => Limit::perMinute(20)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré

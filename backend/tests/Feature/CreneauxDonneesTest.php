@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Schema;
 uses(RefreshDatabase::class);
 
 describe('table creneaux', function () {
-    it('a les colonnes prévues, sans colonne supplémentaire', function () {
+    it('a les colonnes prévues, sans colonne supplémentaire (verrouille_par ajoutée en M4.5)', function () {
         expect(Schema::getColumnListing('creneaux'))->toEqualCanonicalizing([
-            'id', 'prestataire_id', 'date_debut', 'date_fin', 'statut', 'verrou_expire_a', 'created_at', 'updated_at',
+            'id', 'prestataire_id', 'date_debut', 'date_fin', 'statut', 'verrou_expire_a', 'verrouille_par', 'created_at', 'updated_at',
         ]);
     });
 

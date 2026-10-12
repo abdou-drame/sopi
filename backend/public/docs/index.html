@@ -121,6 +121,19 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-client-verrou-dun-creneau" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="client-verrou-dun-creneau">
+                    <a href="#client-verrou-dun-creneau">Client — verrou d'un créneau</a>
+                </li>
+                                    <ul id="tocify-subheader-client-verrou-dun-creneau" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="client-verrou-dun-creneau-POSTapi-v1-creneaux--id--verrou">
+                                <a href="#client-verrou-dun-creneau-POSTapi-v1-creneaux--id--verrou">Verrouiller un créneau</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="client-verrou-dun-creneau-DELETEapi-v1-creneaux--id--verrou">
+                                <a href="#client-verrou-dun-creneau-DELETEapi-v1-creneaux--id--verrou">Libérer son verrou</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-endpoints" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="endpoints">
                     <a href="#endpoints">Endpoints</a>
@@ -2146,6 +2159,389 @@ Must be one of:
             </div>
                 </form>
 
+                <h1 id="client-verrou-dun-creneau">Client — verrou d'un créneau</h1>
+
+    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>), limitées à 20 requêtes par minute et par utilisateur.
+Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.</p>
+
+                                <h2 id="client-verrou-dun-creneau-POSTapi-v1-creneaux--id--verrou">Verrouiller un créneau</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Verrouille le créneau pour 5 minutes si, et seulement si, il est libre et à venir (une seule opération atomique :
+si deux clients tentent en même temps, un seul l'obtient). Un client ne détient qu'un verrou à la fois : verrouiller
+un autre créneau libère le précédent. Si le client tient déjà un verrou valide sur ce créneau, la même échéance
+est renvoyée, sans prolongation.</p>
+
+<span id="example-requests-POSTapi-v1-creneaux--id--verrou">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/creneaux/0198a1b2-0000-7000-8000-000000000040/verrou" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/creneaux/0198a1b2-0000-7000-8000-000000000040/verrou"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-creneaux--id--verrou">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;creneauId&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+    &quot;verrouExpireA&quot;: &quot;2030-01-15T08:55:00+00:00&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Cr&eacute;neau introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Ce cr&eacute;neau n&#039;est plus disponible.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-creneaux--id--verrou" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-creneaux--id--verrou"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-creneaux--id--verrou"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-creneaux--id--verrou" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-creneaux--id--verrou">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-creneaux--id--verrou" data-method="POST"
+      data-path="api/v1/creneaux/{id}/verrou"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-creneaux--id--verrou', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-creneaux--id--verrou"
+                    onclick="tryItOut('POSTapi-v1-creneaux--id--verrou');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-creneaux--id--verrou"
+                    onclick="cancelTryOut('POSTapi-v1-creneaux--id--verrou');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-creneaux--id--verrou"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/creneaux/{id}/verrou</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-creneaux--id--verrou"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-creneaux--id--verrou"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-creneaux--id--verrou"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="POSTapi-v1-creneaux--id--verrou"
+               value="0198a1b2-0000-7000-8000-000000000040"
+               data-component="url">
+    <br>
+<p>Identifiant du créneau. Example: <code>0198a1b2-0000-7000-8000-000000000040</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="client-verrou-dun-creneau-DELETEapi-v1-creneaux--id--verrou">Libérer son verrou</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Remet le créneau à libre, uniquement s'il est verrouillé par le client connecté.</p>
+
+<span id="example-requests-DELETEapi-v1-creneaux--id--verrou">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/v1/creneaux/0198a1b2-0000-7000-8000-000000000040/verrou" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/creneaux/0198a1b2-0000-7000-8000-000000000040/verrou"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-v1-creneaux--id--verrou">
+            <blockquote>
+            <p>Example response (204):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Verrou introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-DELETEapi-v1-creneaux--id--verrou" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-v1-creneaux--id--verrou"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-v1-creneaux--id--verrou"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-v1-creneaux--id--verrou" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-v1-creneaux--id--verrou">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-v1-creneaux--id--verrou" data-method="DELETE"
+      data-path="api/v1/creneaux/{id}/verrou"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-creneaux--id--verrou', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-v1-creneaux--id--verrou"
+                    onclick="tryItOut('DELETEapi-v1-creneaux--id--verrou');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-v1-creneaux--id--verrou"
+                    onclick="cancelTryOut('DELETEapi-v1-creneaux--id--verrou');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-v1-creneaux--id--verrou"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/v1/creneaux/{id}/verrou</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-creneaux--id--verrou"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-v1-creneaux--id--verrou"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-v1-creneaux--id--verrou"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="DELETEapi-v1-creneaux--id--verrou"
+               value="0198a1b2-0000-7000-8000-000000000040"
+               data-component="url">
+    <br>
+<p>Identifiant du créneau. Example: <code>0198a1b2-0000-7000-8000-000000000040</code></p>
+            </div>
+                    </form>
+
                 <h1 id="endpoints">Endpoints</h1>
 
     
@@ -2204,7 +2600,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T01:14:40+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T01:33:21+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -2886,7 +3282,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php647C.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php81A6.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -3187,7 +3583,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php647C.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php81A6.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -5267,7 +5663,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php650A.tmp" </code></pre></div>
+    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php8244.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -5429,7 +5825,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php650A.tmp</code></p>
+<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php8244.tmp</code></p>
         </div>
         </form>
 

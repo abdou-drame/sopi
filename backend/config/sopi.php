@@ -14,4 +14,11 @@ return [
         'password' => env('ADMIN_PASSWORD'),
     ],
 
+    /*
+    | Durée du verrou temporaire d'un créneau pendant qu'un client réserve (RG08, RG09).
+    */
+    'creneaux' => [
+        'verrou_minutes' => (int) env('SLOT_LOCK_MINUTES', 5),
+    ],
+
 ];
