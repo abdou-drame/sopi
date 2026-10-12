@@ -57,6 +57,27 @@ class CalculPaiement
         return new MontantsPaiement($acompte.'.00', $commission.'.00');
     }
 
+    /**
+     * Différence exacte de deux montants décimaux (« 15000.00 » - « 4500.00 » = « 10500.00 »), jamais négative : reste à payer sur place.
+     *
+     * @throws InvalidArgumentException si un montant n'est pas un décimal positif à 2 décimales au plus
+     */
+    public static function soustraire(string $a, string $b): string
+    {
+        $centimes = max(0, self::enCentimes($a) - self::enCentimes($b));
+
+        return intdiv($centimes, 100).'.'.str_pad((string) ($centimes % 100), 2, '0', STR_PAD_LEFT);
+    }
+
+    private static function enCentimes(string $montant): int
+    {
+        if (preg_match('/^(\d{1,10})(?:\.(\d{1,2}))?$/', $montant, $m) !== 1) {
+            throw new InvalidArgumentException('Le montant doit être positif avec au plus 2 décimales.');
+        }
+
+        return ((int) $m[1]) * 100 + (int) str_pad($m[2] ?? '', 2, '0');
+    }
+
     /** prix (en centimes) x taux (en millionièmes) en FCFA entiers, demi vers le haut. Au plus 10^12 x 10^6 : tient dans un entier 64 bits. */
     private function arrondi(int $centimes, int $tauxMicro): int
     {

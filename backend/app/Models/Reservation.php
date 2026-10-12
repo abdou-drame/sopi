@@ -155,6 +155,21 @@ class Reservation extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Prend le verrou de ligne pour initier le paiement (M6.3) sans rien changer d'utile : « touche » updated_at, seulement si la
+     * réservation est au client, toujours ACCEPTEE et dans le délai de paiement ($limite = maintenant moins le délai).
+     * Pendant la transaction, l'expiration et l'annulation ne peuvent plus passer. Vrai si exactement une ligne a changé.
+     */
+    public function prendreVerrouPaiement(string $clientId, CarbonInterface $limite): bool
+    {
+        return static::query()
+            ->whereKey($this->getKey())
+            ->where('client_id', $clientId)
+            ->where('statut', StatutReservation::Acceptee->value)
+            ->where('acceptee_le', '>', $limite)
+            ->update(['updated_at' => now()]) === 1;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

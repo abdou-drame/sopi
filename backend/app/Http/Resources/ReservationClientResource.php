@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Reservation;
+use App\Services\PaiementReservationService;
 use App\Services\SuiviReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,6 +30,7 @@ class ReservationClientResource extends JsonResource
             'motifRefus' => $this->motif_refus,
             'codeReservation' => $this->code_reservation,
             'peutAnnuler' => SuiviReservationService::peutAnnuler($this->resource),
+            'peutPayer' => PaiementReservationService::peutPayer($this->resource),
             'creneau' => [
                 'id' => $this->creneau->id,
                 'dateDebut' => $this->creneau->date_debut->toIso8601String(),

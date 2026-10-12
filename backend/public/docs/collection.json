@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "48629c20-7e4e-43be-a6d8-232cc3696e5c",
+        "_postman_id": "55a81083-48a2-434a-aa73-22a44bf435a6",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -366,6 +366,94 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"L'intervalle ne peut pas d\u00e9passer 31 jours.\",\"errors\":{\"au\":[\"L'intervalle ne peut pas d\u00e9passer 31 jours.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Client \u2014 paiement",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 10 requ\u00eates par minute et par utilisateur.",
+            "item": [
+                {
+                    "name": "Payer l'acompte d'une r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id\/payer",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id\/payer",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pour une r\u00e9servation `acceptee` dont le d\u00e9lai de paiement (2 h apr\u00e8s l'acceptation) n'est pas d\u00e9pass\u00e9, cr\u00e9e le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calcul\u00e9 par le\nserveur \u00e0 partir du prix courant de la prestation. La r\u00e9servation reste `acceptee` : elle ne sera confirm\u00e9e (et son code\ng\u00e9n\u00e9r\u00e9) qu'\u00e0 la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est d\u00e9j\u00e0 en cours\npour cette r\u00e9servation, le m\u00eame paiement et la m\u00eame adresse sont renvoy\u00e9s avec le code 200."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"paiement\":{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"en_attente\",\"montantAcompte\":\"4500.00\",\"devise\":\"XOF\"},\"montantRestantSurPlace\":\"10500.00\",\"urlPaiement\":\"https:\/\/paiement.exemple.test\/session\/abc123\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"acceptee\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"paiement\":{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"en_attente\",\"montantAcompte\":\"4500.00\",\"devise\":\"XOF\"},\"montantRestantSurPlace\":\"10500.00\",\"urlPaiement\":\"https:\/\/paiement.exemple.test\/session\/abc123\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"acceptee\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Le d\u00e9lai de paiement est d\u00e9pass\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 503,
+                            "body": "{\"message\":\"Le service de paiement est momentan\u00e9ment indisponible. Veuillez r\u00e9essayer.\"}",
                             "name": ""
                         }
                     ]
@@ -1048,7 +1136,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T16:54:59+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T21:44:29+00:00\"}",
                             "name": ""
                         }
                     ]

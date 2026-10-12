@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Enums\StatutPaiement;
+use App\Services\Paiement\MontantsPaiement;
+use App\Services\Paiement\SessionPaiement;
+use Carbon\CarbonInterface;
 use Database\Factories\PaiementFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -35,6 +38,50 @@ class Paiement extends Model
             'paye_le' => 'datetime',
             'rembourse_le' => 'datetime',
         ];
+    }
+
+    /** Crée le paiement EN_ATTENTE d'une réservation avec des montants calculés par le serveur (jamais en masse). */
+    public static function ouvrir(string $reservationId, MontantsPaiement $montants): self
+    {
+        $paiement = new self;
+        $paiement->reservation_id = $reservationId;
+        $paiement->montant_acompte = $montants->montantAcompte;
+        $paiement->commission = $montants->commission;
+        $paiement->statut = StatutPaiement::EnAttente;
+        $paiement->save();
+
+        return $paiement;
+    }
+
+    /**
+     * Enregistre la session de paiement, uniquement si le paiement est toujours EN_ATTENTE et sans référence.
+     * Une seule mise à jour conditionnelle. Vrai si exactement une ligne a changé.
+     */
+    public function enregistrerSessionSiEnAttente(SessionPaiement $session): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutPaiement::EnAttente->value)
+            ->whereNull('reference_dexpay')
+            ->update(['reference_dexpay' => $session->reference, 'url_paiement' => $session->urlPaiement, 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /**
+     * Passe EN_ATTENTE à ECHOUE un paiement qui n'a jamais reçu de référence (la session n'a pas pu être créée),
+     * éventuellement seulement s'il a été créé avant $creeAvant. Vrai si exactement une ligne a changé.
+     */
+    public function echouerSiSansReference(?CarbonInterface $creeAvant = null): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutPaiement::EnAttente->value)
+            ->whereNull('reference_dexpay')
+            ->when($creeAvant, fn ($q) => $q->where('created_at', '<=', $creeAvant))
+            ->update(['statut' => StatutPaiement::Echoue->value, 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
     }
 
     public function reservation(): BelongsTo

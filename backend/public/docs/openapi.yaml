@@ -14,6 +14,9 @@ tags:
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
+    name: 'Client — paiement'
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur."
+  -
     name: "Client — profil public d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -848,6 +851,192 @@ paths:
         name: id
         description: 'Identifiant du prestataire.'
         example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/reservations/{id}/payer':
+    post:
+      summary: "Payer l'acompte d'une réservation"
+      operationId: payerLacompteDuneRservation
+      description: "Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le\nserveur à partir du prix courant de la prestation. La réservation reste `acceptee` : elle ne sera confirmée (et son code\ngénéré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours\npour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  paiement:
+                    id: 0198a1b2-0000-7000-8000-000000000070
+                    statut: en_attente
+                    montantAcompte: '4500.00'
+                    devise: XOF
+                  montantRestantSurPlace: '10500.00'
+                  urlPaiement: 'https://paiement.exemple.test/session/abc123'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: acceptee
+                properties:
+                  paiement:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000070
+                      statut:
+                        type: string
+                        example: en_attente
+                      montantAcompte:
+                        type: string
+                        example: '4500.00'
+                      devise:
+                        type: string
+                        example: XOF
+                  montantRestantSurPlace:
+                    type: string
+                    example: '10500.00'
+                  urlPaiement:
+                    type: string
+                    example: 'https://paiement.exemple.test/session/abc123'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: acceptee
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  paiement:
+                    id: 0198a1b2-0000-7000-8000-000000000070
+                    statut: en_attente
+                    montantAcompte: '4500.00'
+                    devise: XOF
+                  montantRestantSurPlace: '10500.00'
+                  urlPaiement: 'https://paiement.exemple.test/session/abc123'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: acceptee
+                properties:
+                  paiement:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000070
+                      statut:
+                        type: string
+                        example: en_attente
+                      montantAcompte:
+                        type: string
+                        example: '4500.00'
+                      devise:
+                        type: string
+                        example: XOF
+                  montantRestantSurPlace:
+                    type: string
+                    example: '10500.00'
+                  urlPaiement:
+                    type: string
+                    example: 'https://paiement.exemple.test/session/abc123'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: acceptee
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le délai de paiement est dépassé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le délai de paiement est dépassé.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+        503:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le service de paiement est momentanément indisponible. Veuillez réessayer.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le service de paiement est momentanément indisponible. Veuillez réessayer.'
+      tags:
+        - 'Client — paiement'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
         required: true
         schema:
           type: string
@@ -2202,7 +2391,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T16:54:59+00:00'
+                  time: '2026-10-12T21:44:29+00:00'
                 properties:
                   status:
                     type: string
@@ -2218,7 +2407,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T16:54:59+00:00'
+                    example: '2026-10-12T21:44:29+00:00'
       tags:
         - Endpoints
       security: []
