@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
+use App\Http\Controllers\Api\V1\Client\ReservationController;
 use App\Http\Controllers\Api\V1\Client\VerrouCreneauController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
@@ -45,6 +46,9 @@ Route::prefix('v1')->group(function () {
             Route::post('/creneaux/{id}/verrou', [VerrouCreneauController::class, 'verrouiller']);
             Route::delete('/creneaux/{id}/verrou', [VerrouCreneauController::class, 'liberer']);
         });
+
+        // Réservation d'un créneau verrouillé (RF03, RF04).
+        Route::post('/reservations', [ReservationController::class, 'store'])->middleware('throttle:reservation');
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.

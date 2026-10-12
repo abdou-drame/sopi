@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "b5e5bb72-6053-4714-8817-2af0d363c198",
+        "_postman_id": "ce860845-a9fd-4413-978e-6e947a99582f",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -600,6 +600,83 @@
             ]
         },
         {
+            "name": "Client \u2014 r\u00e9servations",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 20 requ\u00eates par minute et par utilisateur.",
+            "item": [
+                {
+                    "name": "R\u00e9server un cr\u00e9neau",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"creneau_id\":\"0198a1b2-0000-7000-8000-000000000040\",\"prestation_id\":\"0198a1b2-0000-7000-8000-000000000050\"}"
+                        },
+                        "description": "Confirme la demande du client sur un cr\u00e9neau qu'il a verrouill\u00e9 (voir \u00ab Verrouiller un cr\u00e9neau \u00bb) avant l'expiration\ndu verrou. La r\u00e9servation est cr\u00e9\u00e9e au statut `en_attente` (le prestataire a 12 h pour r\u00e9pondre) et le cr\u00e9neau passe\n\u00e0 \u00ab r\u00e9serv\u00e9 \u00bb. La r\u00e9ponse ne contient aucune donn\u00e9e personnelle du prestataire ni code de r\u00e9servation."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nomEntreprise\":\"Garage Exemple\",\"quartier\":\"Keur Massar Nord\",\"adresse\":\"Rue 10, Keur Massar\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Cr\u00e9neau introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"D\u00e9lai d\u00e9pass\u00e9. Veuillez s\u00e9lectionner de nouveau un cr\u00e9neau.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Cette prestation n'est pas propos\u00e9e sur ce cr\u00e9neau.\",\"errors\":{\"prestation_id\":[\"Cette prestation n'est pas propos\u00e9e sur ce cr\u00e9neau.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 verrou d'un cr\u00e9neau",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 20 requ\u00eates par minute et par utilisateur.\nUn client s\u00e9lectionne un cr\u00e9neau libre : il est verrouill\u00e9 pour lui pendant 5 minutes, le temps de r\u00e9server.",
             "item": [
@@ -786,7 +863,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T01:33:21+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T14:32:16+00:00\"}",
                             "name": ""
                         }
                     ]
