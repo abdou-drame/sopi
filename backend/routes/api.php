@@ -44,6 +44,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/prestations/{id}', [PrestationController::class, 'update'])->whereUuid('id');
 
         Route::get('/photos', [PhotoAtelierController::class, 'index']);
+        Route::get('/photos/{photo}', [PhotoAtelierController::class, 'afficher'])->whereUuid('photo')->name('prestataire.photo');
         Route::post('/photos', [PhotoAtelierController::class, 'store']);
         Route::delete('/photos/{photo}', [PhotoAtelierController::class, 'destroy'])->whereUuid('photo');
     });

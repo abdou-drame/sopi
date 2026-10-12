@@ -90,7 +90,7 @@ describe('photos du prestataire', function () {
         $a = envoyerPhoto()->json('id');
         $b = envoyerPhoto()->json('id');
 
-        $this->getJson(URL_PHOTOS)->assertOk()->assertExactJson(['data' => [['id' => $a], ['id' => $b]]]);
+        $this->getJson(URL_PHOTOS)->assertOk()->assertExactJson(['data' => [['id' => $a, 'url' => URL_PHOTOS."/$a"], ['id' => $b, 'url' => URL_PHOTOS."/$b"]]]);
     });
 
     it('ne liste pas les photos des autres', function () {
