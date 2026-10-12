@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "ce860845-a9fd-4413-978e-6e947a99582f",
+        "_postman_id": "ef85ea85-193b-4f6e-9fb2-a44ff26e8a05",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -863,7 +863,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T14:32:16+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T15:17:42+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -1588,6 +1588,276 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\",\"errors\":{\"prix\":[\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 demandes de r\u00e9servation",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Un prestataire ne voit que les r\u00e9servations\nde ses propres cr\u00e9neaux ; celles d'un autre r\u00e9pondent 404, comme une r\u00e9servation inexistante. Le client n'est identifi\u00e9\nque par son pr\u00e9nom et l'initiale de son nom.",
+            "item": [
+                {
+                    "name": "Mes demandes de r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/reservations",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "en_attente",
+                                    "description": "Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par d\u00e9faut : tous.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations?statut=en_attente"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtre optionnel `statut`."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/reservations\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Accepter une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/reservations\/:id\/accepter",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations\/:id\/accepter",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Possible seulement pour une demande `en_attente` re\u00e7ue il y a moins de 12 h. Elle passe \u00e0 `acceptee` (le client a\nalors 2 h pour payer) et le cr\u00e9neau reste r\u00e9serv\u00e9."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"acceptee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cette demande a d\u00e9j\u00e0 re\u00e7u une r\u00e9ponse.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Refuser une demande",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/reservations\/:id\/refuser",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations\/:id\/refuser",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Je ne suis pas disponible \u00e0 cette heure.\"}"
+                        },
+                        "description": "M\u00eames conditions que l'acceptation. La demande passe \u00e0 `refusee` avec le motif et le cr\u00e9neau est lib\u00e9r\u00e9."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"refusee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Je ne suis pas disponible \u00e0 cette heure.\",\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Le d\u00e9lai de r\u00e9ponse est d\u00e9pass\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif du refus est obligatoire.\",\"errors\":{\"motif\":[\"Le motif du refus est obligatoire.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]

@@ -102,7 +102,7 @@ class InscriptionPrestataireRequest extends FormRequest
             'adresse' => ['description' => 'Adresse.', 'example' => 'Rue 10, près du marché'],
             'justificatifs' => ['description' => 'De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation.'],
             'justificatifs.*.type_document' => ['description' => 'cni, diplome ou attestation.', 'example' => 'cni'],
-            'justificatifs.*.fichier' => ['description' => 'PDF, JPG ou PNG, 5 Mo maximum.'],
+            'justificatifs.*.fichier' => ['description' => 'PDF, JPG ou PNG, 5 Mo maximum.', 'example' => 'resources/exemples-docs/justificatif.pdf'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatutReservation;
+use Carbon\CarbonInterface;
 use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,6 +34,33 @@ class Reservation extends Model
             'statut' => StatutReservation::class,
             'acceptee_le' => 'datetime',
         ];
+    }
+
+    /**
+     * Passe EN_ATTENTE à ACCEPTEE (acceptee_le = maintenant), en UNE requête conditionnelle : seulement si la demande est
+     * toujours en attente et créée après $limite (délai de réponse). Vrai si exactement une ligne a changé.
+     */
+    public function accepterSiEnAttente(CarbonInterface $limite): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::EnAttente->value)
+            ->where('created_at', '>', $limite)
+            ->update(['statut' => StatutReservation::Acceptee->value, 'acceptee_le' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Passe EN_ATTENTE à REFUSEE avec son motif, dans les mêmes conditions que accepterSiEnAttente(). */
+    public function refuserSiEnAttente(string $motif, CarbonInterface $limite): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::EnAttente->value)
+            ->where('created_at', '>', $limite)
+            ->update(['statut' => StatutReservation::Refusee->value, 'motif_refus' => $motif]);
+
+        return $modifies === 1 && $this->refresh() !== null;
     }
 
     public function client(): BelongsTo

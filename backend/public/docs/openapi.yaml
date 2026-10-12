@@ -38,6 +38,9 @@ tags:
     name: 'Prestataire — catalogue de prestations'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est\ntoujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive."
   -
+    name: 'Prestataire — demandes de réservation'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations\nde ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié\nque par son prénom et l'initiale de son nom."
+  -
     name: "Prestataire — photos d'atelier"
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.\nLes clients voient ces photos sur le profil public du prestataire."
   -
@@ -1651,7 +1654,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T14:32:16+00:00'
+                  time: '2026-10-12T15:17:42+00:00'
                 properties:
                   status:
                     type: string
@@ -1667,7 +1670,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T14:32:16+00:00'
+                    example: '2026-10-12T15:17:42+00:00'
       tags:
         - Endpoints
       security: []
@@ -2822,6 +2825,687 @@ paths:
         name: id
         description: 'Identifiant de la prestation.'
         example: 0198a1b2-0000-7000-8000-000000000020
+        required: true
+        schema:
+          type: string
+  /api/v1/prestataire/reservations:
+    get:
+      summary: 'Mes demandes de réservation'
+      operationId: mesDemandesDeRservation
+      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`.'
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+          example: en_attente
+          required: false
+          schema:
+            type: string
+            description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+            example: en_attente
+            enum:
+              - en_attente
+              - acceptee
+              - confirmee
+              - en_cours
+              - terminee
+              - refusee
+              - annulee
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000060
+                      statut: en_attente
+                      dateCreation: '2030-01-15T08:50:00+00:00'
+                      motifRefus: null
+                      creneau:
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut: '2030-01-16T09:00:00+00:00'
+                        dateFin: '2030-01-16T10:00:00+00:00'
+                      prestation:
+                        id: 0198a1b2-0000-7000-8000-000000000050
+                        nom: Vidange
+                        dureeMinutes: 60
+                        prix: 15000
+                      client:
+                        prenom: Awa
+                        initialeNom: D
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataire/reservations?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataire/reservations?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        statut: en_attente
+                        dateCreation: '2030-01-15T08:50:00+00:00'
+                        motifRefus: null
+                        creneau:
+                          id: 0198a1b2-0000-7000-8000-000000000040
+                          dateDebut: '2030-01-16T09:00:00+00:00'
+                          dateFin: '2030-01-16T10:00:00+00:00'
+                        prestation:
+                          id: 0198a1b2-0000-7000-8000-000000000050
+                          nom: Vidange
+                          dureeMinutes: 60
+                          prix: 15000
+                        client:
+                          prenom: Awa
+                          initialeNom: D
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000060
+                        statut:
+                          type: string
+                          example: en_attente
+                        dateCreation:
+                          type: string
+                          example: '2030-01-15T08:50:00+00:00'
+                        motifRefus:
+                          type: string
+                          example: null
+                          nullable: true
+                        creneau:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000040
+                            dateDebut:
+                              type: string
+                              example: '2030-01-16T09:00:00+00:00'
+                            dateFin:
+                              type: string
+                              example: '2030-01-16T10:00:00+00:00'
+                        prestation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000050
+                            nom:
+                              type: string
+                              example: Vidange
+                            dureeMinutes:
+                              type: integer
+                              example: 60
+                            prix:
+                              type: integer
+                              example: 15000
+                        client:
+                          type: object
+                          properties:
+                            prenom:
+                              type: string
+                              example: Awa
+                            initialeNom:
+                              type: string
+                              example: D
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/reservations?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/reservations?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                  errors:
+                    statut:
+                      - "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                properties:
+                  message:
+                    type: string
+                    example: "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                        items:
+                          type: string
+      tags:
+        - 'Prestataire — demandes de réservation'
+  '/api/v1/prestataire/reservations/{id}':
+    get:
+      summary: "Détail d'une demande"
+      operationId: dtailDuneDemande
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: en_attente
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  motifRefus: null
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  client:
+                    prenom: Awa
+                    initialeNom: D
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: en_attente
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  client:
+                    type: object
+                    properties:
+                      prenom:
+                        type: string
+                        example: Awa
+                      initialeNom:
+                        type: string
+                        example: D
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+      tags:
+        - 'Prestataire — demandes de réservation'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
+  '/api/v1/prestataire/reservations/{id}/accepter':
+    post:
+      summary: 'Accepter une demande'
+      operationId: accepterUneDemande
+      description: "Possible seulement pour une demande `en_attente` reçue il y a moins de 12 h. Elle passe à `acceptee` (le client a\nalors 2 h pour payer) et le créneau reste réservé."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: acceptee
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  motifRefus: null
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  client:
+                    prenom: Awa
+                    initialeNom: D
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: acceptee
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  client:
+                    type: object
+                    properties:
+                      prenom:
+                        type: string
+                        example: Awa
+                      initialeNom:
+                        type: string
+                        example: D
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cette demande a déjà reçu une réponse.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cette demande a déjà reçu une réponse.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Prestataire — demandes de réservation'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
+  '/api/v1/prestataire/reservations/{id}/refuser':
+    post:
+      summary: 'Refuser une demande'
+      operationId: refuserUneDemande
+      description: "Mêmes conditions que l'acceptation. La demande passe à `refusee` avec le motif et le créneau est libéré."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: refusee
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  motifRefus: 'Je ne suis pas disponible à cette heure.'
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  client:
+                    prenom: Awa
+                    initialeNom: D
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: refusee
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  motifRefus:
+                    type: string
+                    example: 'Je ne suis pas disponible à cette heure.'
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  client:
+                    type: object
+                    properties:
+                      prenom:
+                        type: string
+                        example: Awa
+                      initialeNom:
+                        type: string
+                        example: D
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le délai de réponse est dépassé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le délai de réponse est dépassé.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif du refus est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif du refus est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif du refus est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif du refus est obligatoire.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Prestataire — demandes de réservation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Raison du refus, transmise au client (3 à 500 caractères). Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+                  example: 'Je ne suis pas disponible à cette heure.'
+              required:
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
         required: true
         schema:
           type: string
