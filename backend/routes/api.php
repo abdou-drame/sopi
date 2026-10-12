@@ -4,9 +4,11 @@ use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
+use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
@@ -29,13 +31,21 @@ Route::prefix('v1')->group(function () {
     });
 
     // Espace client : jeton Sanctum + rôle client.
-    Route::get('/prestataires', RecherchePrestatairesController::class)->middleware(['auth:sanctum', 'role:client']);
+    Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
+        Route::get('/prestataires', RecherchePrestatairesController::class);
+        Route::get('/prestataires/{id}', [ProfilPublicController::class, 'show']);
+        Route::get('/prestataires/{id}/photos/{photo}', [ProfilPublicController::class, 'photo'])->name('prestataires.photo');
+    });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
     Route::middleware(['auth:sanctum', 'prestataire'])->prefix('prestataire')->group(function () {
         Route::get('/prestations', [PrestationController::class, 'index']);
         Route::post('/prestations', [PrestationController::class, 'store']);
         Route::patch('/prestations/{id}', [PrestationController::class, 'update'])->whereUuid('id');
+
+        Route::get('/photos', [PhotoAtelierController::class, 'index']);
+        Route::post('/photos', [PhotoAtelierController::class, 'store']);
+        Route::delete('/photos/{photo}', [PhotoAtelierController::class, 'destroy'])->whereUuid('photo');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

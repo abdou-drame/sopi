@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "791667e9-2b14-4c1b-9863-f5e3b81b54d0",
+        "_postman_id": "b4032179-8056-4288-ac5b-11be7470f886",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -290,6 +290,134 @@
             ]
         },
         {
+            "name": "Client \u2014 profil public d'un prestataire",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont visibles.",
+            "item": [
+                {
+                    "name": "Profil d'un prestataire",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Informations publiques, prestations actives et photos d'atelier. Aucune donn\u00e9e personnelle et pas de note\n(les avis n'existent pas encore). `url` est un chemin de l'API \u00e0 compl\u00e9ter avec l'URL de base ; l'image se charge avec le jeton."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"prestations\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":60,\"prix\":15000}],\"photos\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"url\":\"\/api\/v1\/prestataires\/0198a1b2-0000-7000-8000-000000000002\/photos\/0198a1b2-0000-7000-8000-000000000030\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Prestataire introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Photo d'atelier",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires\/:id\/photos\/:photo",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires\/:id\/photos\/:photo",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                },
+                                {
+                                    "id": "photo",
+                                    "key": "photo",
+                                    "value": "0198a1b2-0000-7000-8000-000000000030",
+                                    "description": "Identifiant de la photo."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Photo introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 recherche de prestataires",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`).",
             "item": [
@@ -435,7 +563,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-11T23:43:29+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T00:06:34+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -921,6 +1049,173 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\",\"errors\":{\"prix\":[\"Le prix doit \u00eatre sup\u00e9rieur \u00e0 0.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 photos d'atelier",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). 6 photos au plus, stock\u00e9es sur un disque priv\u00e9.\nLes clients voient ces photos sur le profil public du prestataire.",
+            "item": [
+                {
+                    "name": "Mes photos",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/photos",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/photos"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Identifiants des photos du prestataire connect\u00e9, dans l'ordre d'ajout."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\"}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Ajouter une photo",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/photos",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/photos"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "multipart\/form-data"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "photo",
+                                    "src": [],
+                                    "type": "file"
+                                }
+                            ]
+                        },
+                        "description": "Envoi multipart, champ `photo`. Le type r\u00e9el est v\u00e9rifi\u00e9 sur le contenu. Au-del\u00e0 de 6 photos, l'envoi est refus\u00e9."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000030\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Vous ne pouvez pas ajouter plus de 6 photos.\",\"errors\":{\"photo\":[\"Vous ne pouvez pas ajouter plus de 6 photos.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Supprimer une photo",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/photos\/:photo",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/photos\/:photo",
+                            "variable": [
+                                {
+                                    "id": "photo",
+                                    "key": "photo",
+                                    "value": "0198a1b2-0000-7000-8000-000000000030",
+                                    "description": "Identifiant de la photo."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Supprime l'entr\u00e9e et le fichier. La photo d'un autre prestataire r\u00e9pond 404, comme une photo inexistante."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 204,
+                            "body": "{}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Photo introuvable.\"}",
                             "name": ""
                         }
                     ]

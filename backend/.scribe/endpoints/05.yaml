@@ -1,23 +1,25 @@
-name: Profil
+name: 'Prestataire — catalogue de prestations'
 description: |-
 
-  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+  toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/me
+    uri: api/v1/prestataire/prestations
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — catalogue de prestations'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Voir mon profil'
-      description: ''
+      title: 'Mes prestations'
+      description: "Toutes les prestations du prestataire connecté, actives et inactives, les plus récentes d'abord (sans pagination)."
       authenticated: true
       deprecated: false
     headers:
@@ -35,13 +37,19 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}]}'
         headers: []
         description: ''
       -
         custom: []
         status: 401
         content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
     responseFields: []
@@ -55,18 +63,21 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me
+      - POST
+    uri: api/v1/prestataire/prestations
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — catalogue de prestations'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Modifier mon profil'
-      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
+      title: 'Ajouter une prestation'
+      description: |-
+        Le domaine est déduit du métier du prestataire (tout champ `domaine` envoyé est ignoré).
+        Le nom doit être unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus.
       authenticated: true
       deprecated: false
     headers:
@@ -81,46 +92,46 @@ endpoints:
       nom:
         custom: []
         name: nom
-        description: Nom.
+        description: 'Nom de la prestation (2 à 100 caractères, unique chez le prestataire sans tenir compte de la casse). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
         required: true
-        example: Diop
+        example: 'Vidange complète'
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-      prenom:
+      duree_minutes:
         custom: []
-        name: prenom
-        description: Prénom.
+        name: duree_minutes
+        description: 'Durée estimée en minutes (1 à 1440). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
         required: true
-        example: Awa
-        type: string
+        example: 60
+        type: integer
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-      telephone:
+      prix:
         custom: []
-        name: telephone
-        description: 'Mobile sénégalais, avec ou sans +221.'
+        name: prix
+        description: 'Prix en FCFA (XOF), supérieur à 0, 2 décimales au plus. Le champ value ne doit pas dépasser 9999999999.99.'
         required: true
-        example: '77 123 45 67'
-        type: string
+        example: 15000.0
+        type: number
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      nom: Diop
-      prenom: Awa
-      telephone: '77 123 45 67'
+      nom: 'Vidange complète'
+      duree_minutes: 60
+      prix: 15000.0
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}'
         headers: []
         description: ''
       -
@@ -131,8 +142,14 @@ endpoints:
         description: ''
       -
         custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
         status: 422
-        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
+        content: '{"message":"Vous proposez déjà une prestation avec ce nom.","errors":{"nom":["Vous proposez déjà une prestation avec ce nom."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -146,72 +163,99 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me/mot-de-passe
+      - PATCH
+    uri: 'api/v1/prestataire/prestations/{id}'
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — catalogue de prestations'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Changer mon mot de passe'
-      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
+      title: 'Modifier une prestation'
+      description: |-
+        Modification partielle : nom, durée, prix et/ou `actif` (`false` désactive, `true` réactive). Au moins un champ est requis.
+        La prestation d'un autre prestataire répond 404, comme une prestation inexistante.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la prestation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000020
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000020
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      mot_de_passe_actuel:
+      nom:
         custom: []
-        name: mot_de_passe_actuel
-        description: 'Mot de passe actuel.'
-        required: true
-        example: ancienmotdepasse
+        name: nom
+        description: 'Nouveau nom (2 à 100 caractères). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
+        required: false
+        example: 'Vidange + filtre'
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-      nouveau_mot_de_passe:
+      duree_minutes:
         custom: []
-        name: nouveau_mot_de_passe
-        description: '8 caractères minimum.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
+        name: duree_minutes
+        description: 'Nouvelle durée en minutes. Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+        required: false
+        example: 75
+        type: integer
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-      confirmation:
+      prix:
         custom: []
-        name: confirmation
-        description: 'Identique au nouveau mot de passe.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
+        name: prix
+        description: 'Nouveau prix en FCFA, supérieur à 0. Le champ value ne doit pas dépasser 9999999999.99.'
+        required: false
+        example: 17500.0
+        type: number
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      actif:
+        custom: []
+        name: actif
+        description: "false pour désactiver la prestation (elle n'est jamais supprimée), true pour la réactiver."
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      mot_de_passe_actuel: ancienmotdepasse
-      nouveau_mot_de_passe: nouveaumotdepasse
-      confirmation: nouveaumotdepasse
+      nom: 'Vidange + filtre'
+      duree_minutes: 75
+      prix: 17500.0
+      actif: false
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Votre mot de passe a été modifié."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":75,"prix":17500,"actif":false}'
         headers: []
         description: ''
       -
@@ -222,75 +266,20 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/jeton-push
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Enregistrer mon jeton push'
-      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      jetonPush:
-        custom: []
-        name: jetonPush
-        description: 'Jeton FCM.'
-        required: true
-        example: fcm-jeton-exemple
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      jetonPush: fcm-jeton-exemple
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Jeton de notification enregistré."}'
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
       -
         custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
+        status: 404
+        content: '{"message":"Prestation introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
+        content: '{"message":"Le prix doit être supérieur à 0.","errors":{"prix":["Le prix doit être supérieur à 0."]}}'
         headers: []
         description: ''
     responseFields: []
