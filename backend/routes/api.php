@@ -50,6 +50,11 @@ Route::prefix('v1')->group(function () {
 
         // Réservation d'un créneau verrouillé (RF03, RF04).
         Route::post('/reservations', [ReservationController::class, 'store'])->middleware('throttle:reservation');
+
+        // Suivi et annulation par le client (RF06, RF07). Pas de whereUuid : un identifiant invalide répond 404 en français.
+        Route::get('/reservations', [ReservationController::class, 'index']);
+        Route::get('/reservations/{id}', [ReservationController::class, 'show']);
+        Route::post('/reservations/{id}/annuler', [ReservationController::class, 'annuler'])->middleware('throttle:annulation-reservation');
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.

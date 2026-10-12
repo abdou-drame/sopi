@@ -129,6 +129,15 @@
                                                     <li class="tocify-item level-2" data-unique="client-reservations-POSTapi-v1-reservations">
                                 <a href="#client-reservations-POSTapi-v1-reservations">Réserver un créneau</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="client-reservations-GETapi-v1-reservations">
+                                <a href="#client-reservations-GETapi-v1-reservations">Mes réservations</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="client-reservations-GETapi-v1-reservations--id-">
+                                <a href="#client-reservations-GETapi-v1-reservations--id-">Détail d'une réservation</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="client-reservations-POSTapi-v1-reservations--id--annuler">
+                                <a href="#client-reservations-POSTapi-v1-reservations--id--annuler">Annuler une réservation</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-client-verrou-dun-creneau" class="tocify-header">
@@ -2190,7 +2199,7 @@ Must be one of:
 
                 <h1 id="client-reservations">Client — réservations</h1>
 
-    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>), limitées à 20 requêtes par minute et par utilisateur.</p>
+    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.</p>
 
                                 <h2 id="client-reservations-POSTapi-v1-reservations">Réserver un créneau</h2>
 
@@ -2441,6 +2450,647 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Identifiant de la prestation, active et proposée par le prestataire du créneau. validation.uuid. Example: <code>0198a1b2-0000-7000-8000-000000000050</code></p>
         </div>
         </form>
+
+                    <h2 id="client-reservations-GETapi-v1-reservations">Mes réservations</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel <code>statut</code>. Le <code>codeReservation</code> n'existe
+qu'après le paiement (<code>null</code> avant) et n'est jamais visible que de son client. <code>peutAnnuler</code> applique les règles
+de l'annulation.</p>
+
+<span id="example-requests-GETapi-v1-reservations">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/reservations?statut=en_attente" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/reservations"
+);
+
+const params = {
+    "statut": "en_attente",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-reservations">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000060&quot;,
+            &quot;statut&quot;: &quot;en_attente&quot;,
+            &quot;dateCreation&quot;: &quot;2030-01-15T08:50:00+00:00&quot;,
+            &quot;motifRefus&quot;: null,
+            &quot;codeReservation&quot;: null,
+            &quot;peutAnnuler&quot;: true,
+            &quot;creneau&quot;: {
+                &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+                &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
+                &quot;dateFin&quot;: &quot;2030-01-16T10:00:00+00:00&quot;
+            },
+            &quot;prestation&quot;: {
+                &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000050&quot;,
+                &quot;nom&quot;: &quot;Vidange&quot;,
+                &quot;dureeMinutes&quot;: 60,
+                &quot;prix&quot;: 15000
+            },
+            &quot;prestataire&quot;: {
+                &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000030&quot;,
+                &quot;nomEntreprise&quot;: &quot;Garage Exemple&quot;,
+                &quot;quartier&quot;: &quot;Keur Massar Nord&quot;,
+                &quot;adresse&quot;: &quot;Rue 10, Keur Massar&quot;
+            }
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/reservations?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/reservations?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le statut doit &ecirc;tre l&#039;un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.&quot;,
+    &quot;errors&quot;: {
+        &quot;statut&quot;: [
+            &quot;Le statut doit &ecirc;tre l&#039;un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-reservations" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-reservations"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-reservations"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-reservations" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-reservations">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-reservations" data-method="GET"
+      data-path="api/v1/reservations"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-reservations', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-reservations"
+                    onclick="tryItOut('GETapi-v1-reservations');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-reservations"
+                    onclick="cancelTryOut('GETapi-v1-reservations');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-reservations"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/reservations</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-reservations"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-reservations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-reservations"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>statut</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="statut"                data-endpoint="GETapi-v1-reservations"
+               value="en_attente"
+               data-component="query">
+    <br>
+<p>Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous. Example: <code>en_attente</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>en_attente</code></li> <li><code>acceptee</code></li> <li><code>confirmee</code></li> <li><code>en_cours</code></li> <li><code>terminee</code></li> <li><code>refusee</code></li> <li><code>annulee</code></li></ul>
+            </div>
+                </form>
+
+                    <h2 id="client-reservations-GETapi-v1-reservations--id-">Détail d&#039;une réservation</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+
+
+<span id="example-requests-GETapi-v1-reservations--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/reservations/0198a1b2-0000-7000-8000-000000000060" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/reservations/0198a1b2-0000-7000-8000-000000000060"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-reservations--id-">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000060&quot;,
+    &quot;statut&quot;: &quot;en_attente&quot;,
+    &quot;dateCreation&quot;: &quot;2030-01-15T08:50:00+00:00&quot;,
+    &quot;motifRefus&quot;: null,
+    &quot;codeReservation&quot;: null,
+    &quot;peutAnnuler&quot;: true,
+    &quot;creneau&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+        &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
+        &quot;dateFin&quot;: &quot;2030-01-16T10:00:00+00:00&quot;
+    },
+    &quot;prestation&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000050&quot;,
+        &quot;nom&quot;: &quot;Vidange&quot;,
+        &quot;dureeMinutes&quot;: 60,
+        &quot;prix&quot;: 15000
+    },
+    &quot;prestataire&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000030&quot;,
+        &quot;nomEntreprise&quot;: &quot;Garage Exemple&quot;,
+        &quot;quartier&quot;: &quot;Keur Massar Nord&quot;,
+        &quot;adresse&quot;: &quot;Rue 10, Keur Massar&quot;
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;R&eacute;servation introuvable.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-reservations--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-reservations--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-reservations--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-reservations--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-reservations--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-reservations--id-" data-method="GET"
+      data-path="api/v1/reservations/{id}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-reservations--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-reservations--id-"
+                    onclick="tryItOut('GETapi-v1-reservations--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-reservations--id-"
+                    onclick="cancelTryOut('GETapi-v1-reservations--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-reservations--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/reservations/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-reservations--id-"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-reservations--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-reservations--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="GETapi-v1-reservations--id-"
+               value="0198a1b2-0000-7000-8000-000000000060"
+               data-component="url">
+    <br>
+<p>Identifiant de la réservation. Example: <code>0198a1b2-0000-7000-8000-000000000060</code></p>
+            </div>
+                    </form>
+
+                    <h2 id="client-reservations-POSTapi-v1-reservations--id--annuler">Annuler une réservation</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Possible pour une réservation <code>en_attente</code>, <code>acceptee</code> ou <code>confirmee</code>, jusqu'à 2 h avant le début du créneau
+(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps.</p>
+
+<span id="example-requests-POSTapi-v1-reservations--id--annuler">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/reservations/0198a1b2-0000-7000-8000-000000000060/annuler" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/reservations/0198a1b2-0000-7000-8000-000000000060/annuler"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "POST",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-reservations--id--annuler">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000060&quot;,
+    &quot;statut&quot;: &quot;annulee&quot;,
+    &quot;dateCreation&quot;: &quot;2030-01-15T08:50:00+00:00&quot;,
+    &quot;motifRefus&quot;: null,
+    &quot;codeReservation&quot;: null,
+    &quot;peutAnnuler&quot;: false,
+    &quot;creneau&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+        &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
+        &quot;dateFin&quot;: &quot;2030-01-16T10:00:00+00:00&quot;
+    },
+    &quot;prestation&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000050&quot;,
+        &quot;nom&quot;: &quot;Vidange&quot;,
+        &quot;dureeMinutes&quot;: 60,
+        &quot;prix&quot;: 15000
+    },
+    &quot;prestataire&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000030&quot;,
+        &quot;nomEntreprise&quot;: &quot;Garage Exemple&quot;,
+        &quot;quartier&quot;: &quot;Keur Massar Nord&quot;,
+        &quot;adresse&quot;: &quot;Rue 10, Keur Massar&quot;
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;R&eacute;servation introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;L&#039;annulation n&#039;est plus possible moins de 2 heures avant le cr&eacute;neau.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-reservations--id--annuler" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-reservations--id--annuler"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-reservations--id--annuler"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-reservations--id--annuler" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-reservations--id--annuler">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-reservations--id--annuler" data-method="POST"
+      data-path="api/v1/reservations/{id}/annuler"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-reservations--id--annuler', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-reservations--id--annuler"
+                    onclick="tryItOut('POSTapi-v1-reservations--id--annuler');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-reservations--id--annuler"
+                    onclick="cancelTryOut('POSTapi-v1-reservations--id--annuler');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-reservations--id--annuler"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/reservations/{id}/annuler</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-reservations--id--annuler"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-reservations--id--annuler"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-reservations--id--annuler"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="POSTapi-v1-reservations--id--annuler"
+               value="0198a1b2-0000-7000-8000-000000000060"
+               data-component="url">
+    <br>
+<p>Identifiant de la réservation. Example: <code>0198a1b2-0000-7000-8000-000000000060</code></p>
+            </div>
+                    </form>
 
                 <h1 id="client-verrou-dun-creneau">Client — verrou d'un créneau</h1>
 
@@ -2883,7 +3533,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T15:17:42+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T15:35:28+00:00&quot;
 }</code>
  </pre>
     </span>

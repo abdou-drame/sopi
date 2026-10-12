@@ -19,6 +19,9 @@ enum StatutReservation: string
     /** Statuts qui ne comptent plus : ils ne bloquent pas le créneau (index unique partiel de la table). */
     public const INACTIFS = [self::Refusee, self::Annulee];
 
+    /** Statuts que le client peut encore annuler (RG13). */
+    public const ANNULABLES_PAR_CLIENT = [self::EnAttente, self::Acceptee, self::Confirmee];
+
     /** Une réservation active occupe son créneau : tous les statuts sauf REFUSEE et ANNULEE. */
     public function estActif(): bool
     {

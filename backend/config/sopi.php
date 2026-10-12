@@ -27,6 +27,9 @@ return [
     */
     'reservations' => [
         'delai_reponse_heures' => (int) env('RESERVATION_DELAI_REPONSE_HEURES', 12),
+
+        // RG13 : le client peut annuler jusqu'à ce nombre d'heures avant le début du créneau (borne incluse).
+        'annulation_client_heures' => (int) env('RESERVATION_ANNULATION_CLIENT_HEURES', 2),
     ],
 
 ];
