@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
+use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\ProfilController;
@@ -47,6 +48,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/photos/{photo}', [PhotoAtelierController::class, 'afficher'])->whereUuid('photo')->name('prestataire.photo');
         Route::post('/photos', [PhotoAtelierController::class, 'store']);
         Route::delete('/photos/{photo}', [PhotoAtelierController::class, 'destroy'])->whereUuid('photo');
+
+        Route::get('/agenda', [AgendaController::class, 'consulter']);
+        Route::post('/agenda/plages', [AgendaController::class, 'configurer']);
+        Route::delete('/agenda/creneaux/{id}', [AgendaController::class, 'supprimerCreneau'])->whereUuid('id');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

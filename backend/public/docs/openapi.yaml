@@ -23,6 +23,9 @@ tags:
     name: Prestataires
     description: ''
   -
+    name: 'Prestataire — agenda'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;\nles dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda."
+  -
     name: 'Prestataire — catalogue de prestations'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est\ntoujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive."
   -
@@ -1162,7 +1165,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T00:20:53+00:00'
+                  time: '2026-10-12T00:53:25+00:00'
                 properties:
                   status:
                     type: string
@@ -1178,7 +1181,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T00:20:53+00:00'
+                    example: '2026-10-12T00:53:25+00:00'
       tags:
         - Endpoints
       security: []
@@ -1571,6 +1574,344 @@ paths:
         name: jeton
         description: "Jeton de suivi reçu à l'inscription."
         example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+        required: true
+        schema:
+          type: string
+  /api/v1/prestataire/agenda:
+    get:
+      summary: 'Mon agenda'
+      operationId: monAgenda
+      description: "Mes créneaux dont le début tombe entre `du` et `au` (inclus), triés par début, sans pagination.\nPar défaut : d'aujourd'hui à 30 jours plus tard. Intervalle maximal : 62 jours."
+      parameters:
+        -
+          in: query
+          name: du
+          description: "Premier jour (AAAA-MM-JJ). Par défaut : aujourd'hui. Must be a valid date in the format <code>Y-m-d</code>."
+          example: '2030-01-15'
+          required: false
+          schema:
+            type: string
+            description: "Premier jour (AAAA-MM-JJ). Par défaut : aujourd'hui. Must be a valid date in the format <code>Y-m-d</code>."
+            example: '2030-01-15'
+            nullable: true
+        -
+          in: query
+          name: au
+          description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 30 jours après `du`. Intervalle maximal : 62 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+          example: '2030-02-15'
+          required: false
+          schema:
+            type: string
+            description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 30 jours après `du`. Intervalle maximal : 62 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+            example: '2030-02-15'
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut: '2030-01-15T09:00:00+00:00'
+                      dateFin: '2030-01-15T10:00:00+00:00'
+                      statut: libre
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut: '2030-01-15T09:00:00+00:00'
+                        dateFin: '2030-01-15T10:00:00+00:00'
+                        statut: libre
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut:
+                          type: string
+                          example: '2030-01-15T09:00:00+00:00'
+                        dateFin:
+                          type: string
+                          example: '2030-01-15T10:00:00+00:00'
+                        statut:
+                          type: string
+                          example: libre
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "L'intervalle ne peut pas dépasser 62 jours."
+                  errors:
+                    au:
+                      - "L'intervalle ne peut pas dépasser 62 jours."
+                properties:
+                  message:
+                    type: string
+                    example: "L'intervalle ne peut pas dépasser 62 jours."
+                  errors:
+                    type: object
+                    properties:
+                      au:
+                        type: array
+                        example:
+                          - "L'intervalle ne peut pas dépasser 62 jours."
+                        items:
+                          type: string
+      tags:
+        - 'Prestataire — agenda'
+  /api/v1/prestataire/agenda/plages:
+    post:
+      summary: "Configurer l'agenda"
+      operationId: configurerLagenda
+      description: "Génère des créneaux LIBRES, consécutifs, de `duree_creneau_minutes` entre `heure_debut` et `heure_fin` pour chaque plage,\npuis aux mêmes jours de la semaine pendant `repeter_semaines` semaines supplémentaires.\nTout ou rien : si un créneau en chevauche un autre (existant, quel que soit son statut, ou de la même requête), rien n'est créé (422).\nLimites : 7 plages, créneaux de 15 à 480 minutes, 8 semaines de répétition, 500 créneaux par requête.\nLa liste `creneaux` n'est renvoyée que si elle compte 200 créneaux au plus."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  nombreCreneaux: 2
+                  creneaux:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut: '2030-01-15T09:00:00+00:00'
+                      dateFin: '2030-01-15T10:00:00+00:00'
+                      statut: libre
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000041
+                      dateDebut: '2030-01-15T10:00:00+00:00'
+                      dateFin: '2030-01-15T11:00:00+00:00'
+                      statut: libre
+                properties:
+                  nombreCreneaux:
+                    type: integer
+                    example: 2
+                  creneaux:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut: '2030-01-15T09:00:00+00:00'
+                        dateFin: '2030-01-15T10:00:00+00:00'
+                        statut: libre
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000041
+                        dateDebut: '2030-01-15T10:00:00+00:00'
+                        dateFin: '2030-01-15T11:00:00+00:00'
+                        statut: libre
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut:
+                          type: string
+                          example: '2030-01-15T09:00:00+00:00'
+                        dateFin:
+                          type: string
+                          example: '2030-01-15T10:00:00+00:00'
+                        statut:
+                          type: string
+                          example: libre
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30).'
+                  errors:
+                    plages:
+                      - 'Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30).'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30).'
+                  errors:
+                    type: object
+                    properties:
+                      plages:
+                        type: array
+                        example:
+                          - 'Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30).'
+                        items:
+                          type: string
+      tags:
+        - 'Prestataire — agenda'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plages:
+                  type: array
+                  description: ''
+                  example: null
+                  items:
+                    type: object
+                    properties:
+                      date:
+                        type: string
+                        description: "Date (AAAA-MM-JJ), aujourd'hui ou plus tard. Must be a valid date in the format <code>Y-m-d</code>. validation.after_or_equal."
+                        example: '2030-01-15'
+                      heure_debut:
+                        type: string
+                        description: 'Heure de début (HH:MM). Must be a valid date in the format <code>H:i</code>.'
+                        example: '09:00'
+                      heure_fin:
+                        type: string
+                        description: "Heure de fin (HH:MM), après l'heure de début. La plage doit contenir un nombre entier de créneaux. Must be a valid date in the format <code>H:i</code>."
+                        example: '12:00'
+                      duree_creneau_minutes:
+                        type: integer
+                        description: "Durée d'un créneau, de 15 à 480 minutes. Le champ value doit être au moins égal à 15. Le champ value ne doit pas dépasser 480."
+                        example: 60
+                      repeter_semaines:
+                        type: integer
+                        description: 'Nombre de semaines supplémentaires où répéter la plage (0 à 8, 0 par défaut). Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 8.'
+                        example: 2
+                        nullable: true
+                    required:
+                      - date
+                      - heure_debut
+                      - heure_fin
+                      - duree_creneau_minutes
+  '/api/v1/prestataire/agenda/creneaux/{id}':
+    delete:
+      summary: 'Supprimer un créneau libre'
+      operationId: supprimerUnCrneauLibre
+      description: "Uniquement si le créneau est libre. Le créneau d'un autre prestataire répond 404, comme un créneau inexistant."
+      parameters: []
+      responses:
+        204:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {  }
+                properties: {  }
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Créneau introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Créneau introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Ce créneau n'est plus libre."
+                properties:
+                  message:
+                    type: string
+                    example: "Ce créneau n'est plus libre."
+      tags:
+        - 'Prestataire — agenda'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du créneau.'
+        example: 0198a1b2-0000-7000-8000-000000000040
         required: true
         schema:
           type: string

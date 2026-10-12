@@ -146,6 +146,22 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-prestataire-agenda" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="prestataire-agenda">
+                    <a href="#prestataire-agenda">Prestataire — agenda</a>
+                </li>
+                                    <ul id="tocify-subheader-prestataire-agenda" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="prestataire-agenda-GETapi-v1-prestataire-agenda">
+                                <a href="#prestataire-agenda-GETapi-v1-prestataire-agenda">Mon agenda</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-agenda-POSTapi-v1-prestataire-agenda-plages">
+                                <a href="#prestataire-agenda-POSTapi-v1-prestataire-agenda-plages">Configurer l'agenda</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-agenda-DELETEapi-v1-prestataire-agenda-creneaux--id-">
+                                <a href="#prestataire-agenda-DELETEapi-v1-prestataire-agenda-creneaux--id-">Supprimer un créneau libre</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-prestataire-catalogue-de-prestations" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="prestataire-catalogue-de-prestations">
                     <a href="#prestataire-catalogue-de-prestations">Prestataire — catalogue de prestations</a>
@@ -1942,7 +1958,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-12T00:20:53+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-12T00:53:25+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -2624,7 +2640,7 @@ ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à
     --form "quartier=Malika"\
     --form "adresse=Rue 10, près du marché"\
     --form "justificatifs[][type_document]=cni"\
-    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\php28B9.tmp" </code></pre></div>
+    --form "justificatifs[][fichier]=@C:\Users\Moi\AppData\Local\Temp\phpF18A.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -2925,7 +2941,7 @@ Must be one of:
                value=""
                data-component="body">
     <br>
-<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php28B9.tmp</code></p>
+<p>PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpF18A.tmp</code></p>
                     </div>
                                     </details>
         </div>
@@ -3095,6 +3111,681 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="url">
     <br>
 <p>Jeton de suivi reçu à l'inscription. Example: <code>jeton-de-suivi-exemple-0123456789-abcdefghijklmnop</code></p>
+            </div>
+                    </form>
+
+                <h1 id="prestataire-agenda">Prestataire — agenda</h1>
+
+    <p>Routes réservées aux prestataires (jeton Sanctum + rôle <code>prestataire</code>). L'agenda est fait de créneaux ;
+les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.</p>
+
+                                <h2 id="prestataire-agenda-GETapi-v1-prestataire-agenda">Mon agenda</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Mes créneaux dont le début tombe entre <code>du</code> et <code>au</code> (inclus), triés par début, sans pagination.
+Par défaut : d'aujourd'hui à 30 jours plus tard. Intervalle maximal : 62 jours.</p>
+
+<span id="example-requests-GETapi-v1-prestataire-agenda">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataire/agenda?du=2030-01-15&amp;au=2030-02-15" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/agenda"
+);
+
+const params = {
+    "du": "2030-01-15",
+    "au": "2030-02-15",
+};
+Object.keys(params)
+    .forEach(key =&gt; url.searchParams.append(key, params[key]));
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataire-agenda">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+            &quot;dateDebut&quot;: &quot;2030-01-15T09:00:00+00:00&quot;,
+            &quot;dateFin&quot;: &quot;2030-01-15T10:00:00+00:00&quot;,
+            &quot;statut&quot;: &quot;libre&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;L&#039;intervalle ne peut pas d&eacute;passer 62 jours.&quot;,
+    &quot;errors&quot;: {
+        &quot;au&quot;: [
+            &quot;L&#039;intervalle ne peut pas d&eacute;passer 62 jours.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataire-agenda" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataire-agenda"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataire-agenda"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataire-agenda" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataire-agenda">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataire-agenda" data-method="GET"
+      data-path="api/v1/prestataire/agenda"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataire-agenda', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataire-agenda"
+                    onclick="tryItOut('GETapi-v1-prestataire-agenda');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataire-agenda"
+                    onclick="cancelTryOut('GETapi-v1-prestataire-agenda');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataire-agenda"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataire/agenda</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataire-agenda"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataire-agenda"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataire-agenda"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                            <h4 class="fancy-heading-panel"><b>Query Parameters</b></h4>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>du</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="du"                data-endpoint="GETapi-v1-prestataire-agenda"
+               value="2030-01-15"
+               data-component="query">
+    <br>
+<p>Premier jour (AAAA-MM-JJ). Par défaut : aujourd'hui. Must be a valid date in the format <code>Y-m-d</code>. Example: <code>2030-01-15</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>au</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="au"                data-endpoint="GETapi-v1-prestataire-agenda"
+               value="2030-02-15"
+               data-component="query">
+    <br>
+<p>Dernier jour inclus (AAAA-MM-JJ). Par défaut : 30 jours après <code>du</code>. Intervalle maximal : 62 jours. Must be a valid date in the format <code>Y-m-d</code>. Example: <code>2030-02-15</code></p>
+            </div>
+                </form>
+
+                    <h2 id="prestataire-agenda-POSTapi-v1-prestataire-agenda-plages">Configurer l&#039;agenda</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Génère des créneaux LIBRES, consécutifs, de <code>duree_creneau_minutes</code> entre <code>heure_debut</code> et <code>heure_fin</code> pour chaque plage,
+puis aux mêmes jours de la semaine pendant <code>repeter_semaines</code> semaines supplémentaires.
+Tout ou rien : si un créneau en chevauche un autre (existant, quel que soit son statut, ou de la même requête), rien n'est créé (422).
+Limites : 7 plages, créneaux de 15 à 480 minutes, 8 semaines de répétition, 500 créneaux par requête.
+La liste <code>creneaux</code> n'est renvoyée que si elle compte 200 créneaux au plus.</p>
+
+<span id="example-requests-POSTapi-v1-prestataire-agenda-plages">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/prestataire/agenda/plages" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"plages\": [
+        {
+            \"date\": \"2030-01-15\",
+            \"heure_debut\": \"09:00\",
+            \"heure_fin\": \"12:00\",
+            \"duree_creneau_minutes\": 60,
+            \"repeter_semaines\": 2
+        }
+    ]
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/agenda/plages"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "plages": [
+        {
+            "date": "2030-01-15",
+            "heure_debut": "09:00",
+            "heure_fin": "12:00",
+            "duree_creneau_minutes": 60,
+            "repeter_semaines": 2
+        }
+    ]
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-prestataire-agenda-plages">
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;nombreCreneaux&quot;: 2,
+    &quot;creneaux&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
+            &quot;dateDebut&quot;: &quot;2030-01-15T09:00:00+00:00&quot;,
+            &quot;dateFin&quot;: &quot;2030-01-15T10:00:00+00:00&quot;,
+            &quot;statut&quot;: &quot;libre&quot;
+        },
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000041&quot;,
+            &quot;dateDebut&quot;: &quot;2030-01-15T10:00:00+00:00&quot;,
+            &quot;dateFin&quot;: &quot;2030-01-15T11:00:00+00:00&quot;,
+            &quot;statut&quot;: &quot;libre&quot;
+        }
+    ]
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le cr&eacute;neau du 15/01/2030 de 09:00 &agrave; 10:00 chevauche un cr&eacute;neau existant (09:30 &agrave; 10:30).&quot;,
+    &quot;errors&quot;: {
+        &quot;plages&quot;: [
+            &quot;Le cr&eacute;neau du 15/01/2030 de 09:00 &agrave; 10:00 chevauche un cr&eacute;neau existant (09:30 &agrave; 10:30).&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-prestataire-agenda-plages" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-prestataire-agenda-plages"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-prestataire-agenda-plages"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-prestataire-agenda-plages" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-prestataire-agenda-plages">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-prestataire-agenda-plages" data-method="POST"
+      data-path="api/v1/prestataire/agenda/plages"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-prestataire-agenda-plages', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-prestataire-agenda-plages"
+                    onclick="tryItOut('POSTapi-v1-prestataire-agenda-plages');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-prestataire-agenda-plages"
+                    onclick="cancelTryOut('POSTapi-v1-prestataire-agenda-plages');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-prestataire-agenda-plages"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/prestataire/agenda/plages</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+        <details>
+            <summary style="padding-bottom: 10px;">
+                <b style="line-height: 2;"><code>plages</code></b>&nbsp;&nbsp;
+<small>object[]</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+<br>
+
+            </summary>
+                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>date</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="plages.0.date"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="2030-01-15"
+               data-component="body">
+    <br>
+<p>Date (AAAA-MM-JJ), aujourd'hui ou plus tard. Must be a valid date in the format <code>Y-m-d</code>. validation.after_or_equal. Example: <code>2030-01-15</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>heure_debut</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="plages.0.heure_debut"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="09:00"
+               data-component="body">
+    <br>
+<p>Heure de début (HH:MM). Must be a valid date in the format <code>H:i</code>. Example: <code>09:00</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>heure_fin</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="plages.0.heure_fin"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="12:00"
+               data-component="body">
+    <br>
+<p>Heure de fin (HH:MM), après l'heure de début. La plage doit contenir un nombre entier de créneaux. Must be a valid date in the format <code>H:i</code>. Example: <code>12:00</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>duree_creneau_minutes</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="plages.0.duree_creneau_minutes"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="60"
+               data-component="body">
+    <br>
+<p>Durée d'un créneau, de 15 à 480 minutes. Le champ value doit être au moins égal à 15. Le champ value ne doit pas dépasser 480. Example: <code>60</code></p>
+                    </div>
+                                                                <div style="margin-left: 14px; clear: unset;">
+                        <b style="line-height: 2;"><code>repeter_semaines</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="plages.0.repeter_semaines"                data-endpoint="POSTapi-v1-prestataire-agenda-plages"
+               value="2"
+               data-component="body">
+    <br>
+<p>Nombre de semaines supplémentaires où répéter la plage (0 à 8, 0 par défaut). Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 8. Example: <code>2</code></p>
+                    </div>
+                                    </details>
+        </div>
+        </form>
+
+                    <h2 id="prestataire-agenda-DELETEapi-v1-prestataire-agenda-creneaux--id-">Supprimer un créneau libre</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Uniquement si le créneau est libre. Le créneau d'un autre prestataire répond 404, comme un créneau inexistant.</p>
+
+<span id="example-requests-DELETEapi-v1-prestataire-agenda-creneaux--id-">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request DELETE \
+    "http://localhost:8000/api/v1/prestataire/agenda/creneaux/0198a1b2-0000-7000-8000-000000000040" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/agenda/creneaux/0198a1b2-0000-7000-8000-000000000040"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "DELETE",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-DELETEapi-v1-prestataire-agenda-creneaux--id-">
+            <blockquote>
+            <p>Example response (204):</p>
+        </blockquote>
+                <pre>
+<code>Empty response</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Cr&eacute;neau introuvable.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (409):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Ce cr&eacute;neau n&#039;est plus libre.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-DELETEapi-v1-prestataire-agenda-creneaux--id-" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-DELETEapi-v1-prestataire-agenda-creneaux--id-"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-DELETEapi-v1-prestataire-agenda-creneaux--id-"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-DELETEapi-v1-prestataire-agenda-creneaux--id-" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-DELETEapi-v1-prestataire-agenda-creneaux--id-">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-DELETEapi-v1-prestataire-agenda-creneaux--id-" data-method="DELETE"
+      data-path="api/v1/prestataire/agenda/creneaux/{id}"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-prestataire-agenda-creneaux--id-', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-DELETEapi-v1-prestataire-agenda-creneaux--id-"
+                    onclick="tryItOut('DELETEapi-v1-prestataire-agenda-creneaux--id-');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-DELETEapi-v1-prestataire-agenda-creneaux--id-"
+                    onclick="cancelTryOut('DELETEapi-v1-prestataire-agenda-creneaux--id-');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-DELETEapi-v1-prestataire-agenda-creneaux--id-"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-red">DELETE</small>
+            <b><code>api/v1/prestataire/agenda/creneaux/{id}</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="DELETEapi-v1-prestataire-agenda-creneaux--id-"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="DELETEapi-v1-prestataire-agenda-creneaux--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="DELETEapi-v1-prestataire-agenda-creneaux--id-"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="DELETEapi-v1-prestataire-agenda-creneaux--id-"
+               value="0198a1b2-0000-7000-8000-000000000040"
+               data-component="url">
+    <br>
+<p>Identifiant du créneau. Example: <code>0198a1b2-0000-7000-8000-000000000040</code></p>
             </div>
                     </form>
 
@@ -4109,7 +4800,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: multipart/form-data" \
     --header "Accept: application/json" \
-    --form "photo=@C:\Users\Moi\AppData\Local\Temp\php29E4.tmp" </code></pre></div>
+    --form "photo=@C:\Users\Moi\AppData\Local\Temp\phpF209.tmp" </code></pre></div>
 
 
 <div class="javascript-example">
@@ -4271,7 +4962,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
                value=""
                data-component="body">
     <br>
-<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\php29E4.tmp</code></p>
+<p>Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko. Example: <code>C:\Users\Moi\AppData\Local\Temp\phpF209.tmp</code></p>
         </div>
         </form>
 
