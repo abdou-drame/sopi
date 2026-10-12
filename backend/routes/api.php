@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
+use App\Http\Controllers\Api\V1\WebhookPaiementController;
 use Illuminate\Support\Facades\Route;
 
 // Toutes les routes de ce fichier sont préfixées par /api (voir bootstrap/app.php).
@@ -26,6 +27,9 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/prestataires/inscription', InscriptionPrestataireController::class)->middleware('throttle:inscription-prestataire');
     Route::get('/suivi/{jeton}', SuiviDossierController::class)->middleware('throttle:suivi-dossier');
+
+    // Webhook du prestataire de paiement : public (la signature HMAC remplace l'authentification).
+    Route::post('/webhooks/paiement', WebhookPaiementController::class)->middleware('throttle:webhook-paiement');
 
     // Administration : jeton Sanctum + rôle administrateur (alias 'admin', voir bootstrap/app.php).
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {

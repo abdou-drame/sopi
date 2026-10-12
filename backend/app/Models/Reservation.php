@@ -171,6 +171,21 @@ class Reservation extends Model
             ->update(['updated_at' => now()]) === 1;
     }
 
+    /**
+     * Passe ACCEPTEE à CONFIRMEE avec son code, en UNE requête conditionnelle (webhook de paiement, M6.4). Le délai de
+     * paiement n'est volontairement pas revérifié : seule l'annulation par la tâche planifiée ferme la porte.
+     * Peut lever UniqueConstraintViolationException si le code existe déjà. Vrai si exactement une ligne a changé.
+     */
+    public function confirmerSiAcceptee(string $code): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::Acceptee->value)
+            ->update(['statut' => StatutReservation::Confirmee->value, 'code_reservation' => $code, 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

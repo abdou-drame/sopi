@@ -84,6 +84,42 @@ class Paiement extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Passe EN_ATTENTE ou ECHOUE (session orpheline payée après abandon) à REUSSI, avec paye_le. Une seule mise à jour
+     * conditionnelle. Peut lever UniqueConstraintViolationException si un autre paiement actif existe pour la réservation.
+     */
+    public function reussirSiEnAttenteOuEchoue(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', [StatutPaiement::EnAttente->value, StatutPaiement::Echoue->value])
+            ->update(['statut' => StatutPaiement::Reussi->value, 'paye_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Passe EN_ATTENTE à ECHOUE (événement « échoué » du webhook) ; jamais un paiement réussi ou remboursé. */
+    public function echouerSiEnAttente(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutPaiement::EnAttente->value)
+            ->update(['statut' => StatutPaiement::Echoue->value, 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Passe à REMBOURSE, seulement si le statut actuel est l'un de $depuis. Vrai si exactement une ligne a changé. */
+    public function rembourserSiStatut(StatutPaiement ...$depuis): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', array_map(fn (StatutPaiement $s) => $s->value, $depuis))
+            ->update(['statut' => StatutPaiement::Rembourse->value, 'rembourse_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class);

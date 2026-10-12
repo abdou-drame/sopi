@@ -44,6 +44,8 @@ class AppServiceProvider extends ServiceProvider
         // Anti-devinette du code de réservation : 5 essais par minute, par utilisateur ET par réservation (clé composée).
         RateLimiter::for('code-reservation', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request).'|'.$request->route('id')));
         RateLimiter::for('paiement-reservation', fn (Request $request) => Limit::perMinute(10)->by($parUtilisateur($request)));
+        // Webhook du prestataire de paiement : public, limité par adresse IP.
+        RateLimiter::for('webhook-paiement', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
