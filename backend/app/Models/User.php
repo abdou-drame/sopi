@@ -4,15 +4,17 @@ namespace App\Models;
 
 use App\Enums\Role;
 use App\Enums\StatutCompte;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasUuids;
 
     // Le rôle et le statut ne sont volontairement PAS assignables en masse.
@@ -46,5 +48,11 @@ class User extends Authenticatable
     public function estActif(): bool
     {
         return $this->statut === StatutCompte::Actif;
+    }
+
+    /** Réservations faites en tant que client. */
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class, 'client_id');
     }
 }
