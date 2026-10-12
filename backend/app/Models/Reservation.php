@@ -80,6 +80,34 @@ class Reservation extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Passe CONFIRMEE à EN_COURS si le code correspond, pour une réservation d'un créneau de ce prestataire.
+     * Une seule mise à jour conditionnelle. Vrai si exactement une ligne a changé.
+     */
+    public function demarrerSiCodeValide(string $code, string $prestataireId): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::Confirmee->value)
+            ->where('code_reservation', $code)
+            ->whereHas('creneau', fn (Builder $q) => $q->where('prestataire_id', $prestataireId))
+            ->update(['statut' => StatutReservation::EnCours->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Passe EN_COURS à TERMINEE pour une réservation d'un créneau de ce prestataire. Vrai si une ligne a changé. */
+    public function terminerSiEnCours(string $prestataireId): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutReservation::EnCours->value)
+            ->whereHas('creneau', fn (Builder $q) => $q->where('prestataire_id', $prestataireId))
+            ->update(['statut' => StatutReservation::Terminee->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');
