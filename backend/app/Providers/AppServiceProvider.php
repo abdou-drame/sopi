@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('verrou-creneau', fn (Request $request) => Limit::perMinute(20)->by($parUtilisateur($request)));
         RateLimiter::for('reservation', fn (Request $request) => Limit::perMinute(20)->by($parUtilisateur($request)));
         RateLimiter::for('reponse-reservation', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
+        RateLimiter::for('annulation-reservation', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré

@@ -21,7 +21,7 @@ tags:
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`)."
   -
     name: 'Client — réservations'
-    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur."
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30."
   -
     name: "Client — verrou d'un créneau"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.\nUn client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver."
@@ -1478,6 +1478,554 @@ paths:
               required:
                 - creneau_id
                 - prestation_id
+    get:
+      summary: 'Mes réservations'
+      operationId: mesRservations
+      description: "Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe\nqu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles\nde l'annulation."
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+          example: en_attente
+          required: false
+          schema:
+            type: string
+            description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+            example: en_attente
+            enum:
+              - en_attente
+              - acceptee
+              - confirmee
+              - en_cours
+              - terminee
+              - refusee
+              - annulee
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000060
+                      statut: en_attente
+                      dateCreation: '2030-01-15T08:50:00+00:00'
+                      motifRefus: null
+                      codeReservation: null
+                      peutAnnuler: true
+                      creneau:
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        dateDebut: '2030-01-16T09:00:00+00:00'
+                        dateFin: '2030-01-16T10:00:00+00:00'
+                      prestation:
+                        id: 0198a1b2-0000-7000-8000-000000000050
+                        nom: Vidange
+                        dureeMinutes: 60
+                        prix: 15000
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000030
+                        nomEntreprise: 'Garage Exemple'
+                        quartier: 'Keur Massar Nord'
+                        adresse: 'Rue 10, Keur Massar'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/reservations?page=1'
+                    last: 'https://api.exemple.test/api/v1/reservations?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        statut: en_attente
+                        dateCreation: '2030-01-15T08:50:00+00:00'
+                        motifRefus: null
+                        codeReservation: null
+                        peutAnnuler: true
+                        creneau:
+                          id: 0198a1b2-0000-7000-8000-000000000040
+                          dateDebut: '2030-01-16T09:00:00+00:00'
+                          dateFin: '2030-01-16T10:00:00+00:00'
+                        prestation:
+                          id: 0198a1b2-0000-7000-8000-000000000050
+                          nom: Vidange
+                          dureeMinutes: 60
+                          prix: 15000
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000030
+                          nomEntreprise: 'Garage Exemple'
+                          quartier: 'Keur Massar Nord'
+                          adresse: 'Rue 10, Keur Massar'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000060
+                        statut:
+                          type: string
+                          example: en_attente
+                        dateCreation:
+                          type: string
+                          example: '2030-01-15T08:50:00+00:00'
+                        motifRefus:
+                          type: string
+                          example: null
+                          nullable: true
+                        codeReservation:
+                          type: string
+                          example: null
+                          nullable: true
+                        peutAnnuler:
+                          type: boolean
+                          example: true
+                        creneau:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000040
+                            dateDebut:
+                              type: string
+                              example: '2030-01-16T09:00:00+00:00'
+                            dateFin:
+                              type: string
+                              example: '2030-01-16T10:00:00+00:00'
+                        prestation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000050
+                            nom:
+                              type: string
+                              example: Vidange
+                            dureeMinutes:
+                              type: integer
+                              example: 60
+                            prix:
+                              type: integer
+                              example: 15000
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000030
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                            quartier:
+                              type: string
+                              example: 'Keur Massar Nord'
+                            adresse:
+                              type: string
+                              example: 'Rue 10, Keur Massar'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/reservations?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/reservations?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                  errors:
+                    statut:
+                      - "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                properties:
+                  message:
+                    type: string
+                    example: "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - "Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."
+                        items:
+                          type: string
+      tags:
+        - 'Client — réservations'
+  '/api/v1/reservations/{id}':
+    get:
+      summary: "Détail d'une réservation"
+      operationId: dtailDuneRservation
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: en_attente
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  motifRefus: null
+                  codeReservation: null
+                  peutAnnuler: true
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000030
+                    nomEntreprise: 'Garage Exemple'
+                    quartier: 'Keur Massar Nord'
+                    adresse: 'Rue 10, Keur Massar'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: en_attente
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  codeReservation:
+                    type: string
+                    example: null
+                    nullable: true
+                  peutAnnuler:
+                    type: boolean
+                    example: true
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000030
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                      quartier:
+                        type: string
+                        example: 'Keur Massar Nord'
+                      adresse:
+                        type: string
+                        example: 'Rue 10, Keur Massar'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+      tags:
+        - 'Client — réservations'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
+  '/api/v1/reservations/{id}/annuler':
+    post:
+      summary: 'Annuler une réservation'
+      operationId: annulerUneRservation
+      description: "Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau\n(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  statut: annulee
+                  dateCreation: '2030-01-15T08:50:00+00:00'
+                  motifRefus: null
+                  codeReservation: null
+                  peutAnnuler: false
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    dateFin: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    nom: Vidange
+                    dureeMinutes: 60
+                    prix: 15000
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000030
+                    nomEntreprise: 'Garage Exemple'
+                    quartier: 'Keur Massar Nord'
+                    adresse: 'Rue 10, Keur Massar'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  statut:
+                    type: string
+                    example: annulee
+                  dateCreation:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  codeReservation:
+                    type: string
+                    example: null
+                    nullable: true
+                  peutAnnuler:
+                    type: boolean
+                    example: false
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      dateFin:
+                        type: string
+                        example: '2030-01-16T10:00:00+00:00'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                      prix:
+                        type: integer
+                        example: 15000
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000030
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                      quartier:
+                        type: string
+                        example: 'Keur Massar Nord'
+                      adresse:
+                        type: string
+                        example: 'Rue 10, Keur Massar'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "L'annulation n'est plus possible moins de 2 heures avant le créneau."
+                properties:
+                  message:
+                    type: string
+                    example: "L'annulation n'est plus possible moins de 2 heures avant le créneau."
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Client — réservations'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
   '/api/v1/creneaux/{id}/verrou':
     post:
       summary: 'Verrouiller un créneau'
@@ -1654,7 +2202,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T15:17:42+00:00'
+                  time: '2026-10-12T15:35:28+00:00'
                 properties:
                   status:
                     type: string
@@ -1670,7 +2218,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T15:17:42+00:00'
+                    example: '2026-10-12T15:35:28+00:00'
       tags:
         - Endpoints
       security: []

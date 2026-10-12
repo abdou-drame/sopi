@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\StatutReservation;
 use Carbon\CarbonInterface;
 use Database\Factories\ReservationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -59,6 +60,22 @@ class Reservation extends Model
             ->where('statut', StatutReservation::EnAttente->value)
             ->where('created_at', '>', $limite)
             ->update(['statut' => StatutReservation::Refusee->value, 'motif_refus' => $motif]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /**
+     * Annule la réservation du client si elle est encore annulable et si le créneau commence au plus tôt à $limite
+     * (UTC). Une seule mise à jour conditionnelle, sans lecture préalable. Vrai si exactement une ligne a changé.
+     */
+    public function annulerParClientSiPossible(string $clientId, CarbonInterface $limite): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('client_id', $clientId)
+            ->whereIn('statut', array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'))
+            ->whereHas('creneau', fn (Builder $q) => $q->where('date_debut', '>=', $limite))
+            ->update(['statut' => StatutReservation::Annulee->value]);
 
         return $modifies === 1 && $this->refresh() !== null;
     }

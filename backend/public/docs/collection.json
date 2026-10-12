@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "ef85ea85-193b-4f6e-9fb2-a44ff26e8a05",
+        "_postman_id": "68575022-b5ce-4c1f-82eb-66674dafccac",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -601,7 +601,7 @@
         },
         {
             "name": "Client \u2014 r\u00e9servations",
-            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 20 requ\u00eates par minute et par utilisateur.",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). La cr\u00e9ation est limit\u00e9e \u00e0 20 requ\u00eates par minute et par utilisateur, l'annulation \u00e0 30.",
             "item": [
                 {
                     "name": "R\u00e9server un cr\u00e9neau",
@@ -664,6 +664,191 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Cette prestation n'est pas propos\u00e9e sur ce cr\u00e9neau.\",\"errors\":{\"prestation_id\":[\"Cette prestation n'est pas propos\u00e9e sur ce cr\u00e9neau.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Mes r\u00e9servations",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "en_attente",
+                                    "description": "Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par d\u00e9faut : tous.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations?statut=en_attente"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe\nqu'apr\u00e8s le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les r\u00e8gles\nde l'annulation."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"codeReservation\":null,\"peutAnnuler\":true,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nomEntreprise\":\"Garage Exemple\",\"quartier\":\"Keur Massar Nord\",\"adresse\":\"Rue 10, Keur Massar\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/reservations?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/reservations?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'une r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"codeReservation\":null,\"peutAnnuler\":true,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nomEntreprise\":\"Garage Exemple\",\"quartier\":\"Keur Massar Nord\",\"adresse\":\"Rue 10, Keur Massar\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Annuler une r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id\/annuler",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id\/annuler",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Possible pour une r\u00e9servation `en_attente`, `acceptee` ou `confirmee`, jusqu'\u00e0 2 h avant le d\u00e9but du cr\u00e9neau\n(borne incluse). Le cr\u00e9neau est lib\u00e9r\u00e9. L'acompte \u00e9ventuellement pay\u00e9 n'est pas rembours\u00e9. Aucun corps."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"annulee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"codeReservation\":null,\"peutAnnuler\":false,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nomEntreprise\":\"Garage Exemple\",\"quartier\":\"Keur Massar Nord\",\"adresse\":\"Rue 10, Keur Massar\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"L'annulation n'est plus possible moins de 2 heures avant le cr\u00e9neau.\"}",
                             "name": ""
                         },
                         {
@@ -863,7 +1048,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T15:17:42+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T15:35:28+00:00\"}",
                             "name": ""
                         }
                     ]
