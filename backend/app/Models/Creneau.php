@@ -107,6 +107,19 @@ class Creneau extends Model
             ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
     }
 
+    /**
+     * Libère un créneau réservé quand sa réservation est refusée : RESERVE vers LIBRE, verrou vidé, et seulement s'il est
+     * encore réservé ET lié à cette réservation. Vrai si le créneau a été libéré.
+     */
+    public function libererPourReservation(Reservation $reservation): bool
+    {
+        return static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutCreneau::Reserve->value)
+            ->whereHas('reservations', fn (Builder $q) => $q->whereKey($reservation->getKey()))
+            ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]) === 1;
+    }
+
     /** Passe le créneau à réservé, uniquement s'il est verrouillé par ce client et que son verrou n'a pas expiré (M5). */
     public function marquerReserve(string $clientId): bool
     {

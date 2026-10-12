@@ -21,4 +21,12 @@ return [
         'verrou_minutes' => (int) env('SLOT_LOCK_MINUTES', 5),
     ],
 
+    /*
+    | Délai laissé au prestataire pour répondre à une demande de réservation EN_ATTENTE (RG10). Passé ce délai,
+    | la demande ne peut plus être acceptée ni refusée (elle sera annulée par la tâche planifiée).
+    */
+    'reservations' => [
+        'delai_reponse_heures' => (int) env('RESERVATION_DELAI_REPONSE_HEURES', 12),
+    ],
+
 ];

@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
+use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
 use Illuminate\Support\Facades\Route;
@@ -66,6 +67,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/agenda/plages', [AgendaController::class, 'configurer']);
         Route::post('/agenda/indisponibilites', [AgendaController::class, 'declarerIndisponibilite']);
         Route::delete('/agenda/creneaux/{id}', [AgendaController::class, 'supprimerCreneau'])->whereUuid('id');
+
+        // Demandes de réservation reçues (pas de whereUuid : un identifiant invalide répond comme un inconnu).
+        Route::get('/reservations', [PrestataireReservationController::class, 'index']);
+        Route::get('/reservations/{id}', [PrestataireReservationController::class, 'show']);
+        Route::post('/reservations/{id}/accepter', [PrestataireReservationController::class, 'accepter'])->middleware('throttle:reponse-reservation');
+        Route::post('/reservations/{id}/refuser', [PrestataireReservationController::class, 'refuser'])->middleware('throttle:reponse-reservation');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

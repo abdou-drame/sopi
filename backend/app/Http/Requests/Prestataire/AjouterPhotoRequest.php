@@ -36,7 +36,7 @@ class AjouterPhotoRequest extends FormRequest
     public function bodyParameters(): array
     {
         return [
-            'photo' => ['description' => 'Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire.'],
+            'photo' => ['description' => 'Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire.', 'example' => 'resources/exemples-docs/photo.png'],
         ];
     }
 }
