@@ -63,4 +63,9 @@ class Prestataire extends Model
     {
         return $this->hasMany(Prestation::class);
     }
+
+    public function creneaux(): HasMany
+    {
+        return $this->hasMany(Creneau::class);
+    }
 }
