@@ -18,6 +18,17 @@ class ReservationClientResource extends JsonResource
 {
     public static $wrap = null;
 
+    /** Paiement le plus récent (statut et acompte seulement : ni commission, ni référence, ni URL), ou null. */
+    private function paiementVisible(): ?array
+    {
+        $paiement = $this->paiements->sortByDesc(fn ($p) => $p->created_at->getTimestamp().$p->id)->first();
+
+        return $paiement === null ? null : [
+            'statut' => $paiement->statut->value,
+            'montantAcompte' => (float) $paiement->montant_acompte,
+        ];
+    }
+
     public function toArray(Request $request): array
     {
         $prestation = $this->prestation;
@@ -31,6 +42,7 @@ class ReservationClientResource extends JsonResource
             'codeReservation' => $this->code_reservation,
             'peutAnnuler' => SuiviReservationService::peutAnnuler($this->resource),
             'peutPayer' => PaiementReservationService::peutPayer($this->resource),
+            'paiement' => $this->paiementVisible(),
             'creneau' => [
                 'id' => $this->creneau->id,
                 'dateDebut' => $this->creneau->date_debut->toIso8601String(),

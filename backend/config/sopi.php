@@ -48,6 +48,10 @@ return [
         // En-tête HTTP qui porte la signature HMAC-SHA256 du corps brut du webhook.
         'signature_header' => env('PAYMENT_SIGNATURE_HEADER', 'X-Signature'),
 
+        // Reprise des remboursements en échec (M6.5) : essais maximum et délai minimal entre deux essais.
+        'remboursement_max_tentatives' => (int) env('PAIEMENT_REMBOURSEMENT_MAX_TENTATIVES', 10),
+        'remboursement_delai_minutes' => (int) env('PAIEMENT_REMBOURSEMENT_DELAI_MINUTES', 5),
+
         'acompte_taux' => (float) env('ACOMPTE_RATE', 0.30),
         'commission_taux' => (float) env('COMMISSION_RATE', 0.10),
     ],

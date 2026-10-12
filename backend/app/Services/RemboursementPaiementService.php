@@ -11,7 +11,7 @@ use Throwable;
 /**
  * Remboursement de l'acompte d'un paiement (M6.4, réutilisable par M6.5). À appeler HORS de toute transaction : l'appel au
  * prestataire de paiement est externe. Un échec ne lève jamais d'exception : le paiement garde son statut et le journal
- * reçoit seulement l'identifiant du paiement et le type d'erreur (ni corps, ni secret). Aucune reprise automatique ici.
+ * reçoit seulement l'identifiant du paiement et le type d'erreur (ni corps, ni secret). La reprise des échecs est assurée par la commande sopi:paiements:rembourser-dus (M6.5), grâce au marquage « dû ».
  */
 class RemboursementPaiementService
 {
@@ -50,6 +50,32 @@ class RemboursementPaiementService
         $paiement->rembourserSiStatut(...$depuis);
 
         return $paiement->refresh()->statut === StatutPaiement::Rembourse;
+    }
+
+    /**
+     * Marque un paiement « à rembourser » (M6.5) pour qu'il soit retrouvé et repris en cas d'échec. Sans appel externe :
+     * utilisable DANS une transaction. Vrai si le marquage a été posé (faux : paiement non payé, remboursé ou déjà marqué).
+     */
+    public function marquerDu(Paiement $paiement): bool
+    {
+        return $paiement->marquerRemboursementDuSiPossible();
+    }
+
+    /**
+     * Tente le remboursement de chaque paiement, APRÈS la transaction de l'appelant. Aucun échec ne remonte : un paiement
+     * non remboursé reste marqué « dû » et la commande planifiée le reprendra.
+     *
+     * @param  iterable<Paiement>  $paiements
+     */
+    public function tenterTous(iterable $paiements): void
+    {
+        foreach ($paiements as $paiement) {
+            try {
+                $this->rembourser($paiement);
+            } catch (Throwable $e) {
+                $this->journaliser($paiement, $e::class);
+            }
+        }
     }
 
     private function journaliser(Paiement $paiement, string $erreur): void

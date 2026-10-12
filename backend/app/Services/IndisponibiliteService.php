@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\CauseAnnulation;
 use App\Enums\Role;
 use App\Enums\StatutCreneau;
+use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationAnnulee;
 use App\Exceptions\ReservationImpossibleException;
@@ -20,11 +21,15 @@ use Symfony\Component\HttpFoundation\Response;
  * Les créneaux libres et les verrous passent à INDISPONIBLE ; les réservations EN_ATTENTE, ACCEPTEE ou CONFIRMEE sont
  * annulées (par le prestataire) et leur créneau passe à INDISPONIBLE ; une prestation EN_COURS refuse tout.
  * Un créneau réservé sans réservation active (prestation TERMINEE, par exemple) reste inchangé, comme avant M5.7.
- * Remboursement (M6) et notifications (M10) viendront plus tard : seuls des événements sont publiés.
+ * Pour chaque réservation annulée, un paiement REUSSI est marqué « remboursement dû » dans la même transaction (M6.5) ; le
+ * remboursement est tenté après validation, hors transaction, et repris par la commande planifiée s'il échoue. Un paiement
+ * EN_ATTENTE n'est pas touché (un paiement tardif est traité par le webhook). Les notifications viendront en M10.
  */
 class IndisponibiliteService
 {
     public const DUREE_MAX_JOURS = 90;
+
+    public function __construct(private readonly RemboursementPaiementService $remboursements) {}
 
     /**
      * @return array{bloques: int, reserves: int, verrouilles: int, reservationsAnnulees: int}
@@ -39,8 +44,9 @@ class IndisponibiliteService
             ->where('date_fin', '>', $debut);
 
         $evenements = [];
+        $aRembourser = [];
 
-        $bilan = DB::transaction(function () use ($prestataire, $debut, $fin, $dansLaPlage, &$evenements) {
+        $bilan = DB::transaction(function () use ($prestataire, $debut, $fin, $dansLaPlage, &$evenements, &$aRembourser) {
             // Réservations actives des créneaux réservés de la plage : simple liste de pistes, chaque écriture est conditionnelle.
             $reservations = Reservation::query()
                 ->whereIn('statut', [...array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'), StatutReservation::EnCours->value])
@@ -59,6 +65,10 @@ class IndisponibiliteService
             foreach ($reservations as $reservation) {
                 if (! $reservation->annulerPourIndisponibilite() || ! $reservation->creneau->bloquerSiReserve()) {
                     throw new ReservationImpossibleException('La situation a changé, veuillez réessayer.', Response::HTTP_CONFLICT);
+                }
+                foreach ($reservation->paiements()->where('statut', StatutPaiement::Reussi->value)->get() as $paiement) {
+                    $this->remboursements->marquerDu($paiement);
+                    $aRembourser[] = $paiement;
                 }
                 $evenements[] = new ReservationAnnulee($reservation, Role::Prestataire, CauseAnnulation::Indisponibilite);
             }
@@ -81,6 +91,9 @@ class IndisponibiliteService
         foreach ($evenements as $evenement) {
             event($evenement);
         }
+
+        // Hors transaction : un échec n'annule pas l'indisponibilité, la commande planifiée reprendra le remboursement.
+        $this->remboursements->tenterTous($aRembourser);
 
         return $bilan;
     }
