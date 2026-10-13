@@ -87,6 +87,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations/{id}/accepter', [PrestataireReservationController::class, 'accepter'])->middleware('throttle:reponse-reservation');
         Route::post('/reservations/{id}/refuser', [PrestataireReservationController::class, 'refuser'])->middleware('throttle:reponse-reservation');
         Route::post('/reservations/{id}/demarrer', [PrestataireReservationController::class, 'demarrer'])->middleware('throttle:code-reservation');
+        Route::post('/reservations/{id}/annuler', [PrestataireReservationController::class, 'annuler'])->middleware('throttle:reponse-reservation');
         Route::post('/reservations/{id}/terminer', [PrestataireReservationController::class, 'terminer'])->middleware('throttle:reponse-reservation');
     });
 

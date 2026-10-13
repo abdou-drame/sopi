@@ -149,6 +149,9 @@ class WebhookPaiementService
             $active = DB::transaction(fn () => $paiement->refresh()->reussirSiEnAttenteOuEchoue());
         } catch (UniqueConstraintViolationException) {
             // Un autre paiement actif existe pour cette réservation : celui-ci est en trop et sera remboursé.
+            // Marqué « dû » dans la transaction du webhook (M6.5), avant toute tentative, pour rester retrouvable.
+            $this->remboursements->marquerDu($paiement->refresh());
+
             return ['paiement_en_trop', null];
         }
 
@@ -160,6 +163,9 @@ class WebhookPaiementService
         if ($reservation->confirmerSiAcceptee($this->generateur->generer())) {
             return ['confirmee', $reservation];
         }
+
+        // Argent reçu mais réservation plus confirmable : marqué « dû » dans la même transaction (M6.5).
+        $this->remboursements->marquerDu($paiement);
 
         return ['reservation_non_confirmable', null];
     }

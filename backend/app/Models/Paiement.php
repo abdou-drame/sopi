@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Paiement de l'acompte d'une réservation (diagramme de classes). Les montants sont calculés par le serveur et le statut
@@ -37,6 +38,7 @@ class Paiement extends Model
             'commission' => 'decimal:2',
             'paye_le' => 'datetime',
             'rembourse_le' => 'datetime',
+            'remboursement_du_le' => 'datetime',
         ];
     }
 
@@ -116,6 +118,34 @@ class Paiement extends Model
             ->whereKey($this->getKey())
             ->whereIn('statut', array_map(fn (StatutPaiement $s) => $s->value, $depuis))
             ->update(['statut' => StatutPaiement::Rembourse->value, 'rembourse_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /**
+     * Marque le paiement « à rembourser » (M6.5), une seule fois : seulement s'il est REUSSI ou ECHOUE (argent reçu) et pas
+     * déjà marqué. Utilisable dans une transaction. Vrai si exactement une ligne a changé.
+     */
+    public function marquerRemboursementDuSiPossible(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', [StatutPaiement::Reussi->value, StatutPaiement::Echoue->value])
+            ->whereNull('remboursement_du_le')
+            ->update(['remboursement_du_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Compte un essai de reprise, seulement si le paiement est toujours dû, non remboursé et sous le maximum d'essais. */
+    public function compterTentativeRemboursement(int $maximum): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', [StatutPaiement::Reussi->value, StatutPaiement::Echoue->value])
+            ->whereNotNull('remboursement_du_le')
+            ->where('remboursement_tentatives', '<', $maximum)
+            ->update(['remboursement_tentatives' => DB::raw('remboursement_tentatives + 1'), 'updated_at' => now()]);
 
         return $modifies === 1 && $this->refresh() !== null;
     }

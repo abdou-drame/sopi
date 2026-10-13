@@ -143,8 +143,7 @@ class Reservation extends Model
      * Annule une réservation active mais pas encore commencée (EN_ATTENTE, ACCEPTEE ou CONFIRMEE) parce que le prestataire
      * a déclaré le créneau indisponible (M5.7). Une seule mise à jour conditionnelle. Vrai si exactement une ligne a changé.
      *
-     * À faire en M6 : c'est ici, dans la même transaction que l'appelant, que le remboursement intégral de l'acompte
-     * (paiement REMBOURSE) sera ajouté.
+     * Le marquage « remboursement dû » du paiement est posé par l'appelant, dans la même transaction (M6.5).
      */
     public function annulerPourIndisponibilite(): bool
     {
@@ -152,6 +151,22 @@ class Reservation extends Model
             ->whereKey($this->getKey())
             ->whereIn('statut', array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'))
             ->update(['statut' => StatutReservation::Annulee->value]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /**
+     * Annule une réservation ACCEPTEE ou CONFIRMEE à la demande du prestataire propriétaire du créneau, avec son motif
+     * (stocké dans motif_refus), seulement si le créneau n'a pas commencé (M6.5). Une seule mise à jour conditionnelle.
+     * Vrai si exactement une ligne a changé.
+     */
+    public function annulerParPrestataireSiPossible(string $prestataireId, string $motif): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->whereIn('statut', [StatutReservation::Acceptee->value, StatutReservation::Confirmee->value])
+            ->whereHas('creneau', fn (Builder $q) => $q->where('prestataire_id', $prestataireId)->where('date_debut', '>', now()))
+            ->update(['statut' => StatutReservation::Annulee->value, 'motif_refus' => $motif, 'updated_at' => now()]);
 
         return $modifies === 1 && $this->refresh() !== null;
     }

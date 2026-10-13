@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "63503e34-eb50-42cf-afe2-0ce68fea339d",
+        "_postman_id": "e741d9e7-d7a3-495d-99e8-7f5e2d0f6e3a",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1136,7 +1136,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T23:35:29+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-12T23:54:39+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2210,6 +2210,85 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Code de r\u00e9servation incorrect.\",\"errors\":{\"code\":[\"Code de r\u00e9servation incorrect.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Annuler une r\u00e9servation accept\u00e9e ou confirm\u00e9e",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/reservations\/:id\/annuler",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations\/:id\/annuler",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Un impr\u00e9vu m'emp\u00eache d'assurer la prestation.\"}"
+                        },
+                        "description": "R\u00e9serv\u00e9 aux r\u00e9servations `acceptee` ou `confirmee` dont le cr\u00e9neau n'a pas commenc\u00e9. Le motif (3 \u00e0 500 caract\u00e8res) est\ntransmis au client (champ `motifRefus`), le cr\u00e9neau est lib\u00e9r\u00e9 et, si le client avait pay\u00e9 l'acompte, il lui est\nint\u00e9gralement rembours\u00e9. Un incident chez le prestataire de paiement ne fait pas \u00e9chouer la route : le remboursement\nest repris automatiquement. Pour une demande `en_attente`, utiliser le refus."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"annulee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Un impr\u00e9vu m'emp\u00eache d'assurer la prestation.\",\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Le cr\u00e9neau a d\u00e9j\u00e0 commenc\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif de l'annulation est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de l'annulation est obligatoire.\"]}}",
                             "name": ""
                         },
                         {

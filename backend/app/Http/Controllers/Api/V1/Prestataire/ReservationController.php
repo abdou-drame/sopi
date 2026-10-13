@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\V1\Prestataire;
 
 use App\Exceptions\ReservationImpossibleException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Prestataire\AnnulerReservationRequest;
 use App\Http\Requests\Prestataire\DemarrerReservationRequest;
 use App\Http\Requests\Prestataire\ListerReservationsRequest;
 use App\Http\Requests\Prestataire\RefuserReservationRequest;
 use App\Http\Resources\DemandeReservationResource;
 use App\Models\Prestataire;
+use App\Services\AnnulationPrestataireService;
 use App\Services\DeroulementReservationService;
 use App\Services\ReponseReservationService;
 use Illuminate\Http\JsonResponse;
@@ -165,6 +167,35 @@ class ReservationController extends Controller
     {
         try {
             return new DemandeReservationResource($deroulement->terminer($this->prestataire($request), $id));
+        } catch (ReservationImpossibleException $e) {
+            return response()->json(['message' => $e->getMessage()], $e->statut);
+        }
+    }
+
+    /**
+     * Annuler une réservation acceptée ou confirmée
+     *
+     * Réservé aux réservations `acceptee` ou `confirmee` dont le créneau n'a pas commencé. Le motif (3 à 500 caractères) est
+     * transmis au client (champ `motifRefus`), le créneau est libéré et, si le client avait payé l'acompte, il lui est
+     * intégralement remboursé. Un incident chez le prestataire de paiement ne fait pas échouer la route : le remboursement
+     * est repris automatiquement. Pour une demande `en_attente`, utiliser le refus.
+     *
+     * @authenticated
+     *
+     * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
+     *
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Un imprévu m'empêche d'assurer la prestation.","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 401 {"message":"Authentification requise."}
+     * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     * @response 404 {"message":"Réservation introuvable."}
+     * @response 409 {"message":"Le créneau a déjà commencé."}
+     * @response 422 {"message":"Le motif de l'annulation est obligatoire.","errors":{"motif":["Le motif de l'annulation est obligatoire."]}}
+     * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
+     */
+    public function annuler(AnnulerReservationRequest $request, AnnulationPrestataireService $annulation, string $id): JsonResponse|DemandeReservationResource
+    {
+        try {
+            return new DemandeReservationResource($annulation->annuler($this->prestataire($request), $id, $request->validated('motif')));
         } catch (ReservationImpossibleException $e) {
             return response()->json(['message' => $e->getMessage()], $e->statut);
         }
