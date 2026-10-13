@@ -12,6 +12,23 @@ return [
         'telephone' => env('ADMIN_TELEPHONE'),
         'email' => env('ADMIN_EMAIL'),
         'password' => env('ADMIN_PASSWORD'),
+
+        // Alertes du tableau de bord (M11.3) : calculées à la demande, rien n'est envoyé à l'administrateur (RG35).
+        'alertes' => [
+            // Dossiers, litiges et avis signalés : gravité « attention » puis « critique » quand le plus ancien attend depuis ces heures.
+            'age_attention_heures' => (int) env('ADMIN_ALERTE_AGE_ATTENTION_HEURES', 24),
+            'age_critique_heures' => (int) env('ADMIN_ALERTE_AGE_CRITIQUE_HEURES', 72),
+            // Retrait EN_COURS au-delà de retraits.delai_blocage_minutes : « critique » quand le plus ancien dépasse cette durée.
+            'retraits_critique_minutes' => (int) env('ADMIN_ALERTE_RETRAITS_CRITIQUE_MINUTES', 60),
+            // Remboursement dû et non effectué depuis ces minutes (hors échec définitif) : gravité « attention ».
+            'remboursements_retard_minutes' => (int) env('ADMIN_ALERTE_REMBOURSEMENTS_RETARD_MINUTES', 30),
+            // Notifications en échec définitif : « critique » à partir de ce nombre.
+            'notifications_critique_seuil' => (int) env('ADMIN_ALERTE_NOTIFICATIONS_CRITIQUE_SEUIL', 20),
+            // Suspensions temporaires qui prennent fin dans ces heures.
+            'suspension_expiration_heures' => (int) env('ADMIN_ALERTE_SUSPENSION_EXPIRATION_HEURES', 24),
+            // Nombre maximal d'identifiants renvoyés par alerte (les plus anciens d'abord).
+            'ids_max' => (int) env('ADMIN_ALERTE_IDS_MAX', 20),
+        ],
     ],
 
     /*

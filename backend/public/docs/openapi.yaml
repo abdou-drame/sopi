@@ -20,6 +20,9 @@ tags:
     name: 'Administration — sanctions'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Poser et lever une sanction sont limités à 10 requêtes par minute.\nUne suspension ou un bannissement est « tout ou rien » : sanction, statut du compte et révocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndisparaît de la recherche et du profil public, et ses réservations à venir (en attente, acceptées, confirmées pour un prestataire ;\nen attente et acceptées pour un client) sont annulées, un prestataire sanctionné voyant l'acompte versé remboursé en intégralité.\nUne prestation en cours va à son terme. Le solde et les retraits ne sont pas modifiés. Un administrateur ne peut pas être sanctionné."
   -
+    name: 'Administration — tableau de bord'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Lecture seule : rien n'est modifié ni envoyé.\nLes agrégats sont calculés à chaque appel par des requêtes groupées (nombre de requêtes constant, quel que soit le volume).\nAucune donnée personnelle n'est renvoyée : seulement des compteurs et des montants globaux en FCFA (entiers)."
+  -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -2751,6 +2754,774 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/admin/tableau-de-bord:
+    get:
+      summary: 'Statistiques générales'
+      operationId: statistiquesGnrales
+      description: "Comptes (clients et prestataires par statut, dossiers en attente), réservations (total, par statut, par domaine de métier et activité\ndes 7 et 30 derniers jours glissants), paiements (nombre et montant d'acompte par statut), litiges, avis (dont signalés à modérer,\nnote moyenne des avis non masqués) et sanctions actives. Les réservations « terminées » d'une fenêtre sont datées par leur passage\nà TERMINEE. Les fenêtres et les dates sont interprétées dans le fuseau de l'application (Africa/Dakar)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  dateGeneration: '2030-01-20T10:00:00+00:00'
+                  comptes:
+                    clients:
+                      total: 120
+                      parStatut:
+                        en_attente: 0
+                        actif: 115
+                        refuse: 0
+                        suspendu: 3
+                        banni: 2
+                    prestataires:
+                      total: 18
+                      parStatut:
+                        en_attente: 2
+                        actif: 14
+                        refuse: 1
+                        suspendu: 1
+                        banni: 0
+                      dossiersEnAttente: 2
+                    administrateurs: 1
+                  reservations:
+                    total: 340
+                    parStatut:
+                      en_attente: 4
+                      acceptee: 2
+                      confirmee: 10
+                      en_cours: 1
+                      terminee: 280
+                      refusee: 15
+                      annulee: 28
+                    parDomaine:
+                      mecanique:
+                        total: 150
+                        parStatut:
+                          en_attente: 2
+                          acceptee: 1
+                          confirmee: 5
+                          en_cours: 1
+                          terminee: 130
+                          refusee: 5
+                          annulee: 6
+                      coiffure:
+                        total: 120
+                        parStatut:
+                          en_attente: 2
+                          acceptee: 1
+                          confirmee: 4
+                          en_cours: 0
+                          terminee: 100
+                          refusee: 6
+                          annulee: 7
+                      pressing:
+                        total: 70
+                        parStatut:
+                          en_attente: 0
+                          acceptee: 0
+                          confirmee: 1
+                          en_cours: 0
+                          terminee: 50
+                          refusee: 4
+                          annulee: 15
+                    activiteRecente:
+                      derniers7Jours:
+                        creees: 30
+                        terminees: 25
+                      derniers30Jours:
+                        creees: 110
+                        terminees: 95
+                  paiements:
+                    total:
+                      nombre: 300
+                      montant: 1350000
+                    parStatut:
+                      en_attente:
+                        nombre: 3
+                        montant: 9000
+                      reussi:
+                        nombre: 280
+                        montant: 1260000
+                      echoue:
+                        nombre: 7
+                        montant: 31500
+                      rembourse:
+                        nombre: 10
+                        montant: 49500
+                  litiges:
+                    total: 9
+                    ouverts: 2
+                    clos: 7
+                  avis:
+                    total: 210
+                    signales: 3
+                    masques: 4
+                    noteMoyenne: 4.35
+                  sanctions:
+                    suspensionsEnCours: 1
+                    bannissements: 2
+                properties:
+                  dateGeneration:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  comptes:
+                    type: object
+                    properties:
+                      clients:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 120
+                          parStatut:
+                            type: object
+                            properties:
+                              en_attente:
+                                type: integer
+                                example: 0
+                              actif:
+                                type: integer
+                                example: 115
+                              refuse:
+                                type: integer
+                                example: 0
+                              suspendu:
+                                type: integer
+                                example: 3
+                              banni:
+                                type: integer
+                                example: 2
+                      prestataires:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 18
+                          parStatut:
+                            type: object
+                            properties:
+                              en_attente:
+                                type: integer
+                                example: 2
+                              actif:
+                                type: integer
+                                example: 14
+                              refuse:
+                                type: integer
+                                example: 1
+                              suspendu:
+                                type: integer
+                                example: 1
+                              banni:
+                                type: integer
+                                example: 0
+                          dossiersEnAttente:
+                            type: integer
+                            example: 2
+                      administrateurs:
+                        type: integer
+                        example: 1
+                  reservations:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 340
+                      parStatut:
+                        type: object
+                        properties:
+                          en_attente:
+                            type: integer
+                            example: 4
+                          acceptee:
+                            type: integer
+                            example: 2
+                          confirmee:
+                            type: integer
+                            example: 10
+                          en_cours:
+                            type: integer
+                            example: 1
+                          terminee:
+                            type: integer
+                            example: 280
+                          refusee:
+                            type: integer
+                            example: 15
+                          annulee:
+                            type: integer
+                            example: 28
+                      parDomaine:
+                        type: object
+                        properties:
+                          mecanique:
+                            type: object
+                            properties:
+                              total:
+                                type: integer
+                                example: 150
+                              parStatut:
+                                type: object
+                                properties:
+                                  en_attente:
+                                    type: integer
+                                    example: 2
+                                  acceptee:
+                                    type: integer
+                                    example: 1
+                                  confirmee:
+                                    type: integer
+                                    example: 5
+                                  en_cours:
+                                    type: integer
+                                    example: 1
+                                  terminee:
+                                    type: integer
+                                    example: 130
+                                  refusee:
+                                    type: integer
+                                    example: 5
+                                  annulee:
+                                    type: integer
+                                    example: 6
+                          coiffure:
+                            type: object
+                            properties:
+                              total:
+                                type: integer
+                                example: 120
+                              parStatut:
+                                type: object
+                                properties:
+                                  en_attente:
+                                    type: integer
+                                    example: 2
+                                  acceptee:
+                                    type: integer
+                                    example: 1
+                                  confirmee:
+                                    type: integer
+                                    example: 4
+                                  en_cours:
+                                    type: integer
+                                    example: 0
+                                  terminee:
+                                    type: integer
+                                    example: 100
+                                  refusee:
+                                    type: integer
+                                    example: 6
+                                  annulee:
+                                    type: integer
+                                    example: 7
+                          pressing:
+                            type: object
+                            properties:
+                              total:
+                                type: integer
+                                example: 70
+                              parStatut:
+                                type: object
+                                properties:
+                                  en_attente:
+                                    type: integer
+                                    example: 0
+                                  acceptee:
+                                    type: integer
+                                    example: 0
+                                  confirmee:
+                                    type: integer
+                                    example: 1
+                                  en_cours:
+                                    type: integer
+                                    example: 0
+                                  terminee:
+                                    type: integer
+                                    example: 50
+                                  refusee:
+                                    type: integer
+                                    example: 4
+                                  annulee:
+                                    type: integer
+                                    example: 15
+                      activiteRecente:
+                        type: object
+                        properties:
+                          derniers7Jours:
+                            type: object
+                            properties:
+                              creees:
+                                type: integer
+                                example: 30
+                              terminees:
+                                type: integer
+                                example: 25
+                          derniers30Jours:
+                            type: object
+                            properties:
+                              creees:
+                                type: integer
+                                example: 110
+                              terminees:
+                                type: integer
+                                example: 95
+                  paiements:
+                    type: object
+                    properties:
+                      total:
+                        type: object
+                        properties:
+                          nombre:
+                            type: integer
+                            example: 300
+                          montant:
+                            type: integer
+                            example: 1350000
+                      parStatut:
+                        type: object
+                        properties:
+                          en_attente:
+                            type: object
+                            properties:
+                              nombre:
+                                type: integer
+                                example: 3
+                              montant:
+                                type: integer
+                                example: 9000
+                          reussi:
+                            type: object
+                            properties:
+                              nombre:
+                                type: integer
+                                example: 280
+                              montant:
+                                type: integer
+                                example: 1260000
+                          echoue:
+                            type: object
+                            properties:
+                              nombre:
+                                type: integer
+                                example: 7
+                              montant:
+                                type: integer
+                                example: 31500
+                          rembourse:
+                            type: object
+                            properties:
+                              nombre:
+                                type: integer
+                                example: 10
+                              montant:
+                                type: integer
+                                example: 49500
+                  litiges:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 9
+                      ouverts:
+                        type: integer
+                        example: 2
+                      clos:
+                        type: integer
+                        example: 7
+                  avis:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                        example: 210
+                      signales:
+                        type: integer
+                        example: 3
+                      masques:
+                        type: integer
+                        example: 4
+                      noteMoyenne:
+                        type: number
+                        example: 4.35
+                  sanctions:
+                    type: object
+                    properties:
+                      suspensionsEnCours:
+                        type: integer
+                        example: 1
+                      bannissements:
+                        type: integer
+                        example: 2
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Administration — tableau de bord'
+  /api/v1/admin/revenus:
+    get:
+      summary: 'Revenus de la plateforme'
+      operationId: revenusDeLaPlateforme
+      description: "Série par jour, semaine (lundi à dimanche) ou mois calendaire, sur une période de 366 jours au plus (bornes incluses, fuseau\nAfrica/Dakar). Par défaut : les 30 derniers jours, par jour. Les périodes vides sont présentes avec des zéros.\nDéfinitions : **revenus** = commissions des paiements réussis dont le crédit au prestataire est fait (prestation terminée), datées\npar ce crédit, paiements remboursés exclus ; **acomptesEncaisses** = acomptes des paiements réussis, datés par le paiement ;\n**remboursements** = acomptes remboursés, datés par le remboursement ; **retraitsVerses** = retraits réussis, datés par leur traitement.\n**soldePrestataires** est le cumul des soldes à l'instant de la demande. Montants en FCFA entiers."
+      parameters:
+        -
+          in: query
+          name: debut
+          description: 'Premier jour de la période (AAAA-MM-JJ, inclus). Par défaut : 29 jours avant la fin. Must be a valid date in the format <code>Y-m-d</code>.'
+          example: '2030-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Premier jour de la période (AAAA-MM-JJ, inclus). Par défaut : 29 jours avant la fin. Must be a valid date in the format <code>Y-m-d</code>.'
+            example: '2030-01-01'
+            nullable: true
+        -
+          in: query
+          name: fin
+          description: "Dernier jour de la période (AAAA-MM-JJ, inclus). Par défaut : aujourd'hui. Au plus 366 jours après le début. Must be a valid date in the format <code>Y-m-d</code>."
+          example: '2030-01-31'
+          required: false
+          schema:
+            type: string
+            description: "Dernier jour de la période (AAAA-MM-JJ, inclus). Par défaut : aujourd'hui. Au plus 366 jours après le début. Must be a valid date in the format <code>Y-m-d</code>."
+            example: '2030-01-31'
+            nullable: true
+        -
+          in: query
+          name: regroupement
+          description: 'Pas de la série : `jour` (défaut), `semaine` (lundi à dimanche) ou `mois` (mois calendaire).'
+          example: semaine
+          required: false
+          schema:
+            type: string
+            description: 'Pas de la série : `jour` (défaut), `semaine` (lundi à dimanche) ou `mois` (mois calendaire).'
+            example: semaine
+            enum:
+              - jour
+              - semaine
+              - mois
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  dateGeneration: '2030-01-20T10:00:00+00:00'
+                  periode:
+                    debut: '2030-01-01'
+                    fin: '2030-01-10'
+                    regroupement: semaine
+                    fuseau: Africa/Dakar
+                  totaux:
+                    revenus: 42000
+                    acomptesEncaisses: 150000
+                    remboursements: 9000
+                    retraitsVerses: 60000
+                  soldePrestataires: 84000
+                  series:
+                    -
+                      debut: '2030-01-01'
+                      fin: '2030-01-06'
+                      revenus: 30000
+                      acomptesEncaisses: 90000
+                      remboursements: 0
+                      retraitsVerses: 60000
+                    -
+                      debut: '2030-01-07'
+                      fin: '2030-01-10'
+                      revenus: 12000
+                      acomptesEncaisses: 60000
+                      remboursements: 9000
+                      retraitsVerses: 0
+                properties:
+                  dateGeneration:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  periode:
+                    type: object
+                    properties:
+                      debut:
+                        type: string
+                        example: '2030-01-01'
+                      fin:
+                        type: string
+                        example: '2030-01-10'
+                      regroupement:
+                        type: string
+                        example: semaine
+                      fuseau:
+                        type: string
+                        example: Africa/Dakar
+                  totaux:
+                    type: object
+                    properties:
+                      revenus:
+                        type: integer
+                        example: 42000
+                      acomptesEncaisses:
+                        type: integer
+                        example: 150000
+                      remboursements:
+                        type: integer
+                        example: 9000
+                      retraitsVerses:
+                        type: integer
+                        example: 60000
+                  soldePrestataires:
+                    type: integer
+                    example: 84000
+                  series:
+                    type: array
+                    example:
+                      -
+                        debut: '2030-01-01'
+                        fin: '2030-01-06'
+                        revenus: 30000
+                        acomptesEncaisses: 90000
+                        remboursements: 0
+                        retraitsVerses: 60000
+                      -
+                        debut: '2030-01-07'
+                        fin: '2030-01-10'
+                        revenus: 12000
+                        acomptesEncaisses: 60000
+                        remboursements: 9000
+                        retraitsVerses: 0
+                    items:
+                      type: object
+                      properties:
+                        debut:
+                          type: string
+                          example: '2030-01-01'
+                        fin:
+                          type: string
+                          example: '2030-01-06'
+                        revenus:
+                          type: integer
+                          example: 30000
+                        acomptesEncaisses:
+                          type: integer
+                          example: 90000
+                        remboursements:
+                          type: integer
+                          example: 0
+                        retraitsVerses:
+                          type: integer
+                          example: 60000
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La période ne peut pas dépasser 366 jours.'
+                  errors:
+                    fin:
+                      - 'La période ne peut pas dépasser 366 jours.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La période ne peut pas dépasser 366 jours.'
+                  errors:
+                    type: object
+                    properties:
+                      fin:
+                        type: array
+                        example:
+                          - 'La période ne peut pas dépasser 366 jours.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — tableau de bord'
+  /api/v1/admin/alertes:
+    get:
+      summary: Alertes
+      operationId: alertes
+      description: "Éléments qui demandent l'attention de l'administrateur, calculés à la demande (rien n'est envoyé : l'administrateur ne reçoit ni\ne-mail ni notification push). Liste vide quand tout est calme. Triées de la plus grave à la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravités : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les éléments (le dossier est identifié par l'id du prestataire) ;\n`compteur` donne le total réel. `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  dateGeneration: '2030-01-20T10:00:00+00:00'
+                  total: 2
+                  parGravite:
+                    critique: 1
+                    attention: 0
+                    info: 1
+                  alertes:
+                    -
+                      type: litiges_ouverts
+                      gravite: critique
+                      compteur: 2
+                      message: '2 litiges ouverts sont à traiter.'
+                      ids:
+                        - 0198a1b2-0000-7000-8000-000000000020
+                        - 0198a1b2-0000-7000-8000-000000000021
+                      ageMinutes: 4500
+                      echeanceDansMinutes: null
+                    -
+                      type: suspensions_a_echeance
+                      gravite: info
+                      compteur: 1
+                      message: '1 suspension temporaire se termine bientôt.'
+                      ids:
+                        - 0198a1b2-0000-7000-8000-000000000030
+                      ageMinutes: null
+                      echeanceDansMinutes: 600
+                properties:
+                  dateGeneration:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  total:
+                    type: integer
+                    example: 2
+                  parGravite:
+                    type: object
+                    properties:
+                      critique:
+                        type: integer
+                        example: 1
+                      attention:
+                        type: integer
+                        example: 0
+                      info:
+                        type: integer
+                        example: 1
+                  alertes:
+                    type: array
+                    example:
+                      -
+                        type: litiges_ouverts
+                        gravite: critique
+                        compteur: 2
+                        message: '2 litiges ouverts sont à traiter.'
+                        ids:
+                          - 0198a1b2-0000-7000-8000-000000000020
+                          - 0198a1b2-0000-7000-8000-000000000021
+                        ageMinutes: 4500
+                        echeanceDansMinutes: null
+                      -
+                        type: suspensions_a_echeance
+                        gravite: info
+                        compteur: 1
+                        message: '1 suspension temporaire se termine bientôt.'
+                        ids:
+                          - 0198a1b2-0000-7000-8000-000000000030
+                        ageMinutes: null
+                        echeanceDansMinutes: 600
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: litiges_ouverts
+                        gravite:
+                          type: string
+                          example: critique
+                        compteur:
+                          type: integer
+                          example: 2
+                        message:
+                          type: string
+                          example: '2 litiges ouverts sont à traiter.'
+                        ids:
+                          type: array
+                          example:
+                            - 0198a1b2-0000-7000-8000-000000000020
+                            - 0198a1b2-0000-7000-8000-000000000021
+                          items:
+                            type: string
+                        ageMinutes:
+                          type: integer
+                          example: 4500
+                        echeanceDansMinutes:
+                          type: string
+                          example: null
+                          nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Administration — tableau de bord'
   '/api/v1/prestataires/{id}/agenda':
     get:
       summary: "Créneaux disponibles d'un prestataire"
@@ -5296,7 +6067,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T17:18:03+00:00'
+                  time: '2026-10-13T17:54:44+00:00'
                 properties:
                   status:
                     type: string
@@ -5312,7 +6083,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T17:18:03+00:00'
+                    example: '2026-10-13T17:54:44+00:00'
       tags:
         - Endpoints
       security: []

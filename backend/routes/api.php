@@ -1,11 +1,14 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AlertesController;
 use App\Http\Controllers\Api\V1\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\RevenusController;
 use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
+use App\Http\Controllers\Api\V1\Admin\TableauDeBordController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
@@ -43,6 +46,11 @@ Route::prefix('v1')->group(function () {
 
     // Administration : jeton Sanctum + rôle administrateur (alias 'admin', voir bootstrap/app.php).
     Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
+        // Tableau de bord (M11) : lecture seule.
+        Route::get('/tableau-de-bord', [TableauDeBordController::class, 'index']);
+        Route::get('/revenus', [RevenusController::class, 'index']);
+        Route::get('/alertes', [AlertesController::class, 'index']);
+
         Route::get('/prestataires/demandes', [DemandePrestataireController::class, 'index']);
         Route::get('/prestataires/{id}', [DemandePrestataireController::class, 'show'])->whereUuid('id');
         Route::post('/prestataires/{id}/accepter', [DecisionDemandeController::class, 'accepter'])->whereUuid('id');
