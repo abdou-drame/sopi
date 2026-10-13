@@ -35,8 +35,8 @@ describe('table litiges', function () {
 
         $index = indexLitiges('litiges');
         expect($index->keys()->all())->toContain(
-            'litiges_statut_date_index', 'litiges_client_date_index', 'litiges_prestataire_date_index', 'litiges_reservation_index', 'litiges_un_ouvert_par_reservation',
-        )->and($index['litiges_un_ouvert_par_reservation']['unique'])->toBeTrue();
+            'litiges_statut_date_index', 'litiges_client_date_index', 'litiges_prestataire_date_index', 'litiges_reservation_index', 'litiges_reservation_unique',
+        )->and($index['litiges_reservation_unique']['unique'])->toBeTrue()->and($index->keys()->all())->not->toContain('litiges_un_ouvert_par_reservation');
     });
 
     it('crée un litige ouvert via la factory, avec le client et le prestataire de la réservation', function () {
@@ -64,7 +64,7 @@ describe('table litiges', function () {
             ->and($litige->prestataire->litiges)->toHaveCount(1);
     });
 
-    it('refuse deux litiges ouverts sur la même réservation, mais accepte un nouveau litige après clôture', function () {
+    it('refuse deux litiges sur la même réservation, même après clôture du premier', function () {
         $premier = Litige::factory()->create();
 
         expect(fn () => Litige::factory()->create(['reservation_id' => $premier->reservation_id]))->toThrow(QueryException::class);
@@ -72,9 +72,9 @@ describe('table litiges', function () {
         DB::table('litiges')->where('id', $premier->id)->update([
             'statut' => 'cloture', 'decision' => 'rejet', 'motif_decision' => 'Non fondé.', 'decide_par_id' => User::factory()->administrateur()->create()->id, 'cloture_le' => now(),
         ]);
-        Litige::factory()->create(['reservation_id' => $premier->reservation_id]);
 
-        expect(Litige::where('reservation_id', $premier->reservation_id)->count())->toBe(2);
+        expect(fn () => Litige::factory()->create(['reservation_id' => $premier->reservation_id]))->toThrow(QueryException::class);
+        expect(Litige::where('reservation_id', $premier->reservation_id)->count())->toBe(1);
     });
 
     it('accepte des litiges ouverts sur des réservations différentes', function () {

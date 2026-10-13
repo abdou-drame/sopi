@@ -12,9 +12,11 @@ use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -105,20 +107,44 @@ describe('ouverture par le client', function () {
         expect(Litige::count())->toBe(0);
     });
 
-    it('refuse (409) un second litige tant que le premier est ouvert, mais en accepte un nouveau après clôture', function () {
+    it('refuse (409) un second litige sur la même réservation, y compris après la clôture du premier', function () {
         $client = User::factory()->create();
         $reservation = reservationDe($client);
         $url = '/api/v1/reservations/'.$reservation->id.'/litiges';
 
         $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])->assertCreated();
         $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])
-            ->assertStatus(409)->assertExactJson(['message' => 'Un litige est déjà ouvert sur cette réservation.']);
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
         expect(Litige::count())->toBe(1);
 
         Litige::query()->update(['statut' => 'cloture', 'decision' => 'rejet', 'motif_decision' => 'Non fondé.', 'decide_par_id' => User::factory()->administrateur()->create()->id, 'cloture_le' => now()]);
 
-        $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])->assertCreated();
-        expect(Litige::count())->toBe(2);
+        $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
+        expect(Litige::count())->toBe(1);
+    });
+
+    it('répond 409 (jamais 500) si un litige est inséré entre la vérification et l\'écriture (concurrence simulée)', function () {
+        Storage::fake('local');
+        $client = User::factory()->create();
+        $reservation = reservationDe($client);
+        $inserer = true;
+
+        // Juste avant l'écriture du service, une autre requête insère son litige pour la même réservation.
+        Litige::saving(function (Litige $litige) use (&$inserer, $reservation) {
+            if ($inserer) {
+                $inserer = false;
+                DB::table('litiges')->insert([
+                    'id' => (string) Str::uuid(), 'reservation_id' => $reservation->id, 'client_id' => $litige->client_id, 'prestataire_id' => $litige->prestataire_id,
+                    'statut' => 'ouvert', 'description' => 'Litige concurrent.', 'created_at' => now(), 'updated_at' => now(),
+                ]);
+            }
+        });
+
+        $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => descriptionLitige(), 'preuves' => [pngPreuve()]])
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
+        // Le litige « concurrent » est inséré dans la transaction du service (une seule connexion en test) : il est annulé avec elle, d'où pas de décompte des litiges.
+        expect(LitigePreuve::count())->toBe(0)->and(Storage::disk('local')->allFiles())->toBe([]);
     });
 
     it('valide la description : obligatoire, 10 à 1000 caractères', function (mixed $description, string $message) {
@@ -156,12 +182,35 @@ describe('ouverture par le client', function () {
             ->assertStatus(429)->assertExactJson(['message' => 'Trop de tentatives. Réessayez dans quelques instants.']);
     });
 
-    it('garantit l\'unicité du litige ouvert au niveau de la base (ouvertures simultanées)', function () {
+    it('garantit l\'unicité du litige par réservation au niveau de la base, même clôturé', function () {
         $reservation = Reservation::factory()->confirmee()->create();
-        Litige::factory()->create(['reservation_id' => $reservation->id]);
+        Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]);
 
         expect(fn () => Litige::factory()->create(['reservation_id' => $reservation->id]))->toThrow(UniqueConstraintViolationException::class);
+        expect(fn () => Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]))->toThrow(UniqueConstraintViolationException::class);
         expect(Litige::count())->toBe(1);
+    });
+
+    it('arrête la migration sans rien modifier, en listant les réservations concernées, s\'il existe des doublons', function () {
+        $migration = require database_path('migrations/2026_10_25_000001_un_seul_litige_par_reservation.php');
+        $migration->down(); // retour à l'index partiel : les doublons (un litige clos, un ouvert) redeviennent possibles
+        $reservation = Reservation::factory()->confirmee()->create();
+        Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]);
+        Litige::factory()->create(['reservation_id' => $reservation->id]);
+
+        expect(fn () => $migration->up())->toThrow(RuntimeException::class, $reservation->id);
+        // Rien n'a été modifié : l'index partiel est toujours là, l'index unique simple n'existe pas.
+        $index = collect(DB::select("select name from sqlite_master where type = 'index' and tbl_name = 'litiges'"))->pluck('name');
+        expect($index)->toContain('litiges_un_ouvert_par_reservation')->not->toContain('litiges_reservation_unique');
+    });
+
+    it('pose l\'index unique simple quand il n\'y a aucun doublon', function () {
+        $migration = require database_path('migrations/2026_10_25_000001_un_seul_litige_par_reservation.php');
+        $migration->down();
+        $migration->up();
+
+        $index = collect(DB::select("select name from sqlite_master where type = 'index' and tbl_name = 'litiges'"))->pluck('name');
+        expect($index)->toContain('litiges_reservation_unique')->not->toContain('litiges_un_ouvert_par_reservation');
     });
 });
 

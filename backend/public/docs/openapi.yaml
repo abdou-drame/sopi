@@ -3144,7 +3144,7 @@ paths:
     post:
       summary: 'Ouvrir un litige'
       operationId: ouvrirUnLitige
-      description: "Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'à 3 photos de preuve (`preuves[]`). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,\npuis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement."
+      description: "Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'à 3 photos de preuve (`preuves[]`). Une réservation ne peut engendrer qu'un seul litige, même une fois clôturé. Le prestataire peut répondre,\npuis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement."
       parameters: []
       responses:
         201:
@@ -3271,11 +3271,11 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Un litige est déjà ouvert sur cette réservation.'
+                  message: 'Un litige a déjà été ouvert pour cette réservation.'
                 properties:
                   message:
                     type: string
-                    example: 'Un litige est déjà ouvert sur cette réservation.'
+                    example: 'Un litige a déjà été ouvert pour cette réservation.'
         422:
           description: ''
           content:
@@ -5249,7 +5249,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T15:23:29+00:00'
+                  time: '2026-10-13T15:59:55+00:00'
                 properties:
                   status:
                     type: string
@@ -5265,7 +5265,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T15:23:29+00:00'
+                    example: '2026-10-13T15:59:55+00:00'
       tags:
         - Endpoints
       security: []

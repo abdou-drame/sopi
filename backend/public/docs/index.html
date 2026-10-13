@@ -4733,7 +4733,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </p>
 
 <p>Signale un problème sur une de vos réservations <code>confirmee</code>, <code>en_cours</code> ou <code>terminee</code>. Envoi JSON, ou multipart pour joindre
-jusqu'à 3 photos de preuve (<code>preuves[]</code>). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,
+jusqu'à 3 photos de preuve (<code>preuves[]</code>). Une réservation ne peut engendrer qu'un seul litige, même une fois clôturé. Le prestataire peut répondre,
 puis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement.</p>
 
 <span id="example-requests-POSTapi-v1-reservations--id--litiges">
@@ -4834,7 +4834,7 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Un litige est d&eacute;j&agrave; ouvert sur cette r&eacute;servation.&quot;
+    &quot;message&quot;: &quot;Un litige a d&eacute;j&agrave; &eacute;t&eacute; ouvert pour cette r&eacute;servation.&quot;
 }</code>
  </pre>
             <blockquote>
@@ -7782,7 +7782,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-13T15:23:29+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-13T15:59:55+00:00&quot;
 }</code>
  </pre>
     </span>

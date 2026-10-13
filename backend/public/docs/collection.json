@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "bf52910c-786a-4799-ae3f-25b11e18e9ef",
+        "_postman_id": "2acf26f8-61b7-433f-87f3-93eec66e2e25",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1319,7 +1319,7 @@
                                 }
                             ]
                         },
-                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Un seul litige peut \u00eatre ouvert \u00e0 la fois par r\u00e9servation. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
+                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Une r\u00e9servation ne peut engendrer qu'un seul litige, m\u00eame une fois cl\u00f4tur\u00e9. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
                     },
                     "response": [
                         {
@@ -1349,7 +1349,7 @@
                         {
                             "header": [],
                             "code": 409,
-                            "body": "{\"message\":\"Un litige est d\u00e9j\u00e0 ouvert sur cette r\u00e9servation.\"}",
+                            "body": "{\"message\":\"Un litige a d\u00e9j\u00e0 \u00e9t\u00e9 ouvert pour cette r\u00e9servation.\"}",
                             "name": ""
                         },
                         {
@@ -2274,7 +2274,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:23:29+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:59:55+00:00\"}",
                             "name": ""
                         }
                     ]

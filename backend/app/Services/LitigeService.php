@@ -36,6 +36,9 @@ class LitigeService
     /** Statuts de réservation sur lesquels un litige est possible : la prestation a été confirmée (payée) au moins. */
     public const STATUTS_ELIGIBLES = [StatutReservation::Confirmee, StatutReservation::EnCours, StatutReservation::Terminee];
 
+    /** Une réservation engendre au plus un litige (diagramme de classes), même clôturé. */
+    public const MESSAGE_LITIGE_EXISTANT = 'Un litige a déjà été ouvert pour cette réservation.';
+
     private const EXTENSIONS = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
@@ -45,7 +48,7 @@ class LitigeService
     /**
      * @param  list<UploadedFile>  $preuves
      *
-     * @throws ReservationImpossibleException 404 (introuvable ou à quelqu'un d'autre), 409 (statut non éligible, litige déjà ouvert)
+     * @throws ReservationImpossibleException 404 (introuvable ou à quelqu'un d'autre), 409 (statut non éligible, un litige existe déjà pour la réservation, même clôturé)
      */
     public function ouvrir(User $client, string $reservationId, string $description, array $preuves = []): Litige
     {
@@ -65,8 +68,8 @@ class LitigeService
 
         try {
             return DB::transaction(function () use ($client, $reservation, $description, $preuves, &$ecrits) {
-                if (Litige::query()->where('reservation_id', $reservation->id)->where('statut', StatutLitige::Ouvert->value)->exists()) {
-                    throw new ReservationImpossibleException('Un litige est déjà ouvert sur cette réservation.', Response::HTTP_CONFLICT);
+                if (Litige::query()->where('reservation_id', $reservation->id)->exists()) {
+                    throw new ReservationImpossibleException(self::MESSAGE_LITIGE_EXISTANT, Response::HTTP_CONFLICT);
                 }
 
                 $litige = new Litige;
@@ -94,10 +97,10 @@ class LitigeService
                 return $litige;
             });
         } catch (UniqueConstraintViolationException) {
-            // Deux ouvertures simultanées : l'index unique partiel ne laisse passer que la première.
+            // Deux ouvertures simultanées : l'index unique sur reservation_id ne laisse passer que la première.
             Storage::disk(InscriptionPrestataireService::DISQUE)->delete($ecrits);
 
-            throw new ReservationImpossibleException('Un litige est déjà ouvert sur cette réservation.', Response::HTTP_CONFLICT);
+            throw new ReservationImpossibleException(self::MESSAGE_LITIGE_EXISTANT, Response::HTTP_CONFLICT);
         } catch (Throwable $erreur) {
             Storage::disk(InscriptionPrestataireService::DISQUE)->delete($ecrits);
 

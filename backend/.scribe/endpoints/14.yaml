@@ -19,7 +19,7 @@ endpoints:
       title: 'Ouvrir un litige'
       description: |-
         Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre
-        jusqu'à 3 photos de preuve (`preuves[]`). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,
+        jusqu'à 3 photos de preuve (`preuves[]`). Une réservation ne peut engendrer qu'un seul litige, même une fois clôturé. Le prestataire peut répondre,
         puis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement.
       authenticated: true
       deprecated: false
@@ -100,7 +100,7 @@ endpoints:
       -
         custom: []
         status: 409
-        content: '{"message":"Un litige est déjà ouvert sur cette réservation."}'
+        content: '{"message":"Un litige a déjà été ouvert pour cette réservation."}'
         headers: []
         description: ''
       -

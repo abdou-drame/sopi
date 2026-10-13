@@ -25,7 +25,7 @@ class LitigeController extends Controller
      * Ouvrir un litige
      *
      * Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre
-     * jusqu'à 3 photos de preuve (`preuves[]`). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,
+     * jusqu'à 3 photos de preuve (`preuves[]`). Une réservation ne peut engendrer qu'un seul litige, même une fois clôturé. Le prestataire peut répondre,
      * puis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement.
      *
      * @authenticated
@@ -36,7 +36,7 @@ class LitigeController extends Controller
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
-     * @response 409 {"message":"Un litige est déjà ouvert sur cette réservation."}
+     * @response 409 {"message":"Un litige a déjà été ouvert pour cette réservation."}
      * @response 422 {"message":"La description doit contenir au moins 10 caractères.","errors":{"description":["La description doit contenir au moins 10 caractères."]}}
      * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
      */
