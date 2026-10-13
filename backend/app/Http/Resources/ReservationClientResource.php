@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\StatutReservation;
 use App\Models\Reservation;
 use App\Services\PaiementReservationService;
 use App\Services\SuiviReservationService;
@@ -43,6 +44,8 @@ class ReservationClientResource extends JsonResource
             'peutAnnuler' => SuiviReservationService::peutAnnuler($this->resource),
             'peutPayer' => PaiementReservationService::peutPayer($this->resource),
             'paiement' => $this->paiementVisible(),
+            'peutNoter' => $this->statut === StatutReservation::Terminee && $this->avis === null,
+            'avis' => $this->avis === null ? null : new AvisClientResource($this->avis),
             'creneau' => [
                 'id' => $this->creneau->id,
                 'dateDebut' => $this->creneau->date_debut->toIso8601String(),

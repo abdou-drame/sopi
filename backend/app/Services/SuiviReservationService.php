@@ -23,7 +23,7 @@ class SuiviReservationService
     public function lister(User $client, ?StatutReservation $statut = null): LengthAwarePaginator
     {
         return $client->reservations()
-            ->with(['creneau', 'prestation.prestataire', 'paiements'])
+            ->with(['creneau', 'prestation.prestataire', 'paiements', 'avis'])
             ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
             ->when($statut, fn ($q) => $q->where('statut', $statut->value))
             ->orderByDesc('created_at')
@@ -38,7 +38,7 @@ class SuiviReservationService
             return null;
         }
 
-        return $client->reservations()->with(['creneau', 'prestation.prestataire', 'paiements'])
+        return $client->reservations()->with(['creneau', 'prestation.prestataire', 'paiements', 'avis'])
             ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
             ->find($id);
     }

@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "f5b6a7a3-6978-43ee-8396-c7fb821ef72e",
+        "_postman_id": "d50d8bcf-9bb0-4a6d-9cb5-661865cb1f23",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -366,6 +366,91 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"L'intervalle ne peut pas d\u00e9passer 31 jours.\",\"errors\":{\"au\":[\"L'intervalle ne peut pas d\u00e9passer 31 jours.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Client \u2014 avis",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 10 requ\u00eates par minute et par utilisateur.",
+            "item": [
+                {
+                    "name": "Donner son avis sur une r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id\/avis",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id\/avis",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"note\":4,\"commentaire\":\"Travail soign\u00e9 et ponctuel.\"}"
+                        },
+                        "description": "R\u00e9serv\u00e9 au client de la r\u00e9servation, une fois la prestation termin\u00e9e (`terminee`). Un seul avis par r\u00e9servation, qui ne\npeut \u00eatre ni modifi\u00e9 ni retir\u00e9. La note est un entier de 1 \u00e0 5 ; le commentaire est facultatif (3 \u00e0 1000 caract\u00e8res).\nLe prestataire not\u00e9 est toujours celui de la r\u00e9servation. Une r\u00e9servation inconnue ou appartenant \u00e0 un autre client\nr\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"note\":4,\"commentaire\":\"Travail soign\u00e9 et ponctuel.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Vous avez d\u00e9j\u00e0 donn\u00e9 votre avis pour cette r\u00e9servation.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La note doit \u00eatre comprise entre 1 et 5.\",\"errors\":{\"note\":[\"La note doit \u00eatre comprise entre 1 et 5.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]
@@ -1136,7 +1221,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T13:40:49+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T14:15:26+00:00\"}",
                             "name": ""
                         }
                     ]

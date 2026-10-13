@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
+use App\Http\Controllers\Api\V1\Client\AvisReservationController;
 use App\Http\Controllers\Api\V1\Client\PaiementReservationController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
@@ -64,6 +65,9 @@ Route::prefix('v1')->group(function () {
 
         // Paiement de l'acompte d'une réservation acceptée (M6.3). Aucun corps ; identifiant non contraint (404 en français).
         Route::post('/reservations/{id}/payer', PaiementReservationController::class)->middleware('throttle:paiement-reservation');
+
+        // Avis du client sur une réservation terminée (M8.2). Identifiant non contraint : un id invalide répond 404 en français.
+        Route::post('/reservations/{id}/avis', [AvisReservationController::class, 'store'])->middleware('throttle:avis');
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
