@@ -16,3 +16,6 @@ Schedule::command('sopi:creneaux:liberer-verrous')->everyMinute()->withoutOverla
 
 // Reprise des remboursements en échec (M6.5), toutes les 5 minutes.
 Schedule::command('sopi:paiements:rembourser-dus')->everyFiveMinutes()->withoutOverlapping();
+
+// Signalement des retraits restés en cours trop longtemps (M7.5), toutes les 10 minutes. Lecture seule.
+Schedule::command('sopi:retraits:signaler-bloques')->everyTenMinutes()->withoutOverlapping();
