@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "c5366e7f-d524-4595-a7d2-42cb4bb75148",
+        "_postman_id": "15a20833-d84d-432c-9bea-f006c62b53b2",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -290,6 +290,246 @@
             ]
         },
         {
+            "name": "Administration \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). La d\u00e9cision est motiv\u00e9e et d\u00e9finitive ;\nelle ne d\u00e9clenche aucun mouvement d'argent automatique.",
+            "item": [
+                {
+                    "name": "Liste des litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "ouvert",
+                                    "description": "ouvert (d\u00e9faut), cloture ou tous.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges?statut=ouvert&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page). Par d\u00e9faut les litiges `ouvert`, du plus ancien au plus r\u00e9cent."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[],\"decidePar\":null,\"sanctionId\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre ouvert, cloture ou tous.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre ouvert, cloture ou tous.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "R\u00e9servation, parties (coordonn\u00e9es compl\u00e8tes), paiements de la r\u00e9servation, preuves, r\u00e9ponse du prestataire et d\u00e9cision."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"paye\",\"montantAcompte\":4500,\"commission\":1500,\"payeLe\":\"2030-01-15T09:00:00+00:00\",\"rembourseLe\":null}],\"decidePar\":null,\"sanctionId\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve d'un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Trancher un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id\/trancher",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id\/trancher",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"decision\":\"rejet\",\"motif\":\"Le prestataire a prouv\u00e9 sa pr\u00e9sence sur place.\"}"
+                        },
+                        "description": "Cl\u00f4ture un litige ouvert par une d\u00e9cision motiv\u00e9e (`rejet` pour l'instant). Un litige d\u00e9j\u00e0 cl\u00f4tur\u00e9 r\u00e9pond 409, y compris\nsi deux d\u00e9cisions arrivent en m\u00eame temps : une seule est retenue."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Ce litige est d\u00e9j\u00e0 cl\u00f4tur\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif de la d\u00e9cision est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la d\u00e9cision est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 agenda d'un prestataire",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont visibles.",
             "item": [
@@ -515,6 +755,245 @@
                             "header": [],
                             "code": 404,
                             "body": "{\"message\":\"Prestataire introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Client \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Un client ne voit que ses propres litiges. L'ouverture est limit\u00e9e \u00e0 5 requ\u00eates par minute et par utilisateur.",
+            "item": [
+                {
+                    "name": "Ouvrir un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id\/litiges",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "multipart\/form-data"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "description",
+                                    "value": "Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.",
+                                    "type": "text",
+                                    "description": "Description du probl\u00e8me, de 10 \u00e0 1000 caract\u00e8res. Le champ value doit contenir au moins 10 caract\u00e8res. Le champ value ne doit pas d\u00e9passer 1000 caract\u00e8res."
+                                },
+                                {
+                                    "key": "preuves[]",
+                                    "src": [],
+                                    "type": "file"
+                                }
+                            ]
+                        },
+                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Un seul litige peut \u00eatre ouvert \u00e0 la fois par r\u00e9servation. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Un litige est d\u00e9j\u00e0 ouvert sur cette r\u00e9servation.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La description doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"description\":[\"La description doit contenir au moins 10 caract\u00e8res.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Mes litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un de mes litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Avec la r\u00e9ponse du prestataire et la d\u00e9cision de l'administrateur quand elles existent. Le litige d'un autre client r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":\"J'\u00e9tais sur place.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\",\"preuves\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000091\",\"url\":\"\/api\/v1\/litiges\/0198a1b2-0000-7000-8000-000000000090\/preuves\/0198a1b2-0000-7000-8000-000000000091\"}],\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve de mon litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
                             "name": ""
                         }
                     ]
@@ -1285,7 +1764,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T14:25:37+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:03:08+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2508,6 +2987,233 @@
                             "header": [],
                             "code": 409,
                             "body": "{\"message\":\"Cette r\u00e9servation ne peut pas \u00eatre termin\u00e9e.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Un prestataire ne voit que les litiges qui le visent ;\nle client n'y est identifi\u00e9 que par son pr\u00e9nom et l'initiale de son nom.",
+            "item": [
+                {
+                    "name": "Litiges me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un litige me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Le litige visant un autre prestataire r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve d'un litige me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "R\u00e9pondre \u00e0 un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id\/reponse",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id\/reponse",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"reponse\":\"J'\u00e9tais sur place \u00e0 l'heure convenue.\"}"
+                        },
+                        "description": "Donne votre version des faits (10 \u00e0 1000 caract\u00e8res). Une seule r\u00e9ponse par litige, tant qu'il est ouvert."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"reponsePrestataire\":\"J'\u00e9tais sur place \u00e0 l'heure convenue.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Vous avez d\u00e9j\u00e0 r\u00e9pondu \u00e0 ce litige.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La r\u00e9ponse doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"reponse\":[\"La r\u00e9ponse doit contenir au moins 10 caract\u00e8res.\"]}}",
                             "name": ""
                         },
                         {

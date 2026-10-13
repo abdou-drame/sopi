@@ -1,4 +1,4 @@
-name: 'Client — avis'
+name: 'Client — paiement'
 description: |-
 
   Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
@@ -7,21 +7,22 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/reservations/{id}/avis'
+    uri: 'api/v1/reservations/{id}/payer'
     metadata:
       custom: []
-      groupName: 'Client — avis'
+      groupName: 'Client — paiement'
       groupDescription: |-
 
         Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Donner son avis sur une réservation'
+      title: "Payer l'acompte d'une réservation"
       description: |-
-        Réservé au client de la réservation, une fois la prestation terminée (`terminee`). Un seul avis par réservation, qui ne
-        peut être ni modifié ni retiré. La note est un entier de 1 à 5 ; le commentaire est facultatif (3 à 1000 caractères).
-        Le prestataire noté est toujours celui de la réservation. Une réservation inconnue ou appartenant à un autre client
-        répond 404.
+        Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
+        l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
+        serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code
+        généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
+        pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.
       authenticated: true
       deprecated: false
     headers:
@@ -44,38 +45,20 @@ endpoints:
       id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      note:
-        custom: []
-        name: note
-        description: 'Note entière de 1 (très mauvais) à 5 (excellent). validation.between.'
-        required: true
-        example: 4
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      commentaire:
-        custom: []
-        name: commentaire
-        description: 'Commentaire facultatif, de 3 à 1000 caractères. Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
-        required: false
-        example: 'Travail soigné et ponctuel.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      note: 4
-      commentaire: 'Travail soigné et ponctuel.'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
+        status: 200
+        content: '{"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
         status: 201
-        content: '{"note":4,"commentaire":"Travail soigné et ponctuel.","dateCreation":"2030-01-17T10:00:00+00:00"}'
+        content: '{"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}'
         headers: []
         description: ''
       -
@@ -99,19 +82,19 @@ endpoints:
       -
         custom: []
         status: 409
-        content: '{"message":"Vous avez déjà donné votre avis pour cette réservation."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"La note doit être comprise entre 1 et 5.","errors":{"note":["La note doit être comprise entre 1 et 5."]}}'
+        content: '{"message":"Le délai de paiement est dépassé."}'
         headers: []
         description: ''
       -
         custom: []
         status: 429
         content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 503
+        content: '{"message":"Le service de paiement est momentanément indisponible. Veuillez réessayer."}'
         headers: []
         description: ''
     responseFields: []
