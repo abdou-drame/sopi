@@ -24,6 +24,12 @@ class PrestataireFactory extends Factory
         ];
     }
 
+    /** Solde de gains disponible (FCFA). Le solde n'est pas assignable en masse : posé directement pour les tests. */
+    public function avoirSolde(string|int|float $montant): static
+    {
+        return $this->afterMaking(fn (Prestataire $prestataire) => $prestataire->solde = number_format((float) $montant, 2, '.', ''));
+    }
+
     public function metier(Metier $metier): static
     {
         return $this->state(['metier' => $metier]);
