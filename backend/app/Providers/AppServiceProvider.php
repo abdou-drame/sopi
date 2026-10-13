@@ -2,7 +2,15 @@
 
 namespace App\Providers;
 
+use App\Exceptions\ConfigurationNotificationInvalide;
 use App\Exceptions\ConfigurationPaiementInvalide;
+use App\Services\Notification\EnvoiEmail;
+use App\Services\Notification\EnvoiPush;
+use App\Services\Notification\LaravelNotificationService;
+use App\Services\Notification\LogEnvoiEmail;
+use App\Services\Notification\LogEnvoiPush;
+use App\Services\Notification\NotificationService;
+use App\Services\Notification\SmtpEnvoiEmail;
 use App\Services\Paiement\CalculPaiement;
 use App\Services\Paiement\FakePaiementService;
 use App\Services\Paiement\PaiementService;
@@ -23,6 +31,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(CalculPaiement::class, fn () => CalculPaiement::depuisConfiguration());
+
+        // Notifications (M10) : pilotes choisis par NOTIFICATION_EMAIL_DRIVER et NOTIFICATION_PUSH_DRIVER.
+        $this->app->bind(NotificationService::class, LaravelNotificationService::class);
+        $this->app->bind(EnvoiEmail::class, fn () => match ($pilote = (string) config('sopi.notifications.email_driver')) {
+            'log' => new LogEnvoiEmail,
+            'smtp' => new SmtpEnvoiEmail,
+            default => throw new ConfigurationNotificationInvalide("Le pilote d'e-mail « {$pilote} » est inconnu (valeurs possibles : log, smtp)."),
+        });
+        $this->app->bind(EnvoiPush::class, fn () => match ($pilote = (string) config('sopi.notifications.push_driver')) {
+            'log' => new LogEnvoiPush,
+            'fcm' => throw new ConfigurationNotificationInvalide('Le service de notifications push FCM n\'est pas encore disponible.'),
+            default => throw new ConfigurationNotificationInvalide("Le pilote push « {$pilote} » est inconnu (valeurs possibles : log, fcm)."),
+        });
     }
 
     public function boot(): void

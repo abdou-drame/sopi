@@ -22,3 +22,6 @@ Schedule::command('sopi:retraits:signaler-bloques')->everyTenMinutes()->withoutO
 
 // Levée automatique des suspensions arrivées à échéance (M9.3), toutes les 5 minutes.
 Schedule::command('sopi:sanctions:lever-expirees')->everyFiveMinutes()->withoutOverlapping();
+
+// Envoi et reprise des notifications e-mail et push en attente (M10), chaque minute.
+Schedule::command('sopi:notifications:envoyer-en-attente')->everyMinute()->withoutOverlapping();

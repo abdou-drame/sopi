@@ -66,4 +66,15 @@ return [
         'delai_blocage_minutes' => (int) env('RETRAIT_DELAI_BLOCAGE_MINUTES', 15),
     ],
 
+    /*
+    | Notifications (M10) : pilotes d'envoi, essais et lot de la commande planifiée. Pilote « log » par défaut : rien n'est envoyé.
+    | e-mail : log ou smtp (transport et accès via les variables MAIL_* du serveur). push : log ou fcm (pas encore disponible).
+    */
+    'notifications' => [
+        'email_driver' => env('NOTIFICATION_EMAIL_DRIVER', 'log'),
+        'push_driver' => env('NOTIFICATION_PUSH_DRIVER', 'log'),
+        'max_tentatives' => (int) env('NOTIFICATION_MAX_TENTATIVES', 5),
+        'delai_essai_minutes' => (int) env('NOTIFICATION_DELAI_ESSAI_MINUTES', 5),
+        'taille_lot' => (int) env('NOTIFICATION_TAILLE_LOT', 100),
+    ],
 ];
