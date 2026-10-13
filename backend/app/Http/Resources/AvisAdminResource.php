@@ -25,6 +25,7 @@ class AvisAdminResource extends JsonResource
             'reservationId' => $this->reservation_id,
             'client' => ['id' => $this->client_id, 'nom' => $this->client?->nom, 'prenom' => $this->client?->prenom],
             'prestataire' => ['id' => $this->prestataire_id, 'nomEntreprise' => $this->prestataire?->nom_entreprise],
+            'statut' => $this->statut->value,
             'signaleLe' => $this->signale_le?->toIso8601String(),
             'motifSignalement' => $this->motif_signalement,
             'modereLe' => $this->modere_le?->toIso8601String(),

@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\StatutAvis;
 use Database\Factories\AvisFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +40,19 @@ class Avis extends Model
     public function scopeVisibles(Builder $requete): void
     {
         $requete->whereNull('masque_le');
+    }
+
+    /**
+     * Statut du diagramme de classes, calculé : SUPPRIME si l'avis est masqué ; sinon SIGNALE tant qu'un signalement n'a pas été traité
+     * (signale_le renseigné, modere_le vide) ; sinon PUBLIE (y compris après conservation ou rétablissement).
+     */
+    protected function statut(): Attribute
+    {
+        return Attribute::get(fn (): StatutAvis => match (true) {
+            $this->masque_le !== null => StatutAvis::Supprime,
+            $this->signale_le !== null && $this->modere_le === null => StatutAvis::Signale,
+            default => StatutAvis::Publie,
+        });
     }
 
     public function reservation(): BelongsTo

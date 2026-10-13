@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\StatutAvis;
 use App\Enums\StatutCompte;
 use App\Models\Avis;
 use App\Models\Creneau;
@@ -392,5 +393,44 @@ describe('effet d\'un avis masqué', function () {
         }
 
         expect($compter())->toBe($pour1);
+    });
+});
+
+describe('statut calculé de l\'avis', function () {
+    it('vaut PUBLIE par défaut, SIGNALE après signalement, SUPPRIME une fois masqué', function () {
+        $avis = avisModere(prestataireModere());
+        expect($avis->statut)->toBe(StatutAvis::Publie);
+
+        DB::table('avis')->where('id', $avis->id)->update(['signale_le' => now(), 'motif_signalement' => 'Avis injuste.']);
+        expect($avis->fresh()->statut)->toBe(StatutAvis::Signale);
+
+        expect(masquerDirect($avis->fresh())->statut)->toBe(StatutAvis::Supprime);
+    });
+
+    it('repasse à PUBLIE après conservation ou rétablissement', function () {
+        $p = prestataireModere();
+        $signale = avisModere($p);
+        DB::table('avis')->where('id', $signale->id)->update(['signale_le' => now(), 'motif_signalement' => 'Avis injuste.']);
+        $masque = avisModere($p);
+        DB::table('avis')->where('id', $masque->id)->update(['signale_le' => now(), 'motif_signalement' => 'Avis injuste.']);
+        $this->actingAs(User::factory()->administrateur()->create(), 'sanctum');
+
+        $this->postJson('/api/v1/admin/avis/'.$signale->id.'/conserver')->assertOk()->assertJsonPath('statut', 'publie');
+        $this->postJson('/api/v1/admin/avis/'.$masque->id.'/masquer', motifValide())->assertOk()->assertJsonPath('statut', 'supprime');
+        $this->postJson('/api/v1/admin/avis/'.$masque->id.'/retablir')->assertOk()->assertJsonPath('statut', 'publie');
+
+        expect($signale->fresh()->statut)->toBe(StatutAvis::Publie)->and($masque->fresh()->statut)->toBe(StatutAvis::Publie);
+    });
+
+    it('expose le statut dans la liste de l\'administrateur seulement', function () {
+        $p = prestataireModere();
+        $avis = avisModere($p);
+        DB::table('avis')->where('id', $avis->id)->update(['signale_le' => now(), 'motif_signalement' => 'Avis injuste.']);
+
+        $this->actingAs(User::factory()->administrateur()->create(), 'sanctum')->getJson('/api/v1/admin/avis')
+            ->assertOk()->assertJsonPath('data.0.statut', 'signale');
+
+        $this->actingAs($p->user, 'sanctum')->getJson('/api/v1/prestataire/avis')->assertOk()->assertJsonMissingPath('data.0.statut');
+        $this->actingAs($avis->client, 'sanctum')->getJson('/api/v1/prestataires/'.$p->id.'/avis')->assertOk()->assertJsonMissingPath('data.0.statut');
     });
 });

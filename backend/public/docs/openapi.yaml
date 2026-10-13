@@ -1577,6 +1577,7 @@ paths:
                       prestataire:
                         id: 0198a1b2-0000-7000-8000-000000000003
                         nomEntreprise: 'Garage Exemple'
+                      statut: signale
                       signaleLe: '2030-01-18T08:00:00+00:00'
                       motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
                       modereLe: null
@@ -1611,6 +1612,7 @@ paths:
                         prestataire:
                           id: 0198a1b2-0000-7000-8000-000000000003
                           nomEntreprise: 'Garage Exemple'
+                        statut: signale
                         signaleLe: '2030-01-18T08:00:00+00:00'
                         motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
                         modereLe: null
@@ -1657,6 +1659,9 @@ paths:
                             nomEntreprise:
                               type: string
                               example: 'Garage Exemple'
+                        statut:
+                          type: string
+                          example: signale
                         signaleLe:
                           type: string
                           example: '2030-01-18T08:00:00+00:00'
@@ -1790,6 +1795,7 @@ paths:
                   prestataire:
                     id: 0198a1b2-0000-7000-8000-000000000003
                     nomEntreprise: 'Garage Exemple'
+                  statut: supprime
                   signaleLe: null
                   motifSignalement: null
                   modereLe: '2030-01-19T09:00:00+00:00'
@@ -1834,6 +1840,9 @@ paths:
                       nomEntreprise:
                         type: string
                         example: 'Garage Exemple'
+                  statut:
+                    type: string
+                    example: supprime
                   signaleLe:
                     type: string
                     example: null
@@ -1979,6 +1988,7 @@ paths:
                   prestataire:
                     id: 0198a1b2-0000-7000-8000-000000000003
                     nomEntreprise: 'Garage Exemple'
+                  statut: publie
                   signaleLe: '2030-01-18T08:00:00+00:00'
                   motifSignalement: 'Avis injuste.'
                   modereLe: '2030-01-19T09:00:00+00:00'
@@ -2023,6 +2033,9 @@ paths:
                       nomEntreprise:
                         type: string
                         example: 'Garage Exemple'
+                  statut:
+                    type: string
+                    example: publie
                   signaleLe:
                     type: string
                     example: '2030-01-18T08:00:00+00:00'
@@ -2143,6 +2156,7 @@ paths:
                   prestataire:
                     id: 0198a1b2-0000-7000-8000-000000000003
                     nomEntreprise: 'Garage Exemple'
+                  statut: publie
                   signaleLe: null
                   motifSignalement: null
                   modereLe: '2030-01-19T09:00:00+00:00'
@@ -2187,6 +2201,9 @@ paths:
                       nomEntreprise:
                         type: string
                         example: 'Garage Exemple'
+                  statut:
+                    type: string
+                    example: publie
                   signaleLe:
                     type: string
                     example: null
@@ -5276,7 +5293,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T16:12:32+00:00'
+                  time: '2026-10-13T16:15:41+00:00'
                 properties:
                   status:
                     type: string
@@ -5292,7 +5309,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T16:12:32+00:00'
+                    example: '2026-10-13T16:15:41+00:00'
       tags:
         - Endpoints
       security: []

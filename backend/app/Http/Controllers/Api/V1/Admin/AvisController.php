@@ -32,7 +32,7 @@ class AvisController extends Controller
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Cet avis concerne une autre prestation que la mienne.","modereLe":null,"moderePar":null,"motifModeration":null,"masque":false,"masqueLe":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/avis?page=1","last":"https://api.exemple.test/api/v1/admin/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"signale","signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Cet avis concerne une autre prestation que la mienne.","modereLe":null,"moderePar":null,"motifModeration":null,"masque":false,"masqueLe":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/avis?page=1","last":"https://api.exemple.test/api/v1/admin/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 422 {"message":"La note doit être comprise entre 1 et 5.","errors":{"note":["La note doit être comprise entre 1 et 5."]}}
@@ -52,7 +52,7 @@ class AvisController extends Controller
      *
      * @urlParam id string required Identifiant de l'avis. Example: 0198a1b2-0000-7000-8000-000000000080
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":true,"masqueLe":"2030-01-19T09:00:00+00:00"}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"supprime","signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":true,"masqueLe":"2030-01-19T09:00:00+00:00"}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Avis introuvable."}
@@ -73,7 +73,7 @@ class AvisController extends Controller
      *
      * @urlParam id string required Identifiant de l'avis. Example: 0198a1b2-0000-7000-8000-000000000080
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Avis injuste.","modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":null,"masque":false,"masqueLe":null}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"publie","signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Avis injuste.","modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":null,"masque":false,"masqueLe":null}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Avis introuvable."}
@@ -93,7 +93,7 @@ class AvisController extends Controller
      *
      * @urlParam id string required Identifiant de l'avis. Example: 0198a1b2-0000-7000-8000-000000000080
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":false,"masqueLe":null}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"publie","signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":false,"masqueLe":null}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Avis introuvable."}
