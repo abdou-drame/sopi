@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Avis d'un client sur une prestation terminée (diagramme de classes) : note de 1 à 5 et commentaire facultatif.
- * Créé uniquement par AvisService (aucune affectation de masse), non modifiable après dépôt.
+ * Créé uniquement par AvisService (aucune affectation de masse), non modifiable après dépôt. Peut être signalé par le
+ * prestataire puis modéré par l'administrateur (signale_le, modere_le, modere_par_id, masque_le : voir la migration de modération).
  */
 class Avis extends Model
 {
@@ -26,6 +27,9 @@ class Avis extends Model
     {
         return [
             'note' => 'integer',
+            'signale_le' => 'datetime',
+            'modere_le' => 'datetime',
+            'masque_le' => 'datetime',
         ];
     }
 
@@ -42,5 +46,11 @@ class Avis extends Model
     public function prestataire(): BelongsTo
     {
         return $this->belongsTo(Prestataire::class);
+    }
+
+    /** Administrateur qui a modéré l'avis (supprimé ou conservé), modereParId du diagramme de classes. */
+    public function moderePar(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'modere_par_id');
     }
 }

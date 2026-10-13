@@ -70,6 +70,12 @@ class Prestataire extends Model
         return $this->hasMany(Avis::class);
     }
 
+    /** Litiges signalés contre ce prestataire. */
+    public function litiges(): HasMany
+    {
+        return $this->hasMany(Litige::class);
+    }
+
     public function retraits(): HasMany
     {
         return $this->hasMany(Retrait::class);

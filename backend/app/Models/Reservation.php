@@ -222,6 +222,12 @@ class Reservation extends Model
         return $this->hasOne(Avis::class);
     }
 
+    /** Litiges signalés sur cette réservation (au plus un ouvert à la fois). */
+    public function litiges(): HasMany
+    {
+        return $this->hasMany(Litige::class);
+    }
+
     public function paiements(): HasMany
     {
         return $this->hasMany(Paiement::class);

@@ -56,6 +56,18 @@ class User extends Authenticatable
         return $this->hasMany(Reservation::class, 'client_id');
     }
 
+    /** Litiges signalés en tant que client. */
+    public function litiges(): HasMany
+    {
+        return $this->hasMany(Litige::class, 'client_id');
+    }
+
+    /** Historique des sanctions reçues (levées ou non). */
+    public function sanctions(): HasMany
+    {
+        return $this->hasMany(Sanction::class);
+    }
+
     /** Avis donnés en tant que client. */
     public function avisDonnes(): HasMany
     {

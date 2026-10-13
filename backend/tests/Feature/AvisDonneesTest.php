@@ -19,6 +19,8 @@ describe('table avis', function () {
     it('a les colonnes prévues', function () {
         expect(Schema::getColumnListing('avis'))->toEqualCanonicalizing([
             'id', 'reservation_id', 'client_id', 'prestataire_id', 'note', 'commentaire', 'created_at', 'updated_at',
+            // Modération (M9.1).
+            'signale_le', 'motif_signalement', 'modere_le', 'modere_par_id', 'motif_moderation', 'masque_le',
         ]);
     });
 
