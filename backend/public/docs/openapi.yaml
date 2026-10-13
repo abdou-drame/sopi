@@ -47,6 +47,9 @@ tags:
     name: "Prestataire — photos d'atelier"
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.\nLes clients voient ces photos sur le profil public du prestataire."
   -
+    name: 'Prestataire — solde et retraits'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses\npropres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA."
+  -
     name: Profil
     description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
 components:
@@ -2391,7 +2394,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-12T23:54:39+00:00'
+                  time: '2026-10-13T13:40:49+00:00'
                 properties:
                   status:
                     type: string
@@ -2407,7 +2410,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-12T23:54:39+00:00'
+                    example: '2026-10-13T13:40:49+00:00'
       tags:
         - Endpoints
       security: []
@@ -5039,6 +5042,397 @@ paths:
         name: photo
         description: 'Identifiant de la photo.'
         example: 0198a1b2-0000-7000-8000-000000000030
+        required: true
+        schema:
+          type: string
+  /api/v1/prestataire/solde:
+    get:
+      summary: 'Mon solde'
+      operationId: monSolde
+      description: "Solde disponible et limites d'un retrait (en FCFA)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  solde: 12500.0
+                  montantMinimumRetrait: 1000
+                  montantMaximumRetrait: 500000
+                properties:
+                  solde:
+                    type: number
+                    example: 12500.0
+                  montantMinimumRetrait:
+                    type: integer
+                    example: 1000
+                  montantMaximumRetrait:
+                    type: integer
+                    example: 500000
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — solde et retraits'
+  /api/v1/prestataire/retraits:
+    get:
+      summary: 'Mes retraits'
+      operationId: mesRetraits
+      description: 'Historique paginé (20 par page), du plus récent au plus ancien. Le numéro de versement est masqué (3 derniers chiffres).'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000070
+                      montant: 5000.0
+                      statut: reussi
+                      telephoneVersement: '+221******567'
+                      dateDemande: '2030-01-15T08:50:00+00:00'
+                      dateTraitement: '2030-01-15T08:50:02+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataire/retraits?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataire/retraits?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000070
+                        montant: 5000
+                        statut: reussi
+                        telephoneVersement: '+221******567'
+                        dateDemande: '2030-01-15T08:50:00+00:00'
+                        dateTraitement: '2030-01-15T08:50:02+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000070
+                        montant:
+                          type: number
+                          example: 5000.0
+                        statut:
+                          type: string
+                          example: reussi
+                        telephoneVersement:
+                          type: string
+                          example: '+221******567'
+                        dateDemande:
+                          type: string
+                          example: '2030-01-15T08:50:00+00:00'
+                        dateTraitement:
+                          type: string
+                          example: '2030-01-15T08:50:02+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/retraits?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/retraits?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — solde et retraits'
+    post:
+      summary: 'Demander un retrait'
+      operationId: demanderUnRetrait
+      description: "Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un\nentier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.\nStatuts renvoyés : `reussi` (versement accepté), ou `en_cours` si le résultat est incertain (délai dépassé, panne) : le montant\nreste alors débité et le retrait est traité par l'équipe, sans nouveau débit. Un refus définitif répond 503 : le solde est\nrecrédité (une seule fois) et la demande peut être refaite."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000070
+                  montant: 5000.0
+                  statut: reussi
+                  telephoneVersement: '+221******567'
+                  dateDemande: '2030-01-15T08:50:00+00:00'
+                  dateTraitement: '2030-01-15T08:50:02+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000070
+                  montant:
+                    type: number
+                    example: 5000.0
+                  statut:
+                    type: string
+                    example: reussi
+                  telephoneVersement:
+                    type: string
+                    example: '+221******567'
+                  dateDemande:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  dateTraitement:
+                    type: string
+                    example: '2030-01-15T08:50:02+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Solde insuffisant.'
+                  errors:
+                    montant:
+                      - 'Solde insuffisant.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Solde insuffisant.'
+                  errors:
+                    type: object
+                    properties:
+                      montant:
+                        type: array
+                        example:
+                          - 'Solde insuffisant.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+        503:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Le versement n'a pas pu être effectué. Votre solde n'a pas été débité. Veuillez réessayer."
+                properties:
+                  message:
+                    type: string
+                    example: "Le versement n'a pas pu être effectué. Votre solde n'a pas été débité. Veuillez réessayer."
+      tags:
+        - 'Prestataire — solde et retraits'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                montant:
+                  type: integer
+                  description: 'Montant à retirer, en FCFA (entier), entre le minimum et le maximum de la configuration. Le champ value doit être au moins égal à 1000. Le champ value ne doit pas dépasser 500000.'
+                  example: 5000
+                telephone_versement:
+                  type: string
+                  description: 'Mobile sénégalais (Wave ou Orange Money) qui reçoit le versement. Must match the regex /^\+2217[05678]\d{7}$/.'
+                  example: '771234567'
+              required:
+                - montant
+                - telephone_versement
+  '/api/v1/prestataire/retraits/{id}':
+    get:
+      summary: "Détail d'un retrait"
+      operationId: dtailDunRetrait
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000070
+                  montant: 5000.0
+                  statut: reussi
+                  telephoneVersement: '+221******567'
+                  dateDemande: '2030-01-15T08:50:00+00:00'
+                  dateTraitement: '2030-01-15T08:50:02+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000070
+                  montant:
+                    type: number
+                    example: 5000.0
+                  statut:
+                    type: string
+                    example: reussi
+                  telephoneVersement:
+                    type: string
+                    example: '+221******567'
+                  dateDemande:
+                    type: string
+                    example: '2030-01-15T08:50:00+00:00'
+                  dateTraitement:
+                    type: string
+                    example: '2030-01-15T08:50:02+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Retrait introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Retrait introuvable.'
+      tags:
+        - 'Prestataire — solde et retraits'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du retrait.'
+        example: 0198a1b2-0000-7000-8000-000000000070
         required: true
         schema:
           type: string

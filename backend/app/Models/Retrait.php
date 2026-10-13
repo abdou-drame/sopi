@@ -36,6 +36,55 @@ class Retrait extends Model
         ];
     }
 
+    /** Crée le retrait EN_COURS d'un prestataire (jamais en masse). Le débit du solde est fait par l'appelant, dans la même transaction. */
+    public static function ouvrir(string $prestataireId, int $montant, string $telephoneVersement): self
+    {
+        $retrait = new self;
+        $retrait->prestataire_id = $prestataireId;
+        $retrait->montant = $montant;
+        $retrait->telephone_versement = $telephoneVersement;
+        $retrait->save();
+
+        return $retrait;
+    }
+
+    /** EN_COURS vers REUSSI avec la référence du versement, une seule fois. Vrai si exactement une ligne a changé. */
+    public function reussirSiEnCours(?string $reference): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutRetrait::EnCours->value)
+            ->update(['statut' => StatutRetrait::Reussi->value, 'reference_dexpay' => $reference, 'traite_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** EN_COURS vers ECHOUE, une seule fois. Vrai si exactement une ligne a changé. */
+    public function echouerSiEnCours(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutRetrait::EnCours->value)
+            ->update(['statut' => StatutRetrait::Echoue->value, 'traite_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /**
+     * Pose la garde du recrédit (recredite_le), une seule fois : seulement pour un retrait ECHOUE pas encore recrédité.
+     * Vrai si exactement une ligne a changé (l'appelant recrédite alors le solde, dans la même transaction).
+     */
+    public function recrediterSiPossible(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutRetrait::Echoue->value)
+            ->whereNull('recredite_le')
+            ->update(['recredite_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     public function prestataire(): BelongsTo
     {
         return $this->belongsTo(Prestataire::class);

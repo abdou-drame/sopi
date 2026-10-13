@@ -62,6 +62,8 @@ return [
     'retraits' => [
         'montant_minimum' => (int) env('RETRAIT_MONTANT_MINIMUM', 1000),
         'montant_maximum' => (int) env('RETRAIT_MONTANT_MAXIMUM', 500000),
+        // Au-delà de ce délai, un retrait encore EN_COURS est signalé dans le journal (sopi:retraits:signaler-bloques).
+        'delai_blocage_minutes' => (int) env('RETRAIT_DELAI_BLOCAGE_MINUTES', 15),
     ],
 
 ];

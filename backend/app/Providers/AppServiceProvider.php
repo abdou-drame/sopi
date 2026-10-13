@@ -46,6 +46,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('paiement-reservation', fn (Request $request) => Limit::perMinute(10)->by($parUtilisateur($request)));
         // Webhook du prestataire de paiement : public, limité par adresse IP.
         RateLimiter::for('webhook-paiement', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+        // Retrait : opération financière, 5 demandes par minute et par utilisateur.
+        RateLimiter::for('retrait', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
