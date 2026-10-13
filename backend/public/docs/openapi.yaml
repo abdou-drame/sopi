@@ -11,6 +11,15 @@ tags:
     name: "Administration — demandes d'inscription"
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`)."
   -
+    name: 'Administration — litiges'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;\nelle ne déclenche aucun mouvement d'argent automatique."
+  -
+    name: 'Administration — modération des avis'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées\nà 10 requêtes par minute."
+  -
+    name: 'Administration — sanctions'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Poser et lever une sanction sont limités à 10 requêtes par minute.\nUne suspension ou un bannissement est « tout ou rien » : sanction, statut du compte et révocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndisparaît de la recherche et du profil public, et ses réservations à venir (en attente, acceptées, confirmées pour un prestataire ;\nen attente et acceptées pour un client) sont annulées, un prestataire sanctionné voyant l'acompte versé remboursé en intégralité.\nUne prestation en cours va à son terme. Le solde et les retraits ne sont pas modifiés. Un administrateur ne peut pas être sanctionné."
+  -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -19,6 +28,9 @@ tags:
   -
     name: "Client — avis d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables."
+  -
+    name: 'Client — litiges'
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur."
   -
     name: 'Client — paiement'
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur."
@@ -49,6 +61,9 @@ tags:
   -
     name: 'Prestataire — demandes de réservation'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations\nde ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié\nque par son prénom et l'initiale de son nom."
+  -
+    name: 'Prestataire — litiges'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;\nle client n'y est identifié que par son prénom et l'initiale de son nom."
   -
     name: 'Prestataire — mes avis'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent."
@@ -734,6 +749,1979 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/admin/litiges:
+    get:
+      summary: 'Liste des litiges'
+      operationId: listeDesLitiges
+      description: 'Paginée (20 par page). Par défaut les litiges `ouvert`, du plus ancien au plus récent.'
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'ouvert (défaut), cloture ou tous.'
+          example: ouvert
+          required: false
+          schema:
+            type: string
+            description: 'ouvert (défaut), cloture ou tous.'
+            example: ouvert
+            enum:
+              - ouvert
+              - cloture
+              - tous
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000090
+                      statut: ouvert
+                      description: "Le prestataire ne s'est pas présenté."
+                      dateCreation: '2030-01-16T12:00:00+00:00'
+                      reservation:
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        statut: confirmee
+                        dateDebut: '2030-01-16T09:00:00+00:00'
+                        prestation: Vidange
+                      nombrePreuves: 1
+                      reponsePrestataire: null
+                      reponseLe: null
+                      decision: null
+                      motifDecision: null
+                      clotureLe: null
+                      client:
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        nom: Diallo
+                        prenom: Awa
+                        telephone: '+221770000001'
+                        email: null
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000002
+                        nom: Diop
+                        prenom: Moussa
+                        telephone: '+221770000002'
+                        email: null
+                        nomEntreprise: 'Garage Exemple'
+                      prixApplique: 15000
+                      paiements: []
+                      decidePar: null
+                      sanctionId: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/litiges?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/litiges?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000090
+                        statut: ouvert
+                        description: "Le prestataire ne s'est pas présenté."
+                        dateCreation: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          id: 0198a1b2-0000-7000-8000-000000000060
+                          statut: confirmee
+                          dateDebut: '2030-01-16T09:00:00+00:00'
+                          prestation: Vidange
+                        nombrePreuves: 1
+                        reponsePrestataire: null
+                        reponseLe: null
+                        decision: null
+                        motifDecision: null
+                        clotureLe: null
+                        client:
+                          id: 0198a1b2-0000-7000-8000-000000000001
+                          nom: Diallo
+                          prenom: Awa
+                          telephone: '+221770000001'
+                          email: null
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000002
+                          nom: Diop
+                          prenom: Moussa
+                          telephone: '+221770000002'
+                          email: null
+                          nomEntreprise: 'Garage Exemple'
+                        prixApplique: 15000
+                        paiements: []
+                        decidePar: null
+                        sanctionId: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000090
+                        statut:
+                          type: string
+                          example: ouvert
+                        description:
+                          type: string
+                          example: "Le prestataire ne s'est pas présenté."
+                        dateCreation:
+                          type: string
+                          example: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000060
+                            statut:
+                              type: string
+                              example: confirmee
+                            dateDebut:
+                              type: string
+                              example: '2030-01-16T09:00:00+00:00'
+                            prestation:
+                              type: string
+                              example: Vidange
+                        nombrePreuves:
+                          type: integer
+                          example: 1
+                        reponsePrestataire:
+                          type: string
+                          example: null
+                          nullable: true
+                        reponseLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        decision:
+                          type: string
+                          example: null
+                          nullable: true
+                        motifDecision:
+                          type: string
+                          example: null
+                          nullable: true
+                        clotureLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        client:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000001
+                            nom:
+                              type: string
+                              example: Diallo
+                            prenom:
+                              type: string
+                              example: Awa
+                            telephone:
+                              type: string
+                              example: '+221770000001'
+                            email:
+                              type: string
+                              example: null
+                              nullable: true
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000002
+                            nom:
+                              type: string
+                              example: Diop
+                            prenom:
+                              type: string
+                              example: Moussa
+                            telephone:
+                              type: string
+                              example: '+221770000002'
+                            email:
+                              type: string
+                              example: null
+                              nullable: true
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                        prixApplique:
+                          type: integer
+                          example: 15000
+                        paiements:
+                          type: array
+                          example: []
+                        decidePar:
+                          type: string
+                          example: null
+                          nullable: true
+                        sanctionId:
+                          type: string
+                          example: null
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/litiges?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/litiges?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le statut doit être ouvert, cloture ou tous.'
+                  errors:
+                    statut:
+                      - 'Le statut doit être ouvert, cloture ou tous.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le statut doit être ouvert, cloture ou tous.'
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - 'Le statut doit être ouvert, cloture ou tous.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — litiges'
+  '/api/v1/admin/litiges/{id}':
+    get:
+      summary: "Détail d'un litige"
+      operationId: dtailDunLitige
+      description: 'Réservation, parties (coordonnées complètes), paiements de la réservation, preuves, réponse du prestataire et décision.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: ouvert
+                  description: "Le prestataire ne s'est pas présenté."
+                  dateCreation: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: confirmee
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    prestation: Vidange
+                  nombrePreuves: 0
+                  reponsePrestataire: null
+                  reponseLe: null
+                  decision: null
+                  motifDecision: null
+                  clotureLe: null
+                  preuves: []
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                    telephone: '+221770000001'
+                    email: null
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000002
+                    nom: Diop
+                    prenom: Moussa
+                    telephone: '+221770000002'
+                    email: null
+                    nomEntreprise: 'Garage Exemple'
+                  prixApplique: 15000
+                  paiements:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000070
+                      statut: paye
+                      montantAcompte: 4500
+                      commission: 1500
+                      payeLe: '2030-01-15T09:00:00+00:00'
+                      rembourseLe: null
+                  decidePar: null
+                  sanctionId: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: ouvert
+                  description:
+                    type: string
+                    example: "Le prestataire ne s'est pas présenté."
+                  dateCreation:
+                    type: string
+                    example: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: confirmee
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      prestation:
+                        type: string
+                        example: Vidange
+                  nombrePreuves:
+                    type: integer
+                    example: 0
+                  reponsePrestataire:
+                    type: string
+                    example: null
+                    nullable: true
+                  reponseLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  decision:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifDecision:
+                    type: string
+                    example: null
+                    nullable: true
+                  clotureLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  preuves:
+                    type: array
+                    example: []
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                      telephone:
+                        type: string
+                        example: '+221770000001'
+                      email:
+                        type: string
+                        example: null
+                        nullable: true
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000002
+                      nom:
+                        type: string
+                        example: Diop
+                      prenom:
+                        type: string
+                        example: Moussa
+                      telephone:
+                        type: string
+                        example: '+221770000002'
+                      email:
+                        type: string
+                        example: null
+                        nullable: true
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  prixApplique:
+                    type: integer
+                    example: 15000
+                  paiements:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000070
+                        statut: paye
+                        montantAcompte: 4500
+                        commission: 1500
+                        payeLe: '2030-01-15T09:00:00+00:00'
+                        rembourseLe: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000070
+                        statut:
+                          type: string
+                          example: paye
+                        montantAcompte:
+                          type: integer
+                          example: 4500
+                        commission:
+                          type: integer
+                          example: 1500
+                        payeLe:
+                          type: string
+                          example: '2030-01-15T09:00:00+00:00'
+                        rembourseLe:
+                          type: string
+                          example: null
+                          nullable: true
+                  decidePar:
+                    type: string
+                    example: null
+                    nullable: true
+                  sanctionId:
+                    type: string
+                    example: null
+                    nullable: true
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Litige introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Litige introuvable.'
+      tags:
+        - 'Administration — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/litiges/{id}/preuves/{preuve}':
+    get:
+      summary: "Afficher une preuve d'un litige"
+      operationId: afficherUnePreuveDunLitige
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      parameters: []
+      responses:
+        200:
+          description: image
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "[Contenu binaire de l'image]"
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Preuve introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Preuve introuvable.'
+      tags:
+        - 'Administration — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        example: 0198a1b2-0000-7000-8000-000000000091
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/litiges/{id}/trancher':
+    post:
+      summary: 'Trancher un litige'
+      operationId: trancherUnLitige
+      description: "Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris\nsi deux décisions arrivent en même temps : une seule est retenue."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: cloture
+                  decision: rejet
+                  motifDecision: 'Signalement non fondé.'
+                  clotureLe: '2030-01-17T09:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: cloture
+                  decision:
+                    type: string
+                    example: rejet
+                  motifDecision:
+                    type: string
+                    example: 'Signalement non fondé.'
+                  clotureLe:
+                    type: string
+                    example: '2030-01-17T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Litige introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Litige introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Ce litige est déjà clôturé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Ce litige est déjà clôturé.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif de la décision est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif de la décision est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif de la décision est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif de la décision est obligatoire.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — litiges'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                decision:
+                  type: string
+                  description: 'Décision : rejet, avertissement, suspension_temporaire, bannissement_definitif.'
+                  example: rejet
+                  enum:
+                    - rejet
+                    - avertissement
+                    - suspension_temporaire
+                    - bannissement_definitif
+                motif:
+                  type: string
+                  description: 'Motif de la décision, de 10 à 1000 caractères. Il sert aussi de motif à la sanction éventuelle. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Le prestataire a prouvé sa présence sur place.'
+                cible:
+                  type: string
+                  description: 'Compte sanctionné par une décision de sanction : prestataire, client (défaut : prestataire).'
+                  example: prestataire
+                  enum:
+                    - prestataire
+                    - client
+                  nullable: true
+                dateFin:
+                  type: string
+                  description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>decision</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+                  example: '2030-02-01T00:00:00+00:00'
+                  nullable: true
+              required:
+                - decision
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/avis:
+    get:
+      summary: 'Liste des avis'
+      operationId: listeDesAvis
+      description: "Paginée (20 par page), du plus récent au plus ancien, tous prestataires confondus. Filtres facultatifs : `prestataire`, `note`,\n`masque`, `signale`, `aTraiter` (signalés et pas encore modérés)."
+      parameters:
+        -
+          in: query
+          name: prestataire
+          description: 'Identifiant du prestataire noté. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000002
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant du prestataire noté. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000002
+            nullable: true
+        -
+          in: query
+          name: note
+          description: 'Note de 1 à 5. validation.between.'
+          example: 2
+          required: false
+          schema:
+            type: integer
+            description: 'Note de 1 à 5. validation.between.'
+            example: 2
+            nullable: true
+        -
+          in: query
+          name: masque
+          description: 'true : avis masqués ; false : avis affichés ; absent : tous.'
+          example: false
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis masqués ; false : avis affichés ; absent : tous.'
+            example: false
+            nullable: true
+        -
+          in: query
+          name: signale
+          description: 'true : avis signalés par le prestataire ; false : jamais signalés.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis signalés par le prestataire ; false : jamais signalés.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: aTraiter
+          description: 'true : avis signalés et pas encore modérés.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis signalés et pas encore modérés.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      note: 1
+                      commentaire: 'Service décevant.'
+                      dateCreation: '2030-01-17T10:00:00+00:00'
+                      reservationId: 0198a1b2-0000-7000-8000-000000000060
+                      client:
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        nom: Diallo
+                        prenom: Awa
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000003
+                        nomEntreprise: 'Garage Exemple'
+                      signaleLe: '2030-01-18T08:00:00+00:00'
+                      motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
+                      modereLe: null
+                      moderePar: null
+                      motifModeration: null
+                      masque: false
+                      masqueLe: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        note: 1
+                        commentaire: 'Service décevant.'
+                        dateCreation: '2030-01-17T10:00:00+00:00'
+                        reservationId: 0198a1b2-0000-7000-8000-000000000060
+                        client:
+                          id: 0198a1b2-0000-7000-8000-000000000001
+                          nom: Diallo
+                          prenom: Awa
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000003
+                          nomEntreprise: 'Garage Exemple'
+                        signaleLe: '2030-01-18T08:00:00+00:00'
+                        motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
+                        modereLe: null
+                        moderePar: null
+                        motifModeration: null
+                        masque: false
+                        masqueLe: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        note:
+                          type: integer
+                          example: 1
+                        commentaire:
+                          type: string
+                          example: 'Service décevant.'
+                        dateCreation:
+                          type: string
+                          example: '2030-01-17T10:00:00+00:00'
+                        reservationId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000060
+                        client:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000001
+                            nom:
+                              type: string
+                              example: Diallo
+                            prenom:
+                              type: string
+                              example: Awa
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000003
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                        signaleLe:
+                          type: string
+                          example: '2030-01-18T08:00:00+00:00'
+                        motifSignalement:
+                          type: string
+                          example: 'Cet avis concerne une autre prestation que la mienne.'
+                        modereLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        moderePar:
+                          type: string
+                          example: null
+                          nullable: true
+                        motifModeration:
+                          type: string
+                          example: null
+                          nullable: true
+                        masque:
+                          type: boolean
+                          example: false
+                        masqueLe:
+                          type: string
+                          example: null
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La note doit être comprise entre 1 et 5.'
+                  errors:
+                    note:
+                      - 'La note doit être comprise entre 1 et 5.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La note doit être comprise entre 1 et 5.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'La note doit être comprise entre 1 et 5.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — modération des avis'
+  '/api/v1/admin/avis/{id}/masquer':
+    post:
+      summary: 'Masquer un avis'
+      operationId: masquerUnAvis
+      description: "Retire l'avis de l'affichage public. Motif obligatoire. Un avis déjà masqué répond 409, y compris si deux requêtes arrivent\nen même temps."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: null
+                  motifSignalement: null
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: 'Propos injurieux sans rapport avec la prestation.'
+                  masque: true
+                  masqueLe: '2030-01-19T09:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifSignalement:
+                    type: string
+                    example: null
+                    nullable: true
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: 'Propos injurieux sans rapport avec la prestation.'
+                  masque:
+                    type: boolean
+                    example: true
+                  masqueLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis est déjà masqué.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis est déjà masqué.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif de la modération est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif de la modération est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif de la modération est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif de la modération est obligatoire.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — modération des avis'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Propos injurieux sans rapport avec la prestation.'
+              required:
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/avis/{id}/conserver':
+    post:
+      summary: 'Conserver un avis'
+      operationId: conserverUnAvis
+      description: "Décide, après examen d'un signalement, que l'avis reste affiché. Motif facultatif. Un avis déjà modéré répond 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: '2030-01-18T08:00:00+00:00'
+                  motifSignalement: 'Avis injuste.'
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: null
+                  masque: false
+                  masqueLe: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: '2030-01-18T08:00:00+00:00'
+                  motifSignalement:
+                    type: string
+                    example: 'Avis injuste.'
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: null
+                    nullable: true
+                  masque:
+                    type: boolean
+                    example: false
+                  masqueLe:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis a déjà été modéré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis a déjà été modéré.'
+      tags:
+        - 'Administration — modération des avis'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Propos injurieux sans rapport avec la prestation.'
+                  nullable: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/avis/{id}/retablir':
+    post:
+      summary: 'Rétablir un avis masqué'
+      operationId: rtablirUnAvisMasqu
+      description: "L'avis est de nouveau affiché et compte dans la note moyenne. La trace de la modération est conservée. Un avis non masqué répond 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: null
+                  motifSignalement: null
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: 'Propos injurieux sans rapport avec la prestation.'
+                  masque: false
+                  masqueLe: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifSignalement:
+                    type: string
+                    example: null
+                    nullable: true
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: 'Propos injurieux sans rapport avec la prestation.'
+                  masque:
+                    type: boolean
+                    example: false
+                  masqueLe:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Cet avis n'est pas masqué."
+                properties:
+                  message:
+                    type: string
+                    example: "Cet avis n'est pas masqué."
+      tags:
+        - 'Administration — modération des avis'
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/utilisateurs/{id}/sanctions':
+    post:
+      summary: 'Poser une sanction'
+      operationId: poserUneSanction
+      description: "Sanctionne un client ou un prestataire. Un compte ne peut porter qu'une seule suspension ou un seul bannissement actif à la fois."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                  type: suspension_temporaire
+                  motif: 'Comportement injurieux envers un client.'
+                  dateFin: '2030-02-01T00:00:00+00:00'
+                  litigeId: null
+                  avisId: null
+                  posePar: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation: '2030-01-20T10:00:00+00:00'
+                  active: true
+                  leveeLe: null
+                  leveePar: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  type:
+                    type: string
+                    example: suspension_temporaire
+                  motif:
+                    type: string
+                    example: 'Comportement injurieux envers un client.'
+                  dateFin:
+                    type: string
+                    example: '2030-02-01T00:00:00+00:00'
+                  litigeId:
+                    type: string
+                    example: null
+                    nullable: true
+                  avisId:
+                    type: string
+                    example: null
+                    nullable: true
+                  posePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  active:
+                    type: boolean
+                    example: true
+                  leveeLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  leveePar:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Un administrateur ne peut pas être sanctionné.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Un administrateur ne peut pas être sanctionné.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Utilisateur introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Utilisateur introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Ce compte fait déjà l'objet d'une sanction active."
+                properties:
+                  message:
+                    type: string
+                    example: "Ce compte fait déjà l'objet d'une sanction active."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La date de fin de la suspension est obligatoire.'
+                  errors:
+                    dateFin:
+                      - 'La date de fin de la suspension est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La date de fin de la suspension est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      dateFin:
+                        type: array
+                        example:
+                          - 'La date de fin de la suspension est obligatoire.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Administration — sanctions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: 'avertissement, suspension_temporaire ou bannissement_definitif.'
+                  example: suspension_temporaire
+                  enum:
+                    - avertissement
+                    - suspension_temporaire
+                    - bannissement_definitif
+                motif:
+                  type: string
+                  description: 'Motif de la sanction, de 10 à 1000 caractères. Il est montré à la personne sanctionnée quand elle tente de se connecter. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Comportement injurieux envers un client.'
+                dateFin:
+                  type: string
+                  description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>type</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+                  example: '2030-02-01T00:00:00+00:00'
+                  nullable: true
+                litigeId:
+                  type: string
+                  description: "Litige à l'origine de la sanction (le compte doit en être une partie). Facultatif. validation.uuid."
+                  example: 0198a1b2-0000-7000-8000-000000000090
+                  nullable: true
+                avisId:
+                  type: string
+                  description: "Avis à l'origine de la sanction (le compte doit en être l'auteur). Facultatif. validation.uuid."
+                  example: 0198a1b2-0000-7000-8000-000000000080
+                  nullable: true
+              required:
+                - type
+                - motif
+    get:
+      summary: "Historique des sanctions d'un utilisateur"
+      operationId: historiqueDesSanctionsDunUtilisateur
+      description: 'Toutes les sanctions du compte, levées ou non, de la plus récente à la plus ancienne. Jamais supprimées.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000100
+                      utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                      type: avertissement
+                      motif: 'Retards répétés.'
+                      dateFin: null
+                      litigeId: null
+                      avisId: null
+                      posePar: 0198a1b2-0000-7000-8000-000000000001
+                      dateCreation: '2030-01-20T10:00:00+00:00'
+                      active: true
+                      leveeLe: null
+                      leveePar: null
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000100
+                        utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                        type: avertissement
+                        motif: 'Retards répétés.'
+                        dateFin: null
+                        litigeId: null
+                        avisId: null
+                        posePar: 0198a1b2-0000-7000-8000-000000000001
+                        dateCreation: '2030-01-20T10:00:00+00:00'
+                        active: true
+                        leveeLe: null
+                        leveePar: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000100
+                        utilisateurId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000002
+                        type:
+                          type: string
+                          example: avertissement
+                        motif:
+                          type: string
+                          example: 'Retards répétés.'
+                        dateFin:
+                          type: string
+                          example: null
+                          nullable: true
+                        litigeId:
+                          type: string
+                          example: null
+                          nullable: true
+                        avisId:
+                          type: string
+                          example: null
+                          nullable: true
+                        posePar:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000001
+                        dateCreation:
+                          type: string
+                          example: '2030-01-20T10:00:00+00:00'
+                        active:
+                          type: boolean
+                          example: true
+                        leveeLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        leveePar:
+                          type: string
+                          example: null
+                          nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Utilisateur introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Utilisateur introuvable.'
+      tags:
+        - 'Administration — sanctions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'utilisateur sanctionné."
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/sanctions/{id}/lever':
+    post:
+      summary: 'Lever une sanction'
+      operationId: leverUneSanction
+      description: "Met fin à une sanction active. Pour une suspension ou un bannissement, le compte redevient actif. Une sanction déjà levée répond 409.\nLes suspensions arrivées à échéance sont levées automatiquement (toutes les 5 minutes)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                  type: suspension_temporaire
+                  motif: 'Comportement injurieux envers un client.'
+                  dateFin: '2030-02-01T00:00:00+00:00'
+                  litigeId: null
+                  avisId: null
+                  posePar: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation: '2030-01-20T10:00:00+00:00'
+                  active: false
+                  leveeLe: '2030-01-21T08:00:00+00:00'
+                  leveePar: 0198a1b2-0000-7000-8000-000000000001
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  type:
+                    type: string
+                    example: suspension_temporaire
+                  motif:
+                    type: string
+                    example: 'Comportement injurieux envers un client.'
+                  dateFin:
+                    type: string
+                    example: '2030-02-01T00:00:00+00:00'
+                  litigeId:
+                    type: string
+                    example: null
+                    nullable: true
+                  avisId:
+                    type: string
+                    example: null
+                    nullable: true
+                  posePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  active:
+                    type: boolean
+                    example: false
+                  leveeLe:
+                    type: string
+                    example: '2030-01-21T08:00:00+00:00'
+                  leveePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Sanction introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Sanction introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cette sanction est déjà levée.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cette sanction est déjà levée.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Administration — sanctions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la sanction.'
+        example: 0198a1b2-0000-7000-8000-000000000100
+        required: true
+        schema:
+          type: string
   '/api/v1/prestataires/{id}/agenda':
     get:
       summary: "Créneaux disponibles d'un prestataire"
@@ -1149,6 +3137,560 @@ paths:
         name: id
         description: 'Identifiant du prestataire.'
         example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/reservations/{id}/litiges':
+    post:
+      summary: 'Ouvrir un litige'
+      operationId: ouvrirUnLitige
+      description: "Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'à 3 photos de preuve (`preuves[]`). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,\npuis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: ouvert
+                  description: "Le prestataire ne s'est pas présenté au rendez-vous."
+                  dateCreation: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: confirmee
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    prestation: Vidange
+                  nombrePreuves: 0
+                  reponsePrestataire: null
+                  reponseLe: null
+                  decision: null
+                  motifDecision: null
+                  clotureLe: null
+                  prestataire:
+                    nomEntreprise: 'Garage Exemple'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: ouvert
+                  description:
+                    type: string
+                    example: "Le prestataire ne s'est pas présenté au rendez-vous."
+                  dateCreation:
+                    type: string
+                    example: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: confirmee
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      prestation:
+                        type: string
+                        example: Vidange
+                  nombrePreuves:
+                    type: integer
+                    example: 0
+                  reponsePrestataire:
+                    type: string
+                    example: null
+                    nullable: true
+                  reponseLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  decision:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifDecision:
+                    type: string
+                    example: null
+                    nullable: true
+                  clotureLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  prestataire:
+                    type: object
+                    properties:
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Un litige est déjà ouvert sur cette réservation.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Un litige est déjà ouvert sur cette réservation.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La description doit contenir au moins 10 caractères.'
+                  errors:
+                    description:
+                      - 'La description doit contenir au moins 10 caractères.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La description doit contenir au moins 10 caractères.'
+                  errors:
+                    type: object
+                    properties:
+                      description:
+                        type: array
+                        example:
+                          - 'La description doit contenir au moins 10 caractères.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Client — litiges'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: 'Description du problème, de 10 à 1000 caractères. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: "Le prestataire ne s'est pas présenté au rendez-vous."
+                preuves:
+                  type: array
+                  description: 'Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
+                  items:
+                    type: string
+                    format: binary
+              required:
+                - description
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
+  /api/v1/litiges:
+    get:
+      summary: 'Mes litiges'
+      operationId: mesLitiges
+      description: 'Paginée (20 par page), du plus récent au plus ancien.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000090
+                      statut: ouvert
+                      description: "Le prestataire ne s'est pas présenté."
+                      dateCreation: '2030-01-16T12:00:00+00:00'
+                      reservation:
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        statut: confirmee
+                        dateDebut: '2030-01-16T09:00:00+00:00'
+                        prestation: Vidange
+                      nombrePreuves: 1
+                      reponsePrestataire: null
+                      reponseLe: null
+                      decision: null
+                      motifDecision: null
+                      clotureLe: null
+                      prestataire:
+                        nomEntreprise: 'Garage Exemple'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/litiges?page=1'
+                    last: 'https://api.exemple.test/api/v1/litiges?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000090
+                        statut: ouvert
+                        description: "Le prestataire ne s'est pas présenté."
+                        dateCreation: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          id: 0198a1b2-0000-7000-8000-000000000060
+                          statut: confirmee
+                          dateDebut: '2030-01-16T09:00:00+00:00'
+                          prestation: Vidange
+                        nombrePreuves: 1
+                        reponsePrestataire: null
+                        reponseLe: null
+                        decision: null
+                        motifDecision: null
+                        clotureLe: null
+                        prestataire:
+                          nomEntreprise: 'Garage Exemple'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000090
+                        statut:
+                          type: string
+                          example: ouvert
+                        description:
+                          type: string
+                          example: "Le prestataire ne s'est pas présenté."
+                        dateCreation:
+                          type: string
+                          example: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000060
+                            statut:
+                              type: string
+                              example: confirmee
+                            dateDebut:
+                              type: string
+                              example: '2030-01-16T09:00:00+00:00'
+                            prestation:
+                              type: string
+                              example: Vidange
+                        nombrePreuves:
+                          type: integer
+                          example: 1
+                        reponsePrestataire:
+                          type: string
+                          example: null
+                          nullable: true
+                        reponseLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        decision:
+                          type: string
+                          example: null
+                          nullable: true
+                        motifDecision:
+                          type: string
+                          example: null
+                          nullable: true
+                        clotureLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        prestataire:
+                          type: object
+                          properties:
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/litiges?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/litiges?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Client — litiges'
+  '/api/v1/litiges/{id}':
+    get:
+      summary: "Détail d'un de mes litiges"
+      operationId: dtailDunDeMesLitiges
+      description: "Avec la réponse du prestataire et la décision de l'administrateur quand elles existent. Le litige d'un autre client répond 404."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: cloture
+                  description: "Le prestataire ne s'est pas présenté."
+                  dateCreation: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: confirmee
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    prestation: Vidange
+                  nombrePreuves: 1
+                  reponsePrestataire: "J'étais sur place."
+                  reponseLe: '2030-01-16T13:00:00+00:00'
+                  decision: rejet
+                  motifDecision: 'Signalement non fondé.'
+                  clotureLe: '2030-01-17T09:00:00+00:00'
+                  preuves:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000091
+                      url: /api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091
+                  prestataire:
+                    nomEntreprise: 'Garage Exemple'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: cloture
+                  description:
+                    type: string
+                    example: "Le prestataire ne s'est pas présenté."
+                  dateCreation:
+                    type: string
+                    example: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: confirmee
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      prestation:
+                        type: string
+                        example: Vidange
+                  nombrePreuves:
+                    type: integer
+                    example: 1
+                  reponsePrestataire:
+                    type: string
+                    example: "J'étais sur place."
+                  reponseLe:
+                    type: string
+                    example: '2030-01-16T13:00:00+00:00'
+                  decision:
+                    type: string
+                    example: rejet
+                  motifDecision:
+                    type: string
+                    example: 'Signalement non fondé.'
+                  clotureLe:
+                    type: string
+                    example: '2030-01-17T09:00:00+00:00'
+                  preuves:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000091
+                        url: /api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000091
+                        url:
+                          type: string
+                          example: /api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091
+                  prestataire:
+                    type: object
+                    properties:
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Litige introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Litige introuvable.'
+      tags:
+        - 'Client — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  '/api/v1/litiges/{id}/preuves/{preuve}':
+    get:
+      summary: 'Afficher une preuve de mon litige'
+      operationId: afficherUnePreuveDeMonLitige
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      parameters: []
+      responses:
+        200:
+          description: image
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "[Contenu binaire de l'image]"
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Preuve introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Preuve introuvable.'
+      tags:
+        - 'Client — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        example: 0198a1b2-0000-7000-8000-000000000091
         required: true
         schema:
           type: string
@@ -2707,7 +5249,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T14:25:37+00:00'
+                  time: '2026-10-13T15:23:29+00:00'
                 properties:
                   status:
                     type: string
@@ -2723,7 +5265,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T14:25:37+00:00'
+                    example: '2026-10-13T15:23:29+00:00'
       tags:
         - Endpoints
       security: []
@@ -5104,11 +7646,501 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/prestataire/litiges:
+    get:
+      summary: 'Litiges me visant'
+      operationId: litigesMeVisant
+      description: 'Paginée (20 par page), du plus récent au plus ancien.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000090
+                      statut: ouvert
+                      description: "Le prestataire ne s'est pas présenté."
+                      dateCreation: '2030-01-16T12:00:00+00:00'
+                      reservation:
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        statut: confirmee
+                        dateDebut: '2030-01-16T09:00:00+00:00'
+                        prestation: Vidange
+                      nombrePreuves: 1
+                      reponsePrestataire: null
+                      reponseLe: null
+                      decision: null
+                      motifDecision: null
+                      clotureLe: null
+                      client:
+                        prenom: Awa
+                        initialeNom: D
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataire/litiges?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataire/litiges?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000090
+                        statut: ouvert
+                        description: "Le prestataire ne s'est pas présenté."
+                        dateCreation: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          id: 0198a1b2-0000-7000-8000-000000000060
+                          statut: confirmee
+                          dateDebut: '2030-01-16T09:00:00+00:00'
+                          prestation: Vidange
+                        nombrePreuves: 1
+                        reponsePrestataire: null
+                        reponseLe: null
+                        decision: null
+                        motifDecision: null
+                        clotureLe: null
+                        client:
+                          prenom: Awa
+                          initialeNom: D
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000090
+                        statut:
+                          type: string
+                          example: ouvert
+                        description:
+                          type: string
+                          example: "Le prestataire ne s'est pas présenté."
+                        dateCreation:
+                          type: string
+                          example: '2030-01-16T12:00:00+00:00'
+                        reservation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000060
+                            statut:
+                              type: string
+                              example: confirmee
+                            dateDebut:
+                              type: string
+                              example: '2030-01-16T09:00:00+00:00'
+                            prestation:
+                              type: string
+                              example: Vidange
+                        nombrePreuves:
+                          type: integer
+                          example: 1
+                        reponsePrestataire:
+                          type: string
+                          example: null
+                          nullable: true
+                        reponseLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        decision:
+                          type: string
+                          example: null
+                          nullable: true
+                        motifDecision:
+                          type: string
+                          example: null
+                          nullable: true
+                        clotureLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        client:
+                          type: object
+                          properties:
+                            prenom:
+                              type: string
+                              example: Awa
+                            initialeNom:
+                              type: string
+                              example: D
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/litiges?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/litiges?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — litiges'
+  '/api/v1/prestataire/litiges/{id}':
+    get:
+      summary: "Détail d'un litige me visant"
+      operationId: dtailDunLitigeMeVisant
+      description: 'Le litige visant un autre prestataire répond 404.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: ouvert
+                  description: "Le prestataire ne s'est pas présenté."
+                  dateCreation: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: confirmee
+                    dateDebut: '2030-01-16T09:00:00+00:00'
+                    prestation: Vidange
+                  nombrePreuves: 0
+                  reponsePrestataire: null
+                  reponseLe: null
+                  decision: null
+                  motifDecision: null
+                  clotureLe: null
+                  preuves: []
+                  client:
+                    prenom: Awa
+                    initialeNom: D
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: ouvert
+                  description:
+                    type: string
+                    example: "Le prestataire ne s'est pas présenté."
+                  dateCreation:
+                    type: string
+                    example: '2030-01-16T12:00:00+00:00'
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: confirmee
+                      dateDebut:
+                        type: string
+                        example: '2030-01-16T09:00:00+00:00'
+                      prestation:
+                        type: string
+                        example: Vidange
+                  nombrePreuves:
+                    type: integer
+                    example: 0
+                  reponsePrestataire:
+                    type: string
+                    example: null
+                    nullable: true
+                  reponseLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  decision:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifDecision:
+                    type: string
+                    example: null
+                    nullable: true
+                  clotureLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  preuves:
+                    type: array
+                    example: []
+                  client:
+                    type: object
+                    properties:
+                      prenom:
+                        type: string
+                        example: Awa
+                      initialeNom:
+                        type: string
+                        example: D
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Litige introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Litige introuvable.'
+      tags:
+        - 'Prestataire — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  '/api/v1/prestataire/litiges/{id}/preuves/{preuve}':
+    get:
+      summary: "Afficher une preuve d'un litige me visant"
+      operationId: afficherUnePreuveDunLitigeMeVisant
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      parameters: []
+      responses:
+        200:
+          description: image
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "[Contenu binaire de l'image]"
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Preuve introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Preuve introuvable.'
+      tags:
+        - 'Prestataire — litiges'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+      -
+        in: path
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        example: 0198a1b2-0000-7000-8000-000000000091
+        required: true
+        schema:
+          type: string
+  '/api/v1/prestataire/litiges/{id}/reponse':
+    post:
+      summary: 'Répondre à un litige'
+      operationId: rpondreUnLitige
+      description: "Donne votre version des faits (10 à 1000 caractères). Une seule réponse par litige, tant qu'il est ouvert."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  statut: ouvert
+                  reponsePrestataire: "J'étais sur place à l'heure convenue."
+                  reponseLe: '2030-01-16T13:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  statut:
+                    type: string
+                    example: ouvert
+                  reponsePrestataire:
+                    type: string
+                    example: "J'étais sur place à l'heure convenue."
+                  reponseLe:
+                    type: string
+                    example: '2030-01-16T13:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Litige introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Litige introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Vous avez déjà répondu à ce litige.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Vous avez déjà répondu à ce litige.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La réponse doit contenir au moins 10 caractères.'
+                  errors:
+                    reponse:
+                      - 'La réponse doit contenir au moins 10 caractères.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La réponse doit contenir au moins 10 caractères.'
+                  errors:
+                    type: object
+                    properties:
+                      reponse:
+                        type: array
+                        example:
+                          - 'La réponse doit contenir au moins 10 caractères.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Prestataire — litiges'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reponse:
+                  type: string
+                  description: 'Votre version des faits, de 10 à 1000 caractères. Une seule réponse par litige. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: "J'étais sur place à l'heure convenue."
+              required:
+                - reponse
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du litige.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
   /api/v1/prestataire/avis:
     get:
       summary: 'Mes avis'
       operationId: mesAvis
-      description: "Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au\nprénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`."
+      description: "Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au\nprénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`."
       parameters: []
       responses:
         200:
@@ -5229,6 +8261,141 @@ paths:
                     example: "Vous n'avez pas le droit d'effectuer cette action."
       tags:
         - 'Prestataire — mes avis'
+  '/api/v1/prestataire/avis/{id}/signaler':
+    post:
+      summary: 'Signaler un avis'
+      operationId: signalerUnAvis
+      description: "Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que\nl'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  signale: true
+                  signaleLe: '2030-01-18T08:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  signale:
+                    type: boolean
+                    example: true
+                  signaleLe:
+                    type: string
+                    example: '2030-01-18T08:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis a déjà été signalé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis a déjà été signalé.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif du signalement est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif du signalement est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif du signalement est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif du signalement est obligatoire.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Prestataire — mes avis'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+                  example: 'Cet avis concerne une autre prestation que la mienne.'
+              required:
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
   /api/v1/prestataire/photos:
     get:
       summary: 'Mes photos'

@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "c5366e7f-d524-4595-a7d2-42cb4bb75148",
+        "_postman_id": "bf52910c-786a-4799-ae3f-25b11e18e9ef",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -290,6 +290,756 @@
             ]
         },
         {
+            "name": "Administration \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). La d\u00e9cision est motiv\u00e9e et d\u00e9finitive ;\nelle ne d\u00e9clenche aucun mouvement d'argent automatique.",
+            "item": [
+                {
+                    "name": "Liste des litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "ouvert",
+                                    "description": "ouvert (d\u00e9faut), cloture ou tous.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges?statut=ouvert&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page). Par d\u00e9faut les litiges `ouvert`, du plus ancien au plus r\u00e9cent."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[],\"decidePar\":null,\"sanctionId\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre ouvert, cloture ou tous.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre ouvert, cloture ou tous.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "R\u00e9servation, parties (coordonn\u00e9es compl\u00e8tes), paiements de la r\u00e9servation, preuves, r\u00e9ponse du prestataire et d\u00e9cision."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"paye\",\"montantAcompte\":4500,\"commission\":1500,\"payeLe\":\"2030-01-15T09:00:00+00:00\",\"rembourseLe\":null}],\"decidePar\":null,\"sanctionId\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve d'un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Trancher un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/litiges\/:id\/trancher",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/litiges\/:id\/trancher",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"decision\":\"rejet\",\"motif\":\"Le prestataire a prouv\u00e9 sa pr\u00e9sence sur place.\",\"cible\":\"prestataire\",\"dateFin\":\"2030-02-01T00:00:00+00:00\"}"
+                        },
+                        "description": "Cl\u00f4ture un litige ouvert par une d\u00e9cision motiv\u00e9e (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une d\u00e9cision de sanction pose la sanction sur le `prestataire` (d\u00e9faut) ou le `client` dans la m\u00eame transaction que la cl\u00f4ture (voir \u00ab Administration \u2014 sanctions \u00bb pour ses effets). Un litige d\u00e9j\u00e0 cl\u00f4tur\u00e9 r\u00e9pond 409, y compris\nsi deux d\u00e9cisions arrivent en m\u00eame temps : une seule est retenue."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Ce litige est d\u00e9j\u00e0 cl\u00f4tur\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif de la d\u00e9cision est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la d\u00e9cision est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 mod\u00e9ration des avis",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Masquer un avis (\u00ab supprimer \u00bb) le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conserv\u00e9e et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque d\u00e9cision est trac\u00e9e (administrateur, date, motif). Les modifications sont limit\u00e9es\n\u00e0 10 requ\u00eates par minute.",
+            "item": [
+                {
+                    "name": "Liste des avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis",
+                            "query": [
+                                {
+                                    "key": "prestataire",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire not\u00e9. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "note",
+                                    "value": "2",
+                                    "description": "Note de 1 \u00e0 5. validation.between.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "masque",
+                                    "value": "",
+                                    "description": "true : avis masqu\u00e9s ; false : avis affich\u00e9s ; absent : tous.",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "signale",
+                                    "value": "1",
+                                    "description": "true : avis signal\u00e9s par le prestataire ; false : jamais signal\u00e9s.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "aTraiter",
+                                    "value": "1",
+                                    "description": "true : avis signal\u00e9s et pas encore mod\u00e9r\u00e9s.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis?prestataire=0198a1b2-0000-7000-8000-000000000002&note=2&masque=&signale=1&aTraiter=1&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, tous prestataires confondus. Filtres facultatifs : `prestataire`, `note`,\n`masque`, `signale`, `aTraiter` (signal\u00e9s et pas encore mod\u00e9r\u00e9s)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Cet avis concerne une autre prestation que la mienne.\",\"modereLe\":null,\"moderePar\":null,\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La note doit \u00eatre comprise entre 1 et 5.\",\"errors\":{\"note\":[\"La note doit \u00eatre comprise entre 1 et 5.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Masquer un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/masquer",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/masquer",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Propos injurieux sans rapport avec la prestation.\"}"
+                        },
+                        "description": "Retire l'avis de l'affichage public. Motif obligatoire. Un avis d\u00e9j\u00e0 masqu\u00e9 r\u00e9pond 409, y compris si deux requ\u00eates arrivent\nen m\u00eame temps."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":true,\"masqueLe\":\"2030-01-19T09:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis est d\u00e9j\u00e0 masqu\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif de la mod\u00e9ration est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la mod\u00e9ration est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Conserver un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/conserver",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/conserver",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Propos injurieux sans rapport avec la prestation.\"}"
+                        },
+                        "description": "D\u00e9cide, apr\u00e8s examen d'un signalement, que l'avis reste affich\u00e9. Motif facultatif. Un avis d\u00e9j\u00e0 mod\u00e9r\u00e9 r\u00e9pond 409."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Avis injuste.\",\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis a d\u00e9j\u00e0 \u00e9t\u00e9 mod\u00e9r\u00e9.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "R\u00e9tablir un avis masqu\u00e9",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/retablir",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/retablir",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "L'avis est de nouveau affich\u00e9 et compte dans la note moyenne. La trace de la mod\u00e9ration est conserv\u00e9e. Un avis non masqu\u00e9 r\u00e9pond 409."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":false,\"masqueLe\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis n'est pas masqu\u00e9.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 sanctions",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Poser et lever une sanction sont limit\u00e9s \u00e0 10 requ\u00eates par minute.\nUne suspension ou un bannissement est \u00ab tout ou rien \u00bb : sanction, statut du compte et r\u00e9vocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndispara\u00eet de la recherche et du profil public, et ses r\u00e9servations \u00e0 venir (en attente, accept\u00e9es, confirm\u00e9es pour un prestataire ;\nen attente et accept\u00e9es pour un client) sont annul\u00e9es, un prestataire sanctionn\u00e9 voyant l'acompte vers\u00e9 rembours\u00e9 en int\u00e9gralit\u00e9.\nUne prestation en cours va \u00e0 son terme. Le solde et les retraits ne sont pas modifi\u00e9s. Un administrateur ne peut pas \u00eatre sanctionn\u00e9.",
+            "item": [
+                {
+                    "name": "Poser une sanction",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant de l'utilisateur sanctionn\u00e9."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":\"0198a1b2-0000-7000-8000-000000000090\",\"avisId\":\"0198a1b2-0000-7000-8000-000000000080\"}"
+                        },
+                        "description": "Sanctionne un client ou un prestataire. Un compte ne peut porter qu'une seule suspension ou un seul bannissement actif \u00e0 la fois."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":true,\"leveeLe\":null,\"leveePar\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Un administrateur ne peut pas \u00eatre sanctionn\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Utilisateur introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Ce compte fait d\u00e9j\u00e0 l'objet d'une sanction active.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La date de fin de la suspension est obligatoire.\",\"errors\":{\"dateFin\":[\"La date de fin de la suspension est obligatoire.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Historique des sanctions d'un utilisateur",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant de l'utilisateur."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Toutes les sanctions du compte, lev\u00e9es ou non, de la plus r\u00e9cente \u00e0 la plus ancienne. Jamais supprim\u00e9es."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"avertissement\",\"motif\":\"Retards r\u00e9p\u00e9t\u00e9s.\",\"dateFin\":null,\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":true,\"leveeLe\":null,\"leveePar\":null}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Utilisateur introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Lever une sanction",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/sanctions\/:id\/lever",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/sanctions\/:id\/lever",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000100",
+                                    "description": "Identifiant de la sanction."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Met fin \u00e0 une sanction active. Pour une suspension ou un bannissement, le compte redevient actif. Une sanction d\u00e9j\u00e0 lev\u00e9e r\u00e9pond 409.\nLes suspensions arriv\u00e9es \u00e0 \u00e9ch\u00e9ance sont lev\u00e9es automatiquement (toutes les 5 minutes)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":false,\"leveeLe\":\"2030-01-21T08:00:00+00:00\",\"leveePar\":\"0198a1b2-0000-7000-8000-000000000001\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Sanction introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cette sanction est d\u00e9j\u00e0 lev\u00e9e.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 agenda d'un prestataire",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont visibles.",
             "item": [
@@ -515,6 +1265,245 @@
                             "header": [],
                             "code": 404,
                             "body": "{\"message\":\"Prestataire introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Client \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Un client ne voit que ses propres litiges. L'ouverture est limit\u00e9e \u00e0 5 requ\u00eates par minute et par utilisateur.",
+            "item": [
+                {
+                    "name": "Ouvrir un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/reservations\/:id\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations\/:id\/litiges",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "multipart\/form-data"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "description",
+                                    "value": "Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.",
+                                    "type": "text",
+                                    "description": "Description du probl\u00e8me, de 10 \u00e0 1000 caract\u00e8res. Le champ value doit contenir au moins 10 caract\u00e8res. Le champ value ne doit pas d\u00e9passer 1000 caract\u00e8res."
+                                },
+                                {
+                                    "key": "preuves[]",
+                                    "src": [],
+                                    "type": "file"
+                                }
+                            ]
+                        },
+                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Un seul litige peut \u00eatre ouvert \u00e0 la fois par r\u00e9servation. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Un litige est d\u00e9j\u00e0 ouvert sur cette r\u00e9servation.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La description doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"description\":[\"La description doit contenir au moins 10 caract\u00e8res.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Mes litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un de mes litiges",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Avec la r\u00e9ponse du prestataire et la d\u00e9cision de l'administrateur quand elles existent. Le litige d'un autre client r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":\"J'\u00e9tais sur place.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\",\"preuves\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000091\",\"url\":\"\/api\/v1\/litiges\/0198a1b2-0000-7000-8000-000000000090\/preuves\/0198a1b2-0000-7000-8000-000000000091\"}],\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve de mon litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
                             "name": ""
                         }
                     ]
@@ -1285,7 +2274,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T14:25:37+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:23:29+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2521,6 +3510,233 @@
             ]
         },
         {
+            "name": "Prestataire \u2014 litiges",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Un prestataire ne voit que les litiges qui le visent ;\nle client n'y est identifi\u00e9 que par son pr\u00e9nom et l'initiale de son nom.",
+            "item": [
+                {
+                    "name": "Litiges me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un litige me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Le litige visant un autre prestataire r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Afficher une preuve d'un litige me visant",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id\/preuves\/:preuve",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id\/preuves\/:preuve",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                },
+                                {
+                                    "id": "preuve",
+                                    "key": "preuve",
+                                    "value": "0198a1b2-0000-7000-8000-000000000091",
+                                    "description": "Identifiant de la preuve."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Renvoie l'image en flux (Content-Type r\u00e9el, `nosniff`, `Cache-Control: private`)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "[Contenu binaire de l'image]",
+                            "name": "image"
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Preuve introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "R\u00e9pondre \u00e0 un litige",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/litiges\/:id\/reponse",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/litiges\/:id\/reponse",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant du litige."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"reponse\":\"J'\u00e9tais sur place \u00e0 l'heure convenue.\"}"
+                        },
+                        "description": "Donne votre version des faits (10 \u00e0 1000 caract\u00e8res). Une seule r\u00e9ponse par litige, tant qu'il est ouvert."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"reponsePrestataire\":\"J'\u00e9tais sur place \u00e0 l'heure convenue.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Litige introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Vous avez d\u00e9j\u00e0 r\u00e9pondu \u00e0 ce litige.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La r\u00e9ponse doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"reponse\":[\"La r\u00e9ponse doit contenir au moins 10 caract\u00e8res.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Prestataire \u2014 mes avis",
             "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Un prestataire ne voit que les avis qui le concernent.",
             "item": [
@@ -2545,7 +3761,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "M\u00eames donn\u00e9es que la consultation par les clients : pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, auteur r\u00e9duit au\npr\u00e9nom et \u00e0 l'initiale du nom, `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis`."
+                        "description": "Avis masqu\u00e9s par l'administrateur exclus. M\u00eames donn\u00e9es que la consultation par les clients : pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, auteur r\u00e9duit au\npr\u00e9nom et \u00e0 l'initiale du nom, `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis`."
                     },
                     "response": [
                         {
@@ -2564,6 +3780,85 @@
                             "header": [],
                             "code": 403,
                             "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Signaler un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/avis\/:id\/signaler",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/avis\/:id\/signaler",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Cet avis concerne une autre prestation que la mienne.\"}"
+                        },
+                        "description": "Demande \u00e0 l'administrateur d'examiner un avis re\u00e7u (RF20). Un seul signalement par avis ; l'avis reste affich\u00e9 tant que\nl'administrateur n'a pas d\u00e9cid\u00e9. Un avis d'un autre prestataire ou masqu\u00e9 r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"signale\":true,\"signaleLe\":\"2030-01-18T08:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis a d\u00e9j\u00e0 \u00e9t\u00e9 signal\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif du signalement est obligatoire.\",\"errors\":{\"motif\":[\"Le motif du signalement est obligatoire.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]

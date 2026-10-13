@@ -1,23 +1,27 @@
-name: Profil
+name: 'Prestataire — agenda'
 description: |-
 
-  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+  les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/me
+    uri: api/v1/prestataire/agenda
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — agenda'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+        les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Voir mon profil'
-      description: ''
+      title: 'Mon agenda'
+      description: |-
+        Mes créneaux dont le début tombe entre `du` et `au` (inclus), triés par début, sans pagination.
+        Par défaut : d'aujourd'hui à 30 jours plus tard. Intervalle maximal : 62 jours.
       authenticated: true
       deprecated: false
     headers:
@@ -26,6 +30,355 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
+    queryParameters:
+      du:
+        custom: []
+        name: du
+        description: "Premier jour (AAAA-MM-JJ). Par défaut : aujourd'hui. Must be a valid date in the format <code>Y-m-d</code>."
+        required: false
+        example: '2030-01-15'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      au:
+        custom: []
+        name: au
+        description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 30 jours après `du`. Intervalle maximal : 62 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+        required: false
+        example: '2030-02-15'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      du: '2030-01-15'
+      au: '2030-02-15'
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-15T09:00:00+00:00","dateFin":"2030-01-15T10:00:00+00:00","statut":"libre"}]}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"L''intervalle ne peut pas dépasser 62 jours.","errors":{"au":["L''intervalle ne peut pas dépasser 62 jours."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/prestataire/agenda/plages
+    metadata:
+      custom: []
+      groupName: 'Prestataire — agenda'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+        les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Configurer l'agenda"
+      description: |-
+        Génère des créneaux LIBRES, consécutifs, de `duree_creneau_minutes` entre `heure_debut` et `heure_fin` pour chaque plage,
+        puis aux mêmes jours de la semaine pendant `repeter_semaines` semaines supplémentaires.
+        Tout ou rien : si un créneau en chevauche un autre (existant, quel que soit son statut, ou de la même requête), rien n'est créé (422).
+        Limites : 7 plages, créneaux de 15 à 480 minutes, 8 semaines de répétition, 500 créneaux par requête.
+        La liste `creneaux` n'est renvoyée que si elle compte 200 créneaux au plus.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      plages:
+        custom: []
+        name: plages
+        description: ''
+        required: false
+        example: null
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'plages[].date':
+        custom: []
+        name: 'plages[].date'
+        description: "Date (AAAA-MM-JJ), aujourd'hui ou plus tard. Must be a valid date in the format <code>Y-m-d</code>. validation.after_or_equal."
+        required: true
+        example: '2030-01-15'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'plages[].heure_debut':
+        custom: []
+        name: 'plages[].heure_debut'
+        description: 'Heure de début (HH:MM). Must be a valid date in the format <code>H:i</code>.'
+        required: true
+        example: '09:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'plages[].heure_fin':
+        custom: []
+        name: 'plages[].heure_fin'
+        description: "Heure de fin (HH:MM), après l'heure de début. La plage doit contenir un nombre entier de créneaux. Must be a valid date in the format <code>H:i</code>."
+        required: true
+        example: '12:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'plages[].duree_creneau_minutes':
+        custom: []
+        name: 'plages[].duree_creneau_minutes'
+        description: "Durée d'un créneau, de 15 à 480 minutes. Le champ value doit être au moins égal à 15. Le champ value ne doit pas dépasser 480."
+        required: true
+        example: 60
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'plages[].repeter_semaines':
+        custom: []
+        name: 'plages[].repeter_semaines'
+        description: 'Nombre de semaines supplémentaires où répéter la plage (0 à 8, 0 par défaut). Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 8.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      plages:
+        -
+          date: '2030-01-15'
+          heure_debut: '09:00'
+          heure_fin: '12:00'
+          duree_creneau_minutes: 60
+          repeter_semaines: 2
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"nombreCreneaux":2,"creneaux":[{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-15T09:00:00+00:00","dateFin":"2030-01-15T10:00:00+00:00","statut":"libre"},{"id":"0198a1b2-0000-7000-8000-000000000041","dateDebut":"2030-01-15T10:00:00+00:00","dateFin":"2030-01-15T11:00:00+00:00","statut":"libre"}]}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30).","errors":{"plages":["Le créneau du 15/01/2030 de 09:00 à 10:00 chevauche un créneau existant (09:30 à 10:30)."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/prestataire/agenda/indisponibilites
+    metadata:
+      custom: []
+      groupName: 'Prestataire — agenda'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+        les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Déclarer une indisponibilité'
+      description: |-
+        Rend `indisponible` tous les créneaux qui chevauchent la plage, en une seule transaction (tout ou rien).
+        Les créneaux libres (verrous expirés compris) sont bloqués ; un verrou en cours est supprimé puis le créneau est bloqué ;
+        pour un créneau réservé, la réservation (en attente, acceptée ou confirmée) est annulée par le prestataire, puis le créneau est bloqué.
+        Le client sera remboursé intégralement et prévenu (paiements et notifications : pas encore disponibles).
+        Si une prestation est en cours dans la plage, rien n'est modifié (409). Un créneau réservé dont la prestation est terminée reste inchangé.
+        Réponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprimés), `creneauxReserves` et `reservationsAnnulees` (réservations annulées).
+        Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      debut:
+        custom: []
+        name: debut
+        description: 'Début (AAAA-MM-JJ HH:MM, fuseau Africa/Dakar). Peut être passé ou présent. Must be a valid date in the format <code>Y-m-d H:i</code>.'
+        required: true
+        example: '2030-01-15 08:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      fin:
+        custom: []
+        name: fin
+        description: 'Fin (AAAA-MM-JJ HH:MM), après le début et dans le futur. Plage de 90 jours au maximum. Must be a valid date in the format <code>Y-m-d H:i</code>.'
+        required: true
+        example: '2030-01-20 18:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      motif:
+        custom: []
+        name: motif
+        description: 'Motif (congé, urgence...). Facultatif, non conservé. Le champ value ne doit pas dépasser 255 caractères.'
+        required: false
+        example: Congé
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      debut: '2030-01-15 08:00'
+      fin: '2030-01-20 18:00'
+      motif: Congé
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"creneauxBloques":4,"creneauxReserves":1,"creneauxVerrouilles":0,"reservationsAnnulees":1}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Une prestation est en cours dans cette plage : l''indisponibilité ne peut pas être déclarée."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"La fin doit être après le début.","errors":{"fin":["La fin doit être après le début."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/prestataire/agenda/creneaux/{id}'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — agenda'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). L'agenda est fait de créneaux ;
+        les dates et heures sont celles du fuseau Africa/Dakar. Un prestataire ne voit et ne modifie que son propre agenda.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Supprimer un créneau libre'
+      description: "Uniquement si le créneau est libre. Le créneau d'un autre prestataire répond 404, comme un créneau inexistant."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du créneau.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000040
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000040
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -34,93 +387,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Modifier mon profil'
-      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      nom:
-        custom: []
-        name: nom
-        description: Nom.
-        required: true
-        example: Diop
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      prenom:
-        custom: []
-        name: prenom
-        description: Prénom.
-        required: true
-        example: Awa
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      telephone:
-        custom: []
-        name: telephone
-        description: 'Mobile sénégalais, avec ou sans +221.'
-        required: true
-        example: '77 123 45 67'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: Diop
-      prenom: Awa
-      telephone: '77 123 45 67'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        status: 204
+        content: '{}'
         headers: []
         description: ''
       -
@@ -131,166 +399,20 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/mot-de-passe
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Changer mon mot de passe'
-      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      mot_de_passe_actuel:
-        custom: []
-        name: mot_de_passe_actuel
-        description: 'Mot de passe actuel.'
-        required: true
-        example: ancienmotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      nouveau_mot_de_passe:
-        custom: []
-        name: nouveau_mot_de_passe
-        description: '8 caractères minimum.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      confirmation:
-        custom: []
-        name: confirmation
-        description: 'Identique au nouveau mot de passe.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      mot_de_passe_actuel: ancienmotdepasse
-      nouveau_mot_de_passe: nouveaumotdepasse
-      confirmation: nouveaumotdepasse
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Votre mot de passe a été modifié."}'
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
       -
         custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
+        status: 404
+        content: '{"message":"Créneau introuvable."}'
         headers: []
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/jeton-push
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Enregistrer mon jeton push'
-      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      jetonPush:
-        custom: []
-        name: jetonPush
-        description: 'Jeton FCM.'
-        required: true
-        example: fcm-jeton-exemple
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      jetonPush: fcm-jeton-exemple
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Jeton de notification enregistré."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
+        status: 409
+        content: '{"message":"Ce créneau n''est plus libre."}'
         headers: []
         description: ''
     responseFields: []

@@ -1,0 +1,167 @@
+name: 'Prestataire — mes avis'
+description: |-
+
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/prestataire/avis
+    metadata:
+      custom: []
+      groupName: 'Prestataire — mes avis'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Mes avis'
+      description: |-
+        Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au
+        prénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/avis?page=1","last":"https://api.exemple.test/api/v1/prestataire/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/prestataire/avis/{id}/signaler'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — mes avis'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Signaler un avis'
+      description: |-
+        Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que
+        l'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: "Identifiant de l'avis."
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000080
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000080
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      motif:
+        custom: []
+        name: motif
+        description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+        required: true
+        example: 'Cet avis concerne une autre prestation que la mienne.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      motif: 'Cet avis concerne une autre prestation que la mienne.'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","signale":true,"signaleLe":"2030-01-18T08:00:00+00:00"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Avis introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cet avis a déjà été signalé."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le motif du signalement est obligatoire.","errors":{"motif":["Le motif du signalement est obligatoire."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null

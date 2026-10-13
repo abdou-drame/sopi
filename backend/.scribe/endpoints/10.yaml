@@ -1,27 +1,29 @@
-name: 'Client — avis'
+name: "Client — verrou d'un créneau"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+  Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
 endpoints:
   -
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/reservations/{id}/avis'
+    uri: 'api/v1/creneaux/{id}/verrou'
     metadata:
       custom: []
-      groupName: 'Client — avis'
+      groupName: "Client — verrou d'un créneau"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Donner son avis sur une réservation'
+      title: 'Verrouiller un créneau'
       description: |-
-        Réservé au client de la réservation, une fois la prestation terminée (`terminee`). Un seul avis par réservation, qui ne
-        peut être ni modifié ni retiré. La note est un entier de 1 à 5 ; le commentaire est facultatif (3 à 1000 caractères).
-        Le prestataire noté est toujours celui de la réservation. Une réservation inconnue ou appartenant à un autre client
-        répond 404.
+        Verrouille le créneau pour 5 minutes si, et seulement si, il est libre et à venir (une seule opération atomique :
+        si deux clients tentent en même temps, un seul l'obtient). Un client ne détient qu'un verrou à la fois : verrouiller
+        un autre créneau libère le précédent. Si le client tient déjà un verrou valide sur ce créneau, la même échéance
+        est renvoyée, sans prolongation.
       authenticated: true
       deprecated: false
     headers:
@@ -32,50 +34,26 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la réservation.'
+        description: 'Identifiant du créneau.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000060
+        example: 0198a1b2-0000-7000-8000-000000000040
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000060
+      id: 0198a1b2-0000-7000-8000-000000000040
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      note:
-        custom: []
-        name: note
-        description: 'Note entière de 1 (très mauvais) à 5 (excellent). validation.between.'
-        required: true
-        example: 4
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      commentaire:
-        custom: []
-        name: commentaire
-        description: 'Commentaire facultatif, de 3 à 1000 caractères. Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
-        required: false
-        example: 'Travail soigné et ponctuel.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      note: 4
-      commentaire: 'Travail soigné et ponctuel.'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: '{"note":4,"commentaire":"Travail soigné et ponctuel.","dateCreation":"2030-01-17T10:00:00+00:00"}'
+        status: 200
+        content: '{"creneauId":"0198a1b2-0000-7000-8000-000000000040","verrouExpireA":"2030-01-15T08:55:00+00:00"}'
         headers: []
         description: ''
       -
@@ -93,19 +71,93 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Réservation introuvable."}'
+        content: '{"message":"Créneau introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 409
-        content: '{"message":"Vous avez déjà donné votre avis pour cette réservation."}'
+        content: '{"message":"Ce créneau n''est plus disponible."}'
         headers: []
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"La note doit être comprise entre 1 et 5.","errors":{"note":["La note doit être comprise entre 1 et 5."]}}'
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/v1/creneaux/{id}/verrou'
+    metadata:
+      custom: []
+      groupName: "Client — verrou d'un créneau"
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Libérer son verrou'
+      description: "Remet le créneau à libre, uniquement s'il est verrouillé par le client connecté."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du créneau.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000040
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000040
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: '{}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Verrou introuvable."}'
         headers: []
         description: ''
       -

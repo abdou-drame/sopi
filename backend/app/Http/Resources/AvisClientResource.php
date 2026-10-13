@@ -21,6 +21,8 @@ class AvisClientResource extends JsonResource
             'note' => $this->note,
             'commentaire' => $this->commentaire,
             'dateCreation' => $this->created_at->toIso8601String(),
+            // Indicateur neutre : un avis masqué reste visible de son auteur mais n'est plus affiché publiquement (sans motif).
+            'affichePubliquement' => $this->masque_le === null,
         ];
     }
 }

@@ -57,7 +57,7 @@ describe('dépôt', function () {
         $this->actingAs($client, 'sanctum')
             ->postJson(urlAvis($reservation), ['note' => 4, 'commentaire' => '  Travail soigné et ponctuel.  '])
             ->assertCreated()
-            ->assertExactJson(['note' => 4, 'commentaire' => 'Travail soigné et ponctuel.', 'dateCreation' => Avis::first()->created_at->toIso8601String()]);
+            ->assertExactJson(['note' => 4, 'commentaire' => 'Travail soigné et ponctuel.', 'affichePubliquement' => true, 'dateCreation' => Avis::first()->created_at->toIso8601String()]);
 
         $avis = Avis::sole();
         expect($avis->reservation_id)->toBe($reservation->id)

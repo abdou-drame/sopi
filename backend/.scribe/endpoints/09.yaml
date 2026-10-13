@@ -1,28 +1,25 @@
-name: 'Client — paiement'
+name: "Client — avis d'un prestataire"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/reservations/{id}/payer'
+      - GET
+    uri: 'api/v1/prestataires/{id}/avis'
     metadata:
       custom: []
-      groupName: 'Client — paiement'
+      groupName: "Client — avis d'un prestataire"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables.
       subgroup: ''
       subgroupDescription: ''
-      title: "Payer l'acompte d'une réservation"
+      title: "Avis d'un prestataire"
       description: |-
-        Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
-        l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
-        serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code
-        généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
-        pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.
+        Paginée (20 par page), du plus récent au plus ancien. L'auteur n'apparaît que par son prénom et l'initiale de son nom.
+        `noteMoyenne` (arrondie à une décimale, `null` sans avis) et `nombreAvis` portent sur tous les avis du prestataire, pas sur la page.
       authenticated: true
       deprecated: false
     headers:
@@ -33,16 +30,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la réservation.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000060
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000060
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -52,13 +49,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 201
-        content: '{"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1","last":"https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
         headers: []
         description: ''
       -
@@ -76,25 +67,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Réservation introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Le délai de paiement est dépassé."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 503
-        content: '{"message":"Le service de paiement est momentanément indisponible. Veuillez réessayer."}'
+        content: '{"message":"Prestataire introuvable."}'
         headers: []
         description: ''
     responseFields: []

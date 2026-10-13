@@ -1,29 +1,25 @@
-name: "Client — verrou d'un créneau"
+name: "Client — profil public d'un prestataire"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-  Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/creneaux/{id}/verrou'
+      - GET
+    uri: 'api/v1/prestataires/{id}'
     metadata:
       custom: []
-      groupName: "Client — verrou d'un créneau"
+      groupName: "Client — profil public d'un prestataire"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Verrouiller un créneau'
+      title: "Profil d'un prestataire"
       description: |-
-        Verrouille le créneau pour 5 minutes si, et seulement si, il est libre et à venir (une seule opération atomique :
-        si deux clients tentent en même temps, un seul l'obtient). Un client ne détient qu'un verrou à la fois : verrouiller
-        un autre créneau libère le précédent. Si le client tient déjà un verrou valide sur ce créneau, la même échéance
-        est renvoyée, sans prolongation.
+        Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. `noteMoyenne` (arrondie à une décimale,
+        `null` sans avis) et `nombreAvis` résument les avis (voir « Avis d'un prestataire »). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.
       authenticated: true
       deprecated: false
     headers:
@@ -34,16 +30,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du créneau.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000040
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000040
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -53,7 +49,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"creneauId":"0198a1b2-0000-7000-8000-000000000040","verrouExpireA":"2030-01-15T08:55:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","noteMoyenne":4.5,"nombreAvis":12,"prestations":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000}],"photos":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
         headers: []
         description: ''
       -
@@ -71,19 +67,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Créneau introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Ce créneau n''est plus disponible."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"message":"Prestataire introuvable."}'
         headers: []
         description: ''
     responseFields: []
@@ -97,19 +81,18 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - DELETE
-    uri: 'api/v1/creneaux/{id}/verrou'
+      - GET
+    uri: 'api/v1/prestataires/{id}/photos/{photo}'
     metadata:
       custom: []
-      groupName: "Client — verrou d'un créneau"
+      groupName: "Client — profil public d'un prestataire"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Libérer son verrou'
-      description: "Remet le créneau à libre, uniquement s'il est verrouillé par le client connecté."
+      title: "Photo d'atelier"
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
       authenticated: true
       deprecated: false
     headers:
@@ -120,16 +103,28 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du créneau.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000040
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      photo:
+        custom: []
+        name: photo
+        description: 'Identifiant de la photo.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000030
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000040
+      id: 0198a1b2-0000-7000-8000-000000000002
+      photo: 0198a1b2-0000-7000-8000-000000000030
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -138,10 +133,10 @@ endpoints:
     responses:
       -
         custom: []
-        status: 204
-        content: '{}'
+        status: 200
+        content: "[Contenu binaire de l'image]"
         headers: []
-        description: ''
+        description: image
       -
         custom: []
         status: 401
@@ -157,13 +152,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Verrou introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"message":"Photo introuvable."}'
         headers: []
         description: ''
     responseFields: []

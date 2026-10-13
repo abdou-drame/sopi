@@ -19,3 +19,6 @@ Schedule::command('sopi:paiements:rembourser-dus')->everyFiveMinutes()->withoutO
 
 // Signalement des retraits restés en cours trop longtemps (M7.5), toutes les 10 minutes. Lecture seule.
 Schedule::command('sopi:retraits:signaler-bloques')->everyTenMinutes()->withoutOverlapping();
+
+// Levée automatique des suspensions arrivées à échéance (M9.3), toutes les 5 minutes.
+Schedule::command('sopi:sanctions:lever-expirees')->everyFiveMinutes()->withoutOverlapping();

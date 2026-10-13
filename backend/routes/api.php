@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
+use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisReservationController;
+use App\Http\Controllers\Api\V1\Client\LitigeController as ClientLitigeController;
 use App\Http\Controllers\Api\V1\Client\PaiementReservationController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
@@ -16,6 +20,7 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\AvisController;
+use App\Http\Controllers\Api\V1\Prestataire\LitigeController as PrestataireLitigeController;
 use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
@@ -42,6 +47,22 @@ Route::prefix('v1')->group(function () {
         Route::post('/prestataires/{id}/accepter', [DecisionDemandeController::class, 'accepter'])->whereUuid('id');
         Route::post('/prestataires/{id}/refuser', [DecisionDemandeController::class, 'refuser'])->whereUuid('id');
         Route::get('/justificatifs/{id}/telecharger', [JustificatifController::class, 'telecharger'])->whereUuid('id');
+
+        // Litiges (M9.2) : consultation et décision motivée. Identifiant non contraint : un id invalide répond 404 en français.
+        Route::get('/litiges', [AdminLitigeController::class, 'index']);
+        Route::get('/litiges/{id}', [AdminLitigeController::class, 'show']);
+        Route::get('/litiges/{id}/preuves/{preuve}', [AdminLitigeController::class, 'preuve'])->name('admin.litiges.preuve');
+        Route::post('/litiges/{id}/trancher', [AdminLitigeController::class, 'trancher'])->middleware('throttle:litige');
+
+        Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
+        Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
+        Route::post('/sanctions/{id}/lever', [AdminSanctionController::class, 'lever'])->middleware('throttle:sanction');
+
+        // Modération des avis (M9.4).
+        Route::get('/avis', [AdminAvisController::class, 'index']);
+        Route::post('/avis/{id}/masquer', [AdminAvisController::class, 'masquer'])->middleware('throttle:sanction');
+        Route::post('/avis/{id}/conserver', [AdminAvisController::class, 'conserver'])->middleware('throttle:sanction');
+        Route::post('/avis/{id}/retablir', [AdminAvisController::class, 'retablir'])->middleware('throttle:sanction');
     });
 
     // Espace client : jeton Sanctum + rôle client.
@@ -71,6 +92,12 @@ Route::prefix('v1')->group(function () {
 
         // Avis du client sur une réservation terminée (M8.2). Identifiant non contraint : un id invalide répond 404 en français.
         Route::post('/reservations/{id}/avis', [AvisReservationController::class, 'store'])->middleware('throttle:avis');
+
+        // Litiges du client (M9.2).
+        Route::post('/reservations/{id}/litiges', [ClientLitigeController::class, 'store'])->middleware('throttle:litige');
+        Route::get('/litiges', [ClientLitigeController::class, 'index']);
+        Route::get('/litiges/{id}', [ClientLitigeController::class, 'show']);
+        Route::get('/litiges/{id}/preuves/{preuve}', [ClientLitigeController::class, 'preuve'])->name('client.litiges.preuve');
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
@@ -106,6 +133,13 @@ Route::prefix('v1')->group(function () {
 
         // Avis reçus (M8.3).
         Route::get('/avis', [AvisController::class, 'index']);
+        Route::post('/avis/{id}/signaler', [AvisController::class, 'signaler'])->middleware('throttle:avis');
+
+        // Litiges me visant (M9.2) : consultation et réponse unique.
+        Route::get('/litiges', [PrestataireLitigeController::class, 'index']);
+        Route::get('/litiges/{id}', [PrestataireLitigeController::class, 'show']);
+        Route::get('/litiges/{id}/preuves/{preuve}', [PrestataireLitigeController::class, 'preuve'])->name('prestataire.litiges.preuve');
+        Route::post('/litiges/{id}/reponse', [PrestataireLitigeController::class, 'repondre'])->middleware('throttle:litige');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {
