@@ -56,4 +56,12 @@ return [
         'commission_taux' => (float) env('COMMISSION_RATE', 0.10),
     ],
 
+    /*
+    | Limites d'un retrait de gains (RG29), en FCFA. Contrôlées par le service de retrait (M7.4), pas par la base.
+    */
+    'retraits' => [
+        'montant_minimum' => (int) env('RETRAIT_MONTANT_MINIMUM', 1000),
+        'montant_maximum' => (int) env('RETRAIT_MONTANT_MAXIMUM', 500000),
+    ],
+
 ];

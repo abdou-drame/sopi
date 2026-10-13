@@ -39,6 +39,7 @@ class Paiement extends Model
             'paye_le' => 'datetime',
             'rembourse_le' => 'datetime',
             'remboursement_du_le' => 'datetime',
+            'credite_le' => 'datetime',
         ];
     }
 
