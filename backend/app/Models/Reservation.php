@@ -216,6 +216,12 @@ class Reservation extends Model
         return $this->belongsTo(Prestation::class);
     }
 
+    /** Avis du client sur cette réservation (au plus un). */
+    public function avis(): HasOne
+    {
+        return $this->hasOne(Avis::class);
+    }
+
     public function paiements(): HasMany
     {
         return $this->hasMany(Paiement::class);
