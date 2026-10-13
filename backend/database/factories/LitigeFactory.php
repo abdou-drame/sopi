@@ -23,6 +23,7 @@ class LitigeFactory extends Factory
             'client_id' => fn (array $attributs) => Reservation::findOrFail($attributs['reservation_id'])->client_id,
             'prestataire_id' => fn (array $attributs) => Reservation::findOrFail($attributs['reservation_id'])->creneau->prestataire_id,
             'statut' => StatutLitige::Ouvert,
+            'motif' => 'Prestataire absent',
             'description' => 'Le prestataire ne s\'est pas présenté au rendez-vous.',
         ];
     }

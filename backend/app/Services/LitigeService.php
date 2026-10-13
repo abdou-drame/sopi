@@ -50,7 +50,7 @@ class LitigeService
      *
      * @throws ReservationImpossibleException 404 (introuvable ou à quelqu'un d'autre), 409 (statut non éligible, un litige existe déjà pour la réservation, même clôturé)
      */
-    public function ouvrir(User $client, string $reservationId, string $description, array $preuves = []): Litige
+    public function ouvrir(User $client, string $reservationId, string $motif, string $description, array $preuves = []): Litige
     {
         $reservation = Str::isUuid($reservationId)
             ? Reservation::query()->with('creneau')->where('client_id', $client->id)->find($reservationId)
@@ -67,7 +67,7 @@ class LitigeService
         $ecrits = [];
 
         try {
-            return DB::transaction(function () use ($client, $reservation, $description, $preuves, &$ecrits) {
+            return DB::transaction(function () use ($client, $reservation, $motif, $description, $preuves, &$ecrits) {
                 if (Litige::query()->where('reservation_id', $reservation->id)->exists()) {
                     throw new ReservationImpossibleException(self::MESSAGE_LITIGE_EXISTANT, Response::HTTP_CONFLICT);
                 }
@@ -78,6 +78,7 @@ class LitigeService
                 // Le prestataire vient TOUJOURS de la réservation, jamais de la requête.
                 $litige->prestataire_id = $reservation->creneau->prestataire_id;
                 $litige->statut = StatutLitige::Ouvert;
+                $litige->motif = $motif;
                 $litige->description = $description;
                 $litige->save();
 

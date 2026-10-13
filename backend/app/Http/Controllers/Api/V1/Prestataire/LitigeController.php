@@ -31,7 +31,7 @@ class LitigeController extends Controller
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s'est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","last":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s'est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","last":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      */
@@ -49,7 +49,7 @@ class LitigeController extends Controller
      *
      * @urlParam id string required Identifiant du litige. Example: 0198a1b2-0000-7000-8000-000000000090
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s'est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s'est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 404 {"message":"Litige introuvable."}
      */
     public function show(Request $requete, string $id): JsonResponse|LitigeResource

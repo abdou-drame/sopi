@@ -50,6 +50,7 @@ class LitigeResource extends JsonResource
         $donnees = [
             'id' => $this->id,
             'statut' => $this->statut->value,
+            'motif' => $this->motif,
             'description' => $this->description,
             'dateCreation' => $this->created_at->toIso8601String(),
             'reservation' => [

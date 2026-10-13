@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
- * Litige signalé par un client sur une réservation (diagramme de classes) : description, preuves, réponse du prestataire,
+ * Litige signalé par un client sur une réservation (diagramme de classes) : motif, description, preuves, réponse du prestataire,
  * puis décision de l'administrateur qui le clôt. Créé et modifié uniquement par des services (aucune affectation de masse).
  */
 class Litige extends Model

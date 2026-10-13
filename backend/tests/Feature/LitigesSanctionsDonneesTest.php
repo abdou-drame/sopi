@@ -29,7 +29,7 @@ function indexLitiges(string $table): Collection
 describe('table litiges', function () {
     it('a les colonnes et les index prévus', function () {
         expect(Schema::getColumnListing('litiges'))->toEqualCanonicalizing([
-            'id', 'reservation_id', 'client_id', 'prestataire_id', 'statut', 'description', 'reponse_prestataire', 'reponse_le',
+            'id', 'reservation_id', 'client_id', 'prestataire_id', 'statut', 'motif', 'description', 'reponse_prestataire', 'reponse_le',
             'decision', 'motif_decision', 'decide_par_id', 'cloture_le', 'created_at', 'updated_at',
         ]);
 

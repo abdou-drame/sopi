@@ -793,6 +793,7 @@ paths:
                     -
                       id: 0198a1b2-0000-7000-8000-000000000090
                       statut: ouvert
+                      motif: 'Prestataire absent'
                       description: "Le prestataire ne s'est pas présenté."
                       dateCreation: '2030-01-16T12:00:00+00:00'
                       reservation:
@@ -840,6 +841,7 @@ paths:
                       -
                         id: 0198a1b2-0000-7000-8000-000000000090
                         statut: ouvert
+                        motif: 'Prestataire absent'
                         description: "Le prestataire ne s'est pas présenté."
                         dateCreation: '2030-01-16T12:00:00+00:00'
                         reservation:
@@ -879,6 +881,9 @@ paths:
                         statut:
                           type: string
                           example: ouvert
+                        motif:
+                          type: string
+                          example: 'Prestataire absent'
                         description:
                           type: string
                           example: "Le prestataire ne s'est pas présenté."
@@ -1076,6 +1081,7 @@ paths:
                 example:
                   id: 0198a1b2-0000-7000-8000-000000000090
                   statut: ouvert
+                  motif: 'Prestataire absent'
                   description: "Le prestataire ne s'est pas présenté."
                   dateCreation: '2030-01-16T12:00:00+00:00'
                   reservation:
@@ -1121,6 +1127,9 @@ paths:
                   statut:
                     type: string
                     example: ouvert
+                  motif:
+                    type: string
+                    example: 'Prestataire absent'
                   description:
                     type: string
                     example: "Le prestataire ne s'est pas présenté."
@@ -3156,6 +3165,7 @@ paths:
                 example:
                   id: 0198a1b2-0000-7000-8000-000000000090
                   statut: ouvert
+                  motif: 'Prestataire absent'
                   description: "Le prestataire ne s'est pas présenté au rendez-vous."
                   dateCreation: '2030-01-16T12:00:00+00:00'
                   reservation:
@@ -3178,6 +3188,9 @@ paths:
                   statut:
                     type: string
                     example: ouvert
+                  motif:
+                    type: string
+                    example: 'Prestataire absent'
                   description:
                     type: string
                     example: "Le prestataire ne s'est pas présenté au rendez-vous."
@@ -3283,21 +3296,21 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'La description doit contenir au moins 10 caractères.'
+                  message: 'Le motif du litige est obligatoire.'
                   errors:
-                    description:
-                      - 'La description doit contenir au moins 10 caractères.'
+                    motif:
+                      - 'Le motif du litige est obligatoire.'
                 properties:
                   message:
                     type: string
-                    example: 'La description doit contenir au moins 10 caractères.'
+                    example: 'Le motif du litige est obligatoire.'
                   errors:
                     type: object
                     properties:
-                      description:
+                      motif:
                         type: array
                         example:
-                          - 'La description doit contenir au moins 10 caractères.'
+                          - 'Le motif du litige est obligatoire.'
                         items:
                           type: string
         429:
@@ -3321,6 +3334,10 @@ paths:
             schema:
               type: object
               properties:
+                motif:
+                  type: string
+                  description: 'Raison du litige en quelques mots, de 3 à 150 caractères. Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 150 caractères.'
+                  example: 'Prestataire absent'
                 description:
                   type: string
                   description: 'Description du problème, de 10 à 1000 caractères. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
@@ -3332,6 +3349,7 @@ paths:
                     type: string
                     format: binary
               required:
+                - motif
                 - description
     parameters:
       -
@@ -3360,6 +3378,7 @@ paths:
                     -
                       id: 0198a1b2-0000-7000-8000-000000000090
                       statut: ouvert
+                      motif: 'Prestataire absent'
                       description: "Le prestataire ne s'est pas présenté."
                       dateCreation: '2030-01-16T12:00:00+00:00'
                       reservation:
@@ -3392,6 +3411,7 @@ paths:
                       -
                         id: 0198a1b2-0000-7000-8000-000000000090
                         statut: ouvert
+                        motif: 'Prestataire absent'
                         description: "Le prestataire ne s'est pas présenté."
                         dateCreation: '2030-01-16T12:00:00+00:00'
                         reservation:
@@ -3416,6 +3436,9 @@ paths:
                         statut:
                           type: string
                           example: ouvert
+                        motif:
+                          type: string
+                          example: 'Prestataire absent'
                         description:
                           type: string
                           example: "Le prestataire ne s'est pas présenté."
@@ -3540,6 +3563,7 @@ paths:
                 example:
                   id: 0198a1b2-0000-7000-8000-000000000090
                   statut: cloture
+                  motif: 'Prestataire absent'
                   description: "Le prestataire ne s'est pas présenté."
                   dateCreation: '2030-01-16T12:00:00+00:00'
                   reservation:
@@ -3566,6 +3590,9 @@ paths:
                   statut:
                     type: string
                     example: cloture
+                  motif:
+                    type: string
+                    example: 'Prestataire absent'
                   description:
                     type: string
                     example: "Le prestataire ne s'est pas présenté."
@@ -5249,7 +5276,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T15:59:55+00:00'
+                  time: '2026-10-13T16:12:32+00:00'
                 properties:
                   status:
                     type: string
@@ -5265,7 +5292,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T15:59:55+00:00'
+                    example: '2026-10-13T16:12:32+00:00'
       tags:
         - Endpoints
       security: []
@@ -7664,6 +7691,7 @@ paths:
                     -
                       id: 0198a1b2-0000-7000-8000-000000000090
                       statut: ouvert
+                      motif: 'Prestataire absent'
                       description: "Le prestataire ne s'est pas présenté."
                       dateCreation: '2030-01-16T12:00:00+00:00'
                       reservation:
@@ -7697,6 +7725,7 @@ paths:
                       -
                         id: 0198a1b2-0000-7000-8000-000000000090
                         statut: ouvert
+                        motif: 'Prestataire absent'
                         description: "Le prestataire ne s'est pas présenté."
                         dateCreation: '2030-01-16T12:00:00+00:00'
                         reservation:
@@ -7722,6 +7751,9 @@ paths:
                         statut:
                           type: string
                           example: ouvert
+                        motif:
+                          type: string
+                          example: 'Prestataire absent'
                         description:
                           type: string
                           example: "Le prestataire ne s'est pas présenté."
@@ -7849,6 +7881,7 @@ paths:
                 example:
                   id: 0198a1b2-0000-7000-8000-000000000090
                   statut: ouvert
+                  motif: 'Prestataire absent'
                   description: "Le prestataire ne s'est pas présenté."
                   dateCreation: '2030-01-16T12:00:00+00:00'
                   reservation:
@@ -7873,6 +7906,9 @@ paths:
                   statut:
                     type: string
                     example: ouvert
+                  motif:
+                    type: string
+                    example: 'Prestataire absent'
                   description:
                     type: string
                     example: "Le prestataire ne s'est pas présenté."

@@ -46,6 +46,17 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
+      motif:
+        custom: []
+        name: motif
+        description: 'Raison du litige en quelques mots, de 3 à 150 caractères. Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 150 caractères.'
+        required: true
+        example: 'Prestataire absent'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
       description:
         custom: []
         name: description
@@ -70,6 +81,7 @@ endpoints:
         nullable: false
         deprecated: false
     cleanBodyParameters:
+      motif: 'Prestataire absent'
       description: "Le prestataire ne s'est pas présenté au rendez-vous."
     fileParameters:
       preuves:
@@ -78,7 +90,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté au rendez-vous.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté au rendez-vous.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}'
         headers: []
         description: ''
       -
@@ -108,7 +120,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"La description doit contenir au moins 10 caractères.","errors":{"description":["La description doit contenir au moins 10 caractères."]}}'
+        content: '{"message":"Le motif du litige est obligatoire.","errors":{"motif":["Le motif du litige est obligatoire."]}}'
         headers: []
         description: ''
       -
@@ -157,7 +169,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}],"links":{"first":"https://api.exemple.test/api/v1/litiges?page=1","last":"https://api.exemple.test/api/v1/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}],"links":{"first":"https://api.exemple.test/api/v1/litiges?page=1","last":"https://api.exemple.test/api/v1/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -224,7 +236,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"cloture","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":"J''étais sur place.","reponseLe":"2030-01-16T13:00:00+00:00","decision":"rejet","motifDecision":"Signalement non fondé.","clotureLe":"2030-01-17T09:00:00+00:00","preuves":[{"id":"0198a1b2-0000-7000-8000-000000000091","url":"/api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091"}],"prestataire":{"nomEntreprise":"Garage Exemple"}}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"cloture","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":"J''étais sur place.","reponseLe":"2030-01-16T13:00:00+00:00","decision":"rejet","motifDecision":"Signalement non fondé.","clotureLe":"2030-01-17T09:00:00+00:00","preuves":[{"id":"0198a1b2-0000-7000-8000-000000000091","url":"/api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091"}],"prestataire":{"nomEntreprise":"Garage Exemple"}}'
         headers: []
         description: ''
       -
