@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
+use App\Http\Controllers\Api\V1\Prestataire\RetraitController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
 use App\Http\Controllers\Api\V1\WebhookPaiementController;
@@ -89,6 +90,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations/{id}/demarrer', [PrestataireReservationController::class, 'demarrer'])->middleware('throttle:code-reservation');
         Route::post('/reservations/{id}/annuler', [PrestataireReservationController::class, 'annuler'])->middleware('throttle:reponse-reservation');
         Route::post('/reservations/{id}/terminer', [PrestataireReservationController::class, 'terminer'])->middleware('throttle:reponse-reservation');
+
+        // Solde et retraits (M7). Pas de whereUuid : un identifiant invalide répond comme un retrait inconnu.
+        Route::get('/solde', [RetraitController::class, 'solde']);
+        Route::get('/retraits', [RetraitController::class, 'index']);
+        Route::get('/retraits/{id}', [RetraitController::class, 'show']);
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {
