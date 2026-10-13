@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\AvisFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,12 @@ class Avis extends Model
             'modere_le' => 'datetime',
             'masque_le' => 'datetime',
         ];
+    }
+
+    /** Avis affichés au public : ceux que l'administrateur n'a pas masqués. */
+    public function scopeVisibles(Builder $requete): void
+    {
+        $requete->whereNull('masque_le');
     }
 
     public function reservation(): BelongsTo

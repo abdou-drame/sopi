@@ -70,6 +70,12 @@ class Prestataire extends Model
         return $this->hasMany(Avis::class);
     }
 
+    /** Avis reçus et non masqués par l'administrateur : seuls ceux-là comptent dans la note moyenne et les listes publiques. */
+    public function avisVisibles(): HasMany
+    {
+        return $this->hasMany(Avis::class)->whereNull('masque_le');
+    }
+
     /** Litiges signalés contre ce prestataire. */
     public function litiges(): HasMany
     {

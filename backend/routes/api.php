@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
@@ -56,6 +57,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
         Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
         Route::post('/sanctions/{id}/lever', [AdminSanctionController::class, 'lever'])->middleware('throttle:sanction');
+
+        // Modération des avis (M9.4).
+        Route::get('/avis', [AdminAvisController::class, 'index']);
+        Route::post('/avis/{id}/masquer', [AdminAvisController::class, 'masquer'])->middleware('throttle:sanction');
+        Route::post('/avis/{id}/conserver', [AdminAvisController::class, 'conserver'])->middleware('throttle:sanction');
+        Route::post('/avis/{id}/retablir', [AdminAvisController::class, 'retablir'])->middleware('throttle:sanction');
     });
 
     // Espace client : jeton Sanctum + rôle client.
@@ -126,6 +133,7 @@ Route::prefix('v1')->group(function () {
 
         // Avis reçus (M8.3).
         Route::get('/avis', [AvisController::class, 'index']);
+        Route::post('/avis/{id}/signaler', [AvisController::class, 'signaler'])->middleware('throttle:avis');
 
         // Litiges me visant (M9.2) : consultation et réponse unique.
         Route::get('/litiges', [PrestataireLitigeController::class, 'index']);

@@ -1,25 +1,25 @@
-name: 'Prestataire — litiges'
+name: 'Prestataire — mes avis'
 description: |-
 
-  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
-  le client n'y est identifié que par son prénom et l'initiale de son nom.
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/prestataire/litiges
+    uri: api/v1/prestataire/avis
     metadata:
       custom: []
-      groupName: 'Prestataire — litiges'
+      groupName: 'Prestataire — mes avis'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
-        le client n'y est identifié que par son prénom et l'initiale de son nom.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Litiges me visant'
-      description: 'Paginée (20 par page), du plus récent au plus ancien.'
+      title: 'Mes avis'
+      description: |-
+        Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au
+        prénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`.
       authenticated: true
       deprecated: false
     headers:
@@ -37,7 +37,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","last":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/avis?page=1","last":"https://api.exemple.test/api/v1/prestataire/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
         headers: []
         description: ''
       -
@@ -50,142 +50,6 @@ endpoints:
         custom: []
         status: 403
         content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/prestataire/litiges/{id}'
-    metadata:
-      custom: []
-      groupName: 'Prestataire — litiges'
-      groupDescription: |-
-
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
-        le client n'y est identifié que par son prénom et l'initiale de son nom.
-      subgroup: ''
-      subgroupDescription: ''
-      title: "Détail d'un litige me visant"
-      description: 'Le litige visant un autre prestataire répond 404.'
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant du litige.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"prenom":"Awa","initialeNom":"D"}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Litige introuvable."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/prestataire/litiges/{id}/preuves/{preuve}'
-    metadata:
-      custom: []
-      groupName: 'Prestataire — litiges'
-      groupDescription: |-
-
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
-        le client n'y est identifié que par son prénom et l'initiale de son nom.
-      subgroup: ''
-      subgroupDescription: ''
-      title: "Afficher une preuve d'un litige me visant"
-      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant du litige.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      preuve:
-        custom: []
-        name: preuve
-        description: 'Identifiant de la preuve.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000091
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
-      preuve: 0198a1b2-0000-7000-8000-000000000091
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: "[Contenu binaire de l'image]"
-        headers: []
-        description: image
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Preuve introuvable."}'
         headers: []
         description: ''
     responseFields: []
@@ -200,18 +64,19 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/prestataire/litiges/{id}/reponse'
+    uri: 'api/v1/prestataire/avis/{id}/signaler'
     metadata:
       custom: []
-      groupName: 'Prestataire — litiges'
+      groupName: 'Prestataire — mes avis'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
-        le client n'y est identifié que par son prénom et l'initiale de son nom.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Répondre à un litige'
-      description: "Donne votre version des faits (10 à 1000 caractères). Une seule réponse par litige, tant qu'il est ouvert."
+      title: 'Signaler un avis'
+      description: |-
+        Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que
+        l'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404.
       authenticated: true
       deprecated: false
     headers:
@@ -222,38 +87,38 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du litige.'
+        description: "Identifiant de l'avis."
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
+        example: 0198a1b2-0000-7000-8000-000000000080
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
+      id: 0198a1b2-0000-7000-8000-000000000080
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      reponse:
+      motif:
         custom: []
-        name: reponse
-        description: 'Votre version des faits, de 10 à 1000 caractères. Une seule réponse par litige. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        name: motif
+        description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
         required: true
-        example: "J'étais sur place à l'heure convenue."
+        example: 'Cet avis concerne une autre prestation que la mienne.'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      reponse: "J'étais sur place à l'heure convenue."
+      motif: 'Cet avis concerne une autre prestation que la mienne.'
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","reponsePrestataire":"J''étais sur place à l''heure convenue.","reponseLe":"2030-01-16T13:00:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","signale":true,"signaleLe":"2030-01-18T08:00:00+00:00"}'
         headers: []
         description: ''
       -
@@ -271,19 +136,19 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Litige introuvable."}'
+        content: '{"message":"Avis introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 409
-        content: '{"message":"Vous avez déjà répondu à ce litige."}'
+        content: '{"message":"Cet avis a déjà été signalé."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"La réponse doit contenir au moins 10 caractères.","errors":{"reponse":["La réponse doit contenir au moins 10 caractères."]}}'
+        content: '{"message":"Le motif du signalement est obligatoire.","errors":{"motif":["Le motif du signalement est obligatoire."]}}'
         headers: []
         description: ''
       -

@@ -1,261 +1,82 @@
-name: 'Prestataire — catalogue de prestations'
+name: 'Client — litiges'
 description: |-
 
-  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
-  toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur.
 endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: api/v1/prestataire/prestations
-    metadata:
-      custom: []
-      groupName: 'Prestataire — catalogue de prestations'
-      groupDescription: |-
-
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
-        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Mes prestations'
-      description: "Toutes les prestations du prestataire connecté, actives et inactives, les plus récentes d'abord (sans pagination)."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}]}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
       - POST
-    uri: api/v1/prestataire/prestations
+    uri: 'api/v1/reservations/{id}/litiges'
     metadata:
       custom: []
-      groupName: 'Prestataire — catalogue de prestations'
+      groupName: 'Client — litiges'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
-        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Ajouter une prestation'
+      title: 'Ouvrir un litige'
       description: |-
-        Le domaine est déduit du métier du prestataire (tout champ `domaine` envoyé est ignoré).
-        Le nom doit être unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus.
+        Signale un problème sur une de vos réservations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre
+        jusqu'à 3 photos de preuve (`preuves[]`). Un seul litige peut être ouvert à la fois par réservation. Le prestataire peut répondre,
+        puis un administrateur tranche. Aucun remboursement n'est déclenché automatiquement.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      nom:
-        custom: []
-        name: nom
-        description: 'Nom de la prestation (2 à 100 caractères, unique chez le prestataire sans tenir compte de la casse). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
-        required: true
-        example: 'Vidange complète'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      duree_minutes:
-        custom: []
-        name: duree_minutes
-        description: 'Durée estimée en minutes (1 à 1440). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
-        required: true
-        example: 60
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      prix:
-        custom: []
-        name: prix
-        description: 'Prix en FCFA (XOF), supérieur à 0, 2 décimales au plus. Le champ value ne doit pas dépasser 9999999999.99.'
-        required: true
-        example: 15000.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: 'Vidange complète'
-      duree_minutes: 60
-      prix: 15000.0
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Vous proposez déjà une prestation avec ce nom.","errors":{"nom":["Vous proposez déjà une prestation avec ce nom."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PATCH
-    uri: 'api/v1/prestataire/prestations/{id}'
-    metadata:
-      custom: []
-      groupName: 'Prestataire — catalogue de prestations'
-      groupDescription: |-
-
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
-        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Modifier une prestation'
-      description: |-
-        Modification partielle : nom, durée, prix et/ou `actif` (`false` désactive, `true` réactive). Au moins un champ est requis.
-        La prestation d'un autre prestataire répond 404, comme une prestation inexistante.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la prestation.'
+        description: 'Identifiant de la réservation.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000020
+        example: 0198a1b2-0000-7000-8000-000000000060
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000020
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      nom:
+      description:
         custom: []
-        name: nom
-        description: 'Nouveau nom (2 à 100 caractères). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
-        required: false
-        example: 'Vidange + filtre'
+        name: description
+        description: 'Description du problème, de 10 à 1000 caractères. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        required: true
+        example: "Le prestataire ne s'est pas présenté au rendez-vous."
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      duree_minutes:
+      preuves:
         custom: []
-        name: duree_minutes
-        description: 'Nouvelle durée en minutes. Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+        name: preuves
+        description: 'Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
         required: false
-        example: 75
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      prix:
-        custom: []
-        name: prix
-        description: 'Nouveau prix en FCFA, supérieur à 0. Le champ value ne doit pas dépasser 9999999999.99.'
-        required: false
-        example: 17500.0
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      actif:
-        custom: []
-        name: actif
-        description: "false pour désactiver la prestation (elle n'est jamais supprimée), true pour la réactiver."
-        required: false
-        example: false
-        type: boolean
+        example:
+          - null
+        type: 'file[]'
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      nom: 'Vidange + filtre'
-      duree_minutes: 75
-      prix: 17500.0
-      actif: false
-    fileParameters: []
+      description: "Le prestataire ne s'est pas présenté au rendez-vous."
+    fileParameters:
+      preuves:
+        - null
     responses:
       -
         custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":75,"prix":17500,"actif":false}'
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté au rendez-vous.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}'
         headers: []
         description: ''
       -
@@ -273,13 +94,214 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Prestation introuvable."}'
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Un litige est déjà ouvert sur cette réservation."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le prix doit être supérieur à 0.","errors":{"prix":["Le prix doit être supérieur à 0."]}}'
+        content: '{"message":"La description doit contenir au moins 10 caractères.","errors":{"description":["La description doit contenir au moins 10 caractères."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/litiges
+    metadata:
+      custom: []
+      groupName: 'Client — litiges'
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Mes litiges'
+      description: 'Paginée (20 par page), du plus récent au plus ancien.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"prestataire":{"nomEntreprise":"Garage Exemple"}}],"links":{"first":"https://api.exemple.test/api/v1/litiges?page=1","last":"https://api.exemple.test/api/v1/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/litiges/{id}'
+    metadata:
+      custom: []
+      groupName: 'Client — litiges'
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Détail d'un de mes litiges"
+      description: "Avec la réponse du prestataire et la décision de l'administrateur quand elles existent. Le litige d'un autre client répond 404."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"cloture","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":"J''étais sur place.","reponseLe":"2030-01-16T13:00:00+00:00","decision":"rejet","motifDecision":"Signalement non fondé.","clotureLe":"2030-01-17T09:00:00+00:00","preuves":[{"id":"0198a1b2-0000-7000-8000-000000000091","url":"/api/v1/litiges/0198a1b2-0000-7000-8000-000000000090/preuves/0198a1b2-0000-7000-8000-000000000091"}],"prestataire":{"nomEntreprise":"Garage Exemple"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Litige introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/litiges/{id}/preuves/{preuve}'
+    metadata:
+      custom: []
+      groupName: 'Client — litiges'
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Un client ne voit que ses propres litiges. L'ouverture est limitée à 5 requêtes par minute et par utilisateur.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Afficher une preuve de mon litige'
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      preuve:
+        custom: []
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000091
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+      preuve: 0198a1b2-0000-7000-8000-000000000091
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: "[Contenu binaire de l'image]"
+        headers: []
+        description: image
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Preuve introuvable."}'
         headers: []
         description: ''
     responseFields: []

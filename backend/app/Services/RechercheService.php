@@ -28,9 +28,9 @@ class RechercheService
         $requete = Prestataire::query()
             // prixMin et nombrePrestations portent sur toutes les prestations actives, quels que soient les filtres de prix ou de texte.
             ->withMin(['prestations as prix_min' => fn (Builder $q) => $q->where('actif', true)], 'prix')
-            // Note moyenne et nombre d'avis : sous-requêtes agrégées dans la même requête (pas de N+1).
-            ->withAvg('avis as note_moyenne', 'note')
-            ->withCount('avis as nombre_avis')
+            // Note moyenne et nombre d'avis (hors avis masqués) : sous-requêtes agrégées dans la même requête (pas de N+1).
+            ->withAvg('avisVisibles as note_moyenne', 'note')
+            ->withCount('avisVisibles as nombre_avis')
             ->withCount(['prestations as nombre_prestations' => fn (Builder $q) => $q->where('actif', true)])
             ->whereHas('user', fn (Builder $q) => $q->where('statut', StatutCompte::Actif->value))
             ->whereHas('prestations', fn (Builder $q) => $q->where('actif', true));

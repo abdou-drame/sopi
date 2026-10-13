@@ -1,4 +1,4 @@
-name: "Client — agenda d'un prestataire"
+name: "Client — profil public d'un prestataire"
 description: |-
 
   Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
@@ -7,20 +7,19 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/prestataires/{id}/agenda'
+    uri: 'api/v1/prestataires/{id}'
     metadata:
       custom: []
-      groupName: "Client — agenda d'un prestataire"
+      groupName: "Client — profil public d'un prestataire"
       groupDescription: |-
 
         Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
       subgroup: ''
       subgroupDescription: ''
-      title: "Créneaux disponibles d'un prestataire"
+      title: "Profil d'un prestataire"
       description: |-
-        Uniquement les créneaux réservables : libres (ou dont le verrou a expiré) et qui commencent dans le futur.
-        Les créneaux réservés, indisponibles ou verrouillés par un autre client n'apparaissent pas. Triés par début, sans pagination.
-        Par défaut : de maintenant à 14 jours plus tard. Intervalle maximal : 31 jours. Réponse jamais mise en cache (`Cache-Control: no-store`).
+        Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. `noteMoyenne` (arrondie à une décimale,
+        `null` sans avis) et `nombreAvis` résument les avis (voir « Avis d'un prestataire »). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.
       authenticated: true
       deprecated: false
     headers:
@@ -41,32 +40,8 @@ endpoints:
         deprecated: false
     cleanUrlParameters:
       id: 0198a1b2-0000-7000-8000-000000000002
-    queryParameters:
-      du:
-        custom: []
-        name: du
-        description: "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>."
-        required: false
-        example: '2030-01-15'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      au:
-        custom: []
-        name: au
-        description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>.'
-        required: false
-        example: '2030-01-29'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanQueryParameters:
-      du: '2030-01-15'
-      au: '2030-01-29'
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -74,7 +49,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-15T09:00:00+00:00","dateFin":"2030-01-15T10:00:00+00:00"}]}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","noteMoyenne":4.5,"nombreAvis":12,"prestations":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000}],"photos":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
         headers: []
         description: ''
       -
@@ -95,10 +70,89 @@ endpoints:
         content: '{"message":"Prestataire introuvable."}'
         headers: []
         description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/prestataires/{id}/photos/{photo}'
+    metadata:
+      custom: []
+      groupName: "Client — profil public d'un prestataire"
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Photo d'atelier"
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du prestataire.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      photo:
+        custom: []
+        name: photo
+        description: 'Identifiant de la photo.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000030
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000002
+      photo: 0198a1b2-0000-7000-8000-000000000030
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
       -
         custom: []
-        status: 422
-        content: '{"message":"L''intervalle ne peut pas dépasser 31 jours.","errors":{"au":["L''intervalle ne peut pas dépasser 31 jours."]}}'
+        status: 200
+        content: "[Contenu binaire de l'image]"
+        headers: []
+        description: image
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Photo introuvable."}'
         headers: []
         description: ''
     responseFields: []

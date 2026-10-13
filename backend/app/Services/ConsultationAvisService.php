@@ -11,10 +11,11 @@ class ConsultationAvisService
 {
     public const PAR_PAGE = 20;
 
-    /** Avis du prestataire, du plus récent au plus ancien ; les auteurs sont chargés en une requête. */
+    /** Avis du prestataire non masqués par l'administrateur, du plus récent au plus ancien ; les auteurs sont chargés en une requête. */
     public function lister(Prestataire $prestataire): LengthAwarePaginator
     {
         return Avis::query()
+            ->visibles()
             ->where('prestataire_id', $prestataire->id)
             ->with('client:id,nom,prenom')
             ->orderByDesc('created_at')
@@ -29,7 +30,7 @@ class ConsultationAvisService
      */
     public function synthese(Prestataire $prestataire): array
     {
-        $ligne = Avis::query()->where('prestataire_id', $prestataire->id)->selectRaw('avg(note) as moyenne, count(*) as nombre')->toBase()->first();
+        $ligne = Avis::query()->visibles()->where('prestataire_id', $prestataire->id)->selectRaw('avg(note) as moyenne, count(*) as nombre')->toBase()->first();
 
         return self::formater($ligne->moyenne, $ligne->nombre);
     }

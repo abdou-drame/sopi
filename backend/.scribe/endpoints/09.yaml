@@ -1,29 +1,25 @@
-name: "Client — verrou d'un créneau"
+name: "Client — avis d'un prestataire"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-  Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/creneaux/{id}/verrou'
+      - GET
+    uri: 'api/v1/prestataires/{id}/avis'
     metadata:
       custom: []
-      groupName: "Client — verrou d'un créneau"
+      groupName: "Client — avis d'un prestataire"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Verrouiller un créneau'
+      title: "Avis d'un prestataire"
       description: |-
-        Verrouille le créneau pour 5 minutes si, et seulement si, il est libre et à venir (une seule opération atomique :
-        si deux clients tentent en même temps, un seul l'obtient). Un client ne détient qu'un verrou à la fois : verrouiller
-        un autre créneau libère le précédent. Si le client tient déjà un verrou valide sur ce créneau, la même échéance
-        est renvoyée, sans prolongation.
+        Paginée (20 par page), du plus récent au plus ancien. L'auteur n'apparaît que par son prénom et l'initiale de son nom.
+        `noteMoyenne` (arrondie à une décimale, `null` sans avis) et `nombreAvis` portent sur tous les avis du prestataire, pas sur la page.
       authenticated: true
       deprecated: false
     headers:
@@ -34,16 +30,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du créneau.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000040
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000040
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -53,7 +49,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"creneauId":"0198a1b2-0000-7000-8000-000000000040","verrouExpireA":"2030-01-15T08:55:00+00:00"}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1","last":"https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
         headers: []
         description: ''
       -
@@ -71,99 +67,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Créneau introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Ce créneau n''est plus disponible."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: 'api/v1/creneaux/{id}/verrou'
-    metadata:
-      custom: []
-      groupName: "Client — verrou d'un créneau"
-      groupDescription: |-
-
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
-        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Libérer son verrou'
-      description: "Remet le créneau à libre, uniquement s'il est verrouillé par le client connecté."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant du créneau.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000040
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000040
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 204
-        content: '{}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Verrou introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"message":"Prestataire introuvable."}'
         headers: []
         description: ''
     responseFields: []

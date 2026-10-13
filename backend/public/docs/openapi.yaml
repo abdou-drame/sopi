@@ -14,6 +14,9 @@ tags:
     name: 'Administration — litiges'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;\nelle ne déclenche aucun mouvement d'argent automatique."
   -
+    name: 'Administration — modération des avis'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées\nà 10 requêtes par minute."
+  -
     name: 'Administration — sanctions'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Poser et lever une sanction sont limités à 10 requêtes par minute.\nUne suspension ou un bannissement est « tout ou rien » : sanction, statut du compte et révocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndisparaît de la recherche et du profil public, et ses réservations à venir (en attente, acceptées, confirmées pour un prestataire ;\nen attente et acceptées pour un client) sont annulées, un prestataire sanctionné voyant l'acompte versé remboursé en intégralité.\nUne prestation en cours va à son terme. Le solde et les retraits ne sont pas modifiés. Un administrateur ne peut pas être sanctionné."
   -
@@ -1468,6 +1471,793 @@ paths:
         name: id
         description: 'Identifiant du litige.'
         example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/avis:
+    get:
+      summary: 'Liste des avis'
+      operationId: listeDesAvis
+      description: "Paginée (20 par page), du plus récent au plus ancien, tous prestataires confondus. Filtres facultatifs : `prestataire`, `note`,\n`masque`, `signale`, `aTraiter` (signalés et pas encore modérés)."
+      parameters:
+        -
+          in: query
+          name: prestataire
+          description: 'Identifiant du prestataire noté. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000002
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant du prestataire noté. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000002
+            nullable: true
+        -
+          in: query
+          name: note
+          description: 'Note de 1 à 5. validation.between.'
+          example: 2
+          required: false
+          schema:
+            type: integer
+            description: 'Note de 1 à 5. validation.between.'
+            example: 2
+            nullable: true
+        -
+          in: query
+          name: masque
+          description: 'true : avis masqués ; false : avis affichés ; absent : tous.'
+          example: false
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis masqués ; false : avis affichés ; absent : tous.'
+            example: false
+            nullable: true
+        -
+          in: query
+          name: signale
+          description: 'true : avis signalés par le prestataire ; false : jamais signalés.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis signalés par le prestataire ; false : jamais signalés.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: aTraiter
+          description: 'true : avis signalés et pas encore modérés.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : avis signalés et pas encore modérés.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      note: 1
+                      commentaire: 'Service décevant.'
+                      dateCreation: '2030-01-17T10:00:00+00:00'
+                      reservationId: 0198a1b2-0000-7000-8000-000000000060
+                      client:
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        nom: Diallo
+                        prenom: Awa
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000003
+                        nomEntreprise: 'Garage Exemple'
+                      signaleLe: '2030-01-18T08:00:00+00:00'
+                      motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
+                      modereLe: null
+                      moderePar: null
+                      motifModeration: null
+                      masque: false
+                      masqueLe: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        note: 1
+                        commentaire: 'Service décevant.'
+                        dateCreation: '2030-01-17T10:00:00+00:00'
+                        reservationId: 0198a1b2-0000-7000-8000-000000000060
+                        client:
+                          id: 0198a1b2-0000-7000-8000-000000000001
+                          nom: Diallo
+                          prenom: Awa
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000003
+                          nomEntreprise: 'Garage Exemple'
+                        signaleLe: '2030-01-18T08:00:00+00:00'
+                        motifSignalement: 'Cet avis concerne une autre prestation que la mienne.'
+                        modereLe: null
+                        moderePar: null
+                        motifModeration: null
+                        masque: false
+                        masqueLe: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        note:
+                          type: integer
+                          example: 1
+                        commentaire:
+                          type: string
+                          example: 'Service décevant.'
+                        dateCreation:
+                          type: string
+                          example: '2030-01-17T10:00:00+00:00'
+                        reservationId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000060
+                        client:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000001
+                            nom:
+                              type: string
+                              example: Diallo
+                            prenom:
+                              type: string
+                              example: Awa
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000003
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                        signaleLe:
+                          type: string
+                          example: '2030-01-18T08:00:00+00:00'
+                        motifSignalement:
+                          type: string
+                          example: 'Cet avis concerne une autre prestation que la mienne.'
+                        modereLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        moderePar:
+                          type: string
+                          example: null
+                          nullable: true
+                        motifModeration:
+                          type: string
+                          example: null
+                          nullable: true
+                        masque:
+                          type: boolean
+                          example: false
+                        masqueLe:
+                          type: string
+                          example: null
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/avis?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La note doit être comprise entre 1 et 5.'
+                  errors:
+                    note:
+                      - 'La note doit être comprise entre 1 et 5.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La note doit être comprise entre 1 et 5.'
+                  errors:
+                    type: object
+                    properties:
+                      note:
+                        type: array
+                        example:
+                          - 'La note doit être comprise entre 1 et 5.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — modération des avis'
+  '/api/v1/admin/avis/{id}/masquer':
+    post:
+      summary: 'Masquer un avis'
+      operationId: masquerUnAvis
+      description: "Retire l'avis de l'affichage public. Motif obligatoire. Un avis déjà masqué répond 409, y compris si deux requêtes arrivent\nen même temps."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: null
+                  motifSignalement: null
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: 'Propos injurieux sans rapport avec la prestation.'
+                  masque: true
+                  masqueLe: '2030-01-19T09:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifSignalement:
+                    type: string
+                    example: null
+                    nullable: true
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: 'Propos injurieux sans rapport avec la prestation.'
+                  masque:
+                    type: boolean
+                    example: true
+                  masqueLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis est déjà masqué.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis est déjà masqué.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif de la modération est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif de la modération est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif de la modération est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif de la modération est obligatoire.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — modération des avis'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Propos injurieux sans rapport avec la prestation.'
+              required:
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/avis/{id}/conserver':
+    post:
+      summary: 'Conserver un avis'
+      operationId: conserverUnAvis
+      description: "Décide, après examen d'un signalement, que l'avis reste affiché. Motif facultatif. Un avis déjà modéré répond 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: '2030-01-18T08:00:00+00:00'
+                  motifSignalement: 'Avis injuste.'
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: null
+                  masque: false
+                  masqueLe: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: '2030-01-18T08:00:00+00:00'
+                  motifSignalement:
+                    type: string
+                    example: 'Avis injuste.'
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: null
+                    nullable: true
+                  masque:
+                    type: boolean
+                    example: false
+                  masqueLe:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis a déjà été modéré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis a déjà été modéré.'
+      tags:
+        - 'Administration — modération des avis'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Propos injurieux sans rapport avec la prestation.'
+                  nullable: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/avis/{id}/retablir':
+    post:
+      summary: 'Rétablir un avis masqué'
+      operationId: rtablirUnAvisMasqu
+      description: "L'avis est de nouveau affiché et compte dans la note moyenne. La trace de la modération est conservée. Un avis non masqué répond 409."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  note: 1
+                  commentaire: 'Service décevant.'
+                  dateCreation: '2030-01-17T10:00:00+00:00'
+                  reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    nom: Diallo
+                    prenom: Awa
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000003
+                    nomEntreprise: 'Garage Exemple'
+                  signaleLe: null
+                  motifSignalement: null
+                  modereLe: '2030-01-19T09:00:00+00:00'
+                  moderePar: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration: 'Propos injurieux sans rapport avec la prestation.'
+                  masque: false
+                  masqueLe: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  note:
+                    type: integer
+                    example: 1
+                  commentaire:
+                    type: string
+                    example: 'Service décevant.'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-17T10:00:00+00:00'
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diallo
+                      prenom:
+                        type: string
+                        example: Awa
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000003
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  signaleLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  motifSignalement:
+                    type: string
+                    example: null
+                    nullable: true
+                  modereLe:
+                    type: string
+                    example: '2030-01-19T09:00:00+00:00'
+                  moderePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000009
+                  motifModeration:
+                    type: string
+                    example: 'Propos injurieux sans rapport avec la prestation.'
+                  masque:
+                    type: boolean
+                    example: false
+                  masqueLe:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Cet avis n'est pas masqué."
+                properties:
+                  message:
+                    type: string
+                    example: "Cet avis n'est pas masqué."
+      tags:
+        - 'Administration — modération des avis'
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
         required: true
         schema:
           type: string
@@ -4459,7 +5249,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T15:15:56+00:00'
+                  time: '2026-10-13T15:23:29+00:00'
                 properties:
                   status:
                     type: string
@@ -4475,7 +5265,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T15:15:56+00:00'
+                    example: '2026-10-13T15:23:29+00:00'
       tags:
         - Endpoints
       security: []
@@ -7350,7 +8140,7 @@ paths:
     get:
       summary: 'Mes avis'
       operationId: mesAvis
-      description: "Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au\nprénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`."
+      description: "Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au\nprénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`."
       parameters: []
       responses:
         200:
@@ -7471,6 +8261,141 @@ paths:
                     example: "Vous n'avez pas le droit d'effectuer cette action."
       tags:
         - 'Prestataire — mes avis'
+  '/api/v1/prestataire/avis/{id}/signaler':
+    post:
+      summary: 'Signaler un avis'
+      operationId: signalerUnAvis
+      description: "Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que\nl'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  signale: true
+                  signaleLe: '2030-01-18T08:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  signale:
+                    type: boolean
+                    example: true
+                  signaleLe:
+                    type: string
+                    example: '2030-01-18T08:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Avis introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Avis introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cet avis a déjà été signalé.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cet avis a déjà été signalé.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le motif du signalement est obligatoire.'
+                  errors:
+                    motif:
+                      - 'Le motif du signalement est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le motif du signalement est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      motif:
+                        type: array
+                        example:
+                          - 'Le motif du signalement est obligatoire.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Prestataire — mes avis'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                motif:
+                  type: string
+                  description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+                  example: 'Cet avis concerne une autre prestation que la mienne.'
+              required:
+                - motif
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'avis."
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
   /api/v1/prestataire/photos:
     get:
       summary: 'Mes photos'

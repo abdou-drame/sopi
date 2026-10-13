@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "604207b1-362f-425d-84e1-6b6eac730a11",
+        "_postman_id": "bf52910c-786a-4799-ae3f-25b11e18e9ef",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -523,6 +523,303 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le motif de la d\u00e9cision est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la d\u00e9cision est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 mod\u00e9ration des avis",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Masquer un avis (\u00ab supprimer \u00bb) le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conserv\u00e9e et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque d\u00e9cision est trac\u00e9e (administrateur, date, motif). Les modifications sont limit\u00e9es\n\u00e0 10 requ\u00eates par minute.",
+            "item": [
+                {
+                    "name": "Liste des avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis",
+                            "query": [
+                                {
+                                    "key": "prestataire",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire not\u00e9. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "note",
+                                    "value": "2",
+                                    "description": "Note de 1 \u00e0 5. validation.between.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "masque",
+                                    "value": "",
+                                    "description": "true : avis masqu\u00e9s ; false : avis affich\u00e9s ; absent : tous.",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "signale",
+                                    "value": "1",
+                                    "description": "true : avis signal\u00e9s par le prestataire ; false : jamais signal\u00e9s.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "aTraiter",
+                                    "value": "1",
+                                    "description": "true : avis signal\u00e9s et pas encore mod\u00e9r\u00e9s.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis?prestataire=0198a1b2-0000-7000-8000-000000000002&note=2&masque=&signale=1&aTraiter=1&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, tous prestataires confondus. Filtres facultatifs : `prestataire`, `note`,\n`masque`, `signale`, `aTraiter` (signal\u00e9s et pas encore mod\u00e9r\u00e9s)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Cet avis concerne une autre prestation que la mienne.\",\"modereLe\":null,\"moderePar\":null,\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La note doit \u00eatre comprise entre 1 et 5.\",\"errors\":{\"note\":[\"La note doit \u00eatre comprise entre 1 et 5.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Masquer un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/masquer",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/masquer",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Propos injurieux sans rapport avec la prestation.\"}"
+                        },
+                        "description": "Retire l'avis de l'affichage public. Motif obligatoire. Un avis d\u00e9j\u00e0 masqu\u00e9 r\u00e9pond 409, y compris si deux requ\u00eates arrivent\nen m\u00eame temps."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":true,\"masqueLe\":\"2030-01-19T09:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis est d\u00e9j\u00e0 masqu\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif de la mod\u00e9ration est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la mod\u00e9ration est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Conserver un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/conserver",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/conserver",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Propos injurieux sans rapport avec la prestation.\"}"
+                        },
+                        "description": "D\u00e9cide, apr\u00e8s examen d'un signalement, que l'avis reste affich\u00e9. Motif facultatif. Un avis d\u00e9j\u00e0 mod\u00e9r\u00e9 r\u00e9pond 409."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Avis injuste.\",\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis a d\u00e9j\u00e0 \u00e9t\u00e9 mod\u00e9r\u00e9.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "R\u00e9tablir un avis masqu\u00e9",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/avis\/:id\/retablir",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/avis\/:id\/retablir",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "L'avis est de nouveau affich\u00e9 et compte dans la note moyenne. La trace de la mod\u00e9ration est conserv\u00e9e. Un avis non masqu\u00e9 r\u00e9pond 409."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":false,\"masqueLe\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis n'est pas masqu\u00e9.\"}",
                             "name": ""
                         }
                     ]
@@ -1977,7 +2274,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:15:56+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:23:29+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -3464,7 +3761,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "M\u00eames donn\u00e9es que la consultation par les clients : pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, auteur r\u00e9duit au\npr\u00e9nom et \u00e0 l'initiale du nom, `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis`."
+                        "description": "Avis masqu\u00e9s par l'administrateur exclus. M\u00eames donn\u00e9es que la consultation par les clients : pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, auteur r\u00e9duit au\npr\u00e9nom et \u00e0 l'initiale du nom, `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis`."
                     },
                     "response": [
                         {
@@ -3483,6 +3780,85 @@
                             "header": [],
                             "code": 403,
                             "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Signaler un avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/avis\/:id\/signaler",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/avis\/:id\/signaler",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant de l'avis."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"motif\":\"Cet avis concerne une autre prestation que la mienne.\"}"
+                        },
+                        "description": "Demande \u00e0 l'administrateur d'examiner un avis re\u00e7u (RF20). Un seul signalement par avis ; l'avis reste affich\u00e9 tant que\nl'administrateur n'a pas d\u00e9cid\u00e9. Un avis d'un autre prestataire ou masqu\u00e9 r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"signale\":true,\"signaleLe\":\"2030-01-18T08:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Avis introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cet avis a d\u00e9j\u00e0 \u00e9t\u00e9 signal\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le motif du signalement est obligatoire.\",\"errors\":{\"motif\":[\"Le motif du signalement est obligatoire.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]

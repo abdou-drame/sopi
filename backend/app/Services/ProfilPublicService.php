@@ -17,8 +17,8 @@ class ProfilPublicService
     public function trouver(string $id): ?Prestataire
     {
         return $this->visible($id)
-            ?->loadAvg('avis as note_moyenne', 'note')
-            ->loadCount('avis as nombre_avis')
+            ?->loadAvg('avisVisibles as note_moyenne', 'note')
+            ->loadCount('avisVisibles as nombre_avis')
             ->load(['prestations' => fn ($q) => $q->where('actif', true)->orderBy('nom')->orderBy('id')]);
     }
 
