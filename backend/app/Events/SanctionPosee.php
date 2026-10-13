@@ -8,7 +8,6 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Une sanction vient d'être posée. Publié après validation de la transaction.
- * Aucun écouteur pour l'instant : les notifications viendront en M10.
  */
 class SanctionPosee implements ShouldDispatchAfterCommit
 {

@@ -2,8 +2,25 @@
 
 namespace App\Providers;
 
+use App\Events\AvisDepose;
+use App\Events\AvisModere;
+use App\Events\DemandePrestataireAcceptee;
+use App\Events\DemandePrestataireRefusee;
+use App\Events\LitigeCloture;
+use App\Events\LitigeOuvert;
+use App\Events\Reservation\ReservationAcceptee;
+use App\Events\Reservation\ReservationAnnulee;
+use App\Events\Reservation\ReservationConfirmee;
+use App\Events\Reservation\ReservationCreee;
+use App\Events\Reservation\ReservationDemarree;
+use App\Events\Reservation\ReservationExpiree;
+use App\Events\Reservation\ReservationRefusee;
+use App\Events\Reservation\ReservationTerminee;
+use App\Events\SanctionLevee;
+use App\Events\SanctionPosee;
 use App\Exceptions\ConfigurationNotificationInvalide;
 use App\Exceptions\ConfigurationPaiementInvalide;
+use App\Listeners\NotifierLesUtilisateurs;
 use App\Services\Notification\EnvoiEmail;
 use App\Services\Notification\EnvoiPush;
 use App\Services\Notification\LaravelNotificationService;
@@ -16,6 +33,7 @@ use App\Services\Paiement\FakePaiementService;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -48,6 +66,24 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Notifications (M10.2) : un écouteur par événement métier, enregistrés explicitement (pas de découverte automatique).
+        Event::listen(AvisDepose::class, [NotifierLesUtilisateurs::class, 'surAvisDepose']);
+        Event::listen(AvisModere::class, [NotifierLesUtilisateurs::class, 'surAvisModere']);
+        Event::listen(DemandePrestataireAcceptee::class, [NotifierLesUtilisateurs::class, 'surDemandePrestataireAcceptee']);
+        Event::listen(DemandePrestataireRefusee::class, [NotifierLesUtilisateurs::class, 'surDemandePrestataireRefusee']);
+        Event::listen(LitigeCloture::class, [NotifierLesUtilisateurs::class, 'surLitigeCloture']);
+        Event::listen(LitigeOuvert::class, [NotifierLesUtilisateurs::class, 'surLitigeOuvert']);
+        Event::listen(ReservationAcceptee::class, [NotifierLesUtilisateurs::class, 'surReservationAcceptee']);
+        Event::listen(ReservationAnnulee::class, [NotifierLesUtilisateurs::class, 'surReservationAnnulee']);
+        Event::listen(ReservationConfirmee::class, [NotifierLesUtilisateurs::class, 'surReservationConfirmee']);
+        Event::listen(ReservationCreee::class, [NotifierLesUtilisateurs::class, 'surReservationCreee']);
+        Event::listen(ReservationDemarree::class, [NotifierLesUtilisateurs::class, 'surReservationDemarree']);
+        Event::listen(ReservationExpiree::class, [NotifierLesUtilisateurs::class, 'surReservationExpiree']);
+        Event::listen(ReservationRefusee::class, [NotifierLesUtilisateurs::class, 'surReservationRefusee']);
+        Event::listen(ReservationTerminee::class, [NotifierLesUtilisateurs::class, 'surReservationTerminee']);
+        Event::listen(SanctionLevee::class, [NotifierLesUtilisateurs::class, 'surSanctionLevee']);
+        Event::listen(SanctionPosee::class, [NotifierLesUtilisateurs::class, 'surSanctionPosee']);
+
         // 5 inscriptions par minute et par adresse IP.
         RateLimiter::for('inscription', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('inscription-prestataire', fn (Request $request) => Limit::perHour(10)->by($request->ip()));

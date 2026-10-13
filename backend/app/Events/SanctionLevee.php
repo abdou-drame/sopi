@@ -8,7 +8,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Une sanction vient d'être levée, par un administrateur ou automatiquement à l'échéance d'une suspension (`levee_par_id` vide).
- * Publié après validation de la transaction. Aucun écouteur pour l'instant : les notifications viendront en M10.
+ * Publié après validation de la transaction.
  */
 class SanctionLevee implements ShouldDispatchAfterCommit
 {

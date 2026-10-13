@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\AvisModere;
 use App\Exceptions\ReservationImpossibleException;
 use App\Models\Avis;
 use App\Models\Prestataire;
@@ -95,6 +96,8 @@ class ModerationAvisService
             throw new ReservationImpossibleException('Cet avis est déjà masqué.', Response::HTTP_CONFLICT);
         }
 
+        AvisModere::dispatch($avis->refresh(), true);
+
         return $this->termine($avis);
     }
 
@@ -115,6 +118,8 @@ class ModerationAvisService
         if ($modifies === 0) {
             throw new ReservationImpossibleException('Cet avis a déjà été modéré.', Response::HTTP_CONFLICT);
         }
+
+        AvisModere::dispatch($avis->refresh(), false);
 
         return $this->termine($avis);
     }

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Une réservation vient d'être annulée (ANNULEE, créneau libéré). `$par` indique qui a annulé (le client en M5.4, le prestataire en M5.7) et `$cause` pourquoi.
- * Publié après validation de la transaction. Aucun écouteur pour l'instant : les notifications viendront en M10.
+ * Publié après validation de la transaction.
  */
 class ReservationAnnulee implements ShouldDispatchAfterCommit
 {

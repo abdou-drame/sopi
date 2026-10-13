@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Enums\StatutCompte;
 use App\Enums\StatutJustificatif;
+use App\Events\DemandePrestataireAcceptee;
+use App\Events\DemandePrestataireRefusee;
 use App\Exceptions\DemandeDejaTraitee;
 use App\Models\Prestataire;
 use App\Models\User;
@@ -22,11 +24,14 @@ class DecisionDemandeService
      */
     public function accepter(string $prestataireId, User $administrateur): Prestataire
     {
-        return $this->decider($prestataireId, function (Prestataire $prestataire) use ($administrateur) {
+        $decide = $this->decider($prestataireId, function (Prestataire $prestataire) use ($administrateur) {
             $prestataire->user->forceFill(['statut' => StatutCompte::Actif])->save();
             $prestataire->forceFill(['motif_refus' => null])->save();
             $this->marquerJustificatifs($prestataire, StatutJustificatif::Valide, $administrateur);
         });
+        DemandePrestataireAcceptee::dispatch($decide);
+
+        return $decide;
     }
 
     /**
@@ -35,11 +40,14 @@ class DecisionDemandeService
      */
     public function refuser(string $prestataireId, string $motif, User $administrateur): Prestataire
     {
-        return $this->decider($prestataireId, function (Prestataire $prestataire) use ($motif, $administrateur) {
+        $decide = $this->decider($prestataireId, function (Prestataire $prestataire) use ($motif, $administrateur) {
             $prestataire->user->forceFill(['statut' => StatutCompte::Refuse])->save();
             $prestataire->forceFill(['motif_refus' => $motif])->save();
             $this->marquerJustificatifs($prestataire, StatutJustificatif::Rejete, $administrateur);
         });
+        DemandePrestataireRefusee::dispatch($decide);
+
+        return $decide;
     }
 
     /** Transaction avec verrou sur la demande : deux décisions simultanées ne peuvent pas passer. */
