@@ -1,68 +1,59 @@
-name: 'Client — réservations'
+name: "Client — verrou d'un créneau"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+  Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
 endpoints:
   -
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/reservations
+    uri: 'api/v1/creneaux/{id}/verrou'
     metadata:
       custom: []
-      groupName: 'Client — réservations'
+      groupName: "Client — verrou d'un créneau"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Réserver un créneau'
+      title: 'Verrouiller un créneau'
       description: |-
-        Confirme la demande du client sur un créneau qu'il a verrouillé (voir « Verrouiller un créneau ») avant l'expiration
-        du verrou. La réservation est créée au statut `en_attente` (le prestataire a 12 h pour répondre) et le créneau passe
-        à « réservé ». La réponse ne contient aucune donnée personnelle du prestataire ni code de réservation.
+        Verrouille le créneau pour 5 minutes si, et seulement si, il est libre et à venir (une seule opération atomique :
+        si deux clients tentent en même temps, un seul l'obtient). Un client ne détient qu'un verrou à la fois : verrouiller
+        un autre créneau libère le précédent. Si le client tient déjà un verrou valide sur ce créneau, la même échéance
+        est renvoyée, sans prolongation.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      creneau_id:
+    urlParameters:
+      id:
         custom: []
-        name: creneau_id
-        description: 'Identifiant du créneau, que le client a verrouillé. validation.uuid.'
+        name: id
+        description: 'Identifiant du créneau.'
         required: true
         example: 0198a1b2-0000-7000-8000-000000000040
         type: string
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
-      prestation_id:
-        custom: []
-        name: prestation_id
-        description: 'Identifiant de la prestation, active et proposée par le prestataire du créneau. validation.uuid.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000050
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      creneau_id: 0198a1b2-0000-7000-8000-000000000040
-      prestation_id: 0198a1b2-0000-7000-8000-000000000050
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000040
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
+        status: 200
+        content: '{"creneauId":"0198a1b2-0000-7000-8000-000000000040","verrouExpireA":"2030-01-15T08:55:00+00:00"}'
         headers: []
         description: ''
       -
@@ -86,13 +77,7 @@ endpoints:
       -
         custom: []
         status: 409
-        content: '{"message":"Délai dépassé. Veuillez sélectionner de nouveau un créneau."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Cette prestation n''est pas proposée sur ce créneau.","errors":{"prestation_id":["Cette prestation n''est pas proposée sur ce créneau."]}}'
+        content: '{"message":"Ce créneau n''est plus disponible."}'
         headers: []
         description: ''
       -
@@ -112,101 +97,19 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: api/v1/reservations
+      - DELETE
+    uri: 'api/v1/creneaux/{id}/verrou'
     metadata:
       custom: []
-      groupName: 'Client — réservations'
+      groupName: "Client — verrou d'un créneau"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 20 requêtes par minute et par utilisateur.
+        Un client sélectionne un créneau libre : il est verrouillé pour lui pendant 5 minutes, le temps de réserver.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Mes réservations'
-      description: |-
-        Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe
-        qu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles
-        de l'annulation.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters:
-      statut:
-        custom: []
-        name: statut
-        description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
-        required: false
-        example: en_attente
-        type: string
-        enumValues:
-          - en_attente
-          - acceptee
-          - confirmee
-          - en_cours
-          - terminee
-          - refusee
-          - annulee
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanQueryParameters:
-      statut: en_attente
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}],"links":{"first":"https://api.exemple.test/api/v1/reservations?page=1","last":"https://api.exemple.test/api/v1/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.","errors":{"statut":["Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/reservations/{id}'
-    metadata:
-      custom: []
-      groupName: 'Client — réservations'
-      groupDescription: |-
-
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
-      subgroup: ''
-      subgroupDescription: ''
-      title: "Détail d'une réservation"
-      description: ''
+      title: 'Libérer son verrou'
+      description: "Remet le créneau à libre, uniquement s'il est verrouillé par le client connecté."
       authenticated: true
       deprecated: false
     headers:
@@ -217,16 +120,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la réservation.'
+        description: 'Identifiant du créneau.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000060
+        example: 0198a1b2-0000-7000-8000-000000000040
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000060
+      id: 0198a1b2-0000-7000-8000-000000000040
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -235,8 +138,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
+        status: 204
+        content: '{}'
         headers: []
         description: ''
       -
@@ -254,88 +157,7 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Réservation introuvable."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: 'api/v1/reservations/{id}/annuler'
-    metadata:
-      custom: []
-      groupName: 'Client — réservations'
-      groupDescription: |-
-
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Annuler une réservation'
-      description: |-
-        Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau
-        (borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant de la réservation.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000060
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000060
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":false,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Réservation introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"L''annulation n''est plus possible moins de 2 heures avant le créneau."}'
+        content: '{"message":"Verrou introuvable."}'
         headers: []
         description: ''
       -

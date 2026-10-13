@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "3b7c233f-671f-46ef-8b75-35a3dad816d0",
+        "_postman_id": "cf0d1886-0641-4c08-a0de-72aa7dd5a7c5",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1033,6 +1033,169 @@
                             "header": [],
                             "code": 429,
                             "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 tableau de bord",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Lecture seule : rien n'est modifi\u00e9 ni envoy\u00e9.\nLes agr\u00e9gats sont calcul\u00e9s \u00e0 chaque appel par des requ\u00eates group\u00e9es (nombre de requ\u00eates constant, quel que soit le volume).\nAucune donn\u00e9e personnelle n'est renvoy\u00e9e : seulement des compteurs et des montants globaux en FCFA (entiers).",
+            "item": [
+                {
+                    "name": "Statistiques g\u00e9n\u00e9rales",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/tableau-de-bord",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/tableau-de-bord"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Comptes (clients et prestataires par statut, dossiers en attente), r\u00e9servations (total, par statut, par domaine de m\u00e9tier et activit\u00e9\ndes 7 et 30 derniers jours glissants), paiements (nombre et montant d'acompte par statut), litiges, avis (dont signal\u00e9s \u00e0 mod\u00e9rer,\nnote moyenne des avis non masqu\u00e9s) et sanctions actives. Les r\u00e9servations \u00ab termin\u00e9es \u00bb d'une fen\u00eatre sont dat\u00e9es par leur passage\n\u00e0 TERMINEE. Les fen\u00eatres et les dates sont interpr\u00e9t\u00e9es dans le fuseau de l'application (Africa\/Dakar)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"dateGeneration\":\"2030-01-20T10:00:00+00:00\",\"comptes\":{\"clients\":{\"total\":120,\"parStatut\":{\"en_attente\":0,\"actif\":115,\"refuse\":0,\"suspendu\":3,\"banni\":2}},\"prestataires\":{\"total\":18,\"parStatut\":{\"en_attente\":2,\"actif\":14,\"refuse\":1,\"suspendu\":1,\"banni\":0},\"dossiersEnAttente\":2},\"administrateurs\":1},\"reservations\":{\"total\":340,\"parStatut\":{\"en_attente\":4,\"acceptee\":2,\"confirmee\":10,\"en_cours\":1,\"terminee\":280,\"refusee\":15,\"annulee\":28},\"parDomaine\":{\"mecanique\":{\"total\":150,\"parStatut\":{\"en_attente\":2,\"acceptee\":1,\"confirmee\":5,\"en_cours\":1,\"terminee\":130,\"refusee\":5,\"annulee\":6}},\"coiffure\":{\"total\":120,\"parStatut\":{\"en_attente\":2,\"acceptee\":1,\"confirmee\":4,\"en_cours\":0,\"terminee\":100,\"refusee\":6,\"annulee\":7}},\"pressing\":{\"total\":70,\"parStatut\":{\"en_attente\":0,\"acceptee\":0,\"confirmee\":1,\"en_cours\":0,\"terminee\":50,\"refusee\":4,\"annulee\":15}}},\"activiteRecente\":{\"derniers7Jours\":{\"creees\":30,\"terminees\":25},\"derniers30Jours\":{\"creees\":110,\"terminees\":95}}},\"paiements\":{\"total\":{\"nombre\":300,\"montant\":1350000},\"parStatut\":{\"en_attente\":{\"nombre\":3,\"montant\":9000},\"reussi\":{\"nombre\":280,\"montant\":1260000},\"echoue\":{\"nombre\":7,\"montant\":31500},\"rembourse\":{\"nombre\":10,\"montant\":49500}}},\"litiges\":{\"total\":9,\"ouverts\":2,\"clos\":7},\"avis\":{\"total\":210,\"signales\":3,\"masques\":4,\"noteMoyenne\":4.35},\"sanctions\":{\"suspensionsEnCours\":1,\"bannissements\":2}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Revenus de la plateforme",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/revenus",
+                            "query": [
+                                {
+                                    "key": "debut",
+                                    "value": "2030-01-01",
+                                    "description": "Premier jour de la p\u00e9riode (AAAA-MM-JJ, inclus). Par d\u00e9faut : 29 jours avant la fin. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "fin",
+                                    "value": "2030-01-31",
+                                    "description": "Dernier jour de la p\u00e9riode (AAAA-MM-JJ, inclus). Par d\u00e9faut : aujourd'hui. Au plus 366 jours apr\u00e8s le d\u00e9but. Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "regroupement",
+                                    "value": "semaine",
+                                    "description": "Pas de la s\u00e9rie : `jour` (d\u00e9faut), `semaine` (lundi \u00e0 dimanche) ou `mois` (mois calendaire).",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/revenus?debut=2030-01-01&fin=2030-01-31&regroupement=semaine"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "S\u00e9rie par jour, semaine (lundi \u00e0 dimanche) ou mois calendaire, sur une p\u00e9riode de 366 jours au plus (bornes incluses, fuseau\nAfrica\/Dakar). Par d\u00e9faut : les 30 derniers jours, par jour. Les p\u00e9riodes vides sont pr\u00e9sentes avec des z\u00e9ros.\nD\u00e9finitions : **revenus** = commissions des paiements r\u00e9ussis dont le cr\u00e9dit au prestataire est fait (prestation termin\u00e9e), dat\u00e9es\npar ce cr\u00e9dit, paiements rembours\u00e9s exclus ; **acomptesEncaisses** = acomptes des paiements r\u00e9ussis, dat\u00e9s par le paiement ;\n**remboursements** = acomptes rembours\u00e9s, dat\u00e9s par le remboursement ; **retraitsVerses** = retraits r\u00e9ussis, dat\u00e9s par leur traitement.\n**soldePrestataires** est le cumul des soldes \u00e0 l'instant de la demande. Montants en FCFA entiers."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"dateGeneration\":\"2030-01-20T10:00:00+00:00\",\"periode\":{\"debut\":\"2030-01-01\",\"fin\":\"2030-01-10\",\"regroupement\":\"semaine\",\"fuseau\":\"Africa\/Dakar\"},\"totaux\":{\"revenus\":42000,\"acomptesEncaisses\":150000,\"remboursements\":9000,\"retraitsVerses\":60000},\"soldePrestataires\":84000,\"series\":[{\"debut\":\"2030-01-01\",\"fin\":\"2030-01-06\",\"revenus\":30000,\"acomptesEncaisses\":90000,\"remboursements\":0,\"retraitsVerses\":60000},{\"debut\":\"2030-01-07\",\"fin\":\"2030-01-10\",\"revenus\":12000,\"acomptesEncaisses\":60000,\"remboursements\":9000,\"retraitsVerses\":0}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La p\u00e9riode ne peut pas d\u00e9passer 366 jours.\",\"errors\":{\"fin\":[\"La p\u00e9riode ne peut pas d\u00e9passer 366 jours.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Alertes",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/alertes",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/alertes"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "\u00c9l\u00e9ments qui demandent l'attention de l'administrateur, calcul\u00e9s \u00e0 la demande (rien n'est envoy\u00e9 : l'administrateur ne re\u00e7oit ni\ne-mail ni notification push). Liste vide quand tout est calme. Tri\u00e9es de la plus grave \u00e0 la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravit\u00e9s : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les \u00e9l\u00e9ments (le dossier est identifi\u00e9 par l'id du prestataire) ;\n`compteur` donne le total r\u00e9el. `ageMinutes` : anciennet\u00e9 du plus ancien \u00e9l\u00e9ment ; `echeanceDansMinutes` : d\u00e9lai avant la premi\u00e8re fin de suspension."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"dateGeneration\":\"2030-01-20T10:00:00+00:00\",\"total\":2,\"parGravite\":{\"critique\":1,\"attention\":0,\"info\":1},\"alertes\":[{\"type\":\"litiges_ouverts\",\"gravite\":\"critique\",\"compteur\":2,\"message\":\"2 litiges ouverts sont \u00e0 traiter.\",\"ids\":[\"0198a1b2-0000-7000-8000-000000000020\",\"0198a1b2-0000-7000-8000-000000000021\"],\"ageMinutes\":4500,\"echeanceDansMinutes\":null},{\"type\":\"suspensions_a_echeance\",\"gravite\":\"info\",\"compteur\":1,\"message\":\"1 suspension temporaire se termine bient\u00f4t.\",\"ids\":[\"0198a1b2-0000-7000-8000-000000000030\"],\"ageMinutes\":null,\"echeanceDansMinutes\":600}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
                             "name": ""
                         }
                     ]
@@ -2280,7 +2443,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T17:18:03+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T17:54:44+00:00\"}",
                             "name": ""
                         }
                     ]
