@@ -112,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
         // Ouverture d'un litige par le client, réponse du prestataire et décision de l'administrateur.
         RateLimiter::for('litige', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
+        RateLimiter::for('notifications', fn (Request $request) => Limit::perMinute(60)->by($parUtilisateur($request)));
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
         // par BlocageConnexionService.

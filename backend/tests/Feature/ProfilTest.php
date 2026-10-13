@@ -278,14 +278,14 @@ describe('colonne jeton_push', function () {
         expect($uniques)->toBeEmpty();
     });
 
-    it('permet à deux utilisateurs d\'enregistrer le même jeton', function () {
+    it('retire le jeton au premier utilisateur quand un second l\'enregistre (dernière affectation)', function () {
         $a = User::factory()->create();
         $b = User::factory()->create();
 
         $this->actingAs($a, 'sanctum')->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'jeton-partage'])->assertOk();
         $this->actingAs($b, 'sanctum')->putJson('/api/v1/me/jeton-push', ['jetonPush' => 'jeton-partage'])->assertOk();
 
-        expect($a->fresh()->jeton_push)->toBe('jeton-partage')
+        expect($a->fresh()->jeton_push)->toBeNull()
             ->and($b->fresh()->jeton_push)->toBe('jeton-partage');
     });
 

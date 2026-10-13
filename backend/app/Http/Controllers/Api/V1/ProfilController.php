@@ -7,6 +7,7 @@ use App\Http\Requests\Profil\ChangerMotDePasseRequest;
 use App\Http\Requests\Profil\EnregistrerJetonPushRequest;
 use App\Http\Requests\Profil\ModifierProfilRequest;
 use App\Http\Resources\ProfilResource;
+use App\Services\JetonPushService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -82,7 +83,8 @@ class ProfilController extends Controller
     /**
      * Enregistrer mon jeton push
      *
-     * Enregistre le jeton FCM de l'appareil pour les notifications.
+     * Enregistre le jeton FCM de l'appareil pour les notifications push. Un jeton désigne un appareil : s'il était déjà
+     * enregistré par un autre compte, il lui est retiré (la dernière affectation l'emporte). Le jeton n'est jamais renvoyé par l'API.
      *
      * @bodyParam jetonPush string required Jeton FCM. Example: fcm-jeton-exemple
      *
@@ -90,10 +92,25 @@ class ProfilController extends Controller
      * @response 401 {"message":"Authentification requise."}
      * @response 422 {"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}
      */
-    public function enregistrerJetonPush(EnregistrerJetonPushRequest $request): JsonResponse
+    public function enregistrerJetonPush(EnregistrerJetonPushRequest $request, JetonPushService $jetons): JsonResponse
     {
-        $request->user()->forceFill(['jeton_push' => $request->validated('jetonPush')])->save();
+        $jetons->enregistrer($request->user(), $request->validated('jetonPush'));
 
         return response()->json(['message' => 'Jeton de notification enregistré.']);
+    }
+
+    /**
+     * Retirer mon jeton push
+     *
+     * À appeler quand l'appareil se déconnecte ou que les notifications push sont désactivées. Sans effet si aucun jeton n'est enregistré.
+     *
+     * @response 200 {"message":"Jeton de notification retiré."}
+     * @response 401 {"message":"Authentification requise."}
+     */
+    public function retirerJetonPush(Request $request, JetonPushService $jetons): JsonResponse
+    {
+        $jetons->retirer($request->user());
+
+        return response()->json(['message' => 'Jeton de notification retiré.']);
     }
 }
