@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\AlertesController;
 use App\Http\Controllers\Api\V1\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
@@ -48,6 +49,7 @@ Route::prefix('v1')->group(function () {
         // Tableau de bord (M11) : lecture seule.
         Route::get('/tableau-de-bord', [TableauDeBordController::class, 'index']);
         Route::get('/revenus', [RevenusController::class, 'index']);
+        Route::get('/alertes', [AlertesController::class, 'index']);
 
         Route::get('/prestataires/demandes', [DemandePrestataireController::class, 'index']);
         Route::get('/prestataires/{id}', [DemandePrestataireController::class, 'show'])->whereUuid('id');
