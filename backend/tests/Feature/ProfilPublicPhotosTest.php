@@ -194,6 +194,8 @@ describe('profil public', function () {
             'metier' => $prestataire->metier->value,
             'quartier' => 'Malika',
             'adresse' => 'Rue 10',
+            'noteMoyenne' => null,
+            'nombreAvis' => 0,
             'prestations' => [[
                 'id' => $active->id,
                 'nom' => 'Vidange',
@@ -247,7 +249,7 @@ describe('profil public', function () {
             ->and($contenu)->not->toContain('user');
 
         $liste = collect(array_keys(json_decode($contenu, true)))->all();
-        expect($liste)->toBe(['id', 'nomEntreprise', 'metier', 'quartier', 'adresse', 'prestations', 'photos']);
+        expect($liste)->toBe(['id', 'nomEntreprise', 'metier', 'quartier', 'adresse', 'noteMoyenne', 'nombreAvis', 'prestations', 'photos']);
     });
 
     it('ne contient aucune donnée personnelle dans la liste de mes photos', function () {

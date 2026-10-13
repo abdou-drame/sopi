@@ -3,13 +3,14 @@
 namespace App\Http\Resources;
 
 use App\Models\Prestataire;
+use App\Services\ConsultationAvisService;
 use App\Services\PhotoAtelierService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * Profil public d'un prestataire (vue client). Aucune donnée personnelle, aucun chemin de stockage, aucune note
- * (les avis arrivent avec M8). Les prestations doivent être chargées (actives seulement) par le service.
+ * Profil public d'un prestataire (vue client). Aucune donnée personnelle, aucun chemin de stockage. noteMoyenne (null sans avis)
+ * et nombreAvis viennent des colonnes calculées par le service, qui charge aussi les prestations (actives seulement).
  *
  * @mixin Prestataire
  */
@@ -27,6 +28,7 @@ class ProfilPublicPrestataireResource extends JsonResource
             'metier' => $this->metier->value,
             'quartier' => $this->quartier,
             'adresse' => $this->adresse,
+            ...ConsultationAvisService::formater($this->note_moyenne, $this->nombre_avis),
             'prestations' => $this->prestations->map(fn ($prestation) => [
                 'id' => $prestation->id,
                 'nom' => $prestation->nom,

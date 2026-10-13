@@ -64,6 +64,12 @@ class Prestataire extends Model
         return $this->hasMany(Prestation::class);
     }
 
+    /** Avis reçus des clients. */
+    public function avis(): HasMany
+    {
+        return $this->hasMany(Avis::class);
+    }
+
     public function retraits(): HasMany
     {
         return $this->hasMany(Retrait::class);

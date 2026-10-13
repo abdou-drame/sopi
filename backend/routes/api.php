@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
+use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
+use App\Http\Controllers\Api\V1\Client\AvisReservationController;
 use App\Http\Controllers\Api\V1\Client\PaiementReservationController;
 use App\Http\Controllers\Api\V1\Client\ProfilPublicController;
 use App\Http\Controllers\Api\V1\Client\RecherchePrestatairesController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Api\V1\Client\VerrouCreneauController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
+use App\Http\Controllers\Api\V1\Prestataire\AvisController;
 use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
@@ -47,6 +50,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/prestataires/{id}', [ProfilPublicController::class, 'show']);
         Route::get('/prestataires/{id}/photos/{photo}', [ProfilPublicController::class, 'photo'])->name('prestataires.photo');
         Route::get('/prestataires/{id}/agenda', AgendaPrestataireController::class);
+        Route::get('/prestataires/{id}/avis', [AvisPrestataireController::class, 'index']);
 
         // Verrou temporaire d'un créneau (RG08, RG09). Identifiant non contraint : un id invalide répond 404 en français.
         Route::middleware('throttle:verrou-creneau')->group(function () {
@@ -64,6 +68,9 @@ Route::prefix('v1')->group(function () {
 
         // Paiement de l'acompte d'une réservation acceptée (M6.3). Aucun corps ; identifiant non contraint (404 en français).
         Route::post('/reservations/{id}/payer', PaiementReservationController::class)->middleware('throttle:paiement-reservation');
+
+        // Avis du client sur une réservation terminée (M8.2). Identifiant non contraint : un id invalide répond 404 en français.
+        Route::post('/reservations/{id}/avis', [AvisReservationController::class, 'store'])->middleware('throttle:avis');
     });
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
@@ -96,6 +103,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/retraits', [RetraitController::class, 'index']);
         Route::get('/retraits/{id}', [RetraitController::class, 'show']);
         Route::post('/retraits', [RetraitController::class, 'store'])->middleware('throttle:retrait');
+
+        // Avis reçus (M8.3).
+        Route::get('/avis', [AvisController::class, 'index']);
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

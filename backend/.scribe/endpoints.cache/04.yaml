@@ -20,8 +20,8 @@ endpoints:
       subgroupDescription: ''
       title: "Profil d'un prestataire"
       description: |-
-        Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle et pas de note
-        (les avis n'existent pas encore). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.
+        Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. `noteMoyenne` (arrondie à une décimale,
+        `null` sans avis) et `nombreAvis` résument les avis (voir « Avis d'un prestataire »). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.
       authenticated: true
       deprecated: false
     headers:
@@ -51,7 +51,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","prestations":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000}],"photos":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","noteMoyenne":4.5,"nombreAvis":12,"prestations":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000}],"photos":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
         headers: []
         description: ''
       -
