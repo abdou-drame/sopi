@@ -12,9 +12,11 @@ use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
@@ -38,6 +40,11 @@ function reservationDe(User $client, StatutReservation $statut = StatutReservati
     return Reservation::factory()->create(['client_id' => $client->id, 'statut' => $statut->value]);
 }
 
+function motifLitige(): string
+{
+    return 'Prestataire absent';
+}
+
 function descriptionLitige(): string
 {
     return 'Le prestataire ne s\'est pas présenté au rendez-vous.';
@@ -48,9 +55,9 @@ describe('ouverture par le client', function () {
         $reservation = Reservation::factory()->confirmee()->create();
         $url = '/api/v1/reservations/'.$reservation->id.'/litiges';
 
-        $this->postJson($url, ['description' => descriptionLitige()])->assertUnauthorized();
+        $this->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])->assertUnauthorized();
         foreach ([User::factory()->prestataire()->create(), User::factory()->administrateur()->create()] as $user) {
-            $this->actingAs($user, 'sanctum')->postJson($url, ['description' => descriptionLitige()])->assertForbidden();
+            $this->actingAs($user, 'sanctum')->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])->assertForbidden();
         }
         expect(Litige::count())->toBe(0);
     });
@@ -61,9 +68,10 @@ describe('ouverture par le client', function () {
         $reservation = reservationDe($client, $statut);
 
         $reponse = $this->actingAs($client, 'sanctum')
-            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => '  '.descriptionLitige().'  '])
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => '  '.motifLitige().'  ', 'description' => '  '.descriptionLitige().'  '])
             ->assertCreated()
             ->assertJsonPath('statut', 'ouvert')
+            ->assertJsonPath('motif', motifLitige())
             ->assertJsonPath('description', descriptionLitige())
             ->assertJsonPath('reservation.id', $reservation->id)
             ->assertJsonPath('prestataire.nomEntreprise', $reservation->creneau->prestataire->nom_entreprise)
@@ -86,7 +94,7 @@ describe('ouverture par le client', function () {
         $reservation = reservationDe($client, $statut);
 
         $this->actingAs($client, 'sanctum')
-            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => descriptionLitige()])
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => motifLitige(), 'description' => descriptionLitige()])
             ->assertStatus(409)
             ->assertExactJson(['message' => 'Un litige ne peut être ouvert que sur une réservation confirmée, en cours ou terminée.']);
         expect(Litige::count())->toBe(0);
@@ -99,26 +107,50 @@ describe('ouverture par le client', function () {
         $autre = reservationDe(User::factory()->create());
 
         foreach (['/api/v1/reservations/'.$autre->id.'/litiges', '/api/v1/reservations/'.fake()->uuid().'/litiges', '/api/v1/reservations/pas-un-uuid/litiges'] as $url) {
-            $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])
+            $this->actingAs($client, 'sanctum')->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])
                 ->assertNotFound()->assertExactJson(['message' => 'Réservation introuvable.']);
         }
         expect(Litige::count())->toBe(0);
     });
 
-    it('refuse (409) un second litige tant que le premier est ouvert, mais en accepte un nouveau après clôture', function () {
+    it('refuse (409) un second litige sur la même réservation, y compris après la clôture du premier', function () {
         $client = User::factory()->create();
         $reservation = reservationDe($client);
         $url = '/api/v1/reservations/'.$reservation->id.'/litiges';
 
-        $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])->assertCreated();
-        $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])
-            ->assertStatus(409)->assertExactJson(['message' => 'Un litige est déjà ouvert sur cette réservation.']);
+        $this->actingAs($client, 'sanctum')->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])->assertCreated();
+        $this->actingAs($client, 'sanctum')->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
         expect(Litige::count())->toBe(1);
 
         Litige::query()->update(['statut' => 'cloture', 'decision' => 'rejet', 'motif_decision' => 'Non fondé.', 'decide_par_id' => User::factory()->administrateur()->create()->id, 'cloture_le' => now()]);
 
-        $this->actingAs($client, 'sanctum')->postJson($url, ['description' => descriptionLitige()])->assertCreated();
-        expect(Litige::count())->toBe(2);
+        $this->actingAs($client, 'sanctum')->postJson($url, ['motif' => motifLitige(), 'description' => descriptionLitige()])
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
+        expect(Litige::count())->toBe(1);
+    });
+
+    it('répond 409 (jamais 500) si un litige est inséré entre la vérification et l\'écriture (concurrence simulée)', function () {
+        Storage::fake('local');
+        $client = User::factory()->create();
+        $reservation = reservationDe($client);
+        $inserer = true;
+
+        // Juste avant l'écriture du service, une autre requête insère son litige pour la même réservation.
+        Litige::saving(function (Litige $litige) use (&$inserer, $reservation) {
+            if ($inserer) {
+                $inserer = false;
+                DB::table('litiges')->insert([
+                    'id' => (string) Str::uuid(), 'reservation_id' => $reservation->id, 'client_id' => $litige->client_id, 'prestataire_id' => $litige->prestataire_id,
+                    'statut' => 'ouvert', 'motif' => 'Concurrent', 'description' => 'Litige concurrent.', 'created_at' => now(), 'updated_at' => now(),
+                ]);
+            }
+        });
+
+        $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => motifLitige(), 'description' => descriptionLitige(), 'preuves' => [pngPreuve()]])
+            ->assertStatus(409)->assertExactJson(['message' => 'Un litige a déjà été ouvert pour cette réservation.']);
+        // Le litige « concurrent » est inséré dans la transaction du service (une seule connexion en test) : il est annulé avec elle, d'où pas de décompte des litiges.
+        expect(LitigePreuve::count())->toBe(0)->and(Storage::disk('local')->allFiles())->toBe([]);
     });
 
     it('valide la description : obligatoire, 10 à 1000 caractères', function (mixed $description, string $message) {
@@ -126,7 +158,7 @@ describe('ouverture par le client', function () {
         $reservation = reservationDe($client);
 
         $this->actingAs($client, 'sanctum')
-            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', $description === null ? [] : ['description' => $description])
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', $description === null ? ['motif' => motifLitige()] : ['motif' => motifLitige(), 'description' => $description])
             ->assertStatus(422)->assertJsonPath('errors.description.0', $message);
         expect(Litige::count())->toBe(0);
     })->with([
@@ -135,12 +167,36 @@ describe('ouverture par le client', function () {
         'trop longue' => [str_repeat('a', 1001), 'La description ne peut pas dépasser 1000 caractères.'],
     ]);
 
+    it('valide le motif : obligatoire, 3 à 150 caractères', function (mixed $motif, string $message) {
+        $client = User::factory()->create();
+        $reservation = reservationDe($client);
+
+        $this->actingAs($client, 'sanctum')
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', $motif === null ? ['description' => descriptionLitige()] : ['motif' => $motif, 'description' => descriptionLitige()])
+            ->assertStatus(422)->assertJsonPath('errors.motif.0', $message);
+        expect(Litige::count())->toBe(0);
+    })->with([
+        'absent' => [null, 'Le motif du litige est obligatoire.'],
+        'vide' => ['   ', 'Le motif du litige est obligatoire.'],
+        'trop court' => ['ab', 'Le motif doit contenir au moins 3 caractères.'],
+        'trop long' => [str_repeat('a', 151), 'Le motif ne peut pas dépasser 150 caractères.'],
+    ]);
+
+    it('accepte un motif de 3 et de 150 caractères', function (int $longueur) {
+        $client = User::factory()->create();
+        $reservation = reservationDe($client);
+
+        $this->actingAs($client, 'sanctum')
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => str_repeat('é', $longueur), 'description' => descriptionLitige()])
+            ->assertCreated()->assertJsonPath('motif', str_repeat('é', $longueur));
+    })->with([3, 150]);
+
     it('accepte une description de 10 et de 1000 caractères', function (int $longueur) {
         $client = User::factory()->create();
         $reservation = reservationDe($client);
 
         $this->actingAs($client, 'sanctum')
-            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => str_repeat('é', $longueur)])
+            ->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => motifLitige(), 'description' => str_repeat('é', $longueur)])
             ->assertCreated();
     })->with([10, 1000]);
 
@@ -150,18 +206,41 @@ describe('ouverture par le client', function () {
         RateLimiter::clear($client->id);
 
         foreach (range(1, 5) as $i) {
-            $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => 'x'])->assertStatus(422);
+            $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => motifLitige(), 'description' => 'x'])->assertStatus(422);
         }
-        $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['description' => 'x'])
+        $this->actingAs($client, 'sanctum')->postJson('/api/v1/reservations/'.$reservation->id.'/litiges', ['motif' => motifLitige(), 'description' => 'x'])
             ->assertStatus(429)->assertExactJson(['message' => 'Trop de tentatives. Réessayez dans quelques instants.']);
     });
 
-    it('garantit l\'unicité du litige ouvert au niveau de la base (ouvertures simultanées)', function () {
+    it('garantit l\'unicité du litige par réservation au niveau de la base, même clôturé', function () {
         $reservation = Reservation::factory()->confirmee()->create();
-        Litige::factory()->create(['reservation_id' => $reservation->id]);
+        Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]);
 
         expect(fn () => Litige::factory()->create(['reservation_id' => $reservation->id]))->toThrow(UniqueConstraintViolationException::class);
+        expect(fn () => Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]))->toThrow(UniqueConstraintViolationException::class);
         expect(Litige::count())->toBe(1);
+    });
+
+    it('arrête la migration sans rien modifier, en listant les réservations concernées, s\'il existe des doublons', function () {
+        $migration = require database_path('migrations/2026_10_25_000001_un_seul_litige_par_reservation.php');
+        $migration->down(); // retour à l'index partiel : les doublons (un litige clos, un ouvert) redeviennent possibles
+        $reservation = Reservation::factory()->confirmee()->create();
+        Litige::factory()->cloture()->create(['reservation_id' => $reservation->id]);
+        Litige::factory()->create(['reservation_id' => $reservation->id]);
+
+        expect(fn () => $migration->up())->toThrow(RuntimeException::class, $reservation->id);
+        // Rien n'a été modifié : l'index partiel est toujours là, l'index unique simple n'existe pas.
+        $index = collect(DB::select("select name from sqlite_master where type = 'index' and tbl_name = 'litiges'"))->pluck('name');
+        expect($index)->toContain('litiges_un_ouvert_par_reservation')->not->toContain('litiges_reservation_unique');
+    });
+
+    it('pose l\'index unique simple quand il n\'y a aucun doublon', function () {
+        $migration = require database_path('migrations/2026_10_25_000001_un_seul_litige_par_reservation.php');
+        $migration->down();
+        $migration->up();
+
+        $index = collect(DB::select("select name from sqlite_master where type = 'index' and tbl_name = 'litiges'"))->pluck('name');
+        expect($index)->toContain('litiges_reservation_unique')->not->toContain('litiges_un_ouvert_par_reservation');
     });
 });
 
@@ -172,6 +251,7 @@ describe('preuves', function () {
         $reservation = reservationDe($client);
 
         $reponse = $this->actingAs($client, 'sanctum')->post('/api/v1/reservations/'.$reservation->id.'/litiges', [
+            'motif' => motifLitige(),
             'description' => descriptionLitige(),
             'preuves' => [pngPreuve('a.png'), pngPreuve('b.png'), pngPreuve('c.png')],
         ], ['Accept' => 'application/json'])->assertCreated()->assertJsonPath('nombrePreuves', 3);
@@ -199,11 +279,13 @@ describe('preuves', function () {
         $url = '/api/v1/reservations/'.$reservation->id.'/litiges';
 
         $this->actingAs($client, 'sanctum')->post($url, [
+            'motif' => motifLitige(),
             'description' => descriptionLitige(),
             'preuves' => [pngPreuve(), pngPreuve(), pngPreuve(), pngPreuve()],
         ], ['Accept' => 'application/json'])->assertStatus(422)->assertJsonPath('errors.preuves.0', 'Vous pouvez joindre 3 photos au plus.');
 
         $faux = $this->actingAs($client, 'sanctum')->post($url, [
+            'motif' => motifLitige(),
             'description' => descriptionLitige(),
             'preuves' => [fauxPng()],
         ], ['Accept' => 'application/json'])->assertStatus(422);
@@ -244,6 +326,19 @@ describe('consultation par le client', function () {
         foreach ([$litige->id, fake()->uuid(), 'nimporte'] as $id) {
             $this->actingAs(User::factory()->create(), 'sanctum')->getJson('/api/v1/litiges/'.$id)
                 ->assertNotFound()->assertExactJson(['message' => 'Litige introuvable.']);
+        }
+    });
+
+    it('expose le motif au client, au prestataire et à l\'administrateur', function () {
+        $litige = Litige::factory()->create(['motif' => 'Retard important']);
+        $client = User::find($litige->client_id);
+
+        foreach ([
+            [$client, '/api/v1/litiges/'],
+            [$litige->prestataire->user, '/api/v1/prestataire/litiges/'],
+            [User::factory()->administrateur()->create(), '/api/v1/admin/litiges/'],
+        ] as [$user, $base]) {
+            $this->actingAs($user, 'sanctum')->getJson($base.$litige->id)->assertOk()->assertJsonPath('motif', 'Retard important');
         }
     });
 

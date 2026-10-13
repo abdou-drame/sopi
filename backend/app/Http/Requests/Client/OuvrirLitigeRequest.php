@@ -7,6 +7,10 @@ use Illuminate\Http\UploadedFile;
 
 class OuvrirLitigeRequest extends FormRequest
 {
+    public const MOTIF_MIN = 3;
+
+    public const MOTIF_MAX = 150;
+
     public const DESCRIPTION_MIN = 10;
 
     public const DESCRIPTION_MAX = 1000;
@@ -24,6 +28,7 @@ class OuvrirLitigeRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'motif' => ['required', 'string', 'min:'.self::MOTIF_MIN, 'max:'.self::MOTIF_MAX],
             'description' => ['required', 'string', 'min:'.self::DESCRIPTION_MIN, 'max:'.self::DESCRIPTION_MAX],
             'preuves' => ['nullable', 'array', 'max:'.self::PREUVES_MAX],
             // « mimetypes » lit le contenu réel du fichier, pas son extension.
@@ -34,6 +39,10 @@ class OuvrirLitigeRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'motif.required' => 'Le motif du litige est obligatoire.',
+            'motif.string' => 'Le motif doit être un texte.',
+            'motif.min' => 'Le motif doit contenir au moins '.self::MOTIF_MIN.' caractères.',
+            'motif.max' => 'Le motif ne peut pas dépasser '.self::MOTIF_MAX.' caractères.',
             'description.required' => 'La description du litige est obligatoire.',
             'description.string' => 'La description doit être un texte.',
             'description.min' => 'La description doit contenir au moins '.self::DESCRIPTION_MIN.' caractères.',
@@ -50,9 +59,15 @@ class OuvrirLitigeRequest extends FormRequest
     public function bodyParameters(): array
     {
         return [
+            'motif' => ['description' => 'Raison du litige en quelques mots, de '.self::MOTIF_MIN.' à '.self::MOTIF_MAX.' caractères.', 'example' => 'Prestataire absent'],
             'description' => ['description' => 'Description du problème, de '.self::DESCRIPTION_MIN.' à '.self::DESCRIPTION_MAX.' caractères.', 'example' => 'Le prestataire ne s\'est pas présenté au rendez-vous.'],
             'preuves' => ['description' => 'Facultatif : '.self::PREUVES_MAX.' photos JPG, PNG ou WebP au plus (5 Mo chacune, type vérifié sur le contenu), en multipart.', 'required' => false],
         ];
+    }
+
+    public function motif(): string
+    {
+        return trim($this->validated('motif'));
     }
 
     public function description(): string

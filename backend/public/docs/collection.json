@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "bf52910c-786a-4799-ae3f-25b11e18e9ef",
+        "_postman_id": "c8ba69ed-c9a0-4c67-bca0-586a3b583ca5",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -333,7 +333,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[],\"decidePar\":null,\"sanctionId\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[],\"decidePar\":null,\"sanctionId\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -391,7 +391,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"paye\",\"montantAcompte\":4500,\"commission\":1500,\"payeLe\":\"2030-01-15T09:00:00+00:00\",\"rembourseLe\":null}],\"decidePar\":null,\"sanctionId\":null}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\",\"telephone\":\"+221770000001\",\"email\":null},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"telephone\":\"+221770000002\",\"email\":null,\"nomEntreprise\":\"Garage Exemple\"},\"prixApplique\":15000,\"paiements\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"statut\":\"paye\",\"montantAcompte\":4500,\"commission\":1500,\"payeLe\":\"2030-01-15T09:00:00+00:00\",\"rembourseLe\":null}],\"decidePar\":null,\"sanctionId\":null}",
                             "name": ""
                         },
                         {
@@ -597,7 +597,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Cet avis concerne une autre prestation que la mienne.\",\"modereLe\":null,\"moderePar\":null,\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"statut\":\"signale\",\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Cet avis concerne une autre prestation que la mienne.\",\"modereLe\":null,\"moderePar\":null,\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -658,7 +658,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":true,\"masqueLe\":\"2030-01-19T09:00:00+00:00\"}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"statut\":\"supprime\",\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":true,\"masqueLe\":\"2030-01-19T09:00:00+00:00\"}",
                             "name": ""
                         },
                         {
@@ -731,7 +731,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Avis injuste.\",\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"statut\":\"publie\",\"signaleLe\":\"2030-01-18T08:00:00+00:00\",\"motifSignalement\":\"Avis injuste.\",\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":null,\"masque\":false,\"masqueLe\":null}",
                             "name": ""
                         },
                         {
@@ -795,7 +795,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":false,\"masqueLe\":null}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":1,\"commentaire\":\"Service d\u00e9cevant.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diallo\",\"prenom\":\"Awa\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Garage Exemple\"},\"statut\":\"publie\",\"signaleLe\":null,\"motifSignalement\":null,\"modereLe\":\"2030-01-19T09:00:00+00:00\",\"moderePar\":\"0198a1b2-0000-7000-8000-000000000009\",\"motifModeration\":\"Propos injurieux sans rapport avec la prestation.\",\"masque\":false,\"masqueLe\":null}",
                             "name": ""
                         },
                         {
@@ -1307,6 +1307,12 @@
                             "mode": "formdata",
                             "formdata": [
                                 {
+                                    "key": "motif",
+                                    "value": "Prestataire absent",
+                                    "type": "text",
+                                    "description": "Raison du litige en quelques mots, de 3 \u00e0 150 caract\u00e8res. Le champ value doit contenir au moins 3 caract\u00e8res. Le champ value ne doit pas d\u00e9passer 150 caract\u00e8res."
+                                },
+                                {
                                     "key": "description",
                                     "value": "Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.",
                                     "type": "text",
@@ -1319,13 +1325,13 @@
                                 }
                             ]
                         },
-                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Un seul litige peut \u00eatre ouvert \u00e0 la fois par r\u00e9servation. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
+                        "description": "Signale un probl\u00e8me sur une de vos r\u00e9servations `confirmee`, `en_cours` ou `terminee`. Envoi JSON, ou multipart pour joindre\njusqu'\u00e0 3 photos de preuve (`preuves[]`). Une r\u00e9servation ne peut engendrer qu'un seul litige, m\u00eame une fois cl\u00f4tur\u00e9. Le prestataire peut r\u00e9pondre,\npuis un administrateur tranche. Aucun remboursement n'est d\u00e9clench\u00e9 automatiquement."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9 au rendez-vous.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
                             "name": ""
                         },
                         {
@@ -1349,13 +1355,13 @@
                         {
                             "header": [],
                             "code": 409,
-                            "body": "{\"message\":\"Un litige est d\u00e9j\u00e0 ouvert sur cette r\u00e9servation.\"}",
+                            "body": "{\"message\":\"Un litige a d\u00e9j\u00e0 \u00e9t\u00e9 ouvert pour cette r\u00e9servation.\"}",
                             "name": ""
                         },
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\"message\":\"La description doit contenir au moins 10 caract\u00e8res.\",\"errors\":{\"description\":[\"La description doit contenir au moins 10 caract\u00e8res.\"]}}",
+                            "body": "{\"message\":\"Le motif du litige est obligatoire.\",\"errors\":{\"motif\":[\"Le motif du litige est obligatoire.\"]}}",
                             "name": ""
                         },
                         {
@@ -1393,7 +1399,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -1445,7 +1451,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":\"J'\u00e9tais sur place.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\",\"preuves\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000091\",\"url\":\"\/api\/v1\/litiges\/0198a1b2-0000-7000-8000-000000000090\/preuves\/0198a1b2-0000-7000-8000-000000000091\"}],\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"cloture\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":\"J'\u00e9tais sur place.\",\"reponseLe\":\"2030-01-16T13:00:00+00:00\",\"decision\":\"rejet\",\"motifDecision\":\"Signalement non fond\u00e9.\",\"clotureLe\":\"2030-01-17T09:00:00+00:00\",\"preuves\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000091\",\"url\":\"\/api\/v1\/litiges\/0198a1b2-0000-7000-8000-000000000090\/preuves\/0198a1b2-0000-7000-8000-000000000091\"}],\"prestataire\":{\"nomEntreprise\":\"Garage Exemple\"}}",
                             "name": ""
                         },
                         {
@@ -2274,7 +2280,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:23:29+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T16:15:41+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -3540,7 +3546,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":1,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/litiges?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -3592,7 +3598,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"statut\":\"ouvert\",\"motif\":\"Prestataire absent\",\"description\":\"Le prestataire ne s'est pas pr\u00e9sent\u00e9.\",\"dateCreation\":\"2030-01-16T12:00:00+00:00\",\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"confirmee\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"prestation\":\"Vidange\"},\"nombrePreuves\":0,\"reponsePrestataire\":null,\"reponseLe\":null,\"decision\":null,\"motifDecision\":null,\"clotureLe\":null,\"preuves\":[],\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
