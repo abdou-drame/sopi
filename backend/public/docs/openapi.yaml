@@ -17,6 +17,9 @@ tags:
     name: 'Client — avis'
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur."
   -
+    name: "Client — avis d'un prestataire"
+    description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont consultables."
+  -
     name: 'Client — paiement'
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur."
   -
@@ -46,6 +49,9 @@ tags:
   -
     name: 'Prestataire — demandes de réservation'
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les réservations\nde ses propres créneaux ; celles d'un autre répondent 404, comme une réservation inexistante. Le client n'est identifié\nque par son prénom et l'initiale de son nom."
+  -
+    name: 'Prestataire — mes avis'
+    description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent."
   -
     name: "Prestataire — photos d'atelier"
     description: "\nRoutes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.\nLes clients voient ces photos sur le profil public du prestataire."
@@ -1000,6 +1006,152 @@ paths:
         required: true
         schema:
           type: string
+  '/api/v1/prestataires/{id}/avis':
+    get:
+      summary: "Avis d'un prestataire"
+      operationId: avisDunPrestataire
+      description: "Paginée (20 par page), du plus récent au plus ancien. L'auteur n'apparaît que par son prénom et l'initiale de son nom.\n`noteMoyenne` (arrondie à une décimale, `null` sans avis) et `nombreAvis` portent sur tous les avis du prestataire, pas sur la page."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      note: 4
+                      commentaire: 'Travail soigné et ponctuel.'
+                      auteur: 'Awa D.'
+                      dateCreation: '2030-01-17T10:00:00+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                  noteMoyenne: 4.0
+                  nombreAvis: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        note: 4
+                        commentaire: 'Travail soigné et ponctuel.'
+                        auteur: 'Awa D.'
+                        dateCreation: '2030-01-17T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        note:
+                          type: integer
+                          example: 4
+                        commentaire:
+                          type: string
+                          example: 'Travail soigné et ponctuel.'
+                        auteur:
+                          type: string
+                          example: 'Awa D.'
+                        dateCreation:
+                          type: string
+                          example: '2030-01-17T10:00:00+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+                  noteMoyenne:
+                    type: number
+                    example: 4.0
+                  nombreAvis:
+                    type: integer
+                    example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Prestataire introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Prestataire introuvable.'
+      tags:
+        - "Client — avis d'un prestataire"
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du prestataire.'
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
   '/api/v1/reservations/{id}/payer':
     post:
       summary: "Payer l'acompte d'une réservation"
@@ -1190,7 +1342,7 @@ paths:
     get:
       summary: "Profil d'un prestataire"
       operationId: profilDunPrestataire
-      description: "Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle et pas de note\n(les avis n'existent pas encore). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton."
+      description: "Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. `noteMoyenne` (arrondie à une décimale,\n`null` sans avis) et `nombreAvis` résument les avis (voir « Avis d'un prestataire »). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton."
       parameters: []
       responses:
         200:
@@ -1205,6 +1357,8 @@ paths:
                   metier: mecanique
                   quartier: Malika
                   adresse: 'Rue 10, près du marché'
+                  noteMoyenne: 4.5
+                  nombreAvis: 12
                   prestations:
                     -
                       id: 0198a1b2-0000-7000-8000-000000000020
@@ -1232,6 +1386,12 @@ paths:
                   adresse:
                     type: string
                     example: 'Rue 10, près du marché'
+                  noteMoyenne:
+                    type: number
+                    example: 4.5
+                  nombreAvis:
+                    type: integer
+                    example: 12
                   prestations:
                     type: array
                     example:
@@ -1394,7 +1554,7 @@ paths:
     get:
       summary: 'Rechercher des prestataires'
       operationId: rechercherDesPrestataires
-      description: "Paginée (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.\nTous les filtres sont optionnels et combinables. Aucune donnée personnelle n'est renvoyée, et pas de note (les avis n'existent pas encore).\nLa recherche ignore la casse mais pas les accents. `prixMin` et `nombrePrestations` portent sur toutes les prestations actives du prestataire."
+      description: "Paginée (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.\nTous les filtres sont optionnels et combinables. Aucune donnée personnelle n'est renvoyée. `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis` résument les avis du prestataire.\nLa recherche ignore la casse mais pas les accents. `prixMin` et `nombrePrestations` portent sur toutes les prestations actives du prestataire."
       parameters:
         -
           in: query
@@ -1498,6 +1658,8 @@ paths:
                       adresse: 'Rue 10, près du marché'
                       prixMin: 5000
                       nombrePrestations: 3
+                      noteMoyenne: 4.5
+                      nombreAvis: 12
                   links:
                     first: 'https://api.exemple.test/api/v1/prestataires?page=1'
                     last: 'https://api.exemple.test/api/v1/prestataires?page=1'
@@ -1520,6 +1682,8 @@ paths:
                         adresse: 'Rue 10, près du marché'
                         prixMin: 5000
                         nombrePrestations: 3
+                        noteMoyenne: 4.5
+                        nombreAvis: 12
                     items:
                       type: object
                       properties:
@@ -1544,6 +1708,12 @@ paths:
                         nombrePrestations:
                           type: integer
                           example: 3
+                        noteMoyenne:
+                          type: number
+                          example: 4.5
+                        nombreAvis:
+                          type: integer
+                          example: 12
                   links:
                     type: object
                     properties:
@@ -2537,7 +2707,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T14:15:26+00:00'
+                  time: '2026-10-13T14:25:37+00:00'
                 properties:
                   status:
                     type: string
@@ -2553,7 +2723,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T14:15:26+00:00'
+                    example: '2026-10-13T14:25:37+00:00'
       tags:
         - Endpoints
       security: []
@@ -4934,6 +5104,131 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/prestataire/avis:
+    get:
+      summary: 'Mes avis'
+      operationId: mesAvis
+      description: "Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au\nprénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      note: 4
+                      commentaire: 'Travail soigné et ponctuel.'
+                      auteur: 'Awa D.'
+                      dateCreation: '2030-01-17T10:00:00+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataire/avis?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataire/avis?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                  noteMoyenne: 4.0
+                  nombreAvis: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        note: 4
+                        commentaire: 'Travail soigné et ponctuel.'
+                        auteur: 'Awa D.'
+                        dateCreation: '2030-01-17T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        note:
+                          type: integer
+                          example: 4
+                        commentaire:
+                          type: string
+                          example: 'Travail soigné et ponctuel.'
+                        auteur:
+                          type: string
+                          example: 'Awa D.'
+                        dateCreation:
+                          type: string
+                          example: '2030-01-17T10:00:00+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/avis?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/avis?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+                  noteMoyenne:
+                    type: number
+                    example: 4.0
+                  nombreAvis:
+                    type: integer
+                    example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — mes avis'
   /api/v1/prestataire/photos:
     get:
       summary: 'Mes photos'

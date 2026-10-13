@@ -81,6 +81,8 @@ it('renvoie les champs attendus calculés sur les prestations actives', function
         'adresse' => 'Rue 1',
         'prixMin' => 5000,
         'nombrePrestations' => 2,
+        'noteMoyenne' => null,
+        'nombreAvis' => 0,
     ]);
 });
 
@@ -91,7 +93,7 @@ it('ne renvoie aucune donnée personnelle', function () {
     $reponse = chercher()->assertOk();
     $contenu = $reponse->getContent();
 
-    expect(array_keys($reponse->json('data.0')))->toBe(['id', 'nomEntreprise', 'metier', 'quartier', 'adresse', 'prixMin', 'nombrePrestations'])
+    expect(array_keys($reponse->json('data.0')))->toBe(['id', 'nomEntreprise', 'metier', 'quartier', 'adresse', 'prixMin', 'nombrePrestations', 'noteMoyenne', 'nombreAvis'])
         ->and($contenu)->not->toContain($user->telephone)
         ->and($contenu)->not->toContain($user->id)
         ->and($contenu)->not->toContain((string) $user->email)

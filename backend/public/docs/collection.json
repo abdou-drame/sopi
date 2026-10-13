@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "d50d8bcf-9bb0-4a6d-9cb5-661865cb1f23",
+        "_postman_id": "c5366e7f-d524-4595-a7d2-42cb4bb75148",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -458,6 +458,70 @@
             ]
         },
         {
+            "name": "Client \u2014 avis d'un prestataire",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont consultables.",
+            "item": [
+                {
+                    "name": "Avis d'un prestataire",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataires\/:id\/avis",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires\/:id\/avis",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du prestataire."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien. L'auteur n'appara\u00eet que par son pr\u00e9nom et l'initiale de son nom.\n`noteMoyenne` (arrondie \u00e0 une d\u00e9cimale, `null` sans avis) et `nombreAvis` portent sur tous les avis du prestataire, pas sur la page."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":4,\"commentaire\":\"Travail soign\u00e9 et ponctuel.\",\"auteur\":\"Awa D.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires\/0198a1b2-0000-7000-8000-000000000002\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires\/0198a1b2-0000-7000-8000-000000000002\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1},\"noteMoyenne\":4.0,\"nombreAvis\":1}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Prestataire introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 paiement",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`), limit\u00e9es \u00e0 10 requ\u00eates par minute et par utilisateur.",
             "item": [
@@ -578,13 +642,13 @@
                             }
                         ],
                         "body": null,
-                        "description": "Informations publiques, prestations actives et photos d'atelier. Aucune donn\u00e9e personnelle et pas de note\n(les avis n'existent pas encore). `url` est un chemin de l'API \u00e0 compl\u00e9ter avec l'URL de base ; l'image se charge avec le jeton."
+                        "description": "Informations publiques, prestations actives et photos d'atelier. Aucune donn\u00e9e personnelle. `noteMoyenne` (arrondie \u00e0 une d\u00e9cimale,\n`null` sans avis) et `nombreAvis` r\u00e9sument les avis (voir \u00ab Avis d'un prestataire \u00bb). `url` est un chemin de l'API \u00e0 compl\u00e9ter avec l'URL de base ; l'image se charge avec le jeton."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"prestations\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":60,\"prix\":15000}],\"photos\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"url\":\"\/api\/v1\/prestataires\/0198a1b2-0000-7000-8000-000000000002\/photos\/0198a1b2-0000-7000-8000-000000000030\"}]}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"noteMoyenne\":4.5,\"nombreAvis\":12,\"prestations\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"nom\":\"Vidange compl\u00e8te\",\"domaine\":\"mecanique\",\"dureeMinutes\":60,\"prix\":15000}],\"photos\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"url\":\"\/api\/v1\/prestataires\/0198a1b2-0000-7000-8000-000000000002\/photos\/0198a1b2-0000-7000-8000-000000000030\"}]}",
                             "name": ""
                         },
                         {
@@ -741,13 +805,13 @@
                             }
                         ],
                         "body": null,
-                        "description": "Pagin\u00e9e (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.\nTous les filtres sont optionnels et combinables. Aucune donn\u00e9e personnelle n'est renvoy\u00e9e, et pas de note (les avis n'existent pas encore).\nLa recherche ignore la casse mais pas les accents. `prixMin` et `nombrePrestations` portent sur toutes les prestations actives du prestataire."
+                        "description": "Pagin\u00e9e (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.\nTous les filtres sont optionnels et combinables. Aucune donn\u00e9e personnelle n'est renvoy\u00e9e. `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis` r\u00e9sument les avis du prestataire.\nLa recherche ignore la casse mais pas les accents. `prixMin` et `nombrePrestations` portent sur toutes les prestations actives du prestataire."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"prixMin\":5000,\"nombrePrestations\":3}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"prixMin\":5000,\"nombrePrestations\":3,\"noteMoyenne\":4.5,\"nombreAvis\":12}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataires?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -1221,7 +1285,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T14:15:26+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T14:25:37+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2450,6 +2514,56 @@
                             "header": [],
                             "code": 429,
                             "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Prestataire \u2014 mes avis",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux prestataires (jeton Sanctum + r\u00f4le `prestataire`). Un prestataire ne voit que les avis qui le concernent.",
+            "item": [
+                {
+                    "name": "Mes avis",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/avis",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/avis"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "M\u00eames donn\u00e9es que la consultation par les clients : pagin\u00e9e (20 par page), du plus r\u00e9cent au plus ancien, auteur r\u00e9duit au\npr\u00e9nom et \u00e0 l'initiale du nom, `noteMoyenne` (une d\u00e9cimale, `null` sans avis) et `nombreAvis`."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"note\":4,\"commentaire\":\"Travail soign\u00e9 et ponctuel.\",\"auteur\":\"Awa D.\",\"dateCreation\":\"2030-01-17T10:00:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/avis?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/avis?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1},\"noteMoyenne\":4.0,\"nombreAvis\":1}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
                             "name": ""
                         }
                     ]

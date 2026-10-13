@@ -32,7 +32,7 @@ endpoints:
       -
         custom: []
         status: 503
-        content: '{"status":"ok","app":"Sopi","version":"0.1.0","database":"erreur","time":"2026-10-13T14:15:26+00:00"}'
+        content: '{"status":"ok","app":"Sopi","version":"0.1.0","database":"erreur","time":"2026-10-13T14:25:37+00:00"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json

@@ -17,7 +17,9 @@ class ProfilPublicService
     public function trouver(string $id): ?Prestataire
     {
         return $this->visible($id)
-            ?->load(['prestations' => fn ($q) => $q->where('actif', true)->orderBy('nom')->orderBy('id')]);
+            ?->loadAvg('avis as note_moyenne', 'note')
+            ->loadCount('avis as nombre_avis')
+            ->load(['prestations' => fn ($q) => $q->where('actif', true)->orderBy('nom')->orderBy('id')]);
     }
 
     public function photo(string $id, string $photo): ?StreamedResponse
@@ -27,7 +29,8 @@ class ProfilPublicService
         return $prestataire ? $this->photos->flux($prestataire, $photo) : null;
     }
 
-    private function visible(string $id): ?Prestataire
+    /** Prestataire dont le compte est actif, ou null (inconnu, identifiant invalide ou compte non actif). */
+    public function visible(string $id): ?Prestataire
     {
         if (! Str::isUuid($id)) {
             return null;

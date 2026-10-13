@@ -108,6 +108,16 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-client-avis-dun-prestataire" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="client-avis-dun-prestataire">
+                    <a href="#client-avis-dun-prestataire">Client — avis d'un prestataire</a>
+                </li>
+                                    <ul id="tocify-subheader-client-avis-dun-prestataire" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="client-avis-dun-prestataire-GETapi-v1-prestataires--id--avis">
+                                <a href="#client-avis-dun-prestataire-GETapi-v1-prestataires--id--avis">Avis d'un prestataire</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-client-paiement" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="client-paiement">
                     <a href="#client-paiement">Client — paiement</a>
@@ -268,6 +278,16 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-demandes-de-reservation-POSTapi-v1-prestataire-reservations--id--terminer">
                                 <a href="#prestataire-demandes-de-reservation-POSTapi-v1-prestataire-reservations--id--terminer">Terminer la prestation</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-prestataire-mes-avis" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="prestataire-mes-avis">
+                    <a href="#prestataire-mes-avis">Prestataire — mes avis</a>
+                </li>
+                                    <ul id="tocify-subheader-prestataire-mes-avis" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="prestataire-mes-avis-GETapi-v1-prestataire-avis">
+                                <a href="#prestataire-mes-avis-GETapi-v1-prestataire-avis">Mes avis</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -1816,6 +1836,208 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
+                <h1 id="client-avis-dun-prestataire">Client — avis d'un prestataire</h1>
+
+    <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>). Seuls les prestataires dont le compte est actif sont consultables.</p>
+
+                                <h2 id="client-avis-dun-prestataire-GETapi-v1-prestataires--id--avis">Avis d&#039;un prestataire</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Paginée (20 par page), du plus récent au plus ancien. L'auteur n'apparaît que par son prénom et l'initiale de son nom.
+<code>noteMoyenne</code> (arrondie à une décimale, <code>null</code> sans avis) et <code>nombreAvis</code> portent sur tous les avis du prestataire, pas sur la page.</p>
+
+<span id="example-requests-GETapi-v1-prestataires--id--avis">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataires--id--avis">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000080&quot;,
+            &quot;note&quot;: 4,
+            &quot;commentaire&quot;: &quot;Travail soign&eacute; et ponctuel.&quot;,
+            &quot;auteur&quot;: &quot;Awa D.&quot;,
+            &quot;dateCreation&quot;: &quot;2030-01-17T10:00:00+00:00&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/avis?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    },
+    &quot;noteMoyenne&quot;: 4,
+    &quot;nombreAvis&quot;: 1
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (404):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Prestataire introuvable.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataires--id--avis" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataires--id--avis"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataires--id--avis"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataires--id--avis" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataires--id--avis">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataires--id--avis" data-method="GET"
+      data-path="api/v1/prestataires/{id}/avis"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataires--id--avis', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataires--id--avis"
+                    onclick="tryItOut('GETapi-v1-prestataires--id--avis');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataires--id--avis"
+                    onclick="cancelTryOut('GETapi-v1-prestataires--id--avis');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataires--id--avis"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataires/{id}/avis</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataires--id--avis"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataires--id--avis"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataires--id--avis"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        <h4 class="fancy-heading-panel"><b>URL Parameters</b></h4>
+                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>id</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="id"                data-endpoint="GETapi-v1-prestataires--id--avis"
+               value="0198a1b2-0000-7000-8000-000000000002"
+               data-component="url">
+    <br>
+<p>Identifiant du prestataire. Example: <code>0198a1b2-0000-7000-8000-000000000002</code></p>
+            </div>
+                    </form>
+
                 <h1 id="client-paiement">Client — paiement</h1>
 
     <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>), limitées à 10 requêtes par minute et par utilisateur.</p>
@@ -2067,8 +2289,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle et pas de note
-(les avis n'existent pas encore). <code>url</code> est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.</p>
+<p>Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. <code>noteMoyenne</code> (arrondie à une décimale,
+<code>null</code> sans avis) et <code>nombreAvis</code> résument les avis (voir « Avis d'un prestataire »). <code>url</code> est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.</p>
 
 <span id="example-requests-GETapi-v1-prestataires--id-">
 <blockquote>Example request:</blockquote>
@@ -2113,6 +2335,8 @@ fetch(url, {
     &quot;metier&quot;: &quot;mecanique&quot;,
     &quot;quartier&quot;: &quot;Malika&quot;,
     &quot;adresse&quot;: &quot;Rue 10, pr&egrave;s du march&eacute;&quot;,
+    &quot;noteMoyenne&quot;: 4.5,
+    &quot;nombreAvis&quot;: 12,
     &quot;prestations&quot;: [
         {
             &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000020&quot;,
@@ -2452,7 +2676,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </p>
 
 <p>Paginée (20 par page). Ne renvoie que les prestataires dont le compte est actif et qui ont au moins une prestation active.
-Tous les filtres sont optionnels et combinables. Aucune donnée personnelle n'est renvoyée, et pas de note (les avis n'existent pas encore).
+Tous les filtres sont optionnels et combinables. Aucune donnée personnelle n'est renvoyée. <code>noteMoyenne</code> (une décimale, <code>null</code> sans avis) et <code>nombreAvis</code> résument les avis du prestataire.
 La recherche ignore la casse mais pas les accents. <code>prixMin</code> et <code>nombrePrestations</code> portent sur toutes les prestations actives du prestataire.</p>
 
 <span id="example-requests-GETapi-v1-prestataires">
@@ -2513,7 +2737,9 @@ fetch(url, {
             &quot;quartier&quot;: &quot;Malika&quot;,
             &quot;adresse&quot;: &quot;Rue 10, pr&egrave;s du march&eacute;&quot;,
             &quot;prixMin&quot;: 5000,
-            &quot;nombrePrestations&quot;: 3
+            &quot;nombrePrestations&quot;: 3,
+            &quot;noteMoyenne&quot;: 4.5,
+            &quot;nombreAvis&quot;: 12
         }
     ],
     &quot;links&quot;: {
@@ -4073,7 +4299,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-13T14:15:26+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-13T14:25:37+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -8381,6 +8607,186 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Identifiant de la réservation. Example: <code>0198a1b2-0000-7000-8000-000000000060</code></p>
             </div>
                     </form>
+
+                <h1 id="prestataire-mes-avis">Prestataire — mes avis</h1>
+
+    <p>Routes réservées aux prestataires (jeton Sanctum + rôle <code>prestataire</code>). Un prestataire ne voit que les avis qui le concernent.</p>
+
+                                <h2 id="prestataire-mes-avis-GETapi-v1-prestataire-avis">Mes avis</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au
+prénom et à l'initiale du nom, <code>noteMoyenne</code> (une décimale, <code>null</code> sans avis) et <code>nombreAvis</code>.</p>
+
+<span id="example-requests-GETapi-v1-prestataire-avis">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataire/avis" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/avis"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataire-avis">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000080&quot;,
+            &quot;note&quot;: 4,
+            &quot;commentaire&quot;: &quot;Travail soign&eacute; et ponctuel.&quot;,
+            &quot;auteur&quot;: &quot;Awa D.&quot;,
+            &quot;dateCreation&quot;: &quot;2030-01-17T10:00:00+00:00&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/prestataire/avis?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/prestataire/avis?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    },
+    &quot;noteMoyenne&quot;: 4,
+    &quot;nombreAvis&quot;: 1
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataire-avis" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataire-avis"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataire-avis"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataire-avis" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataire-avis">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataire-avis" data-method="GET"
+      data-path="api/v1/prestataire/avis"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataire-avis', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataire-avis"
+                    onclick="tryItOut('GETapi-v1-prestataire-avis');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataire-avis"
+                    onclick="cancelTryOut('GETapi-v1-prestataire-avis');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataire-avis"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataire/avis</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataire-avis"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataire-avis"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataire-avis"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
 
                 <h1 id="prestataire-photos-datelier">Prestataire — photos d'atelier</h1>
 
