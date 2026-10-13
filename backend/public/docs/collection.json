@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "15a20833-d84d-432c-9bea-f006c62b53b2",
+        "_postman_id": "604207b1-362f-425d-84e1-6b6eac730a11",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -484,9 +484,9 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\"decision\":\"rejet\",\"motif\":\"Le prestataire a prouv\u00e9 sa pr\u00e9sence sur place.\"}"
+                            "raw": "{\"decision\":\"rejet\",\"motif\":\"Le prestataire a prouv\u00e9 sa pr\u00e9sence sur place.\",\"cible\":\"prestataire\",\"dateFin\":\"2030-02-01T00:00:00+00:00\"}"
                         },
-                        "description": "Cl\u00f4ture un litige ouvert par une d\u00e9cision motiv\u00e9e (`rejet` pour l'instant). Un litige d\u00e9j\u00e0 cl\u00f4tur\u00e9 r\u00e9pond 409, y compris\nsi deux d\u00e9cisions arrivent en m\u00eame temps : une seule est retenue."
+                        "description": "Cl\u00f4ture un litige ouvert par une d\u00e9cision motiv\u00e9e (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une d\u00e9cision de sanction pose la sanction sur le `prestataire` (d\u00e9faut) ou le `client` dans la m\u00eame transaction que la cl\u00f4ture (voir \u00ab Administration \u2014 sanctions \u00bb pour ses effets). Un litige d\u00e9j\u00e0 cl\u00f4tur\u00e9 r\u00e9pond 409, y compris\nsi deux d\u00e9cisions arrivent en m\u00eame temps : une seule est retenue."
                     },
                     "response": [
                         {
@@ -523,6 +523,219 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le motif de la d\u00e9cision est obligatoire.\",\"errors\":{\"motif\":[\"Le motif de la d\u00e9cision est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 sanctions",
+            "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Poser et lever une sanction sont limit\u00e9s \u00e0 10 requ\u00eates par minute.\nUne suspension ou un bannissement est \u00ab tout ou rien \u00bb : sanction, statut du compte et r\u00e9vocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndispara\u00eet de la recherche et du profil public, et ses r\u00e9servations \u00e0 venir (en attente, accept\u00e9es, confirm\u00e9es pour un prestataire ;\nen attente et accept\u00e9es pour un client) sont annul\u00e9es, un prestataire sanctionn\u00e9 voyant l'acompte vers\u00e9 rembours\u00e9 en int\u00e9gralit\u00e9.\nUne prestation en cours va \u00e0 son terme. Le solde et les retraits ne sont pas modifi\u00e9s. Un administrateur ne peut pas \u00eatre sanctionn\u00e9.",
+            "item": [
+                {
+                    "name": "Poser une sanction",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant de l'utilisateur sanctionn\u00e9."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":\"0198a1b2-0000-7000-8000-000000000090\",\"avisId\":\"0198a1b2-0000-7000-8000-000000000080\"}"
+                        },
+                        "description": "Sanctionne un client ou un prestataire. Un compte ne peut porter qu'une seule suspension ou un seul bannissement actif \u00e0 la fois."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":true,\"leveeLe\":null,\"leveePar\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Un administrateur ne peut pas \u00eatre sanctionn\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Utilisateur introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Ce compte fait d\u00e9j\u00e0 l'objet d'une sanction active.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La date de fin de la suspension est obligatoire.\",\"errors\":{\"dateFin\":[\"La date de fin de la suspension est obligatoire.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Historique des sanctions d'un utilisateur",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs\/:id\/sanctions",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant de l'utilisateur."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Toutes les sanctions du compte, lev\u00e9es ou non, de la plus r\u00e9cente \u00e0 la plus ancienne. Jamais supprim\u00e9es."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"avertissement\",\"motif\":\"Retards r\u00e9p\u00e9t\u00e9s.\",\"dateFin\":null,\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":true,\"leveeLe\":null,\"leveePar\":null}]}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Utilisateur introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Lever une sanction",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/sanctions\/:id\/lever",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/sanctions\/:id\/lever",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000100",
+                                    "description": "Identifiant de la sanction."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Met fin \u00e0 une sanction active. Pour une suspension ou un bannissement, le compte redevient actif. Une sanction d\u00e9j\u00e0 lev\u00e9e r\u00e9pond 409.\nLes suspensions arriv\u00e9es \u00e0 \u00e9ch\u00e9ance sont lev\u00e9es automatiquement (toutes les 5 minutes)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000100\",\"utilisateurId\":\"0198a1b2-0000-7000-8000-000000000002\",\"type\":\"suspension_temporaire\",\"motif\":\"Comportement injurieux envers un client.\",\"dateFin\":\"2030-02-01T00:00:00+00:00\",\"litigeId\":null,\"avisId\":null,\"posePar\":\"0198a1b2-0000-7000-8000-000000000001\",\"dateCreation\":\"2030-01-20T10:00:00+00:00\",\"active\":false,\"leveeLe\":\"2030-01-21T08:00:00+00:00\",\"leveePar\":\"0198a1b2-0000-7000-8000-000000000001\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Sanction introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 409,
+                            "body": "{\"message\":\"Cette sanction est d\u00e9j\u00e0 lev\u00e9e.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]
@@ -1764,7 +1977,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:03:08+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T15:15:56+00:00\"}",
                             "name": ""
                         }
                     ]

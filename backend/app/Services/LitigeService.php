@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -30,6 +31,8 @@ use Throwable;
  */
 class LitigeService
 {
+    public function __construct(private readonly SanctionService $sanctions) {}
+
     /** Statuts de réservation sur lesquels un litige est possible : la prestation a été confirmée (payée) au moins. */
     public const STATUTS_ELIGIBLES = [StatutReservation::Confirmee, StatutReservation::EnCours, StatutReservation::Terminee];
 
@@ -135,11 +138,14 @@ class LitigeService
 
     /**
      * Clôture d'un litige ouvert par une décision motivée. Mise à jour conditionnelle : deux décisions simultanées,
-     * une seule passe. Le rejet ne touche à aucun compte ; les décisions de sanction arrivent avec les sanctions (M9.3).
+     * une seule passe. Le rejet ne touche à aucun compte. Une décision de sanction pose la sanction (avec le motif de la
+     * décision) sur le prestataire ou le client, dans la MÊME transaction que la clôture : tout passe ou rien.
      *
-     * @throws ReservationImpossibleException 404 (inconnu), 409 (déjà clôturé)
+     * @param  string  $cible  `prestataire` ou `client` : le compte sanctionné par une décision de sanction
+     *
+     * @throws ReservationImpossibleException 404 (inconnu), 409 (déjà clôturé, sanction impossible), 403 (administrateur visé)
      */
-    public function trancher(User $admin, string $id, DecisionLitige $decision, string $motif): Litige
+    public function trancher(User $admin, string $id, DecisionLitige $decision, string $motif, string $cible = 'prestataire', ?Carbon $dateFin = null): Litige
     {
         $litige = Str::isUuid($id) ? Litige::query()->find($id) : null;
 
@@ -147,7 +153,7 @@ class LitigeService
             throw new ReservationImpossibleException('Litige introuvable.', Response::HTTP_NOT_FOUND);
         }
 
-        return DB::transaction(function () use ($admin, $litige, $decision, $motif) {
+        $cloturer = function () use ($admin, $litige, $decision, $motif) {
             $maintenant = now();
             $mis = Litige::query()
                 ->whereKey($litige->id)
@@ -165,11 +171,20 @@ class LitigeService
                 throw new ReservationImpossibleException('Ce litige est déjà clôturé.', Response::HTTP_CONFLICT);
             }
 
-            $cloture = $this->charger($litige->fresh());
-            LitigeCloture::dispatch($cloture);
+            LitigeCloture::dispatch($this->charger($litige->fresh()));
+        };
 
-            return $cloture;
-        });
+        $type = $decision->typeSanction();
+        if ($type === null) {
+            DB::transaction($cloturer);
+        } else {
+            $litige->loadMissing('prestataire.user', 'client');
+            $compte = $cible === 'client' ? $litige->client : $litige->prestataire->user;
+
+            $this->sanctions->poser($admin, $compte, $type, $motif, $dateFin, $litige, null, $cloturer);
+        }
+
+        return $this->charger($litige->fresh());
     }
 
     public function listerPourClient(User $client): LengthAwarePaginator

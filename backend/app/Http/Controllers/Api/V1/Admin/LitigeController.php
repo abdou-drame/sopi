@@ -64,7 +64,7 @@ class LitigeController extends Controller
     /**
      * Trancher un litige
      *
-     * Clôture un litige ouvert par une décision motivée (`rejet` pour l'instant). Un litige déjà clôturé répond 409, y compris
+     * Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris
      * si deux décisions arrivent en même temps : une seule est retenue.
      *
      * @authenticated
@@ -81,7 +81,7 @@ class LitigeController extends Controller
     public function trancher(TrancherLitigeRequest $requete, string $id): JsonResponse|LitigeResource
     {
         try {
-            $litige = $this->service->trancher($requete->user(), $id, $requete->decision(), $requete->motif());
+            $litige = $this->service->trancher($requete->user(), $id, $requete->decision(), $requete->motif(), $requete->cible(), $requete->dateFin());
         } catch (ReservationImpossibleException $e) {
             return response()->json(['message' => $e->getMessage()], $e->statut);
         }

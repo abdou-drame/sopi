@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\InscriptionRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\BlocageConnexionService;
+use App\Services\SanctionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -31,7 +32,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage): JsonResponse
+    public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage, SanctionService $sanctions): JsonResponse
     {
         $telephone = $request->validated('telephone');
 
@@ -59,7 +60,7 @@ class AuthController extends Controller
 
         // Seul un compte actif s'authentifie ; le statut n'est révélé qu'avec le bon mot de passe.
         if (! $user->estActif()) {
-            return response()->json(['message' => $user->statut->messageRefus()], 403);
+            return response()->json(['message' => $sanctions->messageRefusConnexion($user)], 403);
         }
 
         return response()->json([
@@ -74,6 +75,7 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Vous êtes déconnecté.']);
     }
+
     // Empreinte factice (calculée une fois) : sert à exécuter Hash::check même si le numéro est inconnu.
     private function empreinteFactice(): string
     {
@@ -81,6 +83,7 @@ class AuthController extends Controller
 
         return $empreinte ??= Hash::make(Str::random(40));
     }
+
     public function moi(Request $request): UserResource
     {
         return new UserResource($request->user());

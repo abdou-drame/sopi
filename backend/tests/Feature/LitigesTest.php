@@ -452,7 +452,7 @@ describe('administration', function () {
         expect($litige->fresh()->statut)->toBe(StatutLitige::Ouvert);
     })->with([
         'décision absente' => [['motif' => 'Un motif suffisant.'], 'decision', 'La décision est obligatoire.'],
-        'décision inconnue' => [['decision' => 'condamnation', 'motif' => 'Un motif suffisant.'], 'decision', 'La décision doit être : rejet.'],
+        'décision inconnue' => [['decision' => 'condamnation', 'motif' => 'Un motif suffisant.'], 'decision', 'La décision doit être : rejet, avertissement, suspension_temporaire, bannissement_definitif.'],
         'motif absent' => [['decision' => 'rejet'], 'motif', 'Le motif de la décision est obligatoire.'],
         'motif trop court' => [['decision' => 'rejet', 'motif' => 'court'], 'motif', 'Le motif doit contenir au moins 10 caractères.'],
     ]);

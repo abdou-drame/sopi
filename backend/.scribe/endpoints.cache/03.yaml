@@ -247,7 +247,7 @@ endpoints:
       subgroupDescription: ''
       title: 'Trancher un litige'
       description: |-
-        Clôture un litige ouvert par une décision motivée (`rejet` pour l'instant). Un litige déjà clôturé répond 409, y compris
+        Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris
         si deux décisions arrivent en même temps : une seule est retenue.
       authenticated: true
       deprecated: false
@@ -275,19 +275,22 @@ endpoints:
       decision:
         custom: []
         name: decision
-        description: 'Décision : rejet.'
+        description: 'Décision : rejet, avertissement, suspension_temporaire, bannissement_definitif.'
         required: true
         example: rejet
         type: string
         enumValues:
           - rejet
+          - avertissement
+          - suspension_temporaire
+          - bannissement_definitif
         exampleWasSpecified: false
         nullable: false
         deprecated: false
       motif:
         custom: []
         name: motif
-        description: 'Motif de la décision, de 10 à 1000 caractères. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        description: 'Motif de la décision, de 10 à 1000 caractères. Il sert aussi de motif à la sanction éventuelle. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
         required: true
         example: 'Le prestataire a prouvé sa présence sur place.'
         type: string
@@ -295,9 +298,35 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      cible:
+        custom: []
+        name: cible
+        description: 'Compte sanctionné par une décision de sanction : prestataire, client (défaut : prestataire).'
+        required: false
+        example: prestataire
+        type: string
+        enumValues:
+          - prestataire
+          - client
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      dateFin:
+        custom: []
+        name: dateFin
+        description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>decision</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+        required: false
+        example: '2030-02-01T00:00:00+00:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
       decision: rejet
       motif: 'Le prestataire a prouvé sa présence sur place.'
+      cible: prestataire
+      dateFin: '2030-02-01T00:00:00+00:00'
     fileParameters: []
     responses:
       -

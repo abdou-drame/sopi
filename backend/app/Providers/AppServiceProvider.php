@@ -50,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('retrait', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
         // Dépôt d'un avis : 10 par minute et par utilisateur.
         RateLimiter::for('avis', fn (Request $request) => Limit::perMinute(10)->by($parUtilisateur($request)));
+        // Poser ou lever une sanction : 10 par minute et par administrateur.
+        RateLimiter::for('sanction', fn (Request $request) => Limit::perMinute(10)->by($parUtilisateur($request)));
         // Ouverture d'un litige par le client, réponse du prestataire et décision de l'administrateur.
         RateLimiter::for('litige', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));

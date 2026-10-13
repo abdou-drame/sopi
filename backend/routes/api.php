@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
@@ -51,6 +52,10 @@ Route::prefix('v1')->group(function () {
         Route::get('/litiges/{id}', [AdminLitigeController::class, 'show']);
         Route::get('/litiges/{id}/preuves/{preuve}', [AdminLitigeController::class, 'preuve'])->name('admin.litiges.preuve');
         Route::post('/litiges/{id}/trancher', [AdminLitigeController::class, 'trancher'])->middleware('throttle:litige');
+
+        Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
+        Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
+        Route::post('/sanctions/{id}/lever', [AdminSanctionController::class, 'lever'])->middleware('throttle:sanction');
     });
 
     // Espace client : jeton Sanctum + rôle client.

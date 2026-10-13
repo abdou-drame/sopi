@@ -14,6 +14,9 @@ tags:
     name: 'Administration — litiges'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;\nelle ne déclenche aucun mouvement d'argent automatique."
   -
+    name: 'Administration — sanctions'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Poser et lever une sanction sont limités à 10 requêtes par minute.\nUne suspension ou un bannissement est « tout ou rien » : sanction, statut du compte et révocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndisparaît de la recherche et du profil public, et ses réservations à venir (en attente, acceptées, confirmées pour un prestataire ;\nen attente et acceptées pour un client) sont annulées, un prestataire sanctionné voyant l'acompte versé remboursé en intégralité.\nUne prestation en cours va à son terme. Le solde et les retraits ne sont pas modifiés. Un administrateur ne peut pas être sanctionné."
+  -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -1318,7 +1321,7 @@ paths:
     post:
       summary: 'Trancher un litige'
       operationId: trancherUnLitige
-      description: "Clôture un litige ouvert par une décision motivée (`rejet` pour l'instant). Un litige déjà clôturé répond 409, y compris\nsi deux décisions arrivent en même temps : une seule est retenue."
+      description: "Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris\nsi deux décisions arrivent en même temps : une seule est retenue."
       parameters: []
       responses:
         200:
@@ -1432,14 +1435,30 @@ paths:
               properties:
                 decision:
                   type: string
-                  description: 'Décision : rejet.'
+                  description: 'Décision : rejet, avertissement, suspension_temporaire, bannissement_definitif.'
                   example: rejet
                   enum:
                     - rejet
+                    - avertissement
+                    - suspension_temporaire
+                    - bannissement_definitif
                 motif:
                   type: string
-                  description: 'Motif de la décision, de 10 à 1000 caractères. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  description: 'Motif de la décision, de 10 à 1000 caractères. Il sert aussi de motif à la sanction éventuelle. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
                   example: 'Le prestataire a prouvé sa présence sur place.'
+                cible:
+                  type: string
+                  description: 'Compte sanctionné par une décision de sanction : prestataire, client (défaut : prestataire).'
+                  example: prestataire
+                  enum:
+                    - prestataire
+                    - client
+                  nullable: true
+                dateFin:
+                  type: string
+                  description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>decision</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+                  example: '2030-02-01T00:00:00+00:00'
+                  nullable: true
               required:
                 - decision
                 - motif
@@ -1449,6 +1468,467 @@ paths:
         name: id
         description: 'Identifiant du litige.'
         example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/utilisateurs/{id}/sanctions':
+    post:
+      summary: 'Poser une sanction'
+      operationId: poserUneSanction
+      description: "Sanctionne un client ou un prestataire. Un compte ne peut porter qu'une seule suspension ou un seul bannissement actif à la fois."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                  type: suspension_temporaire
+                  motif: 'Comportement injurieux envers un client.'
+                  dateFin: '2030-02-01T00:00:00+00:00'
+                  litigeId: null
+                  avisId: null
+                  posePar: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation: '2030-01-20T10:00:00+00:00'
+                  active: true
+                  leveeLe: null
+                  leveePar: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  type:
+                    type: string
+                    example: suspension_temporaire
+                  motif:
+                    type: string
+                    example: 'Comportement injurieux envers un client.'
+                  dateFin:
+                    type: string
+                    example: '2030-02-01T00:00:00+00:00'
+                  litigeId:
+                    type: string
+                    example: null
+                    nullable: true
+                  avisId:
+                    type: string
+                    example: null
+                    nullable: true
+                  posePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  active:
+                    type: boolean
+                    example: true
+                  leveeLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  leveePar:
+                    type: string
+                    example: null
+                    nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Un administrateur ne peut pas être sanctionné.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Un administrateur ne peut pas être sanctionné.'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Utilisateur introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Utilisateur introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Ce compte fait déjà l'objet d'une sanction active."
+                properties:
+                  message:
+                    type: string
+                    example: "Ce compte fait déjà l'objet d'une sanction active."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La date de fin de la suspension est obligatoire.'
+                  errors:
+                    dateFin:
+                      - 'La date de fin de la suspension est obligatoire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La date de fin de la suspension est obligatoire.'
+                  errors:
+                    type: object
+                    properties:
+                      dateFin:
+                        type: array
+                        example:
+                          - 'La date de fin de la suspension est obligatoire.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Administration — sanctions'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: 'avertissement, suspension_temporaire ou bannissement_definitif.'
+                  example: suspension_temporaire
+                  enum:
+                    - avertissement
+                    - suspension_temporaire
+                    - bannissement_definitif
+                motif:
+                  type: string
+                  description: 'Motif de la sanction, de 10 à 1000 caractères. Il est montré à la personne sanctionnée quand elle tente de se connecter. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+                  example: 'Comportement injurieux envers un client.'
+                dateFin:
+                  type: string
+                  description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>type</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+                  example: '2030-02-01T00:00:00+00:00'
+                  nullable: true
+                litigeId:
+                  type: string
+                  description: "Litige à l'origine de la sanction (le compte doit en être une partie). Facultatif. validation.uuid."
+                  example: 0198a1b2-0000-7000-8000-000000000090
+                  nullable: true
+                avisId:
+                  type: string
+                  description: "Avis à l'origine de la sanction (le compte doit en être l'auteur). Facultatif. validation.uuid."
+                  example: 0198a1b2-0000-7000-8000-000000000080
+                  nullable: true
+              required:
+                - type
+                - motif
+    get:
+      summary: "Historique des sanctions d'un utilisateur"
+      operationId: historiqueDesSanctionsDunUtilisateur
+      description: 'Toutes les sanctions du compte, levées ou non, de la plus récente à la plus ancienne. Jamais supprimées.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000100
+                      utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                      type: avertissement
+                      motif: 'Retards répétés.'
+                      dateFin: null
+                      litigeId: null
+                      avisId: null
+                      posePar: 0198a1b2-0000-7000-8000-000000000001
+                      dateCreation: '2030-01-20T10:00:00+00:00'
+                      active: true
+                      leveeLe: null
+                      leveePar: null
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000100
+                        utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                        type: avertissement
+                        motif: 'Retards répétés.'
+                        dateFin: null
+                        litigeId: null
+                        avisId: null
+                        posePar: 0198a1b2-0000-7000-8000-000000000001
+                        dateCreation: '2030-01-20T10:00:00+00:00'
+                        active: true
+                        leveeLe: null
+                        leveePar: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000100
+                        utilisateurId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000002
+                        type:
+                          type: string
+                          example: avertissement
+                        motif:
+                          type: string
+                          example: 'Retards répétés.'
+                        dateFin:
+                          type: string
+                          example: null
+                          nullable: true
+                        litigeId:
+                          type: string
+                          example: null
+                          nullable: true
+                        avisId:
+                          type: string
+                          example: null
+                          nullable: true
+                        posePar:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000001
+                        dateCreation:
+                          type: string
+                          example: '2030-01-20T10:00:00+00:00'
+                        active:
+                          type: boolean
+                          example: true
+                        leveeLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        leveePar:
+                          type: string
+                          example: null
+                          nullable: true
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Utilisateur introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Utilisateur introuvable.'
+      tags:
+        - 'Administration — sanctions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'utilisateur sanctionné."
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
+  '/api/v1/admin/sanctions/{id}/lever':
+    post:
+      summary: 'Lever une sanction'
+      operationId: leverUneSanction
+      description: "Met fin à une sanction active. Pour une suspension ou un bannissement, le compte redevient actif. Une sanction déjà levée répond 409.\nLes suspensions arrivées à échéance sont levées automatiquement (toutes les 5 minutes)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId: 0198a1b2-0000-7000-8000-000000000002
+                  type: suspension_temporaire
+                  motif: 'Comportement injurieux envers un client.'
+                  dateFin: '2030-02-01T00:00:00+00:00'
+                  litigeId: null
+                  avisId: null
+                  posePar: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation: '2030-01-20T10:00:00+00:00'
+                  active: false
+                  leveeLe: '2030-01-21T08:00:00+00:00'
+                  leveePar: 0198a1b2-0000-7000-8000-000000000001
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000100
+                  utilisateurId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  type:
+                    type: string
+                    example: suspension_temporaire
+                  motif:
+                    type: string
+                    example: 'Comportement injurieux envers un client.'
+                  dateFin:
+                    type: string
+                    example: '2030-02-01T00:00:00+00:00'
+                  litigeId:
+                    type: string
+                    example: null
+                    nullable: true
+                  avisId:
+                    type: string
+                    example: null
+                    nullable: true
+                  posePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  active:
+                    type: boolean
+                    example: false
+                  leveeLe:
+                    type: string
+                    example: '2030-01-21T08:00:00+00:00'
+                  leveePar:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000001
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Sanction introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Sanction introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Cette sanction est déjà levée.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Cette sanction est déjà levée.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - 'Administration — sanctions'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la sanction.'
+        example: 0198a1b2-0000-7000-8000-000000000100
         required: true
         schema:
           type: string
@@ -3979,7 +4459,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T15:03:08+00:00'
+                  time: '2026-10-13T15:15:56+00:00'
                 properties:
                   status:
                     type: string
@@ -3995,7 +4475,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T15:03:08+00:00'
+                    example: '2026-10-13T15:15:56+00:00'
       tags:
         - Endpoints
       security: []
