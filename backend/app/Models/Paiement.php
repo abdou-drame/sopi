@@ -112,6 +112,21 @@ class Paiement extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Pose la garde « solde crédité » (M7.2), une seule fois : seulement si le paiement est REUSSI et pas déjà crédité.
+     * Vrai si exactement une ligne a changé (l'appelant crédite alors le solde, dans la même transaction).
+     */
+    public function crediterSiPossible(): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutPaiement::Reussi->value)
+            ->whereNull('credite_le')
+            ->update(['credite_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
     /** Passe à REMBOURSE, seulement si le statut actuel est l'un de $depuis. Vrai si exactement une ligne a changé. */
     public function rembourserSiStatut(StatutPaiement ...$depuis): bool
     {
