@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Client\ReservationController;
 use App\Http\Controllers\Api\V1\Client\VerrouCreneauController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\AvisController;
 use App\Http\Controllers\Api\V1\Prestataire\LitigeController as PrestataireLitigeController;
@@ -147,6 +148,15 @@ Route::prefix('v1')->group(function () {
         Route::put('/', 'modifier')->middleware('throttle:profil');
         Route::put('/mot-de-passe', 'changerMotDePasse')->middleware('throttle:mot-de-passe');
         Route::put('/jeton-push', 'enregistrerJetonPush')->middleware('throttle:jeton-push');
+        Route::delete('/jeton-push', 'retirerJetonPush')->middleware('throttle:jeton-push');
+    });
+
+    // Notifications dans l'application (M10.3) : client et prestataire. L'administrateur n'en reçoit pas (403).
+    Route::middleware(['auth:sanctum', 'role:client,prestataire', 'throttle:notifications'])->prefix('notifications')->controller(NotificationController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/non-lues/compteur', 'compteur');
+        Route::post('/lire-tout', 'lireTout');
+        Route::post('/{id}/lire', 'lire');
     });
 
     Route::prefix('auth')->group(function () {

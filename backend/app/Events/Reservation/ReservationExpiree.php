@@ -9,7 +9,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Une réservation a été annulée automatiquement (ANNULEE, créneau libéré) : `$cause` dit pourquoi. Publié après
- * validation de la transaction. Aucun écouteur pour l'instant : les notifications viendront en M10.
+ * validation de la transaction.
  */
 class ReservationExpiree implements ShouldDispatchAfterCommit
 {

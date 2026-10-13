@@ -8,7 +8,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Une réservation vient d'être confirmée par le webhook de paiement (ACCEPTEE vers CONFIRMEE, code généré).
- * Publié après validation de la transaction. Aucun écouteur pour l'instant : les notifications viendront en M10.
+ * Publié après validation de la transaction.
  */
 class ReservationConfirmee implements ShouldDispatchAfterCommit
 {

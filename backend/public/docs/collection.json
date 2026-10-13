@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "c8ba69ed-c9a0-4c67-bca0-586a3b583ca5",
+        "_postman_id": "3b7c233f-671f-46ef-8b75-35a3dad816d0",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -2280,7 +2280,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T16:15:41+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T17:18:03+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2419,6 +2419,245 @@
                             ],
                             "code": 401,
                             "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Notifications",
+            "description": "\nNotifications re\u00e7ues dans l'application (jeton Sanctum + r\u00f4le `client` ou `prestataire`). Chacun ne voit que les siennes.\nL'administrateur ne re\u00e7oit aucune notification : il est alert\u00e9 par les banni\u00e8res de son tableau de bord (403 sur ces routes).\nLes e-mails et les push partent s\u00e9par\u00e9ment ; les textes ne contiennent jamais de code de r\u00e9servation, de montant ni de t\u00e9l\u00e9phone.",
+            "item": [
+                {
+                    "name": "Mes notifications",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/notifications",
+                            "query": [
+                                {
+                                    "key": "nonLues",
+                                    "value": "1",
+                                    "description": "Si vrai, ne renvoie que les notifications non lues.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 notifications par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/notifications?nonLues=1&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. `nonLues=true` ne renvoie que les notifications non lues."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000a01\",\"type\":\"reservation_acceptee\",\"titre\":\"Demande accept\u00e9e\",\"corps\":\"Garage Sow a accept\u00e9 votre demande. Payez l'acompte dans les 2 heures pour confirmer.\",\"donnees\":{\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\"},\"lue\":false,\"lueLe\":null,\"dateCreation\":\"2030-01-13T10:00:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/notifications?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/notifications?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le filtre \u00ab non lues \u00bb doit \u00eatre vrai ou faux.\",\"errors\":{\"nonLues\":[\"Le filtre \u00ab non lues \u00bb doit \u00eatre vrai ou faux.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Nombre de notifications non lues",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/notifications\/non-lues\/compteur",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/notifications\/non-lues\/compteur"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"nonLues\":3}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Tout marquer comme lu",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/notifications\/lire-tout",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/notifications\/lire-tout"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": ""
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"marquees\":3}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Marquer une notification comme lue",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/notifications\/:id\/lire",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/notifications\/:id\/lire",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000a01",
+                                    "description": "Identifiant de la notification."
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Sans effet si elle est d\u00e9j\u00e0 lue (la date de premi\u00e8re lecture est conserv\u00e9e). La notification d'un autre utilisateur r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000a01\",\"type\":\"reservation_acceptee\",\"titre\":\"Demande accept\u00e9e\",\"corps\":\"Garage Sow a accept\u00e9 votre demande. Payez l'acompte dans les 2 heures pour confirmer.\",\"donnees\":{\"reservationId\":\"0198a1b2-0000-7000-8000-000000000060\"},\"lue\":true,\"lueLe\":\"2030-01-13T10:05:00+00:00\",\"dateCreation\":\"2030-01-13T10:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Notification introuvable.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
                             "name": ""
                         }
                     ]
@@ -4473,7 +4712,7 @@
                             "mode": "raw",
                             "raw": "{\"jetonPush\":\"fcm-jeton-exemple\"}"
                         },
-                        "description": "Enregistre le jeton FCM de l'appareil pour les notifications."
+                        "description": "Enregistre le jeton FCM de l'appareil pour les notifications push. Un jeton d\u00e9signe un appareil : s'il \u00e9tait d\u00e9j\u00e0\nenregistr\u00e9 par un autre compte, il lui est retir\u00e9 (la derni\u00e8re affectation l'emporte). Le jeton n'est jamais renvoy\u00e9 par l'API."
                     },
                     "response": [
                         {
@@ -4492,6 +4731,44 @@
                             "header": [],
                             "code": 422,
                             "body": "{\"message\":\"Le champ jeton push est obligatoire.\",\"errors\":{\"jetonPush\":[\"Le champ jeton push est obligatoire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Retirer mon jeton push",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/me\/jeton-push",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/me\/jeton-push"
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "\u00c0 appeler quand l'appareil se d\u00e9connecte ou que les notifications push sont d\u00e9sactiv\u00e9es. Sans effet si aucun jeton n'est enregistr\u00e9."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"message\":\"Jeton de notification retir\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
                             "name": ""
                         }
                     ]

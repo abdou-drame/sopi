@@ -8,7 +8,6 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 /**
  * Un client vient d'ouvrir un litige. Publié après validation de la transaction.
- * Aucun écouteur pour l'instant : les notifications viendront en M10.
  */
 class LitigeOuvert implements ShouldDispatchAfterCommit
 {

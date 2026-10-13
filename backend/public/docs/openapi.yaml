@@ -50,6 +50,9 @@ tags:
     name: Endpoints
     description: ''
   -
+    name: Notifications
+    description: "\nNotifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.\nL'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).\nLes e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone."
+  -
     name: Prestataires
     description: ''
   -
@@ -5293,7 +5296,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T16:15:41+00:00'
+                  time: '2026-10-13T17:18:03+00:00'
                 properties:
                   status:
                     type: string
@@ -5309,7 +5312,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T16:15:41+00:00'
+                    example: '2026-10-13T17:18:03+00:00'
       tags:
         - Endpoints
       security: []
@@ -5416,6 +5419,426 @@ paths:
       tags:
         - Endpoints
       security: []
+  /api/v1/notifications:
+    get:
+      summary: 'Mes notifications'
+      operationId: mesNotifications
+      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. `nonLues=true` ne renvoie que les notifications non lues.'
+      parameters:
+        -
+          in: query
+          name: nonLues
+          description: 'Si vrai, ne renvoie que les notifications non lues.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Si vrai, ne renvoie que les notifications non lues.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 notifications par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 notifications par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000a01
+                      type: reservation_acceptee
+                      titre: 'Demande acceptée'
+                      corps: "Garage Sow a accepté votre demande. Payez l'acompte dans les 2 heures pour confirmer."
+                      donnees:
+                        reservationId: 0198a1b2-0000-7000-8000-000000000060
+                      lue: false
+                      lueLe: null
+                      dateCreation: '2030-01-13T10:00:00+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/notifications?page=1'
+                    last: 'https://api.exemple.test/api/v1/notifications?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000a01
+                        type: reservation_acceptee
+                        titre: 'Demande acceptée'
+                        corps: "Garage Sow a accepté votre demande. Payez l'acompte dans les 2 heures pour confirmer."
+                        donnees:
+                          reservationId: 0198a1b2-0000-7000-8000-000000000060
+                        lue: false
+                        lueLe: null
+                        dateCreation: '2030-01-13T10:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000a01
+                        type:
+                          type: string
+                          example: reservation_acceptee
+                        titre:
+                          type: string
+                          example: 'Demande acceptée'
+                        corps:
+                          type: string
+                          example: "Garage Sow a accepté votre demande. Payez l'acompte dans les 2 heures pour confirmer."
+                        donnees:
+                          type: object
+                          properties:
+                            reservationId:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000060
+                        lue:
+                          type: boolean
+                          example: false
+                        lueLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        dateCreation:
+                          type: string
+                          example: '2030-01-13T10:00:00+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/notifications?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/notifications?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le filtre « non lues » doit être vrai ou faux.'
+                  errors:
+                    nonLues:
+                      - 'Le filtre « non lues » doit être vrai ou faux.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le filtre « non lues » doit être vrai ou faux.'
+                  errors:
+                    type: object
+                    properties:
+                      nonLues:
+                        type: array
+                        example:
+                          - 'Le filtre « non lues » doit être vrai ou faux.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Notifications
+  /api/v1/notifications/non-lues/compteur:
+    get:
+      summary: 'Nombre de notifications non lues'
+      operationId: nombreDeNotificationsNonLues
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  nonLues: 3
+                properties:
+                  nonLues:
+                    type: integer
+                    example: 3
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Notifications
+  /api/v1/notifications/lire-tout:
+    post:
+      summary: 'Tout marquer comme lu'
+      operationId: toutMarquerCommeLu
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  marquees: 3
+                properties:
+                  marquees:
+                    type: integer
+                    example: 3
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Notifications
+  '/api/v1/notifications/{id}/lire':
+    post:
+      summary: 'Marquer une notification comme lue'
+      operationId: marquerUneNotificationCommeLue
+      description: "Sans effet si elle est déjà lue (la date de première lecture est conservée). La notification d'un autre utilisateur répond 404."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000a01
+                  type: reservation_acceptee
+                  titre: 'Demande acceptée'
+                  corps: "Garage Sow a accepté votre demande. Payez l'acompte dans les 2 heures pour confirmer."
+                  donnees:
+                    reservationId: 0198a1b2-0000-7000-8000-000000000060
+                  lue: true
+                  lueLe: '2030-01-13T10:05:00+00:00'
+                  dateCreation: '2030-01-13T10:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000a01
+                  type:
+                    type: string
+                    example: reservation_acceptee
+                  titre:
+                    type: string
+                    example: 'Demande acceptée'
+                  corps:
+                    type: string
+                    example: "Garage Sow a accepté votre demande. Payez l'acompte dans les 2 heures pour confirmer."
+                  donnees:
+                    type: object
+                    properties:
+                      reservationId:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                  lue:
+                    type: boolean
+                    example: true
+                  lueLe:
+                    type: string
+                    example: '2030-01-13T10:05:00+00:00'
+                  dateCreation:
+                    type: string
+                    example: '2030-01-13T10:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Notification introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Notification introuvable.'
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Notifications
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la notification.'
+        example: 0198a1b2-0000-7000-8000-000000000a01
+        required: true
+        schema:
+          type: string
   /api/v1/prestataires/inscription:
     post:
       summary: "Inscription d'un prestataire"
@@ -9346,7 +9769,7 @@ paths:
     put:
       summary: 'Enregistrer mon jeton push'
       operationId: enregistrerMonJetonPush
-      description: "Enregistre le jeton FCM de l'appareil pour les notifications."
+      description: "Enregistre le jeton FCM de l'appareil pour les notifications push. Un jeton désigne un appareil : s'il était déjà\nenregistré par un autre compte, il lui est retiré (la dernière affectation l'emporte). Le jeton n'est jamais renvoyé par l'API."
       parameters: []
       responses:
         200:
@@ -9412,3 +9835,35 @@ paths:
                   example: fcm-jeton-exemple
               required:
                 - jetonPush
+    delete:
+      summary: 'Retirer mon jeton push'
+      operationId: retirerMonJetonPush
+      description: "À appeler quand l'appareil se déconnecte ou que les notifications push sont désactivées. Sans effet si aucun jeton n'est enregistré."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Jeton de notification retiré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Jeton de notification retiré.'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+      tags:
+        - Profil
