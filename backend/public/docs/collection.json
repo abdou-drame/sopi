@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "a3140f27-2b51-4d59-8a89-90a2f36455f1",
+        "_postman_id": "f5b6a7a3-6978-43ee-8396-c7fb821ef72e",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -1136,7 +1136,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T13:35:57+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T13:40:49+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -2742,6 +2742,71 @@
                             "header": [],
                             "code": 404,
                             "body": "{\"message\":\"Retrait introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Demander un retrait",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/retraits",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/retraits"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"montant\":5000,\"telephone_versement\":\"771234567\"}"
+                        },
+                        "description": "D\u00e9bite imm\u00e9diatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un\nentier de FCFA entre le minimum et le maximum (voir `\/prestataire\/solde`). Limit\u00e9 \u00e0 5 demandes par minute.\nStatuts renvoy\u00e9s : `reussi` (versement accept\u00e9), ou `en_cours` si le r\u00e9sultat est incertain (d\u00e9lai d\u00e9pass\u00e9, panne) : le montant\nreste alors d\u00e9bit\u00e9 et le retrait est trait\u00e9 par l'\u00e9quipe, sans nouveau d\u00e9bit. Un refus d\u00e9finitif r\u00e9pond 503 : le solde est\nrecr\u00e9dit\u00e9 (une seule fois) et la demande peut \u00eatre refaite."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 201,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Solde insuffisant.\",\"errors\":{\"montant\":[\"Solde insuffisant.\"]}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 429,
+                            "body": "{\"message\":\"Trop de tentatives. R\u00e9essayez dans quelques instants.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 503,
+                            "body": "{\"message\":\"Le versement n'a pas pu \u00eatre effectu\u00e9. Votre solde n'a pas \u00e9t\u00e9 d\u00e9bit\u00e9. Veuillez r\u00e9essayer.\"}",
                             "name": ""
                         }
                     ]

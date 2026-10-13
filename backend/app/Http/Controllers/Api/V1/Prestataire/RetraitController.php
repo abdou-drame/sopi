@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Prestataire;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Prestataire\DemanderRetraitRequest;
 use App\Http\Resources\RetraitResource;
 use App\Models\Prestataire;
 use App\Services\RetraitService;
@@ -76,6 +77,35 @@ class RetraitController extends Controller
         return $retrait === null
             ? response()->json(['message' => 'Retrait introuvable.'], Response::HTTP_NOT_FOUND)
             : new RetraitResource($retrait);
+    }
+
+    /**
+     * Demander un retrait
+     *
+     * Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un
+     * entier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.
+     * Statuts renvoyés : `reussi` (versement accepté), ou `en_cours` si le résultat est incertain (délai dépassé, panne) : le montant
+     * reste alors débité et le retrait est traité par l'équipe, sans nouveau débit. Un refus définitif répond 503 : le solde est
+     * recrédité (une seule fois) et la demande peut être refaite.
+     *
+     * @authenticated
+     *
+     * @response 201 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
+     * @response 401 {"message":"Authentification requise."}
+     * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     * @response 422 {"message":"Solde insuffisant.","errors":{"montant":["Solde insuffisant."]}}
+     * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
+     * @response 503 {"message":"Le versement n'a pas pu être effectué. Votre solde n'a pas été débité. Veuillez réessayer."}
+     */
+    public function store(DemanderRetraitRequest $request): JsonResponse
+    {
+        $retrait = $this->service->demander(
+            $this->prestataire($request),
+            (int) $request->validated('montant'),
+            $request->validated('telephone_versement'),
+        );
+
+        return (new RetraitResource($retrait))->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
     private function prestataire(Request $request): Prestataire

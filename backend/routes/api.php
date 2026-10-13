@@ -95,6 +95,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/solde', [RetraitController::class, 'solde']);
         Route::get('/retraits', [RetraitController::class, 'index']);
         Route::get('/retraits/{id}', [RetraitController::class, 'show']);
+        Route::post('/retraits', [RetraitController::class, 'store'])->middleware('throttle:retrait');
     });
 
     Route::middleware('auth:sanctum')->prefix('me')->controller(ProfilController::class)->group(function () {

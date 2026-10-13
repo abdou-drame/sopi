@@ -294,6 +294,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-solde-et-retraits-GETapi-v1-prestataire-retraits--id-">
                                 <a href="#prestataire-solde-et-retraits-GETapi-v1-prestataire-retraits--id-">Détail d'un retrait</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-solde-et-retraits-POSTapi-v1-prestataire-retraits">
+                                <a href="#prestataire-solde-et-retraits-POSTapi-v1-prestataire-retraits">Demander un retrait</a>
+                            </li>
                                                                         </ul>
                             </ul>
                     <ul id="tocify-header-profil" class="tocify-header">
@@ -3809,7 +3812,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-13T13:35:57+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-13T13:40:49+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -9323,6 +9326,235 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Identifiant du retrait. Example: <code>0198a1b2-0000-7000-8000-000000000070</code></p>
             </div>
                     </form>
+
+                    <h2 id="prestataire-solde-et-retraits-POSTapi-v1-prestataire-retraits">Demander un retrait</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un
+entier de FCFA entre le minimum et le maximum (voir <code>/prestataire/solde</code>). Limité à 5 demandes par minute.
+Statuts renvoyés : <code>reussi</code> (versement accepté), ou <code>en_cours</code> si le résultat est incertain (délai dépassé, panne) : le montant
+reste alors débité et le retrait est traité par l'équipe, sans nouveau débit. Un refus définitif répond 503 : le solde est
+recrédité (une seule fois) et la demande peut être refaite.</p>
+
+<span id="example-requests-POSTapi-v1-prestataire-retraits">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/prestataire/retraits" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"montant\": 5000,
+    \"telephone_versement\": \"771234567\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/retraits"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "montant": 5000,
+    "telephone_versement": "771234567"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-prestataire-retraits">
+            <blockquote>
+            <p>Example response (201):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000070&quot;,
+    &quot;montant&quot;: 5000,
+    &quot;statut&quot;: &quot;reussi&quot;,
+    &quot;telephoneVersement&quot;: &quot;+221******567&quot;,
+    &quot;dateDemande&quot;: &quot;2030-01-15T08:50:00+00:00&quot;,
+    &quot;dateTraitement&quot;: &quot;2030-01-15T08:50:02+00:00&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Solde insuffisant.&quot;,
+    &quot;errors&quot;: {
+        &quot;montant&quot;: [
+            &quot;Solde insuffisant.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (503):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Le versement n&#039;a pas pu &ecirc;tre effectu&eacute;. Votre solde n&#039;a pas &eacute;t&eacute; d&eacute;bit&eacute;. Veuillez r&eacute;essayer.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-prestataire-retraits" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-prestataire-retraits"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-prestataire-retraits"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-prestataire-retraits" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-prestataire-retraits">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-prestataire-retraits" data-method="POST"
+      data-path="api/v1/prestataire/retraits"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-prestataire-retraits', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-prestataire-retraits"
+                    onclick="tryItOut('POSTapi-v1-prestataire-retraits');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-prestataire-retraits"
+                    onclick="cancelTryOut('POSTapi-v1-prestataire-retraits');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-prestataire-retraits"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/prestataire/retraits</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="POSTapi-v1-prestataire-retraits"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-prestataire-retraits"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-prestataire-retraits"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>montant</code></b>&nbsp;&nbsp;
+<small>integer</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="montant"                data-endpoint="POSTapi-v1-prestataire-retraits"
+               value="5000"
+               data-component="body">
+    <br>
+<p>Montant à retirer, en FCFA (entier), entre le minimum et le maximum de la configuration. Le champ value doit être au moins égal à 1000. Le champ value ne doit pas dépasser 500000. Example: <code>5000</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>telephone_versement</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="telephone_versement"                data-endpoint="POSTapi-v1-prestataire-retraits"
+               value="771234567"
+               data-component="body">
+    <br>
+<p>Mobile sénégalais (Wave ou Orange Money) qui reçoit le versement. Must match the regex /^+2217[05678]\d{7}$/. Example: <code>771234567</code></p>
+        </div>
+        </form>
 
                 <h1 id="profil">Profil</h1>
 
