@@ -5,10 +5,12 @@ use App\Http\Controllers\Api\V1\Admin\AvisController as AdminAvisController;
 use App\Http\Controllers\Api\V1\Admin\DecisionDemandeController;
 use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
+use App\Http\Controllers\Api\V1\Admin\ListeSanctionsController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
 use App\Http\Controllers\Api\V1\Admin\RevenusController;
 use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
 use App\Http\Controllers\Api\V1\Admin\TableauDeBordController;
+use App\Http\Controllers\Api\V1\Admin\UtilisateurController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
@@ -62,6 +64,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/litiges/{id}', [AdminLitigeController::class, 'show']);
         Route::get('/litiges/{id}/preuves/{preuve}', [AdminLitigeController::class, 'preuve'])->name('admin.litiges.preuve');
         Route::post('/litiges/{id}/trancher', [AdminLitigeController::class, 'trancher'])->middleware('throttle:litige');
+
+        // Compléments de lecture (M12). Identifiant non contraint : un id invalide répond 404 en français.
+        Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
+        Route::get('/utilisateurs/{id}', [UtilisateurController::class, 'show']);
+        Route::get('/sanctions', ListeSanctionsController::class);
 
         Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
         Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
