@@ -60,12 +60,6 @@ describe('coque', () => {
     expect(within(nav).getByRole('link', { name: 'Litiges' })).toHaveAttribute('aria-current', 'page')
   })
 
-  it('affiche « bientôt disponible » pour un écran pas encore livré', async () => {
-    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
-    afficherApplication('/notifications-en-echec')
-    expect(await screen.findByText('Bientôt disponible')).toBeInTheDocument()
-  })
-
   it('affiche la barre du haut : raccourcis, alertes et menu du compte', async () => {
     const { appels } = simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES }, 'POST /auth/deconnexion': { corps: {} } })
     afficherApplication('/')

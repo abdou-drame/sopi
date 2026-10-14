@@ -18,8 +18,6 @@ export interface EntreeMenu {
   chemin: string
   libelle: string
   icone: ReactNode
-  /** Écran livré dans cette étape (les autres affichent « bientôt disponible »). */
-  disponible: boolean
 }
 
 export interface GroupeMenu {
@@ -32,34 +30,33 @@ export const MENU: GroupeMenu[] = [
   {
     titre: L.menu.groupePilotage,
     entrees: [
-      { chemin: '/', libelle: L.menu.tableauDeBord, icone: <IconeAccueil />, disponible: true },
-      { chemin: '/revenus', libelle: L.menu.revenus, icone: <IconeRevenus />, disponible: true },
+      { chemin: '/', libelle: L.menu.tableauDeBord, icone: <IconeAccueil /> },
+      { chemin: '/revenus', libelle: L.menu.revenus, icone: <IconeRevenus /> },
     ],
   },
   {
     titre: L.menu.groupeModeration,
     entrees: [
-      { chemin: '/dossiers-prestataires', libelle: L.menu.demandes, icone: <IconeDossier />, disponible: true },
-      { chemin: '/litiges', libelle: L.menu.litiges, icone: <IconeLitige />, disponible: true },
-      { chemin: '/sanctions', libelle: L.menu.sanctions, icone: <IconeSanction />, disponible: true },
-      { chemin: '/avis', libelle: L.menu.avis, icone: <IconeAvis />, disponible: true },
+      { chemin: '/dossiers-prestataires', libelle: L.menu.demandes, icone: <IconeDossier /> },
+      { chemin: '/litiges', libelle: L.menu.litiges, icone: <IconeLitige /> },
+      { chemin: '/sanctions', libelle: L.menu.sanctions, icone: <IconeSanction /> },
+      { chemin: '/avis', libelle: L.menu.avis, icone: <IconeAvis /> },
     ],
   },
   {
     titre: L.menu.groupeActivite,
     entrees: [
-      { chemin: '/utilisateurs', libelle: L.menu.utilisateurs, icone: <IconeUtilisateurs />, disponible: true },
-      { chemin: '/reservations', libelle: L.menu.reservations, icone: <IconeReservation />, disponible: false },
-      { chemin: '/paiements', libelle: L.menu.paiements, icone: <IconePaiement />, disponible: false },
-      { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait />, disponible: false },
+      { chemin: '/utilisateurs', libelle: L.menu.utilisateurs, icone: <IconeUtilisateurs /> },
+      { chemin: '/reservations', libelle: L.menu.reservations, icone: <IconeReservation /> },
+      { chemin: '/paiements', libelle: L.menu.paiements, icone: <IconePaiement /> },
+      { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait /> },
     ],
   },
   {
     titre: L.menu.groupeSysteme,
     entrees: [
-      { chemin: '/notifications-en-echec', libelle: L.menu.notifications, icone: <IconeCloche />, disponible: false },
+      { chemin: '/notifications-en-echec', libelle: L.menu.notifications, icone: <IconeCloche /> },
     ],
   },
 ]
 
-export const ENTREES_A_VENIR = MENU.flatMap((g) => g.entrees).filter((e) => !e.disponible)

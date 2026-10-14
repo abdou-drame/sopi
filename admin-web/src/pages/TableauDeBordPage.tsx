@@ -343,7 +343,7 @@ export default function TableauDeBordPage() {
           ) : (
             <>
               <CarteCompteur titre={T.litigesOuvertsTitre} sousTitre={T.litigesOuvertsSousTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige width={16} height={16} />} chargement={isPending} delai={0} />
-              <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis?aTraiter=1" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
+              <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
               <CarteCompteur titre={T.dossiersTitre} sousTitre={T.dossiersSousTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier width={16} height={16} />} chargement={isPending} delai={140} />
             </>
           )}

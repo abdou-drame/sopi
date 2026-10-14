@@ -16,10 +16,10 @@ export function useAlertes() {
 export const LIEN_ALERTE: Record<TypeAlerte, string> = {
   dossiers_en_attente: '/dossiers-prestataires',
   litiges_ouverts: '/litiges',
-  avis_signales: '/avis?aTraiter=1',
-  retraits_bloques: '/retraits',
-  remboursements_en_echec: '/paiements',
-  remboursements_en_retard: '/paiements',
+  avis_signales: '/avis',
+  retraits_bloques: '/retraits?bloques=true',
+  remboursements_en_echec: '/paiements?remboursementDu=true',
+  remboursements_en_retard: '/paiements?remboursementDu=true',
   notifications_en_echec: '/notifications-en-echec',
   suspensions_a_echeance: '/sanctions?echeanceDansHeures=24',
 }

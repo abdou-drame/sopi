@@ -122,7 +122,7 @@ describe('tableau de bord', () => {
     expect(positions.every((p) => p >= 0)).toBe(true)
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
     const liens = within(bloc).getAllByRole('link', { name: 'Voir la liste' })
-    expect(liens.map((l) => l.getAttribute('href'))).toEqual(['/litiges', '/retraits', '/sanctions?echeanceDansHeures=24'])
+    expect(liens.map((l) => l.getAttribute('href'))).toEqual(['/litiges', '/retraits?bloques=true', '/sanctions?echeanceDansHeures=24'])
     expect(within(bloc).getAllByRole('alert')).toHaveLength(1)
   })
 
@@ -153,7 +153,7 @@ describe('tableau de bord', () => {
     // Compteurs et liens.
     const liens = (nom: RegExp) => screen.getAllByRole('link', { name: nom })[0]
     expect(liens(/Litiges ouverts/)).toHaveAttribute('href', '/litiges')
-    expect(liens(/Avis à modérer/)).toHaveAttribute('href', '/avis?aTraiter=1')
+    expect(liens(/Avis à modérer/)).toHaveAttribute('href', '/avis')
     expect(liens(/Dossiers en attente/)).toHaveAttribute('href', '/dossiers-prestataires')
   })
 
