@@ -23,7 +23,7 @@ function idsReservationsAdmin(string $requete = ''): array
 }
 
 /** Réservation d'un créneau du prestataire donné (créneau neuf, à la date donnée). */
-function reservationDe(Prestataire $prestataire, string $etat = 'enAttente', array $attributs = [], ?string $debutCreneau = null): Reservation
+function reservationPourAdmin(Prestataire $prestataire, string $etat = 'enAttente', array $attributs = [], ?string $debutCreneau = null): Reservation
 {
     $creneau = Creneau::factory()->for($prestataire)->create($debutCreneau === null ? [] : ['date_debut' => $debutCreneau, 'date_fin' => Carbon::parse($debutCreneau)->addHour()]);
 
@@ -117,8 +117,8 @@ describe('réservations — liste', function () {
         adminConnecte();
         $prestataire = Prestataire::factory()->create();
         $client = User::factory()->create();
-        $a = reservationDe($prestataire, 'enAttente', ['client_id' => $client->id]);
-        $b = reservationDe($prestataire);
+        $a = reservationPourAdmin($prestataire, 'enAttente', ['client_id' => $client->id]);
+        $b = reservationPourAdmin($prestataire);
         Reservation::factory()->create(['client_id' => $client->id]);
 
         expect(idsReservationsAdmin('?prestataire='.$prestataire->id))->toEqualCanonicalizing([$a->id, $b->id])
@@ -129,10 +129,10 @@ describe('réservations — liste', function () {
     it('filtre par jour de créneau, bornes incluses', function () {
         adminConnecte();
         $prestataire = Prestataire::factory()->create();
-        $avant = reservationDe($prestataire, 'enAttente', [], '2030-02-09 23:00:00');
-        $debut = reservationDe($prestataire, 'enAttente', [], '2030-02-10 00:00:00');
-        $fin = reservationDe($prestataire, 'enAttente', [], '2030-02-12 23:30:00');
-        $apres = reservationDe($prestataire, 'enAttente', [], '2030-02-13 00:00:00');
+        $avant = reservationPourAdmin($prestataire, 'enAttente', [], '2030-02-09 23:00:00');
+        $debut = reservationPourAdmin($prestataire, 'enAttente', [], '2030-02-10 00:00:00');
+        $fin = reservationPourAdmin($prestataire, 'enAttente', [], '2030-02-12 23:30:00');
+        $apres = reservationPourAdmin($prestataire, 'enAttente', [], '2030-02-13 00:00:00');
 
         expect(idsReservationsAdmin('?debut=2030-02-10&fin=2030-02-12'))->toEqualCanonicalizing([$debut->id, $fin->id])
             ->and(idsReservationsAdmin('?debut=2030-02-13'))->toBe([$apres->id])
@@ -153,9 +153,9 @@ describe('réservations — liste', function () {
     it('combine les filtres', function () {
         adminConnecte();
         $prestataire = Prestataire::factory()->create();
-        $voulue = reservationDe($prestataire, 'confirmee', ['code_reservation' => 'QWE123'], '2030-03-05 09:00:00');
-        reservationDe($prestataire, 'terminee', [], '2030-03-05 11:00:00');
-        reservationDe($prestataire, 'confirmee', [], '2030-04-05 09:00:00');
+        $voulue = reservationPourAdmin($prestataire, 'confirmee', ['code_reservation' => 'QWE123'], '2030-03-05 09:00:00');
+        reservationPourAdmin($prestataire, 'terminee', [], '2030-03-05 11:00:00');
+        reservationPourAdmin($prestataire, 'confirmee', [], '2030-04-05 09:00:00');
 
         expect(idsReservationsAdmin("?statut=confirmee&prestataire={$prestataire->id}&debut=2030-03-01&fin=2030-03-31&q=qwe"))->toBe([$voulue->id]);
     });
