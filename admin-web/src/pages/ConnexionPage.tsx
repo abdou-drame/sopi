@@ -63,10 +63,10 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <section className="hidden flex-col justify-between bg-gradient-to-br from-primaire-900 via-primaire-800 to-primaire-600 p-12 text-white lg:flex">
+    <div className="grid min-h-screen gap-4 p-4 lg:grid-cols-2">
+      <section className="animate-apparition hidden flex-col justify-between rounded-carte bg-gradient-to-br from-primaire-900 via-primaire-800 to-primaire-600 p-12 text-white shadow-eleve lg:flex">
         <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="grid size-11 place-items-center rounded-moyen bg-white/15 text-xl font-bold">
+          <span aria-hidden="true" className="grid size-11 place-items-center rounded-full bg-white/15 text-xl font-bold">
             S
           </span>
           <span className="text-xl font-semibold">{L.marque}</span>
@@ -84,9 +84,9 @@ export default function ConnexionPage() {
       </section>
 
       <main className="grid place-items-center p-6">
-        <form onSubmit={soumettre} noValidate className="animate-apparition flex w-full max-w-sm flex-col gap-5">
+        <form onSubmit={soumettre} noValidate className="animate-apparition flex w-full max-w-sm flex-col gap-5 rounded-carte bg-surface p-8 shadow-carte">
           <div>
-            <h1 className="text-2xl font-semibold text-primaire-800">{L.connexion.titre}</h1>
+            <h1 className="text-titre-page font-bold text-primaire-800">{L.connexion.titre}</h1>
             <p className="mt-1 text-sm text-texte-doux">{L.connexion.sousTitre}</p>
           </div>
 

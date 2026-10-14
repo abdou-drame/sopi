@@ -5,6 +5,7 @@ import { erreursParChamp, messageDErreur } from '../api/client'
 import type { PointRevenus, Regroupement } from '../api/types'
 import BarreFiltres from '../components/ui/BarreFiltres'
 import Bloc from '../components/ui/Bloc'
+import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { Champ, Selecteur } from '../components/ui/Champs'
 import { GraphiqueCourbe } from '../components/ui/Graphiques'
@@ -82,7 +83,7 @@ export default function RevenusPage() {
   return (
     <div className="flex flex-col gap-8">
       <header className="animate-apparition">
-        <h1 className="text-2xl font-semibold text-primaire-800">{T.titre}</h1>
+        <h1 className="text-titre-page font-bold text-primaire-800">{T.titre}</h1>
         <p className="mt-1 text-sm text-texte-doux">
           {T.sousTitre}
           {data && ` ${L.tableauDeBord.misAJour(formatDateHeure(data.dateGeneration))}.`}
@@ -138,7 +139,7 @@ export default function RevenusPage() {
 
         <Bloc titre={T.courbe} {...etat} hauteur="h-72" vide={!isPending && !isError && series.length === 0}>
           {data && (
-            <div className="rounded-grand bg-surface p-5 shadow-carte">
+            <Carte>
               <GraphiqueCourbe
                 description={T.graphiqueDescription}
                 libelles={series.map((p) => libelleAxe(p, regroupement))}
@@ -148,7 +149,7 @@ export default function RevenusPage() {
                 ]}
                 formatValeur={formatMontant}
               />
-            </div>
+            </Carte>
           )}
         </Bloc>
 

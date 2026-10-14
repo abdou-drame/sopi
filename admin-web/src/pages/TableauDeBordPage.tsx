@@ -5,6 +5,7 @@ import type { Alerte, Gravite, TableauDeBord } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import Bloc from '../components/ui/Bloc'
+import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { GraphiqueBarres } from '../components/ui/Graphiques'
 import {
@@ -90,7 +91,7 @@ function Reservations({ d }: { d: TableauDeBord }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-grand bg-surface p-5 shadow-carte lg:col-span-2">
+        <Carte className="lg:col-span-2">
           <p className="mb-2 text-sm font-medium text-texte-doux">
             {T.reservationsTotal} : <strong className="text-texte">{formatNombre(r.total)}</strong> — {T.parStatut.toLowerCase()}
           </p>
@@ -98,7 +99,7 @@ function Reservations({ d }: { d: TableauDeBord }) {
             description={`Réservations ${T.parStatut.toLowerCase()}`}
             donnees={STATUTS_RESERVATION.map((s) => ({ libelle: L.statuts[s], valeur: r.parStatut[s] }))}
           />
-        </div>
+        </Carte>
         <div className="grid gap-4">
           <CarteChiffre
             titre={`${T.creees} · ${T.sept}`}
@@ -173,7 +174,7 @@ export default function TableauDeBordPage() {
   return (
     <div className="flex flex-col gap-8">
       <header className="animate-apparition">
-        <h1 className="text-2xl font-semibold text-primaire-800">{T.titre}</h1>
+        <h1 className="text-titre-page font-bold text-primaire-800">{T.titre}</h1>
         <p className="mt-1 text-sm text-texte-doux">
           {T.sousTitre}
           {data && ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.`}
