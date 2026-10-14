@@ -25,7 +25,7 @@ describe('coque', () => {
     simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
     afficherApplication('/')
     const nav = await screen.findByRole('navigation', { name: 'Navigation principale' })
-    const libelles = within(nav).getAllByRole('link').map((l) => l.textContent)
+    const libelles = within(nav).getAllByRole('link').map((l) => l.getAttribute('aria-label'))
     expect(libelles).toEqual([
       'Tableau de bord',
       'Revenus',
@@ -45,9 +45,9 @@ describe('coque', () => {
     simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES } })
     afficherApplication('/')
     const nav = await screen.findByRole('navigation', { name: 'Navigation principale' })
-    expect(await within(nav).findByRole('link', { name: /Litiges/ })).toHaveTextContent('2')
+    expect(await within(nav).findByRole('link', { name: 'Litiges, 2 alertes' })).toHaveTextContent('2')
     // Deux types d'alertes pointent vers « Paiements » : 1 + 3.
-    expect(within(nav).getByRole('link', { name: /Paiements/ })).toHaveTextContent('4')
+    expect(within(nav).getByRole('link', { name: 'Paiements, 4 alertes' })).toHaveTextContent('4')
     expect(within(nav).getByRole('link', { name: /Retraits/ })).not.toHaveTextContent(/\d/)
   })
 
@@ -56,19 +56,26 @@ describe('coque', () => {
     afficherApplication('/litiges')
     expect(await screen.findByRole('heading', { name: 'Litiges' })).toBeInTheDocument()
     expect(screen.getByText('Bientôt disponible')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Litiges/ })).toHaveAttribute('aria-current', 'page')
+    const nav = screen.getByRole('navigation', { name: 'Navigation principale' })
+    expect(within(nav).getByRole('link', { name: 'Litiges' })).toHaveAttribute('aria-current', 'page')
   })
 
-  it('replie et déplie la barre latérale', async () => {
-    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
+  it('affiche la barre du haut : raccourcis, alertes et menu du compte', async () => {
+    const { appels } = simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES }, 'POST /auth/deconnexion': { corps: {} } })
     afficherApplication('/')
-    const bouton = await screen.findByRole('button', { name: 'Replier le menu' })
-    expect(bouton).toHaveAttribute('aria-expanded', 'true')
-    await userEvent.click(bouton)
-    const deplier = screen.getByRole('button', { name: 'Déplier le menu' })
-    expect(deplier).toHaveAttribute('aria-expanded', 'false')
-    // Replié : les libellés restent accessibles par aria-label.
-    expect(screen.getByRole('link', { name: 'Litiges' })).toBeInTheDocument()
+    const raccourcis = await screen.findByRole('navigation', { name: 'Raccourcis' })
+    expect(within(raccourcis).getAllByRole('link').map((l) => l.textContent)).toEqual(['Tableau de bord', 'Réservations', 'Paiements', 'Revenus', 'Litiges'])
+    expect(within(raccourcis).getByRole('link', { name: 'Tableau de bord' })).toHaveAttribute('aria-current', 'page')
+    expect(await screen.findByRole('link', { name: 'Alertes : 3 alertes' })).toBeInTheDocument()
+
+    const compte = screen.getByRole('button', { name: 'Menu du compte' })
+    expect(compte).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(compte)
+    expect(compte).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('Fatou Diop')).toBeInTheDocument()
+    await userEvent.keyboard('{Escape}')
+    expect(compte).toHaveAttribute('aria-expanded', 'false')
+    expect(appels.some((a) => a.methode === 'POST')).toBe(false)
   })
 
   it('propose un lien d’évitement vers le contenu principal', async () => {

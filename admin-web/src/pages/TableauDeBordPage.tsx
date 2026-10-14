@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { api } from '../api/endpoints'
 import { messageDErreur } from '../api/client'
@@ -10,17 +10,17 @@ import Bloc from '../components/ui/Bloc'
 import Bouton from '../components/ui/Bouton'
 import BoutonRond from '../components/ui/BoutonRond'
 import Carte from '../components/ui/Carte'
-import CarteChiffre from '../components/ui/CarteChiffre'
 import CarteSopi from '../components/ui/CarteSopi'
 import DerniersPaiements from '../components/ui/DerniersPaiements'
-import EnTetePage from '../components/ui/EnTetePage'
+import { useAuth } from '../auth/AuthContext'
+import EnTeteLarge from '../layout/EnTeteLarge'
 import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
-import { IconeAvis, IconeDossier, IconeFleche, IconeLitige } from '../components/ui/Icones'
+import { IconeActualiser, IconeAvis, IconeCalendrier, IconeDossier, IconeFleche, IconeGraphique, IconeLitige } from '../components/ui/Icones'
 import LienGelule from '../components/ui/LienGelule'
 import NombreAnime from '../components/ui/NombreAnime'
 import Squelette from '../components/ui/Squelette'
 import { L } from '../i18n/libelles'
-import { ajouterJours, aujourdhui, formatDateHeure, formatJourCalendaire, formatMontant, formatNombre } from '../lib/format'
+import { ajouterJours, aujourdhui, formatJourCalendaire, formatMontant, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
 const ORDRE_GRAVITE: Record<Gravite, number> = { critique: 0, attention: 1, info: 2 }
@@ -143,6 +143,7 @@ function CarteBarres() {
   return (
     <Carte
       titre={T.barresTitre}
+      icone={<IconeGraphique width={16} height={16} />}
       sousTitre={T.barresSousTitre}
       action={
         <div className="flex items-center gap-2">
@@ -193,8 +194,10 @@ function CarteCommission() {
         <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
       ) : (
         <>
+          <p className="text-center text-micro text-texte-discret">{T.commissionLibelle}</p>
           <p className="text-center text-chiffre font-bold tracking-tight text-texte">
-            <NombreAnime valeur={total} format={formatMontant} />
+            <NombreAnime valeur={total} format={formatNombre} />
+            <span className="ml-1 text-sm font-medium text-texte-discret">FCFA</span>
           </p>
           <div className="mt-2">
             <GraphiqueCourbe
@@ -246,31 +249,70 @@ function useRevenus30Jours() {
 
 function CarteCompteur({
   titre,
+  sousTitre,
   valeur,
   vers,
   icone,
-  teinte,
   chargement,
   delai,
 }: {
   titre: string
+  sousTitre: string
   valeur?: number
   vers: string
   icone: React.ReactNode
-  teinte: 'rose' | 'violet' | 'cyan'
   chargement: boolean
   delai: number
 }) {
   return (
-    <CarteChiffre
-      titre={titre}
-      valeur={valeur === undefined ? '—' : <NombreAnime valeur={valeur} />}
-      icone={icone}
-      teinte={teinte}
-      chargement={chargement}
-      delai={delai}
-      action={<LienGelule vers={vers} variante="claire">{`${T.ouvrir} · ${titre}`}</LienGelule>}
-    />
+    <Carte titre={titre} sousTitre={sousTitre} icone={icone} delai={delai} className="flex-1">
+      <div className="flex items-end justify-between gap-3" aria-busy={chargement || undefined}>
+        {chargement ? (
+          <Squelette className="h-9 w-20" />
+        ) : (
+          <p className="text-chiffre font-bold tracking-tight text-texte">{valeur === undefined ? '—' : <NombreAnime valeur={valeur} />}</p>
+        )}
+        <LienGelule vers={vers}>
+          <span aria-hidden="true">{T.ouvrir}</span>
+          <span className="sr-only">{`${T.ouvrir} · ${titre}`}</span>
+        </LienGelule>
+      </div>
+    </Carte>
+  )
+}
+
+/** En-tête pleine largeur : « Bienvenue, prénom », période affichée et bouton d'actualisation (lectures seulement). */
+function EnTeteAccueil() {
+  const { utilisateur } = useAuth()
+  const client = useQueryClient()
+  const fin = aujourdhui()
+  const debut = ajouterJours(fin, -29)
+  return (
+    <EnTeteLarge>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-titre-page font-bold tracking-tight text-texte">
+          <span className="sr-only">{T.titre} — </span>
+          {T.bienvenue} <span className="font-light text-texte-doux">{utilisateur?.prenom}</span>
+        </h1>
+        <div className="flex flex-wrap items-center gap-3">
+          <p
+            aria-label={`${T.periodeAffichee} : ${formatJourCalendaire(debut, true)} – ${formatJourCalendaire(fin, true)}`}
+            className="flex items-center gap-2.5 rounded-gelule bg-surface px-5 py-2.5 text-sm font-medium text-texte shadow-carte"
+          >
+            <IconeCalendrier width={18} height={18} className="text-texte-doux" />
+            {formatJourCalendaire(debut, true)} – {formatJourCalendaire(fin, true)}
+          </p>
+          <button
+            type="button"
+            onClick={() => void client.invalidateQueries()}
+            className="flex items-center gap-2 rounded-gelule bg-surface px-5 py-2.5 text-sm font-semibold text-texte shadow-carte transition-colors hover:text-primaire-700"
+          >
+            <IconeActualiser width={16} height={16} />
+            {T.actualiser}
+          </button>
+        </div>
+      </div>
+    </EnTeteLarge>
   )
 }
 
@@ -280,27 +322,29 @@ export default function TableauDeBordPage() {
   const erreur = isError ? messageDErreur(error) : null
 
   return (
-    <div className="flex flex-col gap-8">
-      <EnTetePage titre={T.titre} sousTitre={`${T.sousTitre}${data ? ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.` : ''}`} />
+    <div className="flex flex-col gap-6">
+      <EnTeteAccueil />
 
       <BlocAlertes />
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
+      <div className="grid grid-flow-dense gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
         <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
-        <CarteBarres />
+        <div className="md:col-span-2 xl:col-span-1 [&>*]:h-full">
+          <CarteBarres />
+        </div>
         <CarteCommission />
 
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2 xl:col-span-2 [&>*]:h-full">
           <CarteDerniersPaiements />
         </div>
-        <div className="flex flex-col gap-5">
+        <div className="grid gap-5 md:col-span-2 md:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
           {erreur && !isPending ? (
             <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
           ) : (
             <>
-              <CarteCompteur titre={T.litigesOuvertsTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige />} teinte="rose" chargement={isPending} delai={0} />
-              <CarteCompteur titre={T.avisATraiterTitre} valeur={data?.avis.signales} vers="/avis?aTraiter=1" icone={<IconeAvis />} teinte="violet" chargement={isPending} delai={70} />
-              <CarteCompteur titre={T.dossiersTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier />} teinte="cyan" chargement={isPending} delai={140} />
+              <CarteCompteur titre={T.litigesOuvertsTitre} sousTitre={T.litigesOuvertsSousTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige width={16} height={16} />} chargement={isPending} delai={0} />
+              <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis?aTraiter=1" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
+              <CarteCompteur titre={T.dossiersTitre} sousTitre={T.dossiersSousTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier width={16} height={16} />} chargement={isPending} delai={140} />
             </>
           )}
         </div>

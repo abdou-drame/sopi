@@ -179,3 +179,21 @@ export const IconeRecherche = (p: P) => (
     <path d="M16 16l4.5 4.5" />
   </Icone>
 )
+
+export const IconeActualiser = (p: P) => (
+  <Icone {...p}>
+    <path d="M20 11a8 8 0 0 0-14.5-4.5L4 8" />
+    <path d="M4 4v4h4" />
+    <path d="M4 13a8 8 0 0 0 14.5 4.5L20 16" />
+    <path d="M20 20v-4h-4" />
+  </Icone>
+)
+
+export const IconeGraphique = (p: P) => (
+  <Icone {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <path d="M8 16v-4" />
+    <path d="M12 16V8" />
+    <path d="M16 16v-6" />
+  </Icone>
+)

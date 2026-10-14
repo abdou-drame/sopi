@@ -36,6 +36,7 @@ describe('connexion', () => {
     afficherApplication('/connexion')
     await saisir()
 
+    await userEvent.click(await screen.findByRole('button', { name: 'Menu du compte' }))
     expect(await screen.findByText('Fatou Diop')).toBeInTheDocument()
     expect(screen.getByTestId('lieu')).toHaveTextContent('/')
     expect(lireJeton()).toBe(JETON_TEST)
@@ -136,6 +137,7 @@ describe('session et accès', () => {
   it('rétablit la session d’un administrateur avec un jeton valide', async () => {
     simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
     afficherApplication('/revenus')
+    await userEvent.click(await screen.findByRole('button', { name: 'Menu du compte' }))
     expect(await screen.findByText('Fatou Diop')).toBeInTheDocument()
     expect(screen.getByTestId('lieu')).toHaveTextContent('/revenus')
   })

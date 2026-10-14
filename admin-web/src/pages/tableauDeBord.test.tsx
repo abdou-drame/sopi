@@ -157,6 +157,19 @@ describe('tableau de bord', () => {
     expect(liens(/Dossiers en attente/)).toHaveAttribute('href', '/dossiers-prestataires')
   })
 
+  it('affiche l’en-tête « Bienvenue » pleine largeur et actualise en lecture seule', async () => {
+    const { appels } = simulerApi(toutes)
+    afficherApplication('/')
+    const titre = await screen.findByRole('heading', { level: 1 })
+    expect(titre).toHaveTextContent('Bienvenue, Fatou')
+    expect(screen.getByLabelText(/Période affichée :/)).toBeInTheDocument()
+    await screen.findByText('95')
+    const avant = appels.length
+    await userEvent.click(screen.getByRole('button', { name: 'Actualiser' }))
+    await waitFor(() => expect(appels.length).toBeGreaterThan(avant))
+    expect(appels.every((a) => a.methode === 'GET')).toBe(true)
+  })
+
   it('bascule le graphique entre 7 et 30 jours', async () => {
     simulerApi(toutes)
     afficherApplication('/')
