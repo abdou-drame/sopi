@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\Admin\ListeSanctionsController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\NotificationEnEchecController;
 use App\Http\Controllers\Api\V1\Admin\PaiementAdminController;
 use App\Http\Controllers\Api\V1\Admin\ReservationAdminController;
 use App\Http\Controllers\Api\V1\Admin\RetraitAdminController;
@@ -78,6 +79,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/paiements/{id}', [PaiementAdminController::class, 'show']);
         Route::get('/retraits', [RetraitAdminController::class, 'index']);
         Route::get('/retraits/{id}', [RetraitAdminController::class, 'show']);
+        Route::get('/notifications-en-echec', [NotificationEnEchecController::class, 'index']);
+        Route::get('/notifications-en-echec/{id}', [NotificationEnEchecController::class, 'show']);
 
         Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
         Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
