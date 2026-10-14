@@ -1,31 +1,30 @@
 import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { api } from '../api/endpoints'
 import { messageDErreur } from '../api/client'
-import type { Alerte, Gravite, TableauDeBord } from '../api/types'
+import type { Alerte, Gravite, PointRevenus, TableauDeBord } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
+import BasculeGelules from '../components/ui/BasculeGelules'
 import Bloc from '../components/ui/Bloc'
-import EnTetePage from '../components/ui/EnTetePage'
-import CarteSopi from '../components/ui/CarteSopi'
+import Bouton from '../components/ui/Bouton'
+import BoutonRond from '../components/ui/BoutonRond'
 import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
-import { GraphiqueBarres } from '../components/ui/Graphiques'
-import {
-  IconeAvis,
-  IconeLitige,
-  IconePaiement,
-  IconeReservation,
-  IconeSanction,
-  IconeUtilisateurs,
-} from '../components/ui/Icones'
+import CarteSopi from '../components/ui/CarteSopi'
+import DerniersPaiements from '../components/ui/DerniersPaiements'
+import EnTetePage from '../components/ui/EnTetePage'
+import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
+import { IconeAvis, IconeDossier, IconeFleche, IconeLitige } from '../components/ui/Icones'
+import LienGelule from '../components/ui/LienGelule'
 import NombreAnime from '../components/ui/NombreAnime'
+import Squelette from '../components/ui/Squelette'
 import { L } from '../i18n/libelles'
-import { formatDateHeure, formatMontant, formatNombre } from '../lib/format'
+import { ajouterJours, aujourdhui, formatDateHeure, formatJourCalendaire, formatMontant, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
 const ORDRE_GRAVITE: Record<Gravite, number> = { critique: 0, attention: 1, info: 2 }
-const STATUTS_RESERVATION = ['en_attente', 'acceptee', 'confirmee', 'en_cours', 'terminee', 'refusee', 'annulee'] as const
-const STATUTS_PAIEMENT = ['en_attente', 'reussi', 'echoue', 'rembourse'] as const
+const NOMBRE_BARRES_MAX = 7
 
 /** Alertes de la plus grave à la moins grave, puis les plus nombreuses d'abord. */
 export function trierAlertes(alertes: Alerte[]): Alerte[] {
@@ -38,7 +37,22 @@ function detailAlerte(a: Alerte): string | undefined {
   return undefined
 }
 
-const nb = (n: number) => <NombreAnime valeur={n} />
+/**
+ * Regroupe les points journaliers pour garder au plus 7 barres lisibles : 7 jours = une barre par jour,
+ * 30 jours = une barre par tranche de 5 jours (somme des acomptes encaissés, étiquetée par le dernier jour).
+ */
+export function regrouperAcomptes(series: PointRevenus[]): { libelle: string; valeur: number }[] {
+  const taille = Math.max(1, Math.ceil(series.length / NOMBRE_BARRES_MAX))
+  const barres: { libelle: string; valeur: number }[] = []
+  for (let i = 0; i < series.length; i += taille) {
+    const groupe = series.slice(i, i + taille)
+    barres.push({
+      libelle: formatJourCalendaire(groupe[groupe.length - 1].fin, true),
+      valeur: groupe.reduce((somme, p) => somme + p.acomptesEncaisses, 0),
+    })
+  }
+  return barres
+}
 
 function BlocAlertes() {
   const { data, isPending, isError, error, refetch } = useAlertes()
@@ -73,105 +87,197 @@ function BlocAlertes() {
   )
 }
 
-function Effectifs({ d }: { d: TableauDeBord }) {
-  const { clients, prestataires, administrateurs } = d.comptes
-  const detail = (p: typeof clients.parStatut) =>
-    `${formatNombre(p.actif)} actifs · ${formatNombre(p.suspendu)} suspendus · ${formatNombre(p.banni)} bannis`
+/** Message d'erreur d'une carte, avec « Réessayer » (ne révèle rien de technique : le message vient du client d'API). */
+function ErreurCarte({ message, onReessayer }: { message: string; onReessayer: () => void }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <CarteChiffre titre={T.clients} valeur={nb(clients.total)} aide={detail(clients.parStatut)} icone={<IconeUtilisateurs />} teinte="violet" />
-      <CarteChiffre titre={T.prestataires} valeur={nb(prestataires.total)} aide={detail(prestataires.parStatut)} icone={<IconeUtilisateurs />} teinte="cyan" delai={70} />
-      <CarteChiffre titre={T.dossiersEnAttente} valeur={nb(prestataires.dossiersEnAttente)} icone={<IconeReservation />} teinte="rose" delai={140} />
-      <CarteChiffre titre={T.administrateurs} valeur={nb(administrateurs)} icone={<IconeUtilisateurs />} delai={210} />
+    <div role="alert" className="flex flex-col items-start gap-3 rounded-grand bg-erreur-fond p-5 text-erreur-texte">
+      <p className="text-sm font-medium">{message}</p>
+      <Bouton variante="secondaire" taille="p" onClick={onReessayer}>
+        {L.commun.reessayer}
+      </Bouton>
     </div>
   )
 }
 
-function Reservations({ d }: { d: TableauDeBord }) {
-  const r = d.reservations
-  const domaines = Object.entries(r.parDomaine)
+function CarteReservations({ d, erreur, chargement, onReessayer }: { d?: TableauDeBord; erreur: string | null; chargement: boolean; onReessayer: () => void }) {
+  const activite = d?.reservations.activiteRecente
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid gap-4 lg:grid-cols-3">
-        <Carte className="lg:col-span-2">
-          <p className="mb-2 text-sm font-medium text-texte-doux">
-            {T.reservationsTotal} : <strong className="text-texte">{formatNombre(r.total)}</strong> — {T.parStatut.toLowerCase()}
-          </p>
-          <GraphiqueBarres
-            description={`Réservations ${T.parStatut.toLowerCase()}`}
-            donnees={STATUTS_RESERVATION.map((s) => ({ libelle: L.statuts[s], valeur: r.parStatut[s] }))}
-          />
-        </Carte>
-        <div className="grid gap-4">
-          <CarteChiffre
-            titre={`${T.creees} · ${T.sept}`}
-            valeur={nb(r.activiteRecente.derniers7Jours.creees)}
-            aide={`${formatNombre(r.activiteRecente.derniers7Jours.terminees)} ${T.terminees.toLowerCase()}`}
-            icone={<IconeReservation />}
-          />
-          <CarteChiffre
-            titre={`${T.creees} · ${T.trente}`}
-            valeur={nb(r.activiteRecente.derniers30Jours.creees)}
-            aide={`${formatNombre(r.activiteRecente.derniers30Jours.terminees)} ${T.terminees.toLowerCase()}`}
-            icone={<IconeReservation />}
-            teinte="cyan"
-            delai={70}
-          />
-        </div>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        {domaines.map(([cle, dom], i) => (
-          <CarteChiffre
-            key={cle}
-            titre={T.domaines[cle] ?? cle}
-            valeur={nb(dom.total)}
-            aide={`${formatNombre(dom.parStatut.terminee)} ${T.terminees.toLowerCase()} · ${formatNombre(dom.parStatut.annulee)} annulées`}
-            teinte={(['bleu', 'violet', 'rose'] as const)[i % 3]}
-            delai={i * 70}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function Paiements({ d }: { d: TableauDeBord }) {
-  const p = d.paiements
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-      <CarteChiffre titre={T.paiementsTotal} valeur={nb(p.total.nombre)} aide={formatMontant(p.total.montant)} icone={<IconePaiement />} teinte="rose" />
-      {STATUTS_PAIEMENT.map((s, i) => (
-        <CarteChiffre key={s} titre={L.statuts[s]} valeur={nb(p.parStatut[s].nombre)} aide={formatMontant(p.parStatut[s].montant)} delai={(i + 1) * 70} />
-      ))}
-    </div>
-  )
-}
-
-function LitigesAvisSanctions({ d }: { d: TableauDeBord }) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <CarteChiffre titre={`${T.litiges} · ${T.litigesOuverts.toLowerCase()}`} valeur={nb(d.litiges.ouverts)} aide={`${formatNombre(d.litiges.clos)} ${T.litigesClos.toLowerCase()} sur ${formatNombre(d.litiges.total)}`} icone={<IconeLitige />} teinte="rose" />
-      <CarteChiffre titre={T.avisSignales} valeur={nb(d.avis.signales)} aide={`${formatNombre(d.avis.total)} ${T.avisTotal.toLowerCase()} · ${formatNombre(d.avis.masques)} ${T.avisMasques.toLowerCase()}`} icone={<IconeAvis />} teinte="violet" delai={70} />
-      <CarteChiffre
-        titre={T.noteMoyenne}
-        valeur={d.avis.noteMoyenne === null ? '—' : `${d.avis.noteMoyenne.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 2 })} / 5`}
-        icone={<IconeAvis />}
-        teinte="cyan"
-        delai={140}
+    <Carte
+      titre={T.carteReservationsTitre}
+      sousTitre={T.carteReservationsSousTitre}
+      action={<BoutonRond libelle={T.ouvrirReservations} icone={<IconeFleche />} vers="/reservations" />}
+    >
+      <CarteSopi
+        libelle={T.carteTerminees30}
+        montant={activite ? formatNombre(activite.derniers30Jours.terminees) : ''}
+        lignes={[
+          { libelle: T.carteCreees7, valeur: activite ? formatNombre(activite.derniers7Jours.creees) : '' },
+          { libelle: T.cartePaiementsReussis, valeur: d ? formatNombre(d.paiements.parStatut.reussi.nombre) : '' },
+        ]}
+        chargement={chargement}
+        erreur={erreur}
+        onReessayer={onReessayer}
       />
-      <CarteChiffre titre={T.suspensionsEnCours} valeur={nb(d.sanctions.suspensionsEnCours)} aide={`${formatNombre(d.sanctions.bannissements)} ${T.bannissements.toLowerCase()}`} icone={<IconeSanction />} delai={210} />
-    </div>
+      <div className="mt-5 flex items-end justify-between gap-3">
+        <div>
+          <p className="text-micro text-texte-doux">{T.creeesSur30}</p>
+          <p className="mt-0.5 text-xl font-bold text-texte">{activite ? <NombreAnime valeur={activite.derniers30Jours.creees} /> : '—'}</p>
+        </div>
+        <LienGelule vers="/reservations">{T.voirReservations}</LienGelule>
+      </div>
+    </Carte>
+  )
+}
+
+type Periode = '7' | '30'
+
+function CarteBarres() {
+  const [periode, setPeriode] = useState<Periode>('7')
+  const { data, isPending, isError, error, refetch } = useRevenus30Jours()
+  const barres = useMemo(() => {
+    const serie = data?.series ?? []
+    return regrouperAcomptes(periode === '7' ? serie.slice(-7) : serie)
+  }, [data, periode])
+  const vide = !!data && barres.every((b) => b.valeur === 0)
+
+  return (
+    <Carte
+      titre={T.barresTitre}
+      sousTitre={T.barresSousTitre}
+      action={
+        <div className="flex items-center gap-2">
+          <BasculeGelules
+            legende={T.basculePeriode}
+            valeur={periode}
+            onChange={setPeriode}
+            options={[
+              { valeur: '7', libelle: T.sept30.sept },
+              { valeur: '30', libelle: T.sept30.trente },
+            ]}
+          />
+          <BoutonRond libelle={T.ouvrirPaiements} icone={<IconeFleche />} vers="/paiements" />
+        </div>
+      }
+    >
+      {isPending ? (
+        <div role="status" aria-label={`${L.commun.chargement} ${T.barresTitre}`}>
+          <Squelette className="h-64 w-full rounded-grand" />
+        </div>
+      ) : isError ? (
+        <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
+      ) : vide ? (
+        <p className="py-16 text-center text-sm text-texte-doux">{T.barresVide}</p>
+      ) : (
+        <GraphiqueBarres key={periode} description={T.barresDescription} donnees={barres} formatValeur={formatMontant} />
+      )}
+    </Carte>
+  )
+}
+
+function CarteCommission() {
+  const { data, isPending, isError, error, refetch } = useRevenus30Jours()
+  const serie = data?.series ?? []
+  const total = serie.reduce((somme, p) => somme + p.revenus, 0)
+  return (
+    <Carte
+      titre={T.commissionTitre}
+      sousTitre={T.commissionSousTitre}
+      action={<BoutonRond libelle={T.ouvrirRevenus} icone={<IconeFleche />} vers="/revenus" />}
+    >
+      {isPending ? (
+        <div role="status" aria-label={`${L.commun.chargement} ${T.commissionTitre}`}>
+          <Squelette className="h-10 w-48" />
+          <Squelette className="mt-4 h-32 w-full rounded-grand" />
+        </div>
+      ) : isError ? (
+        <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
+      ) : (
+        <>
+          <p className="text-center text-chiffre font-bold tracking-tight text-texte">
+            <NombreAnime valeur={total} format={formatMontant} />
+          </p>
+          <div className="mt-2">
+            <GraphiqueCourbe
+              description={T.courbeDescription}
+              libelles={serie.map((p) => formatJourCalendaire(p.debut, true))}
+              series={[{ nom: T.commissionTitre, couleur: 'var(--color-primaire-500)', valeurs: serie.map((p) => p.revenus) }]}
+              formatValeur={formatMontant}
+            />
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <LienGelule vers="/revenus">{T.voirRevenus}</LienGelule>
+            <LienGelule vers="/paiements" variante="claire">
+              {T.voirPaiements}
+            </LienGelule>
+          </div>
+        </>
+      )}
+    </Carte>
+  )
+}
+
+function CarteDerniersPaiements() {
+  const { data, isPending, isError, error, refetch } = useQuery({ queryKey: ['derniers-paiements'], queryFn: api.derniersPaiements, retry: false })
+  return (
+    <Carte
+      titre={L.derniersPaiements.titre}
+      sousTitre={L.derniersPaiements.sousTitre}
+      action={<BoutonRond libelle={T.ouvrirPaiements} icone={<IconeFleche />} vers="/paiements" />}
+    >
+      <DerniersPaiements
+        paiements={(data?.data ?? []).slice(0, 5)}
+        chargement={isPending}
+        erreur={isError ? messageDErreur(error) : null}
+        onReessayer={() => void refetch()}
+      />
+    </Carte>
+  )
+}
+
+function useRevenus30Jours() {
+  const fin = aujourdhui()
+  const debut = ajouterJours(fin, -29)
+  return useQuery({
+    queryKey: ['tableau-de-bord-revenus', debut, fin],
+    queryFn: () => api.revenus({ debut, fin, regroupement: 'jour' }),
+    retry: false,
+  })
+}
+
+function CarteCompteur({
+  titre,
+  valeur,
+  vers,
+  icone,
+  teinte,
+  chargement,
+  delai,
+}: {
+  titre: string
+  valeur?: number
+  vers: string
+  icone: React.ReactNode
+  teinte: 'rose' | 'violet' | 'cyan'
+  chargement: boolean
+  delai: number
+}) {
+  return (
+    <CarteChiffre
+      titre={titre}
+      valeur={valeur === undefined ? '—' : <NombreAnime valeur={valeur} />}
+      icone={icone}
+      teinte={teinte}
+      chargement={chargement}
+      delai={delai}
+      action={<LienGelule vers={vers} variante="claire">{`${T.ouvrir} · ${titre}`}</LienGelule>}
+    />
   )
 }
 
 export default function TableauDeBordPage() {
   const requete = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
   const { data, isPending, isError, error, refetch } = requete
-  const etat = {
-    chargement: isPending,
-    erreur: isError ? messageDErreur(error) : null,
-    onReessayer: () => void refetch(),
-  }
+  const erreur = isError ? messageDErreur(error) : null
 
   return (
     <div className="flex flex-col gap-8">
@@ -179,30 +285,26 @@ export default function TableauDeBordPage() {
 
       <BlocAlertes />
 
-      <CarteSopi
-        libelle={T.carteTerminees30}
-        montant={data ? formatNombre(data.reservations.activiteRecente.derniers30Jours.terminees) : ''}
-        lignes={[
-          { libelle: T.carteCreees7, valeur: data ? formatNombre(data.reservations.activiteRecente.derniers7Jours.creees) : '' },
-          { libelle: T.cartePaiementsReussis, valeur: data ? formatNombre(data.paiements.parStatut.reussi.nombre) : '' },
-        ]}
-        chargement={isPending}
-        erreur={etat.erreur}
-        onReessayer={etat.onReessayer}
-      />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
+        <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
+        <CarteBarres />
+        <CarteCommission />
 
-      <Bloc titre={T.effectifs} {...etat} hauteur="h-32">
-        {data && <Effectifs d={data} />}
-      </Bloc>
-      <Bloc titre={T.reservations} {...etat} hauteur="h-72">
-        {data && <Reservations d={data} />}
-      </Bloc>
-      <Bloc titre={T.paiements} {...etat} hauteur="h-32">
-        {data && <Paiements d={data} />}
-      </Bloc>
-      <Bloc titre={`${T.litiges}, ${T.avis.toLowerCase()} et ${T.sanctions.toLowerCase()}`} {...etat} hauteur="h-32">
-        {data && <LitigesAvisSanctions d={data} />}
-      </Bloc>
+        <div className="lg:col-span-2">
+          <CarteDerniersPaiements />
+        </div>
+        <div className="flex flex-col gap-5">
+          {erreur && !isPending ? (
+            <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
+          ) : (
+            <>
+              <CarteCompteur titre={T.litigesOuvertsTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige />} teinte="rose" chargement={isPending} delai={0} />
+              <CarteCompteur titre={T.avisATraiterTitre} valeur={data?.avis.signales} vers="/avis?aTraiter=1" icone={<IconeAvis />} teinte="violet" chargement={isPending} delai={70} />
+              <CarteCompteur titre={T.dossiersTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier />} teinte="cyan" chargement={isPending} delai={140} />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

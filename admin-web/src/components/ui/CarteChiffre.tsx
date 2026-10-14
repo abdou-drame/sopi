@@ -17,12 +17,14 @@ interface Props {
   icone?: ReactNode
   teinte?: Teinte
   chargement?: boolean
+  /** Action sous le chiffre (lien gélule vers l'écran concerné). */
+  action?: ReactNode
   /** Retard d'apparition en ms (effet d'échelonnement). */
   delai?: number
 }
 
 /** Carte de chiffre clé : grand nombre, titre et ligne d'aide, avec une pastille d'icône colorée. */
-export default function CarteChiffre({ titre, valeur, aide, icone, teinte = 'bleu', chargement, delai = 0 }: Props) {
+export default function CarteChiffre({ titre, valeur, aide, icone, teinte = 'bleu', chargement, action, delai = 0 }: Props) {
   return (
     <div
       className="animate-apparition rounded-carte bg-surface p-6 shadow-carte"
@@ -44,6 +46,7 @@ export default function CarteChiffre({ titre, valeur, aide, icone, teinte = 'ble
         <>
           <p className="mt-2 text-chiffre font-bold tracking-tight text-texte">{valeur}</p>
           {aide && <p className="mt-1 text-micro text-texte-doux">{aide}</p>}
+          {action && <div className="mt-3">{action}</div>}
         </>
       )}
     </div>
