@@ -11,6 +11,8 @@ export interface ReponseSimulee {
   status?: number
   corps?: unknown
   entetes?: Record<string, string>
+  /** Fichier binaire (justificatif, preuve) : renvoyé tel quel à la place du JSON. */
+  binaire?: { type: string; contenu?: string }
 }
 type Gestionnaire = ReponseSimulee | ((requete: { corps: unknown; entetes: Headers; url: URL }) => ReponseSimulee)
 
@@ -19,6 +21,8 @@ export interface AppelApi {
   chemin: string
   corps: unknown
   entetes: Headers
+  /** Paramètres de requête (filtres, page). */
+  recherche: URLSearchParams
 }
 
 /**
@@ -33,10 +37,16 @@ export function simulerApi(routes: Record<string, Gestionnaire>) {
     const chemin = url.pathname.replace(/^\/api\/v1/, '')
     const entetes = new Headers(init?.headers)
     const corps = init?.body ? JSON.parse(String(init.body)) : undefined
-    appels.push({ methode, chemin, corps, entetes })
+    appels.push({ methode, chemin, corps, entetes, recherche: url.searchParams })
     const gestionnaire = routes[`${methode} ${chemin}`]
     if (!gestionnaire) return new Response(JSON.stringify({ message: `Route non simulée : ${methode} ${chemin}` }), { status: 404 })
     const r = typeof gestionnaire === 'function' ? gestionnaire({ corps, entetes, url }) : gestionnaire
+    if (r.binaire) {
+      return new Response(new Blob([r.binaire.contenu ?? 'x'], { type: r.binaire.type }), {
+        status: r.status ?? 200,
+        headers: { 'Content-Type': r.binaire.type },
+      })
+    }
     return new Response(JSON.stringify(r.corps ?? {}), {
       status: r.status ?? 200,
       headers: { 'Content-Type': 'application/json', ...r.entetes },

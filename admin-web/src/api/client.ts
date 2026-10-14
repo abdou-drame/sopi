@@ -84,7 +84,27 @@ export async function requete<T>(methode: 'GET' | 'POST', chemin: string, option
   if (reponse.ok) {
     return (await lireCorps(reponse)) as T
   }
+  return echouer(reponse, options.publique ?? false)
+}
 
+/** Fichier protégé (justificatif, preuve) : récupéré avec le jeton Sanctum, jamais par une balise <img src> nue. */
+export async function telecharger(chemin: string, signal?: AbortSignal): Promise<Blob> {
+  const entetes: Record<string, string> = {}
+  const jeton = lireJeton()
+  if (jeton) entetes.Authorization = `Bearer ${jeton}`
+  let reponse: Response
+  try {
+    reponse = await fetch(construireUrl(chemin), { method: 'GET', headers: entetes, signal })
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') throw e
+    throw new ApiError(L.erreurs.reseau, 0)
+  }
+  if (reponse.ok) return reponse.blob()
+  return echouer(reponse, false)
+}
+
+async function echouer(reponse: Response, publique: boolean): Promise<never> {
+  const options = { publique }
   const corps = await lireCorps(reponse)
   const retryAfter = Number(reponse.headers.get('Retry-After')) || null
   const status = reponse.status

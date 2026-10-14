@@ -51,13 +51,19 @@ describe('coque', () => {
     expect(within(nav).getByRole('link', { name: /Retraits/ })).not.toHaveTextContent(/\d/)
   })
 
-  it('marque l’écran courant et affiche « bientôt disponible » pour les écrans à venir', async () => {
-    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
+  it('marque l’écran courant dans le menu', async () => {
+    const page = { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } }
+    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES }, 'GET /admin/litiges': { corps: page } })
     afficherApplication('/litiges')
     expect(await screen.findByRole('heading', { name: 'Litiges' })).toBeInTheDocument()
-    expect(screen.getByText('Bientôt disponible')).toBeInTheDocument()
     const nav = screen.getByRole('navigation', { name: 'Navigation principale' })
     expect(within(nav).getByRole('link', { name: 'Litiges' })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('affiche « bientôt disponible » pour un écran pas encore livré', async () => {
+    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
+    afficherApplication('/notifications-en-echec')
+    expect(await screen.findByText('Bientôt disponible')).toBeInTheDocument()
   })
 
   it('affiche la barre du haut : raccourcis, alertes et menu du compte', async () => {

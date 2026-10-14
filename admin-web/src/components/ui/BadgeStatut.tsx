@@ -36,6 +36,13 @@ const tonDuStatut: Record<string, Ton> = {
   rembourse: 'neutre',
   ouvert: 'attention',
   clos: 'neutre',
+  cloture: 'neutre',
+  valide: 'succes',
+  rejete: 'erreur',
+  publie: 'succes',
+  signale: 'attention',
+  supprime: 'neutre',
+  paye: 'succes',
 }
 
 interface Props {
