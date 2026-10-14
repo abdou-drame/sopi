@@ -104,3 +104,19 @@ export interface Page<T> {
   links: { first: string | null; last: string | null; prev: string | null; next: string | null }
   meta: { current_page: number; last_page: number; per_page: number; total: number }
 }
+
+/** Paiement en liste d'administration (aucune référence DexPay en liste). Montants en FCFA entiers. */
+export interface PaiementAdmin {
+  id: string
+  reservationId: string
+  statut: 'en_attente' | 'reussi' | 'echoue' | 'rembourse'
+  montantAcompte: number
+  commission: number
+  remboursementDu: boolean
+  remboursementDuLe: string | null
+  tentativesRemboursement: number
+  tentativesEpuisees: boolean
+  payeLe: string | null
+  rembourseLe: string | null
+  crediteLe: string | null
+}

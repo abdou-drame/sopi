@@ -1,4 +1,8 @@
 import { useState } from 'react'
+import BasculeGelules from '../components/ui/BasculeGelules'
+import BoutonRond from '../components/ui/BoutonRond'
+import DerniersPaiements from '../components/ui/DerniersPaiements'
+import LienGelule from '../components/ui/LienGelule'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import BarreFiltres from '../components/ui/BarreFiltres'
@@ -13,7 +17,7 @@ import Definitions from '../components/ui/Definitions'
 import EnTetePage from '../components/ui/EnTetePage'
 import FiltresListe from '../components/ui/FiltresListe'
 import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
-import { IconeAvis, IconePaiement, IconeReservation, IconeUtilisateurs } from '../components/ui/Icones'
+import { IconeFleche, IconeAvis, IconePaiement, IconeReservation, IconeUtilisateurs } from '../components/ui/Icones'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
 import Squelette from '../components/ui/Squelette'
 import Tableau from '../components/ui/Tableau'
@@ -58,6 +62,7 @@ export default function DemoPage() {
   const [page, setPage] = useState(1)
   const filtres = useFiltresUrl(['statut', 'debut'], { statut: 'ouvert' })
   const [jour, setJour] = useState('')
+  const [periode, setPeriode] = useState<'7' | '30'>('7')
   const [etat, setEtat] = useState<'normal' | 'chargement' | 'erreur' | 'vide'>('normal')
 
   const lignes = [...LIGNES].sort((a, b) => {
@@ -298,6 +303,26 @@ export default function DemoPage() {
           <Definitions elements={[{ libelle: 'Statut', valeur: filtres.valeurs.statut }, { libelle: 'Depuis le', valeur: filtres.valeurs.debut }, { libelle: 'Description', valeur: 'Texte long affiché sur toute la largeur.', large: true }]} />
         </Carte>
       </Section>
+      <Section titre="Carte à en-tête, bascule en gélules, liens gélules et derniers paiements">
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Carte titre="Activité" sousTitre="Exemple de carte à en-tête" action={<BoutonRond libelle="Ouvrir l’écran" icone={<IconeFleche />} vers="/" />}>
+            <BasculeGelules legende="Période" valeur={periode} onChange={setPeriode} options={[{ valeur: '7', libelle: '7 jours' }, { valeur: '30', libelle: '30 jours' }]} />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <LienGelule vers="/">Lien plein</LienGelule>
+              <LienGelule vers="/" variante="claire">Lien clair</LienGelule>
+            </div>
+          </Carte>
+          <Carte className="lg:col-span-2" titre="Derniers paiements" sousTitre="Exemple">
+            <DerniersPaiements
+              paiements={[
+                { id: 'aaaaaaaa-0000-0000-0000-000000000001', reservationId: 'bbbbbbbb-0000-0000-0000-000000000001', statut: 'reussi', montantAcompte: 4500, commission: 1500, remboursementDu: false, remboursementDuLe: null, tentativesRemboursement: 0, tentativesEpuisees: false, payeLe: '2030-01-20T10:30:00+00:00', rembourseLe: null, crediteLe: null },
+                { id: 'aaaaaaaa-0000-0000-0000-000000000002', reservationId: 'bbbbbbbb-0000-0000-0000-000000000002', statut: 'en_attente', montantAcompte: 900, commission: 300, remboursementDu: false, remboursementDuLe: null, tentativesRemboursement: 0, tentativesEpuisees: false, payeLe: null, rembourseLe: null, crediteLe: null },
+              ]}
+            />
+          </Carte>
+        </div>
+      </Section>
+
     </main>
   )
 }

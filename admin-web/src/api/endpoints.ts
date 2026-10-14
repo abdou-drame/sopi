@@ -1,5 +1,5 @@
 import { requete } from './client'
-import type { ReponseAlertes, ReponseConnexion, Regroupement, Revenus, TableauDeBord, Utilisateur } from './types'
+import type { PaiementAdmin, Page, ReponseAlertes, ReponseConnexion, Regroupement, Revenus, TableauDeBord, Utilisateur } from './types'
 
 // Un appel par route de l'API utilisée par le back-office. Aucune règle métier ici.
 export const api = {
@@ -10,6 +10,7 @@ export const api = {
 
   tableauDeBord: () => requete<TableauDeBord>('GET', '/admin/tableau-de-bord'),
   alertes: () => requete<ReponseAlertes>('GET', '/admin/alertes'),
+  derniersPaiements: () => requete<Page<PaiementAdmin>>('GET', '/admin/paiements'),
   revenus: (params: { debut: string; fin: string; regroupement: Regroupement }) =>
     requete<Revenus>('GET', '/admin/revenus', { params }),
 }
