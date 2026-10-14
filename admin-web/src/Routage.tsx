@@ -6,6 +6,8 @@ import { ENTREES_A_VENIR } from './layout/menu'
 import ConnexionPage from './pages/ConnexionPage'
 import { DossierDetailPage, DossiersListePage } from './pages/DossiersPages'
 import { LitigeDetailPage, LitigesListePage } from './pages/LitigesPages'
+import SanctionsListePage from './pages/SanctionsPages'
+import { UtilisateurDetailPage, UtilisateursListePage } from './pages/UtilisateursPages'
 import RevenusPage from './pages/RevenusPage'
 import TableauDeBordPage from './pages/TableauDeBordPage'
 import { AccesRefusePage, BientotPage, NonTrouvePage } from './pages/PagesSimples'
@@ -28,6 +30,9 @@ export default function Routage() {
             <Route path="/dossiers-prestataires/:id" element={<DossierDetailPage />} />
             <Route path="/litiges" element={<LitigesListePage />} />
             <Route path="/litiges/:id" element={<LitigeDetailPage />} />
+            <Route path="/sanctions" element={<SanctionsListePage />} />
+            <Route path="/utilisateurs" element={<UtilisateursListePage />} />
+            <Route path="/utilisateurs/:id" element={<UtilisateurDetailPage />} />
             {ENTREES_A_VENIR.map((e) => (
               <Route key={e.chemin} path={e.chemin} element={<BientotPage />} />
             ))}

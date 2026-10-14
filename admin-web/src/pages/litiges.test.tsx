@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
@@ -82,8 +82,8 @@ describe('litiges', () => {
     expect(screen.getByText(/Acompte 4 500 FCFA/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir la réservation' })).toHaveAttribute('href', '/reservations/0198a1b2-0000-7000-8000-000000000060')
 
-    const images = await screen.findAllByRole('img', { name: /Preuve/ })
-    expect(images).toHaveLength(2)
+    await waitFor(() => expect(screen.getAllByRole('img', { name: /Preuve/ })).toHaveLength(2))
+    const images = screen.getAllByRole('img', { name: /Preuve/ })
     for (const img of images) expect(img).toHaveAttribute('src', 'blob:preuve-locale')
     for (const p of ['pr-1', 'pr-2']) {
       const appel = appels.find((a) => a.chemin === `/admin/litiges/${ID}/preuves/${p}`)

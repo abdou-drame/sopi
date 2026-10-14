@@ -41,14 +41,14 @@ export const MENU: GroupeMenu[] = [
     entrees: [
       { chemin: '/dossiers-prestataires', libelle: L.menu.demandes, icone: <IconeDossier />, disponible: true },
       { chemin: '/litiges', libelle: L.menu.litiges, icone: <IconeLitige />, disponible: true },
-      { chemin: '/sanctions', libelle: L.menu.sanctions, icone: <IconeSanction />, disponible: false },
+      { chemin: '/sanctions', libelle: L.menu.sanctions, icone: <IconeSanction />, disponible: true },
       { chemin: '/avis', libelle: L.menu.avis, icone: <IconeAvis />, disponible: false },
     ],
   },
   {
     titre: L.menu.groupeActivite,
     entrees: [
-      { chemin: '/utilisateurs', libelle: L.menu.utilisateurs, icone: <IconeUtilisateurs />, disponible: false },
+      { chemin: '/utilisateurs', libelle: L.menu.utilisateurs, icone: <IconeUtilisateurs />, disponible: true },
       { chemin: '/reservations', libelle: L.menu.reservations, icone: <IconeReservation />, disponible: false },
       { chemin: '/paiements', libelle: L.menu.paiements, icone: <IconePaiement />, disponible: false },
       { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait />, disponible: false },
