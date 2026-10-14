@@ -97,3 +97,10 @@ export interface Revenus {
   soldePrestataires: number
   series: PointRevenus[]
 }
+
+/** Page de résultats d'une liste (pagination Laravel : 20 éléments par page). */
+export interface Page<T> {
+  data: T[]
+  links: { first: string | null; last: string | null; prev: string | null; next: string | null }
+  meta: { current_page: number; last_page: number; per_page: number; total: number }
+}

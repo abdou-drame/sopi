@@ -242,6 +242,65 @@ body {
   );
 }
 
+/* Barre de défilement fine et discrète (barre latérale) avec fondu en bas */
+.defilement-fin {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-texte-discret) 45%, transparent) transparent;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.75rem), transparent);
+}
+.defilement-fin::-webkit-scrollbar {
+  width: 6px;
+}
+.defilement-fin::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--color-texte-discret) 45%, transparent);
+}
+
+/* Champ de date : l'indicateur natif est masqué, le calendrier du système de design le remplace */
+.champ-date::-webkit-calendar-picker-indicator {
+  display: none;
+}
+.champ-date {
+  min-height: 2.5rem;
+}
+
+/* Liste déroulante : ouverture stylée dans les navigateurs qui savent le faire (Chromium), repli natif ailleurs */
+@supports (appearance: base-select) {
+  .champ-liste,
+  .champ-liste::picker(select) {
+    appearance: base-select;
+  }
+  .champ-liste::picker-icon {
+    display: none;
+  }
+  .champ-liste::picker(select) {
+    margin-top: 0.5rem;
+    border: 0;
+    border-radius: var(--radius-moyen);
+    background: var(--color-surface);
+    color: var(--color-texte);
+    box-shadow: var(--shadow-eleve);
+    padding: 0.375rem;
+  }
+  .champ-liste option {
+    border-radius: var(--radius-petit);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  .champ-liste option:hover,
+  .champ-liste option:focus-visible {
+    background: var(--color-fond);
+  }
+  .champ-liste option:checked {
+    background: var(--color-primaire-50);
+    color: var(--color-primaire-700);
+    font-weight: 600;
+  }
+  .champ-liste option::checkmark {
+    display: none;
+  }
+}
+
 /* Mode « réduire les animations » : on coupe animations et transitions */
 @media (prefers-reduced-motion: reduce) {
   *,

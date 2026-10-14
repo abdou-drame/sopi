@@ -1,4 +1,7 @@
-import { forwardRef, useId } from 'react'
+import { forwardRef, useEffect, useId, useRef, useState } from 'react'
+import { L } from '../../i18n/libelles'
+import Calendrier from './Calendrier'
+import { IconeCalendrier, IconeChevronBas } from './Icones'
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 interface CommunProps {
@@ -100,19 +103,103 @@ export function Selecteur({
   const id = useId()
   return (
     <Enveloppe id={id} label={label} erreur={erreur} aide={aide}>
-      <select
-        id={id}
-        aria-invalid={erreur ? true : undefined}
-        aria-describedby={describedBy(id, erreur, aide)}
-        className={`${classeChamp(erreur)} ${className}`}
-        {...reste}
-      >
-        {options.map((o) => (
-          <option key={o.valeur} value={o.valeur}>
-            {o.libelle}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          id={id}
+          aria-invalid={erreur ? true : undefined}
+          aria-describedby={describedBy(id, erreur, aide)}
+          className={`champ-liste appearance-none pr-10 ${classeChamp(erreur)} ${className}`}
+          {...reste}
+        >
+          {options.map((o) => (
+            <option key={o.valeur} value={o.valeur}>
+              {o.libelle}
+            </option>
+          ))}
+        </select>
+        <IconeChevronBas
+          width={16}
+          height={16}
+          className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-texte-doux"
+        />
+      </div>
+    </Enveloppe>
+  )
+}
+
+interface PropsDate extends CommunProps {
+  /** Jour « AAAA-MM-JJ » ou vide. */
+  value: string
+  onChange: (jour: string) => void
+  min?: string
+  max?: string
+  disabled?: boolean
+}
+
+/**
+ * Champ de date : saisie au clavier par segments (champ date natif, indicateur masqué) et calendrier du système de design
+ * ouvert par le bouton. La valeur est toujours un jour « AAAA-MM-JJ ».
+ */
+export function ChampDate({ label, erreur, aide, value, onChange, min, max, disabled }: PropsDate) {
+  const id = useId()
+  const [ouvert, setOuvert] = useState(false)
+  const racine = useRef<HTMLDivElement>(null)
+  const declencheur = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!ouvert) return
+    const dehors = (e: MouseEvent) => {
+      if (!racine.current?.contains(e.target as Node)) setOuvert(false)
+    }
+    document.addEventListener('mousedown', dehors)
+    return () => document.removeEventListener('mousedown', dehors)
+  }, [ouvert])
+
+  const fermer = () => {
+    setOuvert(false)
+    declencheur.current?.focus()
+  }
+
+  return (
+    <Enveloppe id={id} label={label} erreur={erreur} aide={aide}>
+      <div ref={racine} className="relative">
+        <input
+          id={id}
+          type="date"
+          value={value}
+          min={min}
+          max={max}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={erreur ? true : undefined}
+          aria-describedby={describedBy(id, erreur, aide)}
+          className={`champ-date appearance-none pr-11 ${classeChamp(erreur)}`}
+        />
+        <button
+          ref={declencheur}
+          type="button"
+          disabled={disabled}
+          aria-label={L.calendrier.ouvrir}
+          aria-haspopup="dialog"
+          aria-expanded={ouvert}
+          onClick={() => setOuvert((o) => !o)}
+          className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-texte-doux transition-colors hover:bg-primaire-50 hover:text-primaire-700"
+        >
+          <IconeCalendrier width={16} height={16} />
+        </button>
+        {ouvert && (
+          <Calendrier
+            valeur={value}
+            min={min}
+            max={max}
+            onChoisir={(jour) => {
+              onChange(jour)
+              fermer()
+            }}
+            onFermer={fermer}
+          />
+        )}
+      </div>
     </Enveloppe>
   )
 }

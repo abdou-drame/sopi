@@ -5,9 +5,10 @@ import { erreursParChamp, messageDErreur } from '../api/client'
 import type { PointRevenus, Regroupement } from '../api/types'
 import BarreFiltres from '../components/ui/BarreFiltres'
 import Bloc from '../components/ui/Bloc'
+import EnTetePage from '../components/ui/EnTetePage'
 import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
-import { Champ, Selecteur } from '../components/ui/Champs'
+import { ChampDate, Selecteur } from '../components/ui/Champs'
 import { GraphiqueCourbe } from '../components/ui/Graphiques'
 import { IconePaiement, IconeRetrait, IconeRevenus } from '../components/ui/Icones'
 import NombreAnime from '../components/ui/NombreAnime'
@@ -82,29 +83,21 @@ export default function RevenusPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="animate-apparition">
-        <h1 className="text-titre-page font-bold text-titre">{T.titre}</h1>
-        <p className="mt-1 text-sm text-sous-titre">
-          {T.sousTitre}
-          {data && ` ${L.tableauDeBord.misAJour(formatDateHeure(data.dateGeneration))}.`}
-        </p>
-      </header>
+      <EnTetePage titre={T.titre} sousTitre={`${T.sousTitre}${data ? ` ${L.tableauDeBord.misAJour(formatDateHeure(data.dateGeneration))}.` : ''}`} />
 
       <BarreFiltres legende={T.titre} onAppliquer={appliquer} libelleAppliquer={T.appliquer} onReinitialiser={reinitialiser}>
-        <Champ
+        <ChampDate
           label={T.debut}
-          type="date"
           value={saisie.debut}
           max={saisie.fin || undefined}
-          onChange={(e) => modifier({ debut: e.target.value })}
+          onChange={(debut) => modifier({ debut })}
           erreur={erreursApi.debut}
         />
-        <Champ
+        <ChampDate
           label={T.fin}
-          type="date"
           value={saisie.fin}
           min={saisie.debut || undefined}
-          onChange={(e) => modifier({ fin: e.target.value })}
+          onChange={(fin) => modifier({ fin })}
           erreur={erreurSaisie ?? erreursApi.fin}
         />
         <Selecteur

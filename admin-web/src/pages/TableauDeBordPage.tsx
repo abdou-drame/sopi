@@ -5,6 +5,7 @@ import type { Alerte, Gravite, TableauDeBord } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import Bloc from '../components/ui/Bloc'
+import EnTetePage from '../components/ui/EnTetePage'
 import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { GraphiqueBarres } from '../components/ui/Graphiques'
@@ -173,13 +174,7 @@ export default function TableauDeBordPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="animate-apparition">
-        <h1 className="text-titre-page font-bold text-titre">{T.titre}</h1>
-        <p className="mt-1 text-sm text-sous-titre">
-          {T.sousTitre}
-          {data && ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.`}
-        </p>
-      </header>
+      <EnTetePage titre={T.titre} sousTitre={`${T.sousTitre}${data ? ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.` : ''}`} />
 
       <BlocAlertes />
 

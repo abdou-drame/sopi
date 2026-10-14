@@ -35,7 +35,7 @@ function BarreLaterale({ replie, surBascule }: { replie: boolean; surBascule: ()
       }`}
     >
       <Logo replie={replie} />
-      <nav aria-label={L.menu.titre} className="-mx-1 flex-1 overflow-x-hidden overflow-y-auto px-1 py-1">
+      <nav aria-label={L.menu.titre} className="defilement-fin -mx-1 flex-1 overflow-x-hidden overflow-y-auto px-1 py-1 pb-6">
         {MENU.map((groupe) => (
           <div key={groupe.titre} className="mb-3">
             {!replie && (

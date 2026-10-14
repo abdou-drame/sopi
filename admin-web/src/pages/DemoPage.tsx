@@ -7,7 +7,10 @@ import Carte from '../components/ui/Carte'
 import Infobulle from '../components/ui/Infobulle'
 import Bouton from '../components/ui/Bouton'
 import CarteChiffre from '../components/ui/CarteChiffre'
-import { Champ, Selecteur, ZoneTexte } from '../components/ui/Champs'
+import { Champ, ChampDate, Selecteur, ZoneTexte } from '../components/ui/Champs'
+import Definitions from '../components/ui/Definitions'
+import EnTetePage from '../components/ui/EnTetePage'
+import FiltresListe from '../components/ui/FiltresListe'
 import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
 import { IconeAvis, IconePaiement, IconeReservation, IconeUtilisateurs } from '../components/ui/Icones'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
@@ -16,6 +19,7 @@ import Tableau from '../components/ui/Tableau'
 import type { Tri } from '../components/ui/Tableau'
 import VisionneuseImage from '../components/ui/VisionneuseImage'
 import { L } from '../i18n/libelles'
+import { useFiltresUrl } from '../lib/useFiltresUrl'
 import { formatMontant } from '../lib/format'
 
 // Page interne de démonstration du système de design. Enregistrée uniquement en développement (voir App.tsx).
@@ -51,6 +55,8 @@ export default function DemoPage() {
   const [dernier, setDernier] = useState('')
   const [tri, setTri] = useState<Tri>({ cle: 'reference', sens: 'asc' })
   const [page, setPage] = useState(1)
+  const filtres = useFiltresUrl(['statut', 'debut'], { statut: 'ouvert' })
+  const [jour, setJour] = useState('')
   const [etat, setEtat] = useState<'normal' | 'chargement' | 'erreur' | 'vide'>('normal')
 
   const lignes = [...LIGNES].sort((a, b) => {
@@ -262,6 +268,27 @@ export default function DemoPage() {
             setModale(null)
           }}
         />
+      </Section>
+      <Section titre="Dates et calendrier">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <ChampDate label="Date de début" value={jour} onChange={setJour} />
+          <p className="self-end text-sm text-texte-doux">Choisie : {jour || '—'}</p>
+        </div>
+      </Section>
+
+      <Section titre="En-tête de page, filtres synchronisés avec l’adresse et définitions">
+        <EnTetePage titre="Litiges" sousTitre="Exemple d’en-tête d’écran" actions={<Bouton variante="secondaire" taille="p">Action</Bouton>} />
+        <FiltresListe
+          legende="Filtres d’exemple"
+          etat={filtres}
+          filtres={[
+            { cle: 'statut', type: 'select', label: 'Statut', options: [{ valeur: 'ouvert', libelle: 'Ouverts' }, { valeur: 'cloture', libelle: 'Clôturés' }, { valeur: 'tous', libelle: 'Tous' }] },
+            { cle: 'debut', type: 'date', label: 'Depuis le' },
+          ]}
+        />
+        <Carte titre="Détail (exemple)">
+          <Definitions elements={[{ libelle: 'Statut', valeur: filtres.valeurs.statut }, { libelle: 'Depuis le', valeur: filtres.valeurs.debut }, { libelle: 'Description', valeur: 'Texte long affiché sur toute la largeur.', large: true }]} />
+        </Carte>
       </Section>
     </main>
   )

@@ -151,3 +151,31 @@ export const IconeLune = (p: P) => (
     <path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z" />
   </Icone>
 )
+
+export const IconeChevronBas = (p: P) => (
+  <Icone {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </Icone>
+)
+export const IconeChevronDroite = (p: P) => (
+  <Icone {...p}>
+    <path d="M9 6l6 6-6 6" />
+  </Icone>
+)
+export const IconeCalendrier = (p: P) => (
+  <Icone {...p}>
+    <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+    <path d="M3.5 10h17M8 3v4M16 3v4" />
+  </Icone>
+)
+export const IconeRetour = (p: P) => (
+  <Icone {...p}>
+    <path d="M19 12H5M11 6l-6 6 6 6" />
+  </Icone>
+)
+export const IconeRecherche = (p: P) => (
+  <Icone {...p}>
+    <circle cx="11" cy="11" r="6.5" />
+    <path d="M16 16l4.5 4.5" />
+  </Icone>
+)
