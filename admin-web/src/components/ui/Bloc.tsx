@@ -20,13 +20,13 @@ interface Props {
 export default function Bloc({ titre, chargement, erreur, onReessayer, vide, messageVide, children, hauteur = 'h-40' }: Props) {
   return (
     <section aria-label={titre} className="flex flex-col gap-3">
-      <h2 className="text-lg font-semibold text-primaire-800">{titre}</h2>
+      <h2 className="text-lg font-bold text-primaire-800">{titre}</h2>
       {chargement ? (
         <div role="status" aria-label={`${L.commun.chargement} ${titre}`}>
-          <Squelette className={`${hauteur} w-full rounded-grand`} />
+          <Squelette className={`${hauteur} w-full rounded-carte`} />
         </div>
       ) : erreur ? (
-        <div role="alert" className="flex flex-col items-start gap-3 rounded-grand bg-erreur-fond p-5 text-erreur-texte">
+        <div role="alert" className="flex flex-col items-start gap-3 rounded-carte bg-erreur-fond p-6 text-erreur-texte">
           <p className="text-sm font-medium">{erreur}</p>
           {onReessayer && (
             <Bouton variante="secondaire" taille="p" onClick={onReessayer}>
@@ -35,7 +35,7 @@ export default function Bloc({ titre, chargement, erreur, onReessayer, vide, mes
           )}
         </div>
       ) : vide ? (
-        <p className="rounded-grand bg-surface p-6 text-center text-sm text-texte-doux shadow-carte">
+        <p className="rounded-carte bg-surface p-6 text-center text-sm text-texte-doux shadow-carte">
           {messageVide ?? L.commun.aucuneDonnee}
         </p>
       ) : (

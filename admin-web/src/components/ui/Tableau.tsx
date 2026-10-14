@@ -54,12 +54,12 @@ export default function Tableau<T>({
   const aligne = (c: Colonne<T>) => (c.alignement === 'droite' ? 'text-right' : 'text-left')
 
   return (
-    <div className="overflow-hidden rounded-grand bg-surface shadow-carte">
+    <div className="overflow-hidden rounded-carte bg-surface p-2 shadow-carte">
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm" aria-busy={chargement || undefined}>
           <caption className="sr-only">{legende}</caption>
           <thead>
-            <tr className="border-b border-bordure bg-fond/60">
+            <tr>
               {colonnes.map((c) => {
                 const actif = tri?.cle === c.cle
                 return (
@@ -67,7 +67,7 @@ export default function Tableau<T>({
                     key={c.cle}
                     scope="col"
                     aria-sort={actif ? (tri?.sens === 'asc' ? 'ascending' : 'descending') : undefined}
-                    className={`px-4 py-3 text-xs font-semibold tracking-wide text-texte-doux uppercase ${aligne(c)}`}
+                    className={`px-5 py-3 text-micro font-semibold tracking-wider text-texte-discret uppercase ${aligne(c)}`}
                   >
                     {c.triable && onTri ? (
                       <button
@@ -92,7 +92,7 @@ export default function Tableau<T>({
               Array.from({ length: 5 }, (_, i) => (
                 <tr key={`sq-${i}`} className="border-b border-bordure last:border-0">
                   {colonnes.map((c) => (
-                    <td key={c.cle} className="px-4 py-3.5">
+                    <td key={c.cle} className="px-5 py-4">
                       <Squelette className="h-4 w-full max-w-40" />
                     </td>
                   ))}
@@ -100,13 +100,14 @@ export default function Tableau<T>({
               ))}
             {!chargement &&
               !erreur &&
-              lignes.map((ligne) => (
+              lignes.map((ligne, i) => (
                 <tr
                   key={cleLigne(ligne)}
-                  className="border-b border-bordure transition-colors last:border-0 hover:bg-primaire-50/60"
+                  style={{ animationDelay: `${Math.min(i * 25, 250)}ms` }}
+                  className="animate-apparition border-t border-bordure/60 transition-colors hover:bg-fond"
                 >
                   {colonnes.map((c) => (
-                    <td key={c.cle} className={`px-4 py-3.5 text-texte ${aligne(c)}`}>
+                    <td key={c.cle} className={`px-5 py-4 text-texte ${aligne(c)}`}>
                       {c.rendu(ligne)}
                     </td>
                   ))}

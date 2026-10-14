@@ -5,9 +5,9 @@
 @import "tailwindcss";
 
 /*
- * Jetons de design de Sopi (mode clair uniquement : la palette est celle d'une application financière claire à cartes bleues,
- * un mode sombre demanderait de redéfinir toutes les teintes pastel et n'est pas prévu dans cette étape).
- * `@theme static` publie toutes les variables en CSS (:root), utilisées ensuite par les classes Tailwind (bg-primaire-600...).
+ * Jetons de design de Sopi : palette bleue, forme et mouvement inspirés d'un modèle de tableau de bord
+ * à cartes très arrondies. `@theme static` publie toutes les variables en CSS (:root), utilisées ensuite
+ * par les classes Tailwind (bg-primaire-600...).
  */
 @theme static {
   --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -54,30 +54,72 @@
   --color-info-texte: #1f4f95;
   --color-info: #3b78c0;
 
-  /* Rayons, ombres */
-  --radius-petit: 0.5rem;
-  --radius-moyen: 0.875rem;
-  --radius-grand: 1.25rem;
-  --shadow-carte: 0 1px 2px rgb(17 46 90 / 0.05), 0 8px 24px rgb(17 46 90 / 0.07);
-  --shadow-eleve: 0 12px 40px rgb(17 46 90 / 0.18);
+  /* Rayons : cartes très arrondies, boutons et champs en gélule */
+  --radius-petit: 0.75rem;
+  --radius-moyen: 1rem;
+  --radius-grand: 1.5rem;
+  --radius-carte: 1.75rem;
+  --radius-gelule: 9999px;
 
-  /* Mouvement */
-  --duree-rapide: 120ms;
-  --duree-normale: 220ms;
-  --duree-lente: 450ms;
+  /* Ombres larges et très diffuses, sans bordure */
+  --shadow-carte: 0 1px 2px rgb(17 46 90 / 0.03), 0 10px 32px rgb(17 46 90 / 0.07);
+  --shadow-eleve: 0 16px 48px rgb(17 46 90 / 0.2);
+  --shadow-bouton: 0 6px 16px rgb(31 79 149 / 0.28);
+  --shadow-infobulle: 0 6px 18px rgb(17 46 90 / 0.25);
+
+  /* Tailles de texte propres au back-office */
+  --text-titre-page: 1.875rem;
+  --text-titre-page--line-height: 1.2;
+  --text-chiffre: 1.75rem;
+  --text-chiffre--line-height: 1.15;
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1rem;
+
+  /* Mouvement : contenu en fondu qui se précise, cartes qui montent de 20 px, infobulles rapides */
+  --duree-rapide: 150ms;
+  --duree-normale: 250ms;
+  --duree-lente: 500ms;
+  --duree-trace: 1000ms;
   --ease-sortie: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   --animate-apparition: apparition var(--duree-lente) var(--ease-sortie) both;
   --animate-glissement: glissement var(--duree-normale) var(--ease-sortie) both;
+  --animate-flou: flou-entree 300ms var(--ease-sortie) both;
+  --animate-infobulle: infobulle 180ms var(--ease-sortie) both;
   --animate-pulsation: pulsation 1.6s var(--ease-standard) infinite;
-  --animate-trace: trace 900ms var(--ease-sortie) both;
+  --animate-trace: trace var(--duree-trace) var(--ease-sortie) both;
 }
 
 @keyframes apparition {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Changement de contenu : fondu avec flou qui se précise (relevé sur le clip, environ 300 ms) */
+@keyframes flou-entree {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes infobulle {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
   }
   to {
     opacity: 1;
@@ -124,6 +166,15 @@
   }
 }
 
+@keyframes remplissage {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 html {
   background: var(--color-fond);
   color: var(--color-texte);
@@ -140,6 +191,15 @@ body {
 :focus-visible {
   outline: 3px solid var(--color-primaire-400);
   outline-offset: 2px;
+}
+
+/* Hachures diagonales des barres en gélule (inactives) : motif en nuances de la couleur courante */
+.hachures {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, currentColor 55%, transparent) 0 2px,
+    color-mix(in srgb, currentColor 18%, transparent) 2px 6px
+  );
 }
 
 /* Mode « réduire les animations » : on coupe animations et transitions */

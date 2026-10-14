@@ -8,8 +8,8 @@ interface CommunProps {
 }
 
 const classeChamp = (erreur?: string) =>
-  `w-full rounded-moyen border bg-surface px-3.5 py-2.5 text-sm text-texte placeholder:text-texte-discret transition-colors duration-[var(--duree-rapide)] disabled:bg-fond disabled:text-texte-discret ${
-    erreur ? 'border-erreur' : 'border-bordure hover:border-primaire-300'
+  `w-full rounded-gelule border bg-fond px-4 py-2.5 text-sm text-texte placeholder:text-texte-discret transition-colors duration-[var(--duree-rapide)] focus:bg-surface disabled:text-texte-discret ${
+    erreur ? 'border-erreur' : 'border-transparent hover:border-primaire-200'
   }`
 
 function Enveloppe({
@@ -77,7 +77,7 @@ export function ZoneTexte({
         rows={3}
         aria-invalid={erreur ? true : undefined}
         aria-describedby={describedBy(id, erreur, aide)}
-        className={`${classeChamp(erreur)} resize-y ${className}`}
+        className={`${classeChamp(erreur)} resize-y rounded-moyen! ${className}`}
         {...reste}
       />
     </Enveloppe>

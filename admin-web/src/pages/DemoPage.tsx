@@ -2,6 +2,9 @@ import { useState } from 'react'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import BarreFiltres from '../components/ui/BarreFiltres'
+import BarreProgression from '../components/ui/BarreProgression'
+import Carte from '../components/ui/Carte'
+import Infobulle from '../components/ui/Infobulle'
 import Bouton from '../components/ui/Bouton'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { Champ, Selecteur, ZoneTexte } from '../components/ui/Champs'
@@ -37,7 +40,7 @@ const IMAGE_EXEMPLE =
 function Section({ titre, children }: { titre: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-semibold text-primaire-800">{titre}</h2>
+      <h2 className="text-lg font-bold text-primaire-800">{titre}</h2>
       {children}
     </section>
   )
@@ -58,7 +61,7 @@ export default function DemoPage() {
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10 p-6">
       <header>
-        <h1 className="text-3xl font-semibold text-primaire-800">{L.demo.titre}</h1>
+        <h1 className="text-titre-page text-primaire-800"><span className="font-bold">{L.demo.titre}</span></h1>
         <p className="mt-1 text-sm text-texte-doux">{L.demo.avertissement}</p>
       </header>
 
@@ -169,7 +172,7 @@ export default function DemoPage() {
 
       <Section titre="Graphiques">
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-grand bg-surface p-5 shadow-carte">
+          <Carte titre="Courbe lissée" sousTitre="Survolez la courbe pour déplacer la pastille">
             <GraphiqueCourbe
               description="Exemple de courbe sur 7 jours"
               libelles={['1 janv.', '2 janv.', '3 janv.', '4 janv.', '5 janv.', '6 janv.', '7 janv.']}
@@ -179,8 +182,8 @@ export default function DemoPage() {
               ]}
               formatValeur={formatMontant}
             />
-          </div>
-          <div className="rounded-grand bg-surface p-5 shadow-carte">
+          </Carte>
+          <Carte titre="Barres en gélule" sousTitre="Barre active foncée, autres hachurées" delai={80}>
             <GraphiqueBarres
               description="Exemple de barres par domaine"
               donnees={[
@@ -189,12 +192,34 @@ export default function DemoPage() {
                 { libelle: 'Pressing', valeur: 70 },
               ]}
             />
-          </div>
+          </Carte>
+        </div>
+      </Section>
+
+      <Section titre="Cartes, barres de progression et infobulles">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Carte titre="Charge par domaine" sousTitre="Part des réservations">
+            <div className="flex flex-col gap-4">
+              <BarreProgression libelle="Mécanique" valeur={44} />
+              <BarreProgression libelle="Coiffure" valeur={35} teinte="succes" delai={100} />
+              <BarreProgression libelle="Pressing" valeur={21} teinte="attention" delai={200} />
+            </div>
+          </Carte>
+          <Carte titre="Infobulles" sousTitre="Au survol et au focus clavier" delai={80}>
+            <div className="flex items-center gap-8 py-4">
+              <Infobulle texte="À droite (barre latérale)">
+                <Bouton variante="secondaire">Survolez-moi</Bouton>
+              </Infobulle>
+              <Infobulle texte="Au-dessus" cote="haut">
+                <Bouton variante="secondaire">Ou moi</Bouton>
+              </Infobulle>
+            </div>
+          </Carte>
         </div>
       </Section>
 
       <Section titre="Squelettes de chargement">
-        <div className="flex flex-col gap-2 rounded-grand bg-surface p-5 shadow-carte">
+        <div className="flex flex-col gap-2 rounded-carte bg-surface p-6 shadow-carte">
           <Squelette className="h-5 w-1/3" />
           <Squelette className="h-4 w-full" />
           <Squelette className="h-4 w-2/3" />

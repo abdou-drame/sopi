@@ -98,7 +98,7 @@ export default function ModaleConfirmation({
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
-        className="animate-apparition w-full max-w-md rounded-grand bg-surface p-6 shadow-eleve"
+        className="animate-apparition w-full max-w-md rounded-carte bg-surface p-7 shadow-eleve"
       >
         <form onSubmit={soumettre} noValidate className="flex flex-col gap-4">
           <h2 id={idTitre} className="text-lg font-semibold">

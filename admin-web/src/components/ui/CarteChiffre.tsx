@@ -25,14 +25,14 @@ interface Props {
 export default function CarteChiffre({ titre, valeur, aide, icone, teinte = 'bleu', chargement, delai = 0 }: Props) {
   return (
     <div
-      className="animate-apparition rounded-grand bg-surface p-5 shadow-carte"
+      className="animate-apparition rounded-carte bg-surface p-6 shadow-carte"
       style={{ animationDelay: `${delai}ms` }}
       aria-busy={chargement || undefined}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-medium text-texte-doux">{titre}</p>
+        <p className="text-sm font-semibold text-texte">{titre}</p>
         {icone && (
-          <span className={`grid size-10 shrink-0 place-items-center rounded-moyen ${teintes[teinte]}`}>{icone}</span>
+          <span className={`grid size-10 shrink-0 place-items-center rounded-full ${teintes[teinte]}`}>{icone}</span>
         )}
       </div>
       {chargement ? (
@@ -42,8 +42,8 @@ export default function CarteChiffre({ titre, valeur, aide, icone, teinte = 'ble
         </>
       ) : (
         <>
-          <p className="mt-2 text-3xl font-semibold tracking-tight text-texte">{valeur}</p>
-          {aide && <p className="mt-1 text-xs text-texte-doux">{aide}</p>}
+          <p className="mt-2 text-chiffre font-bold tracking-tight text-texte">{valeur}</p>
+          {aide && <p className="mt-1 text-micro text-texte-doux">{aide}</p>}
         </>
       )}
     </div>

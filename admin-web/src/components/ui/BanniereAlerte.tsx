@@ -26,7 +26,7 @@ export default function BanniereAlerte({ gravite, titre, detail, vers, delai = 0
   return (
     <div
       role={gravite === 'critique' ? 'alert' : 'status'}
-      className={`animate-glissement flex items-start gap-3 rounded-moyen border px-4 py-3 ${s.boite}`}
+      className={`animate-glissement flex items-start gap-3 rounded-grand border px-5 py-3.5 ${s.boite}`}
       style={{ animationDelay: `${delai}ms` }}
     >
       <span className="mt-0.5 shrink-0">{s.icone}</span>
