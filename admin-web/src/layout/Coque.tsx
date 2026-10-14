@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { compteursParEcran, useAlertes } from '../api/useAlertes'
+import BasculeTheme from '../theme/BasculeTheme'
 import Infobulle from '../components/ui/Infobulle'
 import { IconeChevron, IconeDeconnexion } from '../components/ui/Icones'
 import { useAuth } from '../auth/AuthContext'
@@ -10,7 +11,7 @@ import { MENU } from './menu'
 function Logo({ replie }: { replie: boolean }) {
   return (
     <div className={`flex items-center gap-3 ${replie ? 'justify-center' : 'px-1'}`}>
-      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-primaire-800 text-lg font-bold text-white">
+      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-full bg-primaire-600 text-lg font-bold text-white">
         S
       </span>
       {!replie && (
@@ -29,7 +30,7 @@ function BarreLaterale({ replie, surBascule }: { replie: boolean; surBascule: ()
 
   return (
     <aside
-      className={`sticky top-4 m-4 flex h-[calc(100vh-2rem)] shrink-0 flex-col gap-5 rounded-carte bg-surface p-3 shadow-carte transition-[width] duration-[var(--duree-normale)] ease-[var(--ease-sortie)] ${
+      className={`verre sombre:border sombre:border-white/15 sombre:backdrop-blur-xl sticky top-4 m-4 flex h-[calc(100vh-2rem)] shrink-0 flex-col gap-5 rounded-carte bg-surface p-3 shadow-carte transition-[width] duration-[var(--duree-normale)] ease-[var(--ease-sortie)] ${
         replie ? 'w-[4.75rem]' : 'w-64'
       }`}
     >
@@ -122,7 +123,7 @@ export default function Coque() {
       </a>
       <BarreLaterale replie={replie} surBascule={() => setReplie((r) => !r)} />
       <div className="flex min-w-0 flex-1 flex-col pr-4">
-        <header className="sticky top-4 z-20 mt-4 flex items-center justify-between gap-4 rounded-gelule bg-surface/90 py-2 pr-2 pl-6 shadow-carte backdrop-blur">
+        <header className="verre sombre:border sombre:border-white/15 sombre:backdrop-blur-xl sticky top-4 z-20 mt-4 flex items-center justify-between gap-4 rounded-gelule bg-surface/90 py-2 pr-2 pl-6 shadow-carte backdrop-blur">
           <p className="truncate text-lg text-texte-doux">
             Bienvenue, <span className="font-bold text-texte">{utilisateur?.prenom}</span>
           </p>
@@ -133,6 +134,7 @@ export default function Coque() {
               </p>
               <p className="text-micro text-texte-doux">{L.coque.administrateur}</p>
             </div>
+            <BasculeTheme />
             <span aria-hidden="true" className="grid size-10 place-items-center rounded-full bg-primaire-100 font-semibold text-primaire-700">
               {initiale}
             </span>

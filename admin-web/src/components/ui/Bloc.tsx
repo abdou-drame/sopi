@@ -20,7 +20,7 @@ interface Props {
 export default function Bloc({ titre, chargement, erreur, onReessayer, vide, messageVide, children, hauteur = 'h-40' }: Props) {
   return (
     <section aria-label={titre} className="flex flex-col gap-3">
-      <h2 className="text-lg font-bold text-primaire-800">{titre}</h2>
+      <h2 className="text-lg font-bold text-titre">{titre}</h2>
       {chargement ? (
         <div role="status" aria-label={`${L.commun.chargement} ${titre}`}>
           <Squelette className={`${hauteur} w-full rounded-carte`} />

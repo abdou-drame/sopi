@@ -174,8 +174,8 @@ export default function TableauDeBordPage() {
   return (
     <div className="flex flex-col gap-8">
       <header className="animate-apparition">
-        <h1 className="text-titre-page font-bold text-primaire-800">{T.titre}</h1>
-        <p className="mt-1 text-sm text-texte-doux">
+        <h1 className="text-titre-page font-bold text-titre">{T.titre}</h1>
+        <p className="mt-1 text-sm text-sous-titre">
           {T.sousTitre}
           {data && ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.`}
         </p>

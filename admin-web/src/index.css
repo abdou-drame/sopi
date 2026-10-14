@@ -32,6 +32,10 @@
   --color-texte-doux: #5b6676;
   --color-texte-discret: #8a93a3;
 
+  /* Titres et sous-titres posés directement sur le fond de page (clairs en mode sombre) */
+  --color-titre: var(--color-primaire-800);
+  --color-sous-titre: var(--color-texte-doux);
+
   /* Teintes pastel des raccourcis (violet, cyan, rose) */
   --color-violet-fond: #e6ddfb;
   --color-violet-texte: #5b3fb5;
@@ -173,6 +177,42 @@
   to {
     transform: scaleX(1);
   }
+}
+
+/* Mode sombre « verre » : dégradé en nuances de nos bleus, panneaux translucides, cartes qui restent claires */
+@custom-variant sombre (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-titre: #ffffff;
+  --color-sous-titre: var(--color-primaire-200);
+  --fond-sombre: color-mix(in srgb, var(--color-primaire-900) 45%, black);
+}
+
+/*
+ * Panneau de verre (barre latérale, en-tête) : en mode sombre, les neutres sont redéfinis pour ce panneau
+ * et ses descendants (texte clair, fonds translucides). Sans effet en mode clair.
+ */
+:root[data-theme="dark"] .verre {
+  --color-surface: rgb(255 255 255 / 0.08);
+  --color-fond: rgb(255 255 255 / 0.1);
+  --color-bordure: rgb(255 255 255 / 0.16);
+  --color-texte: #ffffff;
+  --color-texte-doux: var(--color-primaire-200);
+  --color-texte-discret: var(--color-primaire-300);
+  --color-primaire-50: rgb(255 255 255 / 0.1);
+  --color-primaire-100: rgb(255 255 255 / 0.16);
+  --color-primaire-700: var(--color-primaire-200);
+  --color-primaire-800: #ffffff;
+}
+
+:root[data-theme="dark"],
+:root[data-theme="dark"] body {
+  background-color: var(--fond-sombre);
+  background-image:
+    radial-gradient(60rem 40rem at 90% -10%, color-mix(in srgb, var(--color-primaire-600) 38%, transparent), transparent),
+    linear-gradient(150deg, var(--fond-sombre) 0%, var(--color-primaire-900) 55%, color-mix(in srgb, var(--color-primaire-800) 65%, black) 100%);
+  background-attachment: fixed;
 }
 
 html {

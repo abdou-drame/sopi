@@ -90,6 +90,7 @@ export const L = {
   coque: {
     administrateur: 'Administrateur',
     deconnexion: 'Se déconnecter',
+    modeSombre: 'Mode sombre',
     allerAuContenu: 'Aller au contenu principal',
     alertes: (n: number) => (n > 1 ? `${n} alertes` : `${n} alerte`),
   },

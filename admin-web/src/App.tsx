@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import Routage from './Routage'
+import { ThemeProvider } from './theme/ThemeContext'
 
 export function creerClientRequetes() {
   return new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } })
@@ -11,12 +12,14 @@ export function creerClientRequetes() {
 export default function App() {
   const [client] = useState(creerClientRequetes)
   return (
-    <QueryClientProvider client={client}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routage />
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={client}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routage />
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }

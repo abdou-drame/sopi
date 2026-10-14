@@ -5,6 +5,7 @@ import { vi } from 'vitest'
 import { creerClientRequetes } from '../App'
 import { AuthProvider } from '../auth/AuthContext'
 import Routage from '../Routage'
+import { ThemeProvider } from '../theme/ThemeContext'
 
 export interface ReponseSimulee {
   status?: number
@@ -54,6 +55,7 @@ function AfficheLieu() {
 export function afficherApplication(adresse = '/') {
   const client = creerClientRequetes()
   return render(
+    <ThemeProvider>
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[adresse]}>
         <AuthProvider>
@@ -61,7 +63,8 @@ export function afficherApplication(adresse = '/') {
           <AfficheLieu />
         </AuthProvider>
       </MemoryRouter>
-    </QueryClientProvider>,
+    </QueryClientProvider>
+    </ThemeProvider>,
   )
 }
 

@@ -61,7 +61,7 @@ export default function DemoPage() {
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10 p-6">
       <header>
-        <h1 className="text-titre-page text-primaire-800"><span className="font-bold">{L.demo.titre}</span></h1>
+        <h1 className="text-titre-page text-titre"><span className="font-bold">{L.demo.titre}</span></h1>
         <p className="mt-1 text-sm text-texte-doux">{L.demo.avertissement}</p>
       </header>
 

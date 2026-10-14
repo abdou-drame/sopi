@@ -21,7 +21,7 @@ export default function Infobulle({ texte, cote = 'droite', children }: Props) {
       <span
         id={id}
         role="tooltip"
-        className={`pointer-events-none absolute z-30 rounded-gelule bg-primaire-900 px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white opacity-0 shadow-infobulle transition-[opacity,transform] duration-[var(--duree-rapide)] ease-[var(--ease-sortie)] group-hover/info:opacity-100 group-focus-within/info:opacity-100 ${position}`}
+        className={`pointer-events-none absolute z-30 rounded-gelule bg-primaire-900 px-3 py-1.5 text-xs font-medium whitespace-nowrap text-white opacity-0 shadow-infobulle ring-1 ring-white/20 transition-[opacity,transform] duration-[var(--duree-rapide)] ease-[var(--ease-sortie)] group-hover/info:opacity-100 group-focus-within/info:opacity-100 ${position}`}
       >
         {texte}
       </span>
