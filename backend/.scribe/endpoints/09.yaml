@@ -1,72 +1,88 @@
-name: "Client — agenda d'un prestataire"
+name: 'Administration — retraits'
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/prestataires/{id}/agenda'
+    uri: api/v1/admin/retraits
     metadata:
       custom: []
-      groupName: "Client — agenda d'un prestataire"
+      groupName: 'Administration — retraits'
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: "Créneaux disponibles d'un prestataire"
+      title: 'Liste des retraits'
       description: |-
-        Uniquement les créneaux réservables : libres (ou dont le verrou a expiré) et qui commencent dans le futur.
-        Les créneaux réservés, indisponibles ou verrouillés par un autre client n'apparaissent pas. Triés par début, sans pagination.
-        Par défaut : de maintenant à 14 jours plus tard. Intervalle maximal : 31 jours. Réponse jamais mise en cache (`Cache-Control: no-store`).
+        Retraits des prestataires, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `prestataire`
+        (identifiant du profil prestataire) et `bloques` (retraits en_cours depuis plus longtemps que le délai de blocage : point
+        d'arrivée de l'alerte `retraits_bloques`). Le téléphone de versement est masqué dans la liste ; la référence DexPay n'apparaît
+        que dans le détail.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant du prestataire.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000002
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000002
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters:
-      du:
+      statut:
         custom: []
-        name: du
-        description: "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>."
+        name: statut
+        description: 'en_cours, reussi ou echoue.'
         required: false
-        example: '2030-01-15'
+        example: en_cours
+        type: string
+        enumValues:
+          - en_cours
+          - reussi
+          - echoue
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      prestataire:
+        custom: []
+        name: prestataire
+        description: 'Identifiant du profil prestataire. validation.uuid.'
+        required: false
+        example: 0198a1b2-0000-7000-8000-000000000012
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      au:
+      bloques:
         custom: []
-        name: au
-        description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+        name: bloques
+        description: "true : retraits en_cours depuis plus longtemps que le délai de blocage (point d'arrivée de l'alerte `retraits_bloques`) ; false : tous les autres."
         required: false
-        example: '2030-01-29'
-        type: string
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+        required: false
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
     cleanQueryParameters:
-      du: '2030-01-15'
-      au: '2030-01-29'
+      statut: en_cours
+      prestataire: 0198a1b2-0000-7000-8000-000000000012
+      bloques: true
+      page: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -74,7 +90,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-15T09:00:00+00:00","dateFin":"2030-01-15T10:00:00+00:00"}]}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"en_cours","bloque":true,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":null,"recredite":false,"telephoneVersement":"+221*******67"}],"links":{"first":"https://api.exemple.test/api/v1/admin/retraits?page=1","last":"https://api.exemple.test/api/v1/admin/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -91,14 +107,71 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 404
-        content: '{"message":"Prestataire introuvable."}'
+        status: 422
+        content: '{"message":"Le statut doit être en_cours, reussi ou echoue.","errors":{"statut":["Le statut doit être en_cours, reussi ou echoue."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/retraits/{id}'
+    metadata:
+      custom: []
+      groupName: 'Administration — retraits'
+      groupDescription: |-
+
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Détail d'un retrait"
+      description: |-
+        Prestataire, montant, statut, dates de demande et de traitement, téléphone de versement complet, référence DexPay et
+        `recredite` / `recrediteLe` (le montant d'un retrait échoué a-t-il été remis au solde).
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du retrait.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000080
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000080
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"echoue","bloque":false,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":"2030-01-20T08:05:00+00:00","recredite":true,"telephoneVersement":"+221771234567","referenceDexpay":"DXP-RET-EXEMPLE","recrediteLe":"2030-01-20T08:05:00+00:00"}'
         headers: []
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"L''intervalle ne peut pas dépasser 31 jours.","errors":{"au":["L''intervalle ne peut pas dépasser 31 jours."]}}'
+        status: 404
+        content: '{"message":"Retrait introuvable."}'
         headers: []
         description: ''
     responseFields: []

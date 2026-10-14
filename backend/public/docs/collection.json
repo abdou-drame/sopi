@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "cf0d1886-0641-4c08-a0de-72aa7dd5a7c5",
+        "_postman_id": "99fdb1a1-0b7f-4394-8a89-2e962eefee3d",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -827,9 +827,622 @@
             ]
         },
         {
+            "name": "Administration \u2014 notifications en \u00e9chec",
+            "description": "\nRoutes de lecture r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Le contenu du message et les coordonn\u00e9es\ndu destinataire ne sont jamais expos\u00e9s.",
+            "item": [
+                {
+                    "name": "Liste des notifications en \u00e9chec",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/notifications-en-echec",
+                            "query": [
+                                {
+                                    "key": "canal",
+                                    "value": "email",
+                                    "description": "email ou push : ne garde que les notifications dont CE canal est en \u00e9chec.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "type",
+                                    "value": "reservation_confirmee",
+                                    "description": "Type de notification, par exemple reservation_confirmee.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "ancienneteMinutes",
+                                    "value": "60",
+                                    "description": "Notifications cr\u00e9\u00e9es depuis au moins N minutes (alias : anciennete_minutes). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1. Le champ value ne doit pas d\u00e9passer 525600.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/notifications-en-echec?canal=email&type=reservation_confirmee&ancienneteMinutes=60&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Notifications dont au moins un canal (e-mail ou push) a \u00e9chou\u00e9 d\u00e9finitivement : point d'arriv\u00e9e de l'alerte\n`notifications_en_echec`. Du plus r\u00e9cent au plus ancien (20 par page). Filtres combinables : `canal`, `type`, `ancienneteMinutes`.\nChaque ligne donne le type, le destinataire (id et r\u00f4le), les canaux en \u00e9chec, le nombre d'essais, la classe de l'erreur et la date."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"type\":\"reservation_confirmee\",\"destinataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"role\":\"client\"},\"canauxEnEchec\":[\"email\"],\"tentatives\":5,\"classeErreur\":\"TransportException\",\"dateCreation\":\"2030-01-20T08:00:00+00:00\"}],\"links\":{},\"meta\":{\"current_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le canal doit \u00eatre email ou push.\",\"errors\":{\"canal\":[\"Le canal doit \u00eatre email ou push.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'une notification en \u00e9chec",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/notifications-en-echec\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/notifications-en-echec\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000090",
+                                    "description": "Identifiant de la notification."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "M\u00eame forme qu'une ligne de la liste. Permet d'ouvrir un identifiant renvoy\u00e9 par l'alerte `notifications_en_echec`, quelle que\nsoit sa page dans la liste. Une notification qui n'est pas (ou plus) en \u00e9chec r\u00e9pond 404."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000090\",\"type\":\"reservation_confirmee\",\"destinataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"role\":\"client\"},\"canauxEnEchec\":[\"email\"],\"tentatives\":5,\"classeErreur\":\"TransportException\",\"dateCreation\":\"2030-01-20T08:00:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Notification introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 paiements",
+            "description": "\nRoutes de lecture r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Montants en FCFA entiers.",
+            "item": [
+                {
+                    "name": "Liste des paiements",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/paiements",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "reussi",
+                                    "description": "en_attente, reussi, echoue ou rembourse.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "remboursementDu",
+                                    "value": "1",
+                                    "description": "true : paiements re\u00e7us (reussi ou echoue) marqu\u00e9s \u00ab \u00e0 rembourser \u00bb ; false : tous les autres. Alias : remboursement_du.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "retardRemboursementMinutes",
+                                    "value": "30",
+                                    "description": "Remboursements dus depuis au moins N minutes (1 \u00e0 525600), y compris ceux dont les essais sont \u00e9puis\u00e9s : point d'arriv\u00e9e des alertes `remboursements_en_retard` et `remboursements_en_echec`. Alias : retard_remboursement_minutes. validation.between.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "reservation",
+                                    "value": "0198a1b2-0000-7000-8000-000000000020",
+                                    "description": "Identifiant de la r\u00e9servation. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/paiements?statut=reussi&remboursementDu=1&retardRemboursementMinutes=30&reservation=0198a1b2-0000-7000-8000-000000000020&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Paiements d'acompte, du plus r\u00e9cent au plus ancien (20 par page). Filtres combinables : `statut`, `remboursementDu`,\n`retardRemboursementMinutes` (remboursements dus depuis au moins N minutes, essais \u00e9puis\u00e9s compris : point d'arriv\u00e9e des alertes\n`remboursements_en_retard` et `remboursements_en_echec`) et `reservation`. La r\u00e9f\u00e9rence DexPay n'appara\u00eet que dans le d\u00e9tail."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000020\",\"statut\":\"reussi\",\"montantAcompte\":3000,\"commission\":1000,\"remboursementDu\":true,\"remboursementDuLe\":\"2030-01-20T10:00:00+00:00\",\"tentativesRemboursement\":3,\"tentativesEpuisees\":false,\"payeLe\":\"2030-01-20T09:00:00+00:00\",\"rembourseLe\":null,\"crediteLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/paiements?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/paiements?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre en_attente, reussi, echoue ou rembourse.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre en_attente, reussi, echoue ou rembourse.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un paiement",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/paiements\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/paiements\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000060",
+                                    "description": "Identifiant du paiement."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "R\u00e9servation concern\u00e9e, acompte, commission, statut, dates (dont `crediteLe`, cr\u00e9dit du prestataire), remboursement d\u00fb ou non,\ntentatives et leur maximum, et r\u00e9f\u00e9rence DexPay (`null` tant que la session n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"reservationId\":\"0198a1b2-0000-7000-8000-000000000020\",\"statut\":\"reussi\",\"montantAcompte\":3000,\"commission\":1000,\"remboursementDu\":true,\"remboursementDuLe\":\"2030-01-20T10:00:00+00:00\",\"tentativesRemboursement\":10,\"tentativesEpuisees\":true,\"payeLe\":\"2030-01-20T09:00:00+00:00\",\"rembourseLe\":null,\"crediteLe\":null,\"reservation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"statut\":\"annulee\",\"prixApplique\":10000,\"clientId\":\"0198a1b2-0000-7000-8000-000000000001\",\"prestataireId\":\"0198a1b2-0000-7000-8000-000000000012\"},\"creeLe\":\"2030-01-20T08:45:00+00:00\",\"tentativesMaximum\":10,\"referenceDexpay\":\"DXP-EXEMPLE\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Paiement introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 retraits",
+            "description": "\nRoutes de lecture r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Montants en FCFA entiers.",
+            "item": [
+                {
+                    "name": "Liste des retraits",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/retraits",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "en_cours",
+                                    "description": "en_cours, reussi ou echoue.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "prestataire",
+                                    "value": "0198a1b2-0000-7000-8000-000000000012",
+                                    "description": "Identifiant du profil prestataire. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "bloques",
+                                    "value": "1",
+                                    "description": "true : retraits en_cours depuis plus longtemps que le d\u00e9lai de blocage (point d'arriv\u00e9e de l'alerte `retraits_bloques`) ; false : tous les autres.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/retraits?statut=en_cours&prestataire=0198a1b2-0000-7000-8000-000000000012&bloques=1&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Retraits des prestataires, du plus r\u00e9cent au plus ancien (20 par page). Filtres combinables : `statut`, `prestataire`\n(identifiant du profil prestataire) et `bloques` (retraits en_cours depuis plus longtemps que le d\u00e9lai de blocage : point\nd'arriv\u00e9e de l'alerte `retraits_bloques`). Le t\u00e9l\u00e9phone de versement est masqu\u00e9 dans la liste ; la r\u00e9f\u00e9rence DexPay n'appara\u00eet\nque dans le d\u00e9tail."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"userId\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Exemple\"},\"montant\":5000,\"statut\":\"en_cours\",\"bloque\":true,\"dateDemande\":\"2030-01-20T08:00:00+00:00\",\"traiteLe\":null,\"recredite\":false,\"telephoneVersement\":\"+221*******67\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/retraits?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/retraits?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le statut doit \u00eatre en_cours, reussi ou echoue.\",\"errors\":{\"statut\":[\"Le statut doit \u00eatre en_cours, reussi ou echoue.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'un retrait",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/retraits\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/retraits\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000080",
+                                    "description": "Identifiant du retrait."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Prestataire, montant, statut, dates de demande et de traitement, t\u00e9l\u00e9phone de versement complet, r\u00e9f\u00e9rence DexPay et\n`recredite` \/ `recrediteLe` (le montant d'un retrait \u00e9chou\u00e9 a-t-il \u00e9t\u00e9 remis au solde)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"userId\":\"0198a1b2-0000-7000-8000-000000000002\",\"nomEntreprise\":\"Garage Exemple\"},\"montant\":5000,\"statut\":\"echoue\",\"bloque\":false,\"dateDemande\":\"2030-01-20T08:00:00+00:00\",\"traiteLe\":\"2030-01-20T08:05:00+00:00\",\"recredite\":true,\"telephoneVersement\":\"+221771234567\",\"referenceDexpay\":\"DXP-RET-EXEMPLE\",\"recrediteLe\":\"2030-01-20T08:05:00+00:00\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Retrait introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 r\u00e9servations",
+            "description": "\nRoutes de lecture r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Le code de r\u00e9servation n'est jamais renvoy\u00e9.",
+            "item": [
+                {
+                    "name": "Liste des r\u00e9servations",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/reservations",
+                            "query": [
+                                {
+                                    "key": "statut",
+                                    "value": "confirmee",
+                                    "description": "en_attente, acceptee, confirmee, en_cours, terminee, refusee ou annulee.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "prestataire",
+                                    "value": "0198a1b2-0000-7000-8000-000000000012",
+                                    "description": "Identifiant du profil prestataire (celui des autres routes d'administration). validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "client",
+                                    "value": "0198a1b2-0000-7000-8000-000000000001",
+                                    "description": "Identifiant du compte client. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "AB12",
+                                    "description": "Code de r\u00e9servation (recherche partielle, sans tenir compte de la casse). Le code lui-m\u00eame n'est jamais renvoy\u00e9. Le champ value ne doit pas d\u00e9passer 20 caract\u00e8res.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "debut",
+                                    "value": "2030-01-01",
+                                    "description": "Cr\u00e9neaux commen\u00e7ant \u00e0 partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "fin",
+                                    "value": "2030-01-31",
+                                    "description": "Cr\u00e9neaux commen\u00e7ant jusqu'\u00e0 ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/reservations?statut=confirmee&prestataire=0198a1b2-0000-7000-8000-000000000012&client=0198a1b2-0000-7000-8000-000000000001&q=AB12&page=1&debut=2030-01-01&fin=2030-01-31"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Toutes les r\u00e9servations, de la plus r\u00e9cente \u00e0 la plus ancienne (20 par page). Filtres combinables : `statut`, `prestataire`\n(identifiant du profil prestataire), `client` (identifiant du compte), `debut` \/ `fin` (jour de d\u00e9but du cr\u00e9neau) et `q`\n(code de r\u00e9servation, recherche partielle). Le client n'appara\u00eet que par son pr\u00e9nom et l'initiale de son nom ;\n`statutPaiement` est celui du paiement qui repr\u00e9sente la r\u00e9servation (`null` sans paiement)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"statut\":\"confirmee\",\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"prenom\":\"Awa\",\"initialeNom\":\"D.\"},\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"nomEntreprise\":\"Garage Exemple\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nom\":\"Vidange\"},\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"debut\":\"2030-01-21T09:00:00+00:00\",\"fin\":\"2030-01-21T10:00:00+00:00\"},\"prixApplique\":10000,\"statutPaiement\":\"reussi\",\"dateCreation\":\"2030-01-20T08:00:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/reservations?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/reservations?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le prestataire doit \u00eatre un identifiant valide.\",\"errors\":{\"prestataire\":[\"Le prestataire doit \u00eatre un identifiant valide.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "D\u00e9tail d'une r\u00e9servation",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/reservations\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/reservations\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000020",
+                                    "description": "Identifiant de la r\u00e9servation."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Client (nom complet), prestataire, prestation, cr\u00e9neau, prix appliqu\u00e9, `paiement` (statut, acompte, commission, remboursement d\u00fb\nou non, nombre de tentatives de remboursement, dates), `avis` et `litige` \u00e9ventuels (`null` sinon) et `historique` des dates\ncl\u00e9s. Le code de r\u00e9servation et la r\u00e9f\u00e9rence de paiement ne sont pas expos\u00e9s ici."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000020\",\"statut\":\"terminee\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"nomEntreprise\":\"Garage Exemple\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000030\",\"nom\":\"Vidange\",\"dureeMinutes\":60},\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"debut\":\"2030-01-21T09:00:00+00:00\",\"fin\":\"2030-01-21T10:00:00+00:00\"},\"prixApplique\":10000,\"client\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"prenom\":\"Awa\",\"nom\":\"Diallo\"},\"motifRefus\":null,\"paiement\":{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"reussi\",\"montantAcompte\":3000,\"commission\":1000,\"remboursementDu\":false,\"remboursementDuLe\":null,\"tentativesRemboursement\":0,\"tentativesEpuisees\":false,\"payeLe\":\"2030-01-20T09:00:00+00:00\",\"rembourseLe\":null,\"crediteLe\":\"2030-01-21T10:05:00+00:00\"},\"nombrePaiements\":1,\"avis\":{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"note\":5,\"statut\":\"publie\",\"dateCreation\":\"2030-01-21T12:00:00+00:00\"},\"litige\":null,\"historique\":{\"creeeLe\":\"2030-01-20T08:00:00+00:00\",\"accepteeLe\":\"2030-01-20T08:30:00+00:00\",\"payeLe\":\"2030-01-20T09:00:00+00:00\",\"remboursementDuLe\":null,\"rembourseLe\":null,\"debutCreneau\":\"2030-01-21T09:00:00+00:00\",\"finCreneau\":\"2030-01-21T10:00:00+00:00\",\"misAJourLe\":\"2030-01-21T10:05:00+00:00\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"R\u00e9servation introuvable.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Administration \u2014 sanctions",
             "description": "\nRoutes r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Poser et lever une sanction sont limit\u00e9s \u00e0 10 requ\u00eates par minute.\nUne suspension ou un bannissement est \u00ab tout ou rien \u00bb : sanction, statut du compte et r\u00e9vocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndispara\u00eet de la recherche et du profil public, et ses r\u00e9servations \u00e0 venir (en attente, accept\u00e9es, confirm\u00e9es pour un prestataire ;\nen attente et accept\u00e9es pour un client) sont annul\u00e9es, un prestataire sanctionn\u00e9 voyant l'acompte vers\u00e9 rembours\u00e9 en int\u00e9gralit\u00e9.\nUne prestation en cours va \u00e0 son terme. Le solde et les retraits ne sont pas modifi\u00e9s. Un administrateur ne peut pas \u00eatre sanctionn\u00e9.",
             "item": [
+                {
+                    "name": "Liste de toutes les sanctions",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/sanctions",
+                            "query": [
+                                {
+                                    "key": "actives",
+                                    "value": "1",
+                                    "description": "true : sanctions non lev\u00e9es ; false : sanctions lev\u00e9es ; absent : toutes.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "type",
+                                    "value": "suspension_temporaire",
+                                    "description": "avertissement, suspension_temporaire ou bannissement_definitif.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "utilisateur",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant du compte sanctionn\u00e9. validation.uuid.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "echeanceDansHeures",
+                                    "value": "48",
+                                    "description": "Suspensions non lev\u00e9es qui se terminent dans les N prochaines heures (1 \u00e0 8760), comme l'alerte \u00ab suspensions \u00e0 \u00e9ch\u00e9ance \u00bb. Alias : echeance_dans_heures. validation.between.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/sanctions?actives=1&type=suspension_temporaire&utilisateur=0198a1b2-0000-7000-8000-000000000002&echeanceDansHeures=48&page=1"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Toutes les sanctions de la plateforme, lev\u00e9es ou non, du plus r\u00e9cent au plus ancien (20 par page). Filtres combinables :\n`actives`, `type`, `utilisateur`, `echeanceDansHeures` (suspensions non lev\u00e9es qui se terminent dans les N prochaines heures :\npoint d'arriv\u00e9e de l'alerte `suspensions_a_echeance`). L'historique d'un seul compte reste sur `\/admin\/utilisateurs\/{id}\/sanctions`."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"type\":\"suspension_temporaire\",\"utilisateur\":{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"prenom\":\"Moussa\",\"nom\":\"Diop\",\"role\":\"prestataire\"},\"motif\":\"Comportement contraire aux r\u00e8gles.\",\"litigeId\":null,\"avisId\":null,\"dateCreation\":\"2030-01-20T09:00:00+00:00\",\"dateFin\":\"2030-01-27T09:00:00+00:00\",\"active\":true,\"leveeLe\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/sanctions?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/sanctions?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le type doit \u00eatre avertissement, suspension_temporaire ou bannissement_definitif.\",\"errors\":{\"type\":[\"Le type doit \u00eatre avertissement, suspension_temporaire ou bannissement_definitif.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
                 {
                     "name": "Poser une sanction",
                     "request": {
@@ -1177,7 +1790,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "\u00c9l\u00e9ments qui demandent l'attention de l'administrateur, calcul\u00e9s \u00e0 la demande (rien n'est envoy\u00e9 : l'administrateur ne re\u00e7oit ni\ne-mail ni notification push). Liste vide quand tout est calme. Tri\u00e9es de la plus grave \u00e0 la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravit\u00e9s : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les \u00e9l\u00e9ments (le dossier est identifi\u00e9 par l'id du prestataire) ;\n`compteur` donne le total r\u00e9el. `ageMinutes` : anciennet\u00e9 du plus ancien \u00e9l\u00e9ment ; `echeanceDansMinutes` : d\u00e9lai avant la premi\u00e8re fin de suspension."
+                        "description": "\u00c9l\u00e9ments qui demandent l'attention de l'administrateur, calcul\u00e9s \u00e0 la demande (rien n'est envoy\u00e9 : l'administrateur ne re\u00e7oit ni\ne-mail ni notification push). Liste vide quand tout est calme. Tri\u00e9es de la plus grave \u00e0 la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravit\u00e9s : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les \u00e9l\u00e9ments (le dossier est identifi\u00e9 par l'id du prestataire) ;\n`compteur` donne le total r\u00e9el. `ressource` : o\u00f9 ouvrir les `ids` dans l'administration (`demandes-prestataires` : `\/admin\/prestataires\/{id}`, `litiges`, `retraits`, `paiements`, `notifications` : `\/admin\/notifications-en-echec\/{id}` ; `avis` : liste `\/admin\/avis?aTraiter=1` ; `sanctions` : liste `\/admin\/sanctions?echeanceDansHeures=24`). `ageMinutes` : anciennet\u00e9 du plus ancien \u00e9l\u00e9ment ; `echeanceDansMinutes` : d\u00e9lai avant la premi\u00e8re fin de suspension."
                     },
                     "response": [
                         {
@@ -1196,6 +1809,145 @@
                             "header": [],
                             "code": 403,
                             "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Administration \u2014 utilisateurs",
+            "description": "\nRoutes de lecture r\u00e9serv\u00e9es aux administrateurs (jeton Sanctum + r\u00f4le `administrateur`). Les comptes administrateurs ne sont\njamais list\u00e9s ni ouverts (404). Nom, e-mail et t\u00e9l\u00e9phone sont visibles (supervision) ; jamais de mot de passe ni de jeton.",
+            "item": [
+                {
+                    "name": "Liste des utilisateurs",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs",
+                            "query": [
+                                {
+                                    "key": "role",
+                                    "value": "prestataire",
+                                    "description": "client ou prestataire (les administrateurs ne sont jamais list\u00e9s).",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "statut",
+                                    "value": "actif",
+                                    "description": "Statut du compte : en_attente, actif, refuse, suspendu ou banni.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "q",
+                                    "value": "diop",
+                                    "description": "Recherche partielle, sans tenir compte des majuscules, dans le nom, le pr\u00e9nom, l'e-mail, le t\u00e9l\u00e9phone et le nom d'entreprise. Le champ value ne doit pas d\u00e9passer 100 caract\u00e8res.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Num\u00e9ro de page (20 r\u00e9sultats par page). Le champ value doit \u00eatre au moins \u00e9gal \u00e0 1.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "debut",
+                                    "value": "2030-01-01",
+                                    "description": "Comptes cr\u00e9\u00e9s \u00e0 partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                },
+                                {
+                                    "key": "fin",
+                                    "value": "2030-01-31",
+                                    "description": "Comptes cr\u00e9\u00e9s jusqu'\u00e0 ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format Y-m-d.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs?role=prestataire&statut=actif&q=diop&page=1&debut=2030-01-01&fin=2030-01-31"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Clients et prestataires, tous statuts confondus, du plus r\u00e9cent au plus ancien (20 par page). Filtres combinables : `role`,\n`statut`, `q` (recherche partielle, insensible \u00e0 la casse, dans nom, pr\u00e9nom, \u00ab pr\u00e9nom nom \u00bb, e-mail, t\u00e9l\u00e9phone et nom d'entreprise ;\nles accents ne sont pas ignor\u00e9s), `debut` \/ `fin` (date de cr\u00e9ation). `prestataire` vaut `null` pour un client ; son `id` est\nl'identifiant du profil prestataire, celui des autres routes d'administration."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"role\":\"prestataire\",\"prenom\":\"Moussa\",\"nom\":\"Diop\",\"email\":\"moussa@example.com\",\"telephone\":\"+221770000002\",\"statut\":\"actif\",\"dateCreation\":\"2030-01-10T09:00:00+00:00\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"nomEntreprise\":\"Garage Exemple\"}},{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"role\":\"client\",\"prenom\":\"Awa\",\"nom\":\"Diallo\",\"email\":null,\"telephone\":\"+221770000001\",\"statut\":\"actif\",\"dateCreation\":\"2030-01-09T09:00:00+00:00\",\"prestataire\":null}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/utilisateurs?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/admin\/utilisateurs?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":2}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"Le r\u00f4le doit \u00eatre client ou prestataire.\",\"errors\":{\"role\":[\"Le r\u00f4le doit \u00eatre client ou prestataire.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Fiche d'un utilisateur",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/admin\/utilisateurs\/:id",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/admin\/utilisateurs\/:id",
+                            "variable": [
+                                {
+                                    "id": "id",
+                                    "key": "id",
+                                    "value": "0198a1b2-0000-7000-8000-000000000002",
+                                    "description": "Identifiant de l'utilisateur."
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Identit\u00e9, statut, `sanctionActive` (blocage en cours, sinon avertissement non lev\u00e9, sinon `null`) et `nombreSanctions`.\nUn client a un bloc `client` (`reservationsParStatut`, `nombreAvisDonnes`, `litiges`), un prestataire un bloc `prestataire`\n(adresse, `solde` en FCFA, `prestationsActives`, `reservationsParStatut`, `noteMoyenne` et `nombreAvis` hors avis masqu\u00e9s,\n`nombreRetraits`, `litiges`) ; l'autre bloc vaut `null`. `litiges` : `total` et `ouverts` (concernant le compte)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"role\":\"prestataire\",\"prenom\":\"Moussa\",\"nom\":\"Diop\",\"email\":\"moussa@example.com\",\"telephone\":\"+221770000002\",\"statut\":\"suspendu\",\"dateCreation\":\"2030-01-10T09:00:00+00:00\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000012\",\"metier\":\"mecanique\",\"quartier\":\"Malika\",\"nomEntreprise\":\"Garage Exemple\",\"adresse\":\"Rue 10, pr\u00e8s du march\u00e9\",\"solde\":12000,\"prestationsActives\":3,\"reservationsParStatut\":{\"en_attente\":1,\"acceptee\":0,\"confirmee\":2,\"en_cours\":0,\"terminee\":14,\"refusee\":1,\"annulee\":2},\"noteMoyenne\":4.5,\"nombreAvis\":10,\"nombreRetraits\":2,\"litiges\":{\"total\":1,\"ouverts\":0}},\"sanctionActive\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"type\":\"suspension_temporaire\",\"dateFin\":\"2030-02-01T09:00:00+00:00\"},\"nombreSanctions\":2,\"client\":null}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 404,
+                            "body": "{\"message\":\"Utilisateur introuvable.\"}",
                             "name": ""
                         }
                     ]
@@ -2443,7 +3195,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-13T17:54:44+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-14T12:55:27+00:00\"}",
                             "name": ""
                         }
                     ]

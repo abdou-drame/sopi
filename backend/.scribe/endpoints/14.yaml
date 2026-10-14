@@ -1,27 +1,26 @@
-name: 'Client — avis'
+name: "Client — agenda d'un prestataire"
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/reservations/{id}/avis'
+      - GET
+    uri: 'api/v1/prestataires/{id}/agenda'
     metadata:
       custom: []
-      groupName: 'Client — avis'
+      groupName: "Client — agenda d'un prestataire"
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`), limitées à 10 requêtes par minute et par utilisateur.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Donner son avis sur une réservation'
+      title: "Créneaux disponibles d'un prestataire"
       description: |-
-        Réservé au client de la réservation, une fois la prestation terminée (`terminee`). Un seul avis par réservation, qui ne
-        peut être ni modifié ni retiré. La note est un entier de 1 à 5 ; le commentaire est facultatif (3 à 1000 caractères).
-        Le prestataire noté est toujours celui de la réservation. Une réservation inconnue ou appartenant à un autre client
-        répond 404.
+        Uniquement les créneaux réservables : libres (ou dont le verrou a expiré) et qui commencent dans le futur.
+        Les créneaux réservés, indisponibles ou verrouillés par un autre client n'apparaissent pas. Triés par début, sans pagination.
+        Par défaut : de maintenant à 14 jours plus tard. Intervalle maximal : 31 jours. Réponse jamais mise en cache (`Cache-Control: no-store`).
       authenticated: true
       deprecated: false
     headers:
@@ -32,50 +31,50 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la réservation.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000060
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000060
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      note:
+      id: 0198a1b2-0000-7000-8000-000000000002
+    queryParameters:
+      du:
         custom: []
-        name: note
-        description: 'Note entière de 1 (très mauvais) à 5 (excellent). validation.between.'
-        required: true
-        example: 4
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      commentaire:
-        custom: []
-        name: commentaire
-        description: 'Commentaire facultatif, de 3 à 1000 caractères. Le champ value doit contenir au moins 3 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        name: du
+        description: "Premier jour (AAAA-MM-JJ), aujourd'hui ou plus tard. Par défaut : maintenant. Must be a valid date in the format <code>Y-m-d</code>."
         required: false
-        example: 'Travail soigné et ponctuel.'
+        example: '2030-01-15'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-    cleanBodyParameters:
-      note: 4
-      commentaire: 'Travail soigné et ponctuel.'
+      au:
+        custom: []
+        name: au
+        description: 'Dernier jour inclus (AAAA-MM-JJ). Par défaut : 14 jours après le début. Intervalle maximal : 31 jours. Must be a valid date in the format <code>Y-m-d</code>.'
+        required: false
+        example: '2030-01-29'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      du: '2030-01-15'
+      au: '2030-01-29'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: '{"note":4,"commentaire":"Travail soigné et ponctuel.","dateCreation":"2030-01-17T10:00:00+00:00"}'
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-15T09:00:00+00:00","dateFin":"2030-01-15T10:00:00+00:00"}]}'
         headers: []
         description: ''
       -
@@ -93,25 +92,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Réservation introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Vous avez déjà donné votre avis pour cette réservation."}'
+        content: '{"message":"Prestataire introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"La note doit être comprise entre 1 et 5.","errors":{"note":["La note doit être comprise entre 1 et 5."]}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"message":"L''intervalle ne peut pas dépasser 31 jours.","errors":{"au":["L''intervalle ne peut pas dépasser 31 jours."]}}'
         headers: []
         description: ''
     responseFields: []

@@ -1,47 +1,100 @@
-name: "Client — profil public d'un prestataire"
+name: 'Administration — paiements'
 description: |-
 
-  Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/prestataires/{id}'
+    uri: api/v1/admin/paiements
     metadata:
       custom: []
-      groupName: "Client — profil public d'un prestataire"
+      groupName: 'Administration — paiements'
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: "Profil d'un prestataire"
+      title: 'Liste des paiements'
       description: |-
-        Informations publiques, prestations actives et photos d'atelier. Aucune donnée personnelle. `noteMoyenne` (arrondie à une décimale,
-        `null` sans avis) et `nombreAvis` résument les avis (voir « Avis d'un prestataire »). `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton.
+        Paiements d'acompte, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `remboursementDu`,
+        `retardRemboursementMinutes` (remboursements dus depuis au moins N minutes, essais épuisés compris : point d'arrivée des alertes
+        `remboursements_en_retard` et `remboursements_en_echec`) et `reservation`. La référence DexPay n'apparaît que dans le détail.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      statut:
         custom: []
-        name: id
-        description: 'Identifiant du prestataire.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000002
+        name: statut
+        description: 'en_attente, reussi, echoue ou rembourse.'
+        required: false
+        example: reussi
+        type: string
+        enumValues:
+          - en_attente
+          - reussi
+          - echoue
+          - rembourse
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      remboursementDu:
+        custom: []
+        name: remboursementDu
+        description: 'true : paiements reçus (reussi ou echoue) marqués « à rembourser » ; false : tous les autres. Alias : remboursement_du.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      retardRemboursementMinutes:
+        custom: []
+        name: retardRemboursementMinutes
+        description: "Remboursements dus depuis au moins N minutes (1 à 525600), y compris ceux dont les essais sont épuisés : point d'arrivée des alertes `remboursements_en_retard` et `remboursements_en_echec`. Alias : retard_remboursement_minutes. validation.between."
+        required: false
+        example: 30
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      reservation:
+        custom: []
+        name: reservation
+        description: 'Identifiant de la réservation. validation.uuid.'
+        required: false
+        example: 0198a1b2-0000-7000-8000-000000000020
         type: string
         enumValues: []
-        exampleWasSpecified: true
-        nullable: false
+        exampleWasSpecified: false
+        nullable: true
         deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000002
-    queryParameters: []
-    cleanQueryParameters: []
+      page:
+        custom: []
+        name: page
+        description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      statut: reussi
+      remboursementDu: true
+      retardRemboursementMinutes: 30
+      reservation: 0198a1b2-0000-7000-8000-000000000020
+      page: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -49,7 +102,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","noteMoyenne":4.5,"nombreAvis":12,"prestations":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000}],"photos":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataires/0198a1b2-0000-7000-8000-000000000002/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","reservationId":"0198a1b2-0000-7000-8000-000000000020","statut":"reussi","montantAcompte":3000,"commission":1000,"remboursementDu":true,"remboursementDuLe":"2030-01-20T10:00:00+00:00","tentativesRemboursement":3,"tentativesEpuisees":false,"payeLe":"2030-01-20T09:00:00+00:00","rembourseLe":null,"crediteLe":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/paiements?page=1","last":"https://api.exemple.test/api/v1/admin/paiements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -66,8 +119,8 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 404
-        content: '{"message":"Prestataire introuvable."}'
+        status: 422
+        content: '{"message":"Le statut doit être en_attente, reussi, echoue ou rembourse.","errors":{"statut":["Le statut doit être en_attente, reussi, echoue ou rembourse."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -82,17 +135,19 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/prestataires/{id}/photos/{photo}'
+    uri: 'api/v1/admin/paiements/{id}'
     metadata:
       custom: []
-      groupName: "Client — profil public d'un prestataire"
+      groupName: 'Administration — paiements'
       groupDescription: |-
 
-        Routes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: "Photo d'atelier"
-      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      title: "Détail d'un paiement"
+      description: |-
+        Réservation concernée, acompte, commission, statut, dates (dont `crediteLe`, crédit du prestataire), remboursement dû ou non,
+        tentatives et leur maximum, et référence DexPay (`null` tant que la session n'a pas été créée).
       authenticated: true
       deprecated: false
     headers:
@@ -103,28 +158,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du prestataire.'
+        description: 'Identifiant du paiement.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000002
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      photo:
-        custom: []
-        name: photo
-        description: 'Identifiant de la photo.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000030
+        example: 0198a1b2-0000-7000-8000-000000000060
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000002
-      photo: 0198a1b2-0000-7000-8000-000000000030
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -134,25 +177,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: "[Contenu binaire de l'image]"
-        headers: []
-        description: image
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","reservationId":"0198a1b2-0000-7000-8000-000000000020","statut":"reussi","montantAcompte":3000,"commission":1000,"remboursementDu":true,"remboursementDuLe":"2030-01-20T10:00:00+00:00","tentativesRemboursement":10,"tentativesEpuisees":true,"payeLe":"2030-01-20T09:00:00+00:00","rembourseLe":null,"crediteLe":null,"reservation":{"id":"0198a1b2-0000-7000-8000-000000000020","statut":"annulee","prixApplique":10000,"clientId":"0198a1b2-0000-7000-8000-000000000001","prestataireId":"0198a1b2-0000-7000-8000-000000000012"},"creeLe":"2030-01-20T08:45:00+00:00","tentativesMaximum":10,"referenceDexpay":"DXP-EXEMPLE"}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Photo introuvable."}'
+        content: '{"message":"Paiement introuvable."}'
         headers: []
         description: ''
     responseFields: []

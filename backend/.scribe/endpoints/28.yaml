@@ -1,0 +1,354 @@
+name: Profil
+description: |-
+
+  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/me
+    metadata:
+      custom: []
+      groupName: Profil
+      groupDescription: |-
+
+        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Voir mon profil'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/v1/me
+    metadata:
+      custom: []
+      groupName: Profil
+      groupDescription: |-
+
+        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Modifier mon profil'
+      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nom:
+        custom: []
+        name: nom
+        description: Nom.
+        required: true
+        example: Diop
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      prenom:
+        custom: []
+        name: prenom
+        description: Prénom.
+        required: true
+        example: Awa
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      telephone:
+        custom: []
+        name: telephone
+        description: 'Mobile sénégalais, avec ou sans +221.'
+        required: true
+        example: '77 123 45 67'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      nom: Diop
+      prenom: Awa
+      telephone: '77 123 45 67'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/v1/me/mot-de-passe
+    metadata:
+      custom: []
+      groupName: Profil
+      groupDescription: |-
+
+        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Changer mon mot de passe'
+      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      mot_de_passe_actuel:
+        custom: []
+        name: mot_de_passe_actuel
+        description: 'Mot de passe actuel.'
+        required: true
+        example: ancienmotdepasse
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      nouveau_mot_de_passe:
+        custom: []
+        name: nouveau_mot_de_passe
+        description: '8 caractères minimum.'
+        required: true
+        example: nouveaumotdepasse
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      confirmation:
+        custom: []
+        name: confirmation
+        description: 'Identique au nouveau mot de passe.'
+        required: true
+        example: nouveaumotdepasse
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      mot_de_passe_actuel: ancienmotdepasse
+      nouveau_mot_de_passe: nouveaumotdepasse
+      confirmation: nouveaumotdepasse
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"message":"Votre mot de passe a été modifié."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: api/v1/me/jeton-push
+    metadata:
+      custom: []
+      groupName: Profil
+      groupDescription: |-
+
+        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Enregistrer mon jeton push'
+      description: |-
+        Enregistre le jeton FCM de l'appareil pour les notifications push. Un jeton désigne un appareil : s'il était déjà
+        enregistré par un autre compte, il lui est retiré (la dernière affectation l'emporte). Le jeton n'est jamais renvoyé par l'API.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      jetonPush:
+        custom: []
+        name: jetonPush
+        description: 'Jeton FCM.'
+        required: true
+        example: fcm-jeton-exemple
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      jetonPush: fcm-jeton-exemple
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"message":"Jeton de notification enregistré."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: api/v1/me/jeton-push
+    metadata:
+      custom: []
+      groupName: Profil
+      groupDescription: |-
+
+        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Retirer mon jeton push'
+      description: "À appeler quand l'appareil se déconnecte ou que les notifications push sont désactivées. Sans effet si aucun jeton n'est enregistré."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"message":"Jeton de notification retiré."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null

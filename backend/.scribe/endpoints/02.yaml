@@ -188,7 +188,7 @@ endpoints:
         `litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,
         `notifications_en_echec`, `suspensions_a_echeance`. Gravités : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).
         `ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les éléments (le dossier est identifié par l'id du prestataire) ;
-        `compteur` donne le total réel. `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension.
+        `compteur` donne le total réel. `ressource` : où ouvrir les `ids` dans l'administration (`demandes-prestataires` : `/admin/prestataires/{id}`, `litiges`, `retraits`, `paiements`, `notifications` : `/admin/notifications-en-echec/{id}` ; `avis` : liste `/admin/avis?aTraiter=1` ; `sanctions` : liste `/admin/sanctions?echeanceDansHeures=24`). `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension.
       authenticated: true
       deprecated: false
     headers:
