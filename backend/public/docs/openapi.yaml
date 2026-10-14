@@ -17,11 +17,26 @@ tags:
     name: 'Administration — modération des avis'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées\nà 10 requêtes par minute."
   -
+    name: 'Administration — notifications en échec'
+    description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées\ndu destinataire ne sont jamais exposés."
+  -
+    name: 'Administration — paiements'
+    description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers."
+  -
+    name: 'Administration — retraits'
+    description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers."
+  -
+    name: 'Administration — réservations'
+    description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le code de réservation n'est jamais renvoyé."
+  -
     name: 'Administration — sanctions'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Poser et lever une sanction sont limités à 10 requêtes par minute.\nUne suspension ou un bannissement est « tout ou rien » : sanction, statut du compte et révocation de tous ses jetons dans une seule\ntransaction. Le compte ne peut plus se connecter (le message de refus indique le motif et, pour une suspension, la date de fin),\ndisparaît de la recherche et du profil public, et ses réservations à venir (en attente, acceptées, confirmées pour un prestataire ;\nen attente et acceptées pour un client) sont annulées, un prestataire sanctionné voyant l'acompte versé remboursé en intégralité.\nUne prestation en cours va à son terme. Le solde et les retraits ne sont pas modifiés. Un administrateur ne peut pas être sanctionné."
   -
     name: 'Administration — tableau de bord'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Lecture seule : rien n'est modifié ni envoyé.\nLes agrégats sont calculés à chaque appel par des requêtes groupées (nombre de requêtes constant, quel que soit le volume).\nAucune donnée personnelle n'est renvoyée : seulement des compteurs et des montants globaux en FCFA (entiers)."
+  -
+    name: 'Administration — utilisateurs'
+    description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les comptes administrateurs ne sont\njamais listés ni ouverts (404). Nom, e-mail et téléphone sont visibles (supervision) ; jamais de mot de passe ni de jeton."
   -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
@@ -2293,6 +2308,1749 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/admin/notifications-en-echec:
+    get:
+      summary: 'Liste des notifications en échec'
+      operationId: listeDesNotificationsEnchec
+      description: "Notifications dont au moins un canal (e-mail ou push) a échoué définitivement : point d'arrivée de l'alerte\n`notifications_en_echec`. Du plus récent au plus ancien (20 par page). Filtres combinables : `canal`, `type`, `ancienneteMinutes`.\nChaque ligne donne le type, le destinataire (id et rôle), les canaux en échec, le nombre d'essais, la classe de l'erreur et la date."
+      parameters:
+        -
+          in: query
+          name: canal
+          description: 'email ou push : ne garde que les notifications dont CE canal est en échec.'
+          example: email
+          required: false
+          schema:
+            type: string
+            description: 'email ou push : ne garde que les notifications dont CE canal est en échec.'
+            example: email
+            enum:
+              - email
+              - push
+            nullable: true
+        -
+          in: query
+          name: type
+          description: 'Type de notification, par exemple reservation_confirmee.'
+          example: reservation_confirmee
+          required: false
+          schema:
+            type: string
+            description: 'Type de notification, par exemple reservation_confirmee.'
+            example: reservation_confirmee
+            enum:
+              - demande_acceptee
+              - demande_refusee
+              - reservation_nouvelle_demande
+              - reservation_acceptee
+              - reservation_refusee
+              - reservation_expiree
+              - reservation_annulee
+              - reservation_confirmee
+              - reservation_demarree
+              - reservation_terminee
+              - avis_recu
+              - avis_modere
+              - litige_ouvert
+              - litige_cloture
+              - sanction_posee
+              - sanction_levee
+            nullable: true
+        -
+          in: query
+          name: ancienneteMinutes
+          description: 'Notifications créées depuis au moins N minutes (alias : anciennete_minutes). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 525600.'
+          example: 60
+          required: false
+          schema:
+            type: integer
+            description: 'Notifications créées depuis au moins N minutes (alias : anciennete_minutes). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 525600.'
+            example: 60
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000090
+                      type: reservation_confirmee
+                      destinataire:
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        role: client
+                      canauxEnEchec:
+                        - email
+                      tentatives: 5
+                      classeErreur: TransportException
+                      dateCreation: '2030-01-20T08:00:00+00:00'
+                  links: {  }
+                  meta:
+                    current_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000090
+                        type: reservation_confirmee
+                        destinataire:
+                          id: 0198a1b2-0000-7000-8000-000000000001
+                          role: client
+                        canauxEnEchec:
+                          - email
+                        tentatives: 5
+                        classeErreur: TransportException
+                        dateCreation: '2030-01-20T08:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000090
+                        type:
+                          type: string
+                          example: reservation_confirmee
+                        destinataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000001
+                            role:
+                              type: string
+                              example: client
+                        canauxEnEchec:
+                          type: array
+                          example:
+                            - email
+                          items:
+                            type: string
+                        tentatives:
+                          type: integer
+                          example: 5
+                        classeErreur:
+                          type: string
+                          example: TransportException
+                        dateCreation:
+                          type: string
+                          example: '2030-01-20T08:00:00+00:00'
+                  links:
+                    type: object
+                    properties: {  }
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le canal doit être email ou push.'
+                  errors:
+                    canal:
+                      - 'Le canal doit être email ou push.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le canal doit être email ou push.'
+                  errors:
+                    type: object
+                    properties:
+                      canal:
+                        type: array
+                        example:
+                          - 'Le canal doit être email ou push.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — notifications en échec'
+  '/api/v1/admin/notifications-en-echec/{id}':
+    get:
+      summary: "Détail d'une notification en échec"
+      operationId: dtailDuneNotificationEnchec
+      description: "Même forme qu'une ligne de la liste. Permet d'ouvrir un identifiant renvoyé par l'alerte `notifications_en_echec`, quelle que\nsoit sa page dans la liste. Une notification qui n'est pas (ou plus) en échec répond 404."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000090
+                  type: reservation_confirmee
+                  destinataire:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    role: client
+                  canauxEnEchec:
+                    - email
+                  tentatives: 5
+                  classeErreur: TransportException
+                  dateCreation: '2030-01-20T08:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000090
+                  type:
+                    type: string
+                    example: reservation_confirmee
+                  destinataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      role:
+                        type: string
+                        example: client
+                  canauxEnEchec:
+                    type: array
+                    example:
+                      - email
+                    items:
+                      type: string
+                  tentatives:
+                    type: integer
+                    example: 5
+                  classeErreur:
+                    type: string
+                    example: TransportException
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T08:00:00+00:00'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Notification introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Notification introuvable.'
+      tags:
+        - 'Administration — notifications en échec'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la notification.'
+        example: 0198a1b2-0000-7000-8000-000000000090
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/paiements:
+    get:
+      summary: 'Liste des paiements'
+      operationId: listeDesPaiements
+      description: "Paiements d'acompte, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `remboursementDu`,\n`retardRemboursementMinutes` (remboursements dus depuis au moins N minutes, essais épuisés compris : point d'arrivée des alertes\n`remboursements_en_retard` et `remboursements_en_echec`) et `reservation`. La référence DexPay n'apparaît que dans le détail."
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'en_attente, reussi, echoue ou rembourse.'
+          example: reussi
+          required: false
+          schema:
+            type: string
+            description: 'en_attente, reussi, echoue ou rembourse.'
+            example: reussi
+            enum:
+              - en_attente
+              - reussi
+              - echoue
+              - rembourse
+            nullable: true
+        -
+          in: query
+          name: remboursementDu
+          description: 'true : paiements reçus (reussi ou echoue) marqués « à rembourser » ; false : tous les autres. Alias : remboursement_du.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : paiements reçus (reussi ou echoue) marqués « à rembourser » ; false : tous les autres. Alias : remboursement_du.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: retardRemboursementMinutes
+          description: "Remboursements dus depuis au moins N minutes (1 à 525600), y compris ceux dont les essais sont épuisés : point d'arrivée des alertes `remboursements_en_retard` et `remboursements_en_echec`. Alias : retard_remboursement_minutes. validation.between."
+          example: 30
+          required: false
+          schema:
+            type: integer
+            description: "Remboursements dus depuis au moins N minutes (1 à 525600), y compris ceux dont les essais sont épuisés : point d'arrivée des alertes `remboursements_en_retard` et `remboursements_en_echec`. Alias : retard_remboursement_minutes. validation.between."
+            example: 30
+            nullable: true
+        -
+          in: query
+          name: reservation
+          description: 'Identifiant de la réservation. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000020
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant de la réservation. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000020
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000060
+                      reservationId: 0198a1b2-0000-7000-8000-000000000020
+                      statut: reussi
+                      montantAcompte: 3000
+                      commission: 1000
+                      remboursementDu: true
+                      remboursementDuLe: '2030-01-20T10:00:00+00:00'
+                      tentativesRemboursement: 3
+                      tentativesEpuisees: false
+                      payeLe: '2030-01-20T09:00:00+00:00'
+                      rembourseLe: null
+                      crediteLe: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/paiements?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/paiements?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000060
+                        reservationId: 0198a1b2-0000-7000-8000-000000000020
+                        statut: reussi
+                        montantAcompte: 3000
+                        commission: 1000
+                        remboursementDu: true
+                        remboursementDuLe: '2030-01-20T10:00:00+00:00'
+                        tentativesRemboursement: 3
+                        tentativesEpuisees: false
+                        payeLe: '2030-01-20T09:00:00+00:00'
+                        rembourseLe: null
+                        crediteLe: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000060
+                        reservationId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000020
+                        statut:
+                          type: string
+                          example: reussi
+                        montantAcompte:
+                          type: integer
+                          example: 3000
+                        commission:
+                          type: integer
+                          example: 1000
+                        remboursementDu:
+                          type: boolean
+                          example: true
+                        remboursementDuLe:
+                          type: string
+                          example: '2030-01-20T10:00:00+00:00'
+                        tentativesRemboursement:
+                          type: integer
+                          example: 3
+                        tentativesEpuisees:
+                          type: boolean
+                          example: false
+                        payeLe:
+                          type: string
+                          example: '2030-01-20T09:00:00+00:00'
+                        rembourseLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        crediteLe:
+                          type: string
+                          example: null
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/paiements?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/paiements?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le statut doit être en_attente, reussi, echoue ou rembourse.'
+                  errors:
+                    statut:
+                      - 'Le statut doit être en_attente, reussi, echoue ou rembourse.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le statut doit être en_attente, reussi, echoue ou rembourse.'
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - 'Le statut doit être en_attente, reussi, echoue ou rembourse.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — paiements'
+  '/api/v1/admin/paiements/{id}':
+    get:
+      summary: "Détail d'un paiement"
+      operationId: dtailDunPaiement
+      description: "Réservation concernée, acompte, commission, statut, dates (dont `crediteLe`, crédit du prestataire), remboursement dû ou non,\ntentatives et leur maximum, et référence DexPay (`null` tant que la session n'a pas été créée)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000060
+                  reservationId: 0198a1b2-0000-7000-8000-000000000020
+                  statut: reussi
+                  montantAcompte: 3000
+                  commission: 1000
+                  remboursementDu: true
+                  remboursementDuLe: '2030-01-20T10:00:00+00:00'
+                  tentativesRemboursement: 10
+                  tentativesEpuisees: true
+                  payeLe: '2030-01-20T09:00:00+00:00'
+                  rembourseLe: null
+                  crediteLe: null
+                  reservation:
+                    id: 0198a1b2-0000-7000-8000-000000000020
+                    statut: annulee
+                    prixApplique: 10000
+                    clientId: 0198a1b2-0000-7000-8000-000000000001
+                    prestataireId: 0198a1b2-0000-7000-8000-000000000012
+                  creeLe: '2030-01-20T08:45:00+00:00'
+                  tentativesMaximum: 10
+                  referenceDexpay: DXP-EXEMPLE
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000060
+                  reservationId:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000020
+                  statut:
+                    type: string
+                    example: reussi
+                  montantAcompte:
+                    type: integer
+                    example: 3000
+                  commission:
+                    type: integer
+                    example: 1000
+                  remboursementDu:
+                    type: boolean
+                    example: true
+                  remboursementDuLe:
+                    type: string
+                    example: '2030-01-20T10:00:00+00:00'
+                  tentativesRemboursement:
+                    type: integer
+                    example: 10
+                  tentativesEpuisees:
+                    type: boolean
+                    example: true
+                  payeLe:
+                    type: string
+                    example: '2030-01-20T09:00:00+00:00'
+                  rembourseLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  crediteLe:
+                    type: string
+                    example: null
+                    nullable: true
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000020
+                      statut:
+                        type: string
+                        example: annulee
+                      prixApplique:
+                        type: integer
+                        example: 10000
+                      clientId:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      prestataireId:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000012
+                  creeLe:
+                    type: string
+                    example: '2030-01-20T08:45:00+00:00'
+                  tentativesMaximum:
+                    type: integer
+                    example: 10
+                  referenceDexpay:
+                    type: string
+                    example: DXP-EXEMPLE
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Paiement introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Paiement introuvable.'
+      tags:
+        - 'Administration — paiements'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du paiement.'
+        example: 0198a1b2-0000-7000-8000-000000000060
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/retraits:
+    get:
+      summary: 'Liste des retraits'
+      operationId: listeDesRetraits
+      description: "Retraits des prestataires, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `prestataire`\n(identifiant du profil prestataire) et `bloques` (retraits en_cours depuis plus longtemps que le délai de blocage : point\nd'arrivée de l'alerte `retraits_bloques`). Le téléphone de versement est masqué dans la liste ; la référence DexPay n'apparaît\nque dans le détail."
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'en_cours, reussi ou echoue.'
+          example: en_cours
+          required: false
+          schema:
+            type: string
+            description: 'en_cours, reussi ou echoue.'
+            example: en_cours
+            enum:
+              - en_cours
+              - reussi
+              - echoue
+            nullable: true
+        -
+          in: query
+          name: prestataire
+          description: 'Identifiant du profil prestataire. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000012
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant du profil prestataire. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000012
+            nullable: true
+        -
+          in: query
+          name: bloques
+          description: "true : retraits en_cours depuis plus longtemps que le délai de blocage (point d'arrivée de l'alerte `retraits_bloques`) ; false : tous les autres."
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: "true : retraits en_cours depuis plus longtemps que le délai de blocage (point d'arrivée de l'alerte `retraits_bloques`) ; false : tous les autres."
+            example: true
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000012
+                        userId: 0198a1b2-0000-7000-8000-000000000002
+                        nomEntreprise: 'Garage Exemple'
+                      montant: 5000
+                      statut: en_cours
+                      bloque: true
+                      dateDemande: '2030-01-20T08:00:00+00:00'
+                      traiteLe: null
+                      recredite: false
+                      telephoneVersement: '+221*******67'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/retraits?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/retraits?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000012
+                          userId: 0198a1b2-0000-7000-8000-000000000002
+                          nomEntreprise: 'Garage Exemple'
+                        montant: 5000
+                        statut: en_cours
+                        bloque: true
+                        dateDemande: '2030-01-20T08:00:00+00:00'
+                        traiteLe: null
+                        recredite: false
+                        telephoneVersement: '+221*******67'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000012
+                            userId:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000002
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                        montant:
+                          type: integer
+                          example: 5000
+                        statut:
+                          type: string
+                          example: en_cours
+                        bloque:
+                          type: boolean
+                          example: true
+                        dateDemande:
+                          type: string
+                          example: '2030-01-20T08:00:00+00:00'
+                        traiteLe:
+                          type: string
+                          example: null
+                          nullable: true
+                        recredite:
+                          type: boolean
+                          example: false
+                        telephoneVersement:
+                          type: string
+                          example: '+221*******67'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/retraits?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/retraits?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le statut doit être en_cours, reussi ou echoue.'
+                  errors:
+                    statut:
+                      - 'Le statut doit être en_cours, reussi ou echoue.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le statut doit être en_cours, reussi ou echoue.'
+                  errors:
+                    type: object
+                    properties:
+                      statut:
+                        type: array
+                        example:
+                          - 'Le statut doit être en_cours, reussi ou echoue.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — retraits'
+  '/api/v1/admin/retraits/{id}':
+    get:
+      summary: "Détail d'un retrait"
+      operationId: dtailDunRetrait
+      description: "Prestataire, montant, statut, dates de demande et de traitement, téléphone de versement complet, référence DexPay et\n`recredite` / `recrediteLe` (le montant d'un retrait échoué a-t-il été remis au solde)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000080
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000012
+                    userId: 0198a1b2-0000-7000-8000-000000000002
+                    nomEntreprise: 'Garage Exemple'
+                  montant: 5000
+                  statut: echoue
+                  bloque: false
+                  dateDemande: '2030-01-20T08:00:00+00:00'
+                  traiteLe: '2030-01-20T08:05:00+00:00'
+                  recredite: true
+                  telephoneVersement: '+221771234567'
+                  referenceDexpay: DXP-RET-EXEMPLE
+                  recrediteLe: '2030-01-20T08:05:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000080
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000012
+                      userId:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000002
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  montant:
+                    type: integer
+                    example: 5000
+                  statut:
+                    type: string
+                    example: echoue
+                  bloque:
+                    type: boolean
+                    example: false
+                  dateDemande:
+                    type: string
+                    example: '2030-01-20T08:00:00+00:00'
+                  traiteLe:
+                    type: string
+                    example: '2030-01-20T08:05:00+00:00'
+                  recredite:
+                    type: boolean
+                    example: true
+                  telephoneVersement:
+                    type: string
+                    example: '+221771234567'
+                  referenceDexpay:
+                    type: string
+                    example: DXP-RET-EXEMPLE
+                  recrediteLe:
+                    type: string
+                    example: '2030-01-20T08:05:00+00:00'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Retrait introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Retrait introuvable.'
+      tags:
+        - 'Administration — retraits'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du retrait.'
+        example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/reservations:
+    get:
+      summary: 'Liste des réservations'
+      operationId: listeDesRservations
+      description: "Toutes les réservations, de la plus récente à la plus ancienne (20 par page). Filtres combinables : `statut`, `prestataire`\n(identifiant du profil prestataire), `client` (identifiant du compte), `debut` / `fin` (jour de début du créneau) et `q`\n(code de réservation, recherche partielle). Le client n'apparaît que par son prénom et l'initiale de son nom ;\n`statutPaiement` est celui du paiement qui représente la réservation (`null` sans paiement)."
+      parameters:
+        -
+          in: query
+          name: statut
+          description: 'en_attente, acceptee, confirmee, en_cours, terminee, refusee ou annulee.'
+          example: confirmee
+          required: false
+          schema:
+            type: string
+            description: 'en_attente, acceptee, confirmee, en_cours, terminee, refusee ou annulee.'
+            example: confirmee
+            enum:
+              - en_attente
+              - acceptee
+              - confirmee
+              - en_cours
+              - terminee
+              - refusee
+              - annulee
+            nullable: true
+        -
+          in: query
+          name: prestataire
+          description: "Identifiant du profil prestataire (celui des autres routes d'administration). validation.uuid."
+          example: 0198a1b2-0000-7000-8000-000000000012
+          required: false
+          schema:
+            type: string
+            description: "Identifiant du profil prestataire (celui des autres routes d'administration). validation.uuid."
+            example: 0198a1b2-0000-7000-8000-000000000012
+            nullable: true
+        -
+          in: query
+          name: client
+          description: 'Identifiant du compte client. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000001
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant du compte client. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000001
+            nullable: true
+        -
+          in: query
+          name: q
+          description: "Code de réservation (recherche partielle, sans tenir compte de la casse). Le code lui-même n'est jamais renvoyé. Le champ value ne doit pas dépasser 20 caractères."
+          example: AB12
+          required: false
+          schema:
+            type: string
+            description: "Code de réservation (recherche partielle, sans tenir compte de la casse). Le code lui-même n'est jamais renvoyé. Le champ value ne doit pas dépasser 20 caractères."
+            example: AB12
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+        -
+          in: query
+          name: debut
+          description: 'Créneaux commençant à partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>.'
+          example: '2030-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Créneaux commençant à partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>.'
+            example: '2030-01-01'
+            nullable: true
+        -
+          in: query
+          name: fin
+          description: "Créneaux commençant jusqu'à ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>."
+          example: '2030-01-31'
+          required: false
+          schema:
+            type: string
+            description: "Créneaux commençant jusqu'à ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>."
+            example: '2030-01-31'
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000020
+                      statut: confirmee
+                      client:
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        prenom: Awa
+                        initialeNom: D.
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000012
+                        nomEntreprise: 'Garage Exemple'
+                      prestation:
+                        id: 0198a1b2-0000-7000-8000-000000000030
+                        nom: Vidange
+                      creneau:
+                        id: 0198a1b2-0000-7000-8000-000000000050
+                        debut: '2030-01-21T09:00:00+00:00'
+                        fin: '2030-01-21T10:00:00+00:00'
+                      prixApplique: 10000
+                      statutPaiement: reussi
+                      dateCreation: '2030-01-20T08:00:00+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/reservations?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/reservations?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000020
+                        statut: confirmee
+                        client:
+                          id: 0198a1b2-0000-7000-8000-000000000001
+                          prenom: Awa
+                          initialeNom: D.
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000012
+                          nomEntreprise: 'Garage Exemple'
+                        prestation:
+                          id: 0198a1b2-0000-7000-8000-000000000030
+                          nom: Vidange
+                        creneau:
+                          id: 0198a1b2-0000-7000-8000-000000000050
+                          debut: '2030-01-21T09:00:00+00:00'
+                          fin: '2030-01-21T10:00:00+00:00'
+                        prixApplique: 10000
+                        statutPaiement: reussi
+                        dateCreation: '2030-01-20T08:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000020
+                        statut:
+                          type: string
+                          example: confirmee
+                        client:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000001
+                            prenom:
+                              type: string
+                              example: Awa
+                            initialeNom:
+                              type: string
+                              example: D.
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000012
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                        prestation:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000030
+                            nom:
+                              type: string
+                              example: Vidange
+                        creneau:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000050
+                            debut:
+                              type: string
+                              example: '2030-01-21T09:00:00+00:00'
+                            fin:
+                              type: string
+                              example: '2030-01-21T10:00:00+00:00'
+                        prixApplique:
+                          type: integer
+                          example: 10000
+                        statutPaiement:
+                          type: string
+                          example: reussi
+                        dateCreation:
+                          type: string
+                          example: '2030-01-20T08:00:00+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/reservations?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/reservations?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le prestataire doit être un identifiant valide.'
+                  errors:
+                    prestataire:
+                      - 'Le prestataire doit être un identifiant valide.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le prestataire doit être un identifiant valide.'
+                  errors:
+                    type: object
+                    properties:
+                      prestataire:
+                        type: array
+                        example:
+                          - 'Le prestataire doit être un identifiant valide.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — réservations'
+  '/api/v1/admin/reservations/{id}':
+    get:
+      summary: "Détail d'une réservation"
+      operationId: dtailDuneRservation
+      description: "Client (nom complet), prestataire, prestation, créneau, prix appliqué, `paiement` (statut, acompte, commission, remboursement dû\nou non, nombre de tentatives de remboursement, dates), `avis` et `litige` éventuels (`null` sinon) et `historique` des dates\nclés. Le code de réservation et la référence de paiement ne sont pas exposés ici."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000020
+                  statut: terminee
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000012
+                    nomEntreprise: 'Garage Exemple'
+                  prestation:
+                    id: 0198a1b2-0000-7000-8000-000000000030
+                    nom: Vidange
+                    dureeMinutes: 60
+                  creneau:
+                    id: 0198a1b2-0000-7000-8000-000000000050
+                    debut: '2030-01-21T09:00:00+00:00'
+                    fin: '2030-01-21T10:00:00+00:00'
+                  prixApplique: 10000
+                  client:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    prenom: Awa
+                    nom: Diallo
+                  motifRefus: null
+                  paiement:
+                    id: 0198a1b2-0000-7000-8000-000000000060
+                    statut: reussi
+                    montantAcompte: 3000
+                    commission: 1000
+                    remboursementDu: false
+                    remboursementDuLe: null
+                    tentativesRemboursement: 0
+                    tentativesEpuisees: false
+                    payeLe: '2030-01-20T09:00:00+00:00'
+                    rembourseLe: null
+                    crediteLe: '2030-01-21T10:05:00+00:00'
+                  nombrePaiements: 1
+                  avis:
+                    id: 0198a1b2-0000-7000-8000-000000000070
+                    note: 5
+                    statut: publie
+                    dateCreation: '2030-01-21T12:00:00+00:00'
+                  litige: null
+                  historique:
+                    creeeLe: '2030-01-20T08:00:00+00:00'
+                    accepteeLe: '2030-01-20T08:30:00+00:00'
+                    payeLe: '2030-01-20T09:00:00+00:00'
+                    remboursementDuLe: null
+                    rembourseLe: null
+                    debutCreneau: '2030-01-21T09:00:00+00:00'
+                    finCreneau: '2030-01-21T10:00:00+00:00'
+                    misAJourLe: '2030-01-21T10:05:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000020
+                  statut:
+                    type: string
+                    example: terminee
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000012
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                  prestation:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000030
+                      nom:
+                        type: string
+                        example: Vidange
+                      dureeMinutes:
+                        type: integer
+                        example: 60
+                  creneau:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000050
+                      debut:
+                        type: string
+                        example: '2030-01-21T09:00:00+00:00'
+                      fin:
+                        type: string
+                        example: '2030-01-21T10:00:00+00:00'
+                  prixApplique:
+                    type: integer
+                    example: 10000
+                  client:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      prenom:
+                        type: string
+                        example: Awa
+                      nom:
+                        type: string
+                        example: Diallo
+                  motifRefus:
+                    type: string
+                    example: null
+                    nullable: true
+                  paiement:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000060
+                      statut:
+                        type: string
+                        example: reussi
+                      montantAcompte:
+                        type: integer
+                        example: 3000
+                      commission:
+                        type: integer
+                        example: 1000
+                      remboursementDu:
+                        type: boolean
+                        example: false
+                      remboursementDuLe:
+                        type: string
+                        example: null
+                        nullable: true
+                      tentativesRemboursement:
+                        type: integer
+                        example: 0
+                      tentativesEpuisees:
+                        type: boolean
+                        example: false
+                      payeLe:
+                        type: string
+                        example: '2030-01-20T09:00:00+00:00'
+                      rembourseLe:
+                        type: string
+                        example: null
+                        nullable: true
+                      crediteLe:
+                        type: string
+                        example: '2030-01-21T10:05:00+00:00'
+                  nombrePaiements:
+                    type: integer
+                    example: 1
+                  avis:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000070
+                      note:
+                        type: integer
+                        example: 5
+                      statut:
+                        type: string
+                        example: publie
+                      dateCreation:
+                        type: string
+                        example: '2030-01-21T12:00:00+00:00'
+                  litige:
+                    type: string
+                    example: null
+                    nullable: true
+                  historique:
+                    type: object
+                    properties:
+                      creeeLe:
+                        type: string
+                        example: '2030-01-20T08:00:00+00:00'
+                      accepteeLe:
+                        type: string
+                        example: '2030-01-20T08:30:00+00:00'
+                      payeLe:
+                        type: string
+                        example: '2030-01-20T09:00:00+00:00'
+                      remboursementDuLe:
+                        type: string
+                        example: null
+                        nullable: true
+                      rembourseLe:
+                        type: string
+                        example: null
+                        nullable: true
+                      debutCreneau:
+                        type: string
+                        example: '2030-01-21T09:00:00+00:00'
+                      finCreneau:
+                        type: string
+                        example: '2030-01-21T10:00:00+00:00'
+                      misAJourLe:
+                        type: string
+                        example: '2030-01-21T10:05:00+00:00'
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Réservation introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Réservation introuvable.'
+      tags:
+        - 'Administration — réservations'
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant de la réservation.'
+        example: 0198a1b2-0000-7000-8000-000000000020
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/sanctions:
+    get:
+      summary: 'Liste de toutes les sanctions'
+      operationId: listeDeToutesLesSanctions
+      description: "Toutes les sanctions de la plateforme, levées ou non, du plus récent au plus ancien (20 par page). Filtres combinables :\n`actives`, `type`, `utilisateur`, `echeanceDansHeures` (suspensions non levées qui se terminent dans les N prochaines heures :\npoint d'arrivée de l'alerte `suspensions_a_echeance`). L'historique d'un seul compte reste sur `/admin/utilisateurs/{id}/sanctions`."
+      parameters:
+        -
+          in: query
+          name: actives
+          description: 'true : sanctions non levées ; false : sanctions levées ; absent : toutes.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'true : sanctions non levées ; false : sanctions levées ; absent : toutes.'
+            example: true
+            nullable: true
+        -
+          in: query
+          name: type
+          description: 'avertissement, suspension_temporaire ou bannissement_definitif.'
+          example: suspension_temporaire
+          required: false
+          schema:
+            type: string
+            description: 'avertissement, suspension_temporaire ou bannissement_definitif.'
+            example: suspension_temporaire
+            enum:
+              - avertissement
+              - suspension_temporaire
+              - bannissement_definitif
+            nullable: true
+        -
+          in: query
+          name: utilisateur
+          description: 'Identifiant du compte sanctionné. validation.uuid.'
+          example: 0198a1b2-0000-7000-8000-000000000002
+          required: false
+          schema:
+            type: string
+            description: 'Identifiant du compte sanctionné. validation.uuid.'
+            example: 0198a1b2-0000-7000-8000-000000000002
+            nullable: true
+        -
+          in: query
+          name: echeanceDansHeures
+          description: "Suspensions non levées qui se terminent dans les N prochaines heures (1 à 8760), comme l'alerte « suspensions à échéance ». Alias : echeance_dans_heures. validation.between."
+          example: 48
+          required: false
+          schema:
+            type: integer
+            description: "Suspensions non levées qui se terminent dans les N prochaines heures (1 à 8760), comme l'alerte « suspensions à échéance ». Alias : echeance_dans_heures. validation.between."
+            example: 48
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000040
+                      type: suspension_temporaire
+                      utilisateur:
+                        id: 0198a1b2-0000-7000-8000-000000000002
+                        prenom: Moussa
+                        nom: Diop
+                        role: prestataire
+                      motif: 'Comportement contraire aux règles.'
+                      litigeId: null
+                      avisId: null
+                      dateCreation: '2030-01-20T09:00:00+00:00'
+                      dateFin: '2030-01-27T09:00:00+00:00'
+                      active: true
+                      leveeLe: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/sanctions?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/sanctions?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000040
+                        type: suspension_temporaire
+                        utilisateur:
+                          id: 0198a1b2-0000-7000-8000-000000000002
+                          prenom: Moussa
+                          nom: Diop
+                          role: prestataire
+                        motif: 'Comportement contraire aux règles.'
+                        litigeId: null
+                        avisId: null
+                        dateCreation: '2030-01-20T09:00:00+00:00'
+                        dateFin: '2030-01-27T09:00:00+00:00'
+                        active: true
+                        leveeLe: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000040
+                        type:
+                          type: string
+                          example: suspension_temporaire
+                        utilisateur:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000002
+                            prenom:
+                              type: string
+                              example: Moussa
+                            nom:
+                              type: string
+                              example: Diop
+                            role:
+                              type: string
+                              example: prestataire
+                        motif:
+                          type: string
+                          example: 'Comportement contraire aux règles.'
+                        litigeId:
+                          type: string
+                          example: null
+                          nullable: true
+                        avisId:
+                          type: string
+                          example: null
+                          nullable: true
+                        dateCreation:
+                          type: string
+                          example: '2030-01-20T09:00:00+00:00'
+                        dateFin:
+                          type: string
+                          example: '2030-01-27T09:00:00+00:00'
+                        active:
+                          type: boolean
+                          example: true
+                        leveeLe:
+                          type: string
+                          example: null
+                          nullable: true
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/sanctions?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/sanctions?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.'
+                  errors:
+                    type:
+                      - 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.'
+                  errors:
+                    type: object
+                    properties:
+                      type:
+                        type: array
+                        example:
+                          - 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — sanctions'
   '/api/v1/admin/utilisateurs/{id}/sanctions':
     post:
       summary: 'Poser une sanction'
@@ -3390,7 +5148,7 @@ paths:
     get:
       summary: Alertes
       operationId: alertes
-      description: "Éléments qui demandent l'attention de l'administrateur, calculés à la demande (rien n'est envoyé : l'administrateur ne reçoit ni\ne-mail ni notification push). Liste vide quand tout est calme. Triées de la plus grave à la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravités : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les éléments (le dossier est identifié par l'id du prestataire) ;\n`compteur` donne le total réel. `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension."
+      description: "Éléments qui demandent l'attention de l'administrateur, calculés à la demande (rien n'est envoyé : l'administrateur ne reçoit ni\ne-mail ni notification push). Liste vide quand tout est calme. Triées de la plus grave à la moins grave. Types : `dossiers_en_attente`,\n`litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,\n`notifications_en_echec`, `suspensions_a_echeance`. Gravités : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).\n`ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les éléments (le dossier est identifié par l'id du prestataire) ;\n`compteur` donne le total réel. `ressource` : où ouvrir les `ids` dans l'administration (`demandes-prestataires` : `/admin/prestataires/{id}`, `litiges`, `retraits`, `paiements`, `notifications` : `/admin/notifications-en-echec/{id}` ; `avis` : liste `/admin/avis?aTraiter=1` ; `sanctions` : liste `/admin/sanctions?echeanceDansHeures=24`). `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension."
       parameters: []
       responses:
         200:
@@ -3522,6 +5280,465 @@ paths:
                     example: "Vous n'avez pas le droit d'effectuer cette action."
       tags:
         - 'Administration — tableau de bord'
+  /api/v1/admin/utilisateurs:
+    get:
+      summary: 'Liste des utilisateurs'
+      operationId: listeDesUtilisateurs
+      description: "Clients et prestataires, tous statuts confondus, du plus récent au plus ancien (20 par page). Filtres combinables : `role`,\n`statut`, `q` (recherche partielle, insensible à la casse, dans nom, prénom, « prénom nom », e-mail, téléphone et nom d'entreprise ;\nles accents ne sont pas ignorés), `debut` / `fin` (date de création). `prestataire` vaut `null` pour un client ; son `id` est\nl'identifiant du profil prestataire, celui des autres routes d'administration."
+      parameters:
+        -
+          in: query
+          name: role
+          description: 'client ou prestataire (les administrateurs ne sont jamais listés).'
+          example: prestataire
+          required: false
+          schema:
+            type: string
+            description: 'client ou prestataire (les administrateurs ne sont jamais listés).'
+            example: prestataire
+            enum:
+              - client
+              - prestataire
+            nullable: true
+        -
+          in: query
+          name: statut
+          description: 'Statut du compte : en_attente, actif, refuse, suspendu ou banni.'
+          example: actif
+          required: false
+          schema:
+            type: string
+            description: 'Statut du compte : en_attente, actif, refuse, suspendu ou banni.'
+            example: actif
+            enum:
+              - en_attente
+              - actif
+              - refuse
+              - suspendu
+              - banni
+            nullable: true
+        -
+          in: query
+          name: q
+          description: "Recherche partielle, sans tenir compte des majuscules, dans le nom, le prénom, l'e-mail, le téléphone et le nom d'entreprise. Le champ value ne doit pas dépasser 100 caractères."
+          example: diop
+          required: false
+          schema:
+            type: string
+            description: "Recherche partielle, sans tenir compte des majuscules, dans le nom, le prénom, l'e-mail, le téléphone et le nom d'entreprise. Le champ value ne doit pas dépasser 100 caractères."
+            example: diop
+            nullable: true
+        -
+          in: query
+          name: page
+          description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+          example: 1
+          required: false
+          schema:
+            type: integer
+            description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+            example: 1
+            nullable: true
+        -
+          in: query
+          name: debut
+          description: 'Comptes créés à partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>.'
+          example: '2030-01-01'
+          required: false
+          schema:
+            type: string
+            description: 'Comptes créés à partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>.'
+            example: '2030-01-01'
+            nullable: true
+        -
+          in: query
+          name: fin
+          description: "Comptes créés jusqu'à ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>."
+          example: '2030-01-31'
+          required: false
+          schema:
+            type: string
+            description: "Comptes créés jusqu'à ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>."
+            example: '2030-01-31'
+            nullable: true
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000002
+                      role: prestataire
+                      prenom: Moussa
+                      nom: Diop
+                      email: moussa@example.com
+                      telephone: '+221770000002'
+                      statut: actif
+                      dateCreation: '2030-01-10T09:00:00+00:00'
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000012
+                        metier: mecanique
+                        quartier: Malika
+                        nomEntreprise: 'Garage Exemple'
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000001
+                      role: client
+                      prenom: Awa
+                      nom: Diallo
+                      email: null
+                      telephone: '+221770000001'
+                      statut: actif
+                      dateCreation: '2030-01-09T09:00:00+00:00'
+                      prestataire: null
+                  links:
+                    first: 'https://api.exemple.test/api/v1/admin/utilisateurs?page=1'
+                    last: 'https://api.exemple.test/api/v1/admin/utilisateurs?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 2
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000002
+                        role: prestataire
+                        prenom: Moussa
+                        nom: Diop
+                        email: moussa@example.com
+                        telephone: '+221770000002'
+                        statut: actif
+                        dateCreation: '2030-01-10T09:00:00+00:00'
+                        prestataire:
+                          id: 0198a1b2-0000-7000-8000-000000000012
+                          metier: mecanique
+                          quartier: Malika
+                          nomEntreprise: 'Garage Exemple'
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000001
+                        role: client
+                        prenom: Awa
+                        nom: Diallo
+                        email: null
+                        telephone: '+221770000001'
+                        statut: actif
+                        dateCreation: '2030-01-09T09:00:00+00:00'
+                        prestataire: null
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000002
+                        role:
+                          type: string
+                          example: prestataire
+                        prenom:
+                          type: string
+                          example: Moussa
+                        nom:
+                          type: string
+                          example: Diop
+                        email:
+                          type: string
+                          example: moussa@example.com
+                        telephone:
+                          type: string
+                          example: '+221770000002'
+                        statut:
+                          type: string
+                          example: actif
+                        dateCreation:
+                          type: string
+                          example: '2030-01-10T09:00:00+00:00'
+                        prestataire:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              example: 0198a1b2-0000-7000-8000-000000000012
+                            metier:
+                              type: string
+                              example: mecanique
+                            quartier:
+                              type: string
+                              example: Malika
+                            nomEntreprise:
+                              type: string
+                              example: 'Garage Exemple'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/utilisateurs?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/admin/utilisateurs?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 2
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Le rôle doit être client ou prestataire.'
+                  errors:
+                    role:
+                      - 'Le rôle doit être client ou prestataire.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Le rôle doit être client ou prestataire.'
+                  errors:
+                    type: object
+                    properties:
+                      role:
+                        type: array
+                        example:
+                          - 'Le rôle doit être client ou prestataire.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — utilisateurs'
+  '/api/v1/admin/utilisateurs/{id}':
+    get:
+      summary: "Fiche d'un utilisateur"
+      operationId: ficheDunUtilisateur
+      description: "Identité, statut, `sanctionActive` (blocage en cours, sinon avertissement non levé, sinon `null`) et `nombreSanctions`.\nUn client a un bloc `client` (`reservationsParStatut`, `nombreAvisDonnes`, `litiges`), un prestataire un bloc `prestataire`\n(adresse, `solde` en FCFA, `prestationsActives`, `reservationsParStatut`, `noteMoyenne` et `nombreAvis` hors avis masqués,\n`nombreRetraits`, `litiges`) ; l'autre bloc vaut `null`. `litiges` : `total` et `ouverts` (concernant le compte)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000002
+                  role: prestataire
+                  prenom: Moussa
+                  nom: Diop
+                  email: moussa@example.com
+                  telephone: '+221770000002'
+                  statut: suspendu
+                  dateCreation: '2030-01-10T09:00:00+00:00'
+                  prestataire:
+                    id: 0198a1b2-0000-7000-8000-000000000012
+                    metier: mecanique
+                    quartier: Malika
+                    nomEntreprise: 'Garage Exemple'
+                    adresse: 'Rue 10, près du marché'
+                    solde: 12000
+                    prestationsActives: 3
+                    reservationsParStatut:
+                      en_attente: 1
+                      acceptee: 0
+                      confirmee: 2
+                      en_cours: 0
+                      terminee: 14
+                      refusee: 1
+                      annulee: 2
+                    noteMoyenne: 4.5
+                    nombreAvis: 10
+                    nombreRetraits: 2
+                    litiges:
+                      total: 1
+                      ouverts: 0
+                  sanctionActive:
+                    id: 0198a1b2-0000-7000-8000-000000000040
+                    type: suspension_temporaire
+                    dateFin: '2030-02-01T09:00:00+00:00'
+                  nombreSanctions: 2
+                  client: null
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000002
+                  role:
+                    type: string
+                    example: prestataire
+                  prenom:
+                    type: string
+                    example: Moussa
+                  nom:
+                    type: string
+                    example: Diop
+                  email:
+                    type: string
+                    example: moussa@example.com
+                  telephone:
+                    type: string
+                    example: '+221770000002'
+                  statut:
+                    type: string
+                    example: suspendu
+                  dateCreation:
+                    type: string
+                    example: '2030-01-10T09:00:00+00:00'
+                  prestataire:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000012
+                      metier:
+                        type: string
+                        example: mecanique
+                      quartier:
+                        type: string
+                        example: Malika
+                      nomEntreprise:
+                        type: string
+                        example: 'Garage Exemple'
+                      adresse:
+                        type: string
+                        example: 'Rue 10, près du marché'
+                      solde:
+                        type: integer
+                        example: 12000
+                      prestationsActives:
+                        type: integer
+                        example: 3
+                      reservationsParStatut:
+                        type: object
+                        properties:
+                          en_attente:
+                            type: integer
+                            example: 1
+                          acceptee:
+                            type: integer
+                            example: 0
+                          confirmee:
+                            type: integer
+                            example: 2
+                          en_cours:
+                            type: integer
+                            example: 0
+                          terminee:
+                            type: integer
+                            example: 14
+                          refusee:
+                            type: integer
+                            example: 1
+                          annulee:
+                            type: integer
+                            example: 2
+                      noteMoyenne:
+                        type: number
+                        example: 4.5
+                      nombreAvis:
+                        type: integer
+                        example: 10
+                      nombreRetraits:
+                        type: integer
+                        example: 2
+                      litiges:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 1
+                          ouverts:
+                            type: integer
+                            example: 0
+                  sanctionActive:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000040
+                      type:
+                        type: string
+                        example: suspension_temporaire
+                      dateFin:
+                        type: string
+                        example: '2030-02-01T09:00:00+00:00'
+                  nombreSanctions:
+                    type: integer
+                    example: 2
+                  client:
+                    type: string
+                    example: null
+                    nullable: true
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Utilisateur introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Utilisateur introuvable.'
+      tags:
+        - 'Administration — utilisateurs'
+    parameters:
+      -
+        in: path
+        name: id
+        description: "Identifiant de l'utilisateur."
+        example: 0198a1b2-0000-7000-8000-000000000002
+        required: true
+        schema:
+          type: string
   '/api/v1/prestataires/{id}/agenda':
     get:
       summary: "Créneaux disponibles d'un prestataire"
@@ -6067,7 +8284,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-13T17:54:44+00:00'
+                  time: '2026-10-14T12:55:27+00:00'
                 properties:
                   status:
                     type: string
@@ -6083,7 +8300,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-13T17:54:44+00:00'
+                    example: '2026-10-14T12:55:27+00:00'
       tags:
         - Endpoints
       security: []

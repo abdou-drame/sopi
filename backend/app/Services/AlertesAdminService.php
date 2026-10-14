@@ -29,6 +29,21 @@ class AlertesAdminService
 
     public const CRITIQUE = 'critique';
 
+    /**
+     * Ressource d'administration où ouvrir les `ids` de chaque type d'alerte : `/admin/{ressource}` (liste, avec le filtre qui reprend la
+     * définition de l'alerte) et, quand elle existe, `/admin/{ressource}/{id}`.
+     */
+    private const RESSOURCES = [
+        'dossiers_en_attente' => 'demandes-prestataires',
+        'litiges_ouverts' => 'litiges',
+        'avis_signales' => 'avis',
+        'retraits_bloques' => 'retraits',
+        'remboursements_en_echec' => 'paiements',
+        'remboursements_en_retard' => 'paiements',
+        'notifications_en_echec' => 'notifications',
+        'suspensions_a_echeance' => 'sanctions',
+    ];
+
     private const ORDRE_GRAVITE = [self::CRITIQUE => 0, self::ATTENTION => 1, self::INFO => 2];
 
     public function alertes(): array
@@ -225,6 +240,7 @@ class AlertesAdminService
     {
         return [
             'type' => $type,
+            'ressource' => self::RESSOURCES[$type],
             'gravite' => $gravite,
             'compteur' => $compteur,
             'message' => $message,

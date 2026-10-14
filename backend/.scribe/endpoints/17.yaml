@@ -1,25 +1,26 @@
-name: "Prestataire — photos d'atelier"
+name: 'Client — réservations'
 description: |-
 
-  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
-  Les clients voient ces photos sur le profil public du prestataire.
+  Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
 endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: api/v1/prestataire/photos
+      - POST
+    uri: api/v1/reservations
     metadata:
       custom: []
-      groupName: "Prestataire — photos d'atelier"
+      groupName: 'Client — réservations'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
-        Les clients voient ces photos sur le profil public du prestataire.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Mes photos'
-      description: "Photos du prestataire connecté, dans l'ordre d'ajout. `url` est un chemin de l'API à compléter avec l'URL de base ; l'image se charge avec le jeton."
+      title: 'Réserver un créneau'
+      description: |-
+        Confirme la demande du client sur un créneau qu'il a verrouillé (voir « Verrouiller un créneau ») avant l'expiration
+        du verrou. La réservation est créée au statut `en_attente` (le prestataire a 12 h pour répondre) et le créneau passe
+        à « réservé ». La réponse ne contient aucune donnée personnelle du prestataire ni code de réservation.
       authenticated: true
       deprecated: false
     headers:
@@ -30,84 +31,40 @@ endpoints:
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
+    bodyParameters:
+      creneau_id:
         custom: []
-        status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000030","url":"/api/v1/prestataire/photos/0198a1b2-0000-7000-8000-000000000030"}]}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/prestataire/photos/{photo}'
-    metadata:
-      custom: []
-      groupName: "Prestataire — photos d'atelier"
-      groupDescription: |-
-
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
-        Les clients voient ces photos sur le profil public du prestataire.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Afficher une de mes photos'
-      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`). La photo d'un autre prestataire répond 404, comme une photo inexistante."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      photo:
-        custom: []
-        name: photo
-        description: 'Identifiant de la photo.'
+        name: creneau_id
+        description: 'Identifiant du créneau, que le client a verrouillé. validation.uuid.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000030
+        example: 0198a1b2-0000-7000-8000-000000000040
         type: string
         enumValues: []
-        exampleWasSpecified: true
+        exampleWasSpecified: false
         nullable: false
         deprecated: false
-    cleanUrlParameters:
-      photo: 0198a1b2-0000-7000-8000-000000000030
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+      prestation_id:
+        custom: []
+        name: prestation_id
+        description: 'Identifiant de la prestation, active et proposée par le prestataire du créneau. validation.uuid.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000050
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      creneau_id: 0198a1b2-0000-7000-8000-000000000040
+      prestation_id: 0198a1b2-0000-7000-8000-000000000050
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: "[Contenu binaire de l'image]"
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
         headers: []
-        description: image
+        description: ''
       -
         custom: []
         status: 401
@@ -123,7 +80,25 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Photo introuvable."}'
+        content: '{"message":"Créneau introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Délai dépassé. Veuillez sélectionner de nouveau un créneau."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Cette prestation n''est pas proposée sur ce créneau.","errors":{"prestation_id":["Cette prestation n''est pas proposée sur ce créneau."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []
@@ -137,49 +112,58 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: api/v1/prestataire/photos
+      - GET
+    uri: api/v1/reservations
     metadata:
       custom: []
-      groupName: "Prestataire — photos d'atelier"
+      groupName: 'Client — réservations'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
-        Les clients voient ces photos sur le profil public du prestataire.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Ajouter une photo'
-      description: "Envoi multipart, champ `photo`. Le type réel est vérifié sur le contenu. Au-delà de 6 photos, l'envoi est refusé."
+      title: 'Mes réservations'
+      description: |-
+        Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe
+        qu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles
+        de l'annulation.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: multipart/form-data
+      Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      photo:
+    queryParameters:
+      statut:
         custom: []
-        name: photo
-        description: 'Image JPG, PNG ou WebP (type vérifié sur le contenu), 5 Mo maximum. 6 photos au plus par prestataire. Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
-        required: true
-        example: null
-        type: file
-        enumValues: []
+        name: statut
+        description: 'Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous.'
+        required: false
+        example: en_attente
+        type: string
+        enumValues:
+          - en_attente
+          - acceptee
+          - confirmee
+          - en_cours
+          - terminee
+          - refusee
+          - annulee
         exampleWasSpecified: false
-        nullable: false
+        nullable: true
         deprecated: false
+    cleanQueryParameters:
+      statut: en_attente
+    bodyParameters: []
     cleanBodyParameters: []
-    fileParameters:
-      photo: null
+    fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000030"}'
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}],"links":{"first":"https://api.exemple.test/api/v1/reservations?page=1","last":"https://api.exemple.test/api/v1/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -197,7 +181,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Vous ne pouvez pas ajouter plus de 6 photos.","errors":{"photo":["Vous ne pouvez pas ajouter plus de 6 photos."]}}'
+        content: '{"message":"Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.","errors":{"statut":["Le statut doit être l''un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -211,19 +195,18 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - DELETE
-    uri: 'api/v1/prestataire/photos/{photo}'
+      - GET
+    uri: 'api/v1/reservations/{id}'
     metadata:
       custom: []
-      groupName: "Prestataire — photos d'atelier"
+      groupName: 'Client — réservations'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). 6 photos au plus, stockées sur un disque privé.
-        Les clients voient ces photos sur le profil public du prestataire.
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Supprimer une photo'
-      description: "Supprime l'entrée et le fichier. La photo d'un autre prestataire répond 404, comme une photo inexistante."
+      title: "Détail d'une réservation"
+      description: ''
       authenticated: true
       deprecated: false
     headers:
@@ -231,19 +214,19 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      photo:
+      id:
         custom: []
-        name: photo
-        description: 'Identifiant de la photo.'
+        name: id
+        description: 'Identifiant de la réservation.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000030
+        example: 0198a1b2-0000-7000-8000-000000000060
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      photo: 0198a1b2-0000-7000-8000-000000000030
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -252,8 +235,8 @@ endpoints:
     responses:
       -
         custom: []
-        status: 204
-        content: '{}'
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
         headers: []
         description: ''
       -
@@ -271,7 +254,94 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Photo introuvable."}'
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/reservations/{id}/annuler'
+    metadata:
+      custom: []
+      groupName: 'Client — réservations'
+      groupDescription: |-
+
+        Routes réservées aux clients (jeton Sanctum + rôle `client`). La création est limitée à 20 requêtes par minute et par utilisateur, l'annulation à 30.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Annuler une réservation'
+      description: |-
+        Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau
+        (borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la réservation.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000060
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000060
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":false,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Réservation introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"L''annulation n''est plus possible moins de 2 heures avant le créneau."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []

@@ -1,25 +1,25 @@
-name: 'Prestataire — mes avis'
+name: 'Prestataire — catalogue de prestations'
 description: |-
 
-  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+  toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/prestataire/avis
+    uri: api/v1/prestataire/prestations
     metadata:
       custom: []
-      groupName: 'Prestataire — mes avis'
+      groupName: 'Prestataire — catalogue de prestations'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Mes avis'
-      description: |-
-        Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au
-        prénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`.
+      title: 'Mes prestations'
+      description: "Toutes les prestations du prestataire connecté, actives et inactives, les plus récentes d'abord (sans pagination)."
       authenticated: true
       deprecated: false
     headers:
@@ -37,7 +37,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/avis?page=1","last":"https://api.exemple.test/api/v1/prestataire/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}]}'
         headers: []
         description: ''
       -
@@ -64,19 +64,120 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/prestataire/avis/{id}/signaler'
+    uri: api/v1/prestataire/prestations
     metadata:
       custom: []
-      groupName: 'Prestataire — mes avis'
+      groupName: 'Prestataire — catalogue de prestations'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Signaler un avis'
+      title: 'Ajouter une prestation'
       description: |-
-        Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que
-        l'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404.
+        Le domaine est déduit du métier du prestataire (tout champ `domaine` envoyé est ignoré).
+        Le nom doit être unique chez le prestataire, sans tenir compte de la casse ni des espaces superflus.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      nom:
+        custom: []
+        name: nom
+        description: 'Nom de la prestation (2 à 100 caractères, unique chez le prestataire sans tenir compte de la casse). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
+        required: true
+        example: 'Vidange complète'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      duree_minutes:
+        custom: []
+        name: duree_minutes
+        description: 'Durée estimée en minutes (1 à 1440). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+        required: true
+        example: 60
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      prix:
+        custom: []
+        name: prix
+        description: 'Prix en FCFA (XOF), supérieur à 0, 2 décimales au plus. Le champ value ne doit pas dépasser 9999999999.99.'
+        required: true
+        example: 15000.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      nom: 'Vidange complète'
+      duree_minutes: 60
+      prix: 15000.0
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":60,"prix":15000,"actif":true}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Vous proposez déjà une prestation avec ce nom.","errors":{"nom":["Vous proposez déjà une prestation avec ce nom."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PATCH
+    uri: 'api/v1/prestataire/prestations/{id}'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — catalogue de prestations'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Le domaine d'une prestation est
+        toujours le métier du prestataire : il n'est jamais saisi. Une prestation ne se supprime pas, elle se désactive.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Modifier une prestation'
+      description: |-
+        Modification partielle : nom, durée, prix et/ou `actif` (`false` désactive, `true` réactive). Au moins un champ est requis.
+        La prestation d'un autre prestataire répond 404, comme une prestation inexistante.
       authenticated: true
       deprecated: false
     headers:
@@ -87,38 +188,74 @@ endpoints:
       id:
         custom: []
         name: id
-        description: "Identifiant de l'avis."
+        description: 'Identifiant de la prestation.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
+        example: 0198a1b2-0000-7000-8000-000000000020
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
+      id: 0198a1b2-0000-7000-8000-000000000020
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      motif:
+      nom:
         custom: []
-        name: motif
-        description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
-        required: true
-        example: 'Cet avis concerne une autre prestation que la mienne.'
+        name: nom
+        description: 'Nouveau nom (2 à 100 caractères). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 100 caractères.'
+        required: false
+        example: 'Vidange + filtre'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      duree_minutes:
+        custom: []
+        name: duree_minutes
+        description: 'Nouvelle durée en minutes. Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 1440.'
+        required: false
+        example: 75
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      prix:
+        custom: []
+        name: prix
+        description: 'Nouveau prix en FCFA, supérieur à 0. Le champ value ne doit pas dépasser 9999999999.99.'
+        required: false
+        example: 17500.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      actif:
+        custom: []
+        name: actif
+        description: "false pour désactiver la prestation (elle n'est jamais supprimée), true pour la réactiver."
+        required: false
+        example: false
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      motif: 'Cet avis concerne une autre prestation que la mienne.'
+      nom: 'Vidange + filtre'
+      duree_minutes: 75
+      prix: 17500.0
+      actif: false
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","signale":true,"signaleLe":"2030-01-18T08:00:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000020","nom":"Vidange complète","domaine":"mecanique","dureeMinutes":75,"prix":17500,"actif":false}'
         headers: []
         description: ''
       -
@@ -136,25 +273,13 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Avis introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Cet avis a déjà été signalé."}'
+        content: '{"message":"Prestation introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le motif du signalement est obligatoire.","errors":{"motif":["Le motif du signalement est obligatoire."]}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"message":"Le prix doit être supérieur à 0.","errors":{"prix":["Le prix doit être supérieur à 0."]}}'
         headers: []
         description: ''
     responseFields: []

@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +15,7 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
+pest()->extend(TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
@@ -44,4 +48,25 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/** Authentifie la requête suivante comme un administrateur (M12) et le renvoie. */
+function adminConnecte(): User
+{
+    $admin = User::factory()->administrateur()->create();
+    test()->actingAs($admin, 'sanctum');
+
+    return $admin;
+}
+
+/** Nombre de requêtes SQL exécutées par $appel (M12 : contrôle des N+1). */
+function nombreDeRequetes(callable $appel): int
+{
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+    $appel();
+    $nombre = count(DB::getQueryLog());
+    DB::disableQueryLog();
+
+    return $nombre;
 }

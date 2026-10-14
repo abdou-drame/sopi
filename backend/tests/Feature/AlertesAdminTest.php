@@ -91,6 +91,7 @@ describe('alertes — liste vide et structure', function () {
             'parGravite' => ['critique' => 0, 'attention' => 1, 'info' => 0],
             'alertes' => [[
                 'type' => 'litiges_ouverts',
+                'ressource' => 'litiges',
                 'gravite' => 'attention',
                 'compteur' => 1,
                 'message' => '1 litige ouvert est à traiter.',
@@ -310,5 +311,70 @@ describe('alertes — identifiants, ordre et volume', function () {
             ->not->toContain($dossier->user->nom)
             ->not->toContain($dossier->nom_entreprise)
             ->not->toContain($dossier->user_id);
+    });
+});
+
+describe('alertes — ressource et cohérence avec les routes d\'administration (M12.3)', function () {
+    it('donne à chaque type d\'alerte sa ressource, sans retirer aucun champ existant', function () {
+        dossierEnAttente(now()->subHour());
+        Litige::factory()->create();
+        avisSignale(now()->subHour());
+        Retrait::factory()->enCours()->create(['created_at' => now()->subHour()]);
+        remboursementDu(now()->subMinutes(30), 10);
+        remboursementDu(now()->subMinutes(30), 2);
+        Notification::factory()->create(['canal_email_statut' => StatutEnvoi::Echoue]);
+        Sanction::factory()->suspension(now()->addHours(3))->create();
+
+        $attendu = [
+            'dossiers_en_attente' => 'demandes-prestataires', 'litiges_ouverts' => 'litiges', 'avis_signales' => 'avis',
+            'retraits_bloques' => 'retraits', 'remboursements_en_echec' => 'paiements', 'remboursements_en_retard' => 'paiements',
+            'notifications_en_echec' => 'notifications', 'suspensions_a_echeance' => 'sanctions',
+        ];
+        $alertes = collect(alertes()['alertes'])->keyBy('type');
+
+        expect($alertes->keys()->all())->toEqualCanonicalizing(array_keys($attendu));
+        foreach ($attendu as $type => $ressource) {
+            expect($alertes[$type]['ressource'])->toBe($ressource)
+                ->and(array_keys($alertes[$type]))->toEqualCanonicalizing(['type', 'ressource', 'gravite', 'compteur', 'message', 'ids', 'ageMinutes', 'echeanceDansMinutes']);
+        }
+    });
+
+    it('renvoie des identifiants que les routes d\'administration savent ouvrir', function () {
+        $dossier = dossierEnAttente(now()->subHour());
+        $litige = Litige::factory()->create();
+        $retrait = Retrait::factory()->enCours()->create(['created_at' => now()->subHour()]);
+        $enEchec = remboursementDu(now()->subMinutes(30), 10);
+        $enRetard = remboursementDu(now()->subMinutes(30), 2);
+        $notification = Notification::factory()->create(['canal_push_statut' => StatutEnvoi::Echoue]);
+
+        test()->actingAs(User::factory()->administrateur()->create(), 'sanctum');
+        test()->getJson('/api/v1/admin/prestataires/'.$dossier->id)->assertOk();
+        test()->getJson('/api/v1/admin/litiges/'.$litige->id)->assertOk();
+        test()->getJson('/api/v1/admin/retraits/'.$retrait->id)->assertOk();
+        test()->getJson('/api/v1/admin/paiements/'.$enEchec->id)->assertOk();
+        test()->getJson('/api/v1/admin/paiements/'.$enRetard->id)->assertOk();
+        test()->getJson('/api/v1/admin/notifications-en-echec/'.$notification->id)->assertOk();
+
+        expect(alerte('dossiers_en_attente')['ids'])->toBe([$dossier->id])
+            ->and(alerte('notifications_en_echec')['ids'])->toBe([$notification->id]);
+    });
+
+    it('trouve les avis et les sanctions des alertes dans les listes filtrées correspondantes', function () {
+        $avis = avisSignale(now()->subHour());
+        $sanction = Sanction::factory()->suspension(now()->addHours(3))->create();
+
+        test()->actingAs(User::factory()->administrateur()->create(), 'sanctum');
+        expect(collect(test()->getJson('/api/v1/admin/avis?aTraiter=1')->assertOk()->json('data'))->pluck('id')->all())->toBe(alerte('avis_signales')['ids'])->toBe([$avis->id])
+            ->and(collect(test()->getJson('/api/v1/admin/sanctions?echeanceDansHeures=24')->assertOk()->json('data'))->pluck('id')->all())->toBe(alerte('suspensions_a_echeance')['ids'])->toBe([$sanction->id]);
+    });
+
+    it('garde la liste des notifications en échec cohérente avec l\'alerte (même compteur)', function () {
+        Notification::factory()->count(3)->create(['canal_email_statut' => StatutEnvoi::Echoue]);
+        Notification::factory()->create(['canal_email_statut' => StatutEnvoi::EnAttente]);
+
+        test()->actingAs(User::factory()->administrateur()->create(), 'sanctum');
+        $liste = test()->getJson('/api/v1/admin/notifications-en-echec')->assertOk()->json('meta.total');
+
+        expect($liste)->toBe(alerte('notifications_en_echec')['compteur'])->toBe(3);
     });
 });
