@@ -1,23 +1,21 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import AccueilPage from './pages/AccueilPage'
+import { useState } from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import Routage from './Routage'
 
-const queryClient = new QueryClient()
-
-// Page de démonstration du système de design : chargée uniquement en développement (le code est retiré du build de production).
-const DemoPage = import.meta.env.DEV ? lazy(() => import('./pages/DemoPage')) : null
+export function creerClientRequetes() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } })
+}
 
 export default function App() {
+  const [client] = useState(creerClientRequetes)
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <BrowserRouter>
-        <Suspense fallback={null}>
-          <Routes>
-            {DemoPage && <Route path="/dev/design-system" element={<DemoPage />} />}
-            <Route path="*" element={<AccueilPage />} />
-          </Routes>
-        </Suspense>
+        <AuthProvider>
+          <Routage />
+        </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
   )
