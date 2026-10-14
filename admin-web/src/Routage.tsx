@@ -4,6 +4,8 @@ import RouteProtegee from './auth/RouteProtegee'
 import Coque from './layout/Coque'
 import { ENTREES_A_VENIR } from './layout/menu'
 import ConnexionPage from './pages/ConnexionPage'
+import RevenusPage from './pages/RevenusPage'
+import TableauDeBordPage from './pages/TableauDeBordPage'
 import { AccesRefusePage, BientotPage, NonTrouvePage } from './pages/PagesSimples'
 
 // Page de démonstration du système de design : chargée uniquement en développement (le code est retiré du build de production).
@@ -18,8 +20,8 @@ export default function Routage() {
         {DemoPage && <Route path="/dev/design-system" element={<DemoPage />} />}
         <Route element={<RouteProtegee />}>
           <Route element={<Coque />}>
-            <Route index element={<BientotPage />} />
-            <Route path="/revenus" element={<BientotPage />} />
+            <Route index element={<TableauDeBordPage />} />
+            <Route path="/revenus" element={<RevenusPage />} />
             {ENTREES_A_VENIR.map((e) => (
               <Route key={e.chemin} path={e.chemin} element={<BientotPage />} />
             ))}

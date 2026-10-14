@@ -163,6 +163,7 @@ export const L = {
     retraitsVerses: 'Retraits versés',
     remboursements: 'Remboursements',
     soldePrestataires: 'Soldes des prestataires',
+    totaux: 'Totaux de la période',
     courbe: 'Évolution sur la période',
     tableau: 'Détail par période',
     periode: 'Période',
