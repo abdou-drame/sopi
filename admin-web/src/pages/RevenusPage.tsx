@@ -11,7 +11,7 @@ import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import { GraphiqueCourbe } from '../components/ui/Graphiques'
-import { IconePaiement, IconeRetrait, IconeRevenus } from '../components/ui/Icones'
+import { IconeGraphique, IconePaiement, IconeRetrait, IconeRevenus } from '../components/ui/Icones'
 import NombreAnime from '../components/ui/NombreAnime'
 import Tableau from '../components/ui/Tableau'
 import { L } from '../i18n/libelles'
@@ -19,6 +19,7 @@ import { ajouterJours, aujourdhui, formatDateHeure, formatJourCalendaire, format
 
 const T = L.revenus
 const MAX_JOURS = 366
+const PAR_PAGE = 10
 
 interface Filtres {
   debut: string
@@ -55,6 +56,7 @@ function libellePeriode(p: PointRevenus, regroupement: Regroupement): string {
 export default function RevenusPage() {
   const [saisie, setSaisie] = useState<Filtres>(filtresParDefaut)
   const [appliques, setAppliques] = useState<Filtres>(saisie)
+  const [page, setPage] = useState(1)
 
   const { data, isPending, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['revenus', appliques],
@@ -65,16 +67,23 @@ export default function RevenusPage() {
   const erreurSaisie = erreurPeriode(saisie)
   const erreursApi = erreursParChamp(error)
   const appliquer = () => {
-    if (!erreurSaisie) setAppliques(saisie)
+    if (!erreurSaisie) {
+      setAppliques(saisie)
+      setPage(1)
+    }
   }
   const reinitialiser = () => {
     const defaut = filtresParDefaut()
     setSaisie(defaut)
     setAppliques(defaut)
+    setPage(1)
   }
   const modifier = (changement: Partial<Filtres>) => setSaisie((s) => ({ ...s, ...changement }))
 
   const series = data?.series ?? []
+  const totalPages = Math.max(1, Math.ceil(series.length / PAR_PAGE))
+  const pageCourante = Math.min(page, totalPages)
+  const seriePage = series.slice((pageCourante - 1) * PAR_PAGE, pageCourante * PAR_PAGE)
   const regroupement = data?.periode.regroupement ?? appliques.regroupement
   const etat = {
     chargement: isPending,
@@ -83,7 +92,7 @@ export default function RevenusPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5">
       <EnTetePage titre={T.titre} sousTitre={`${T.sousTitre}${data ? ` ${L.tableauDeBord.misAJour(formatDateHeure(data.dateGeneration))}.` : ''}`} />
 
       <BarreFiltres legende={T.titre} onAppliquer={appliquer} libelleAppliquer={T.appliquer} onReinitialiser={reinitialiser}>
@@ -114,54 +123,66 @@ export default function RevenusPage() {
         />
       </BarreFiltres>
 
-      <div aria-busy={isFetching || undefined} className="flex flex-col gap-8">
-        <CarteSopi
-          libelle={T.revenus}
-          montant={data ? formatMontant(data.totaux.revenus) : ''}
-          lignes={[
-            { libelle: T.acomptesEncaisses, valeur: data ? formatMontant(data.totaux.acomptesEncaisses) : '' },
-            { libelle: T.soldePrestataires, valeur: data ? formatMontant(data.soldePrestataires) : '' },
-          ]}
-          note={data ? `${formatJourCalendaire(data.periode.debut, true)} – ${formatJourCalendaire(data.periode.fin, true)}` : undefined}
-          {...etat}
-        />
-        <Bloc titre={T.totaux} {...etat} hauteur="h-32">
+      <div aria-busy={isFetching || undefined} className="grid gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
+        <Carte titre={T.revenus} sousTitre={T.sousTitre} icone={<IconeRevenus width={16} height={16} />}>
+          <CarteSopi
+            libelle={T.revenus}
+            montant={data ? formatMontant(data.totaux.revenus) : ''}
+            lignes={[
+              { libelle: T.acomptesEncaisses, valeur: data ? formatMontant(data.totaux.acomptesEncaisses) : '' },
+              { libelle: T.soldePrestataires, valeur: data ? formatMontant(data.soldePrestataires) : '' },
+            ]}
+            note={data ? `${formatJourCalendaire(data.periode.debut, true)} – ${formatJourCalendaire(data.periode.fin, true)}` : undefined}
+            {...etat}
+          />
           {data && (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <CarteChiffre titre={T.revenus} valeur={<NombreAnime valeur={data.totaux.revenus} format={formatMontant} />} icone={<IconeRevenus />} />
-              <CarteChiffre titre={T.acomptesEncaisses} valeur={<NombreAnime valeur={data.totaux.acomptesEncaisses} format={formatMontant} />} icone={<IconePaiement />} teinte="violet" delai={70} />
-              <CarteChiffre titre={T.retraitsVerses} valeur={<NombreAnime valeur={data.totaux.retraitsVerses} format={formatMontant} />} icone={<IconeRetrait />} teinte="cyan" delai={140} />
-              <CarteChiffre titre={T.remboursements} valeur={<NombreAnime valeur={data.totaux.remboursements} format={formatMontant} />} icone={<IconePaiement />} teinte="rose" delai={210} />
-            </div>
+            <p className="mt-4 text-sm text-texte-doux">
+              {T.soldePrestataires} : <strong className="text-texte">{formatMontant(data.soldePrestataires)}</strong>
+            </p>
           )}
-        </Bloc>
-        {data && (
-          <p className="-mt-4 text-sm text-sous-titre">
-            {T.soldePrestataires} : <strong className="text-titre">{formatMontant(data.soldePrestataires)}</strong>
-          </p>
-        )}
+        </Carte>
 
-        <Bloc titre={T.courbe} {...etat} hauteur="h-72" vide={!isPending && !isError && series.length === 0}>
-          {data && (
-            <Carte>
-              <GraphiqueCourbe
-                description={T.graphiqueDescription}
-                libelles={series.map((p) => libelleAxe(p, regroupement))}
-                series={[
-                  { nom: T.legendeAcomptes, couleur: 'var(--color-primaire-500)', valeurs: series.map((p) => p.acomptesEncaisses) },
-                  { nom: T.legendeRevenus, couleur: 'var(--color-succes)', valeurs: series.map((p) => p.revenus) },
-                ]}
-                formatValeur={formatMontant}
-              />
-            </Carte>
-          )}
-        </Bloc>
+        <div className="md:col-span-2 xl:col-span-1 [&>section]:h-full">
+          <Bloc titre={T.courbe} {...etat} hauteur="h-72" vide={!isPending && !isError && series.length === 0} titreVisible={false}>
+            {data && (
+              <Carte titre={T.courbe} icone={<IconeGraphique width={16} height={16} />} className="h-full">
+                <GraphiqueCourbe
+                  description={T.graphiqueDescription}
+                  libelles={series.map((p) => libelleAxe(p, regroupement))}
+                  series={[
+                    { nom: T.legendeAcomptes, couleur: 'var(--color-primaire-500)', valeurs: series.map((p) => p.acomptesEncaisses) },
+                    { nom: T.legendeRevenus, couleur: 'var(--color-succes)', valeurs: series.map((p) => p.revenus) },
+                  ]}
+                  formatValeur={formatMontant}
+                />
+              </Carte>
+            )}
+          </Bloc>
+        </div>
 
-        <Bloc titre={T.tableau} {...etat} hauteur="h-48" vide={!isPending && !isError && series.length === 0}>
+        <div className="md:col-span-2 xl:col-span-1 [&>section]:h-full">
+          <Bloc titre={T.totaux} {...etat} hauteur="h-32" titreVisible={false}>
+            {data && (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-1">
+                <CarteChiffre titre={T.revenus} valeur={<NombreAnime valeur={data.totaux.revenus} format={formatMontant} />} icone={<IconeRevenus />} />
+                <CarteChiffre titre={T.acomptesEncaisses} valeur={<NombreAnime valeur={data.totaux.acomptesEncaisses} format={formatMontant} />} icone={<IconePaiement />} teinte="violet" delai={70} />
+                <CarteChiffre titre={T.retraitsVerses} valeur={<NombreAnime valeur={data.totaux.retraitsVerses} format={formatMontant} />} icone={<IconeRetrait />} teinte="cyan" delai={140} />
+                <CarteChiffre titre={T.remboursements} valeur={<NombreAnime valeur={data.totaux.remboursements} format={formatMontant} />} icone={<IconePaiement />} teinte="rose" delai={210} />
+              </div>
+            )}
+          </Bloc>
+        </div>
+
+        <div className="md:col-span-2 xl:col-span-3">
+        <Bloc titre={T.tableau} {...etat} hauteur="h-48" titreVisible={false} vide={!isPending && !isError && series.length === 0}>
           <Tableau
             legende={T.tableau}
             cleLigne={(p) => p.debut}
-            lignes={series}
+            lignes={seriePage}
+            page={pageCourante}
+            totalPages={totalPages}
+            total={series.length}
+            onPage={setPage}
             colonnes={[
               { cle: 'periode', titre: T.periode, rendu: (p) => libellePeriode(p, regroupement) },
               { cle: 'revenus', titre: T.legendeRevenus, alignement: 'droite', rendu: (p) => formatMontant(p.revenus) },
@@ -171,6 +192,7 @@ export default function RevenusPage() {
             ]}
           />
         </Bloc>
+        </div>
       </div>
     </div>
   )

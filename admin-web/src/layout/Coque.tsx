@@ -91,7 +91,7 @@ function BarreDuHaut() {
   const total = data?.total ?? 0
   return (
     <header
-      className={`${VERRE} sticky top-4 z-30 flex items-center justify-between gap-4 rounded-gelule bg-surface/90 py-2 pr-3 pl-3 shadow-carte backdrop-blur`}
+      className={`${VERRE} relative z-30 flex shrink-0 items-center justify-between gap-4 rounded-gelule bg-surface/90 py-2 pr-3 pl-3 shadow-carte backdrop-blur`}
     >
       <Logo />
       <nav aria-label={L.coque.raccourcis} className="hidden gap-1 rounded-gelule bg-fond p-1 md:flex">
@@ -135,10 +135,10 @@ function ColonneIcones() {
   const { deconnexion } = useAuth()
   const compteurs = compteursParEcran(data?.alertes ?? [])
   return (
-    <aside className="flex shrink-0 items-start gap-3 overflow-x-auto lg:sticky lg:top-24 lg:flex-col lg:items-center lg:self-start lg:overflow-visible">
+    <aside className="flex shrink-0 items-start gap-3 overflow-x-auto lg:sticky lg:top-0 lg:flex-col lg:items-center lg:self-start lg:overflow-visible">
       <nav
         aria-label={L.menu.titre}
-        className={`${VERRE} defilement-fin flex gap-1 rounded-gelule bg-surface p-2 shadow-carte lg:max-h-[calc(100vh-11rem)] lg:flex-col lg:overflow-y-auto`}
+        className={`${VERRE} defilement-fin flex gap-1 rounded-gelule bg-surface p-2 shadow-carte lg:max-h-[calc(100dvh-15rem)] lg:flex-col lg:overflow-y-auto`}
       >
         {ENTREES.map((e, i) => {
           const compteur = compteurs[e.chemin] ?? 0
@@ -183,10 +183,16 @@ function ColonneIcones() {
 export default function Coque() {
   const lieu = useLocation()
   const [hote, setHote] = useState<HTMLElement | null>(null)
+  const defilement = useRef<HTMLDivElement>(null)
+
+  // Nouvelle page : on revient en haut de la zone défilante.
+  useEffect(() => {
+    defilement.current?.scrollTo?.({ top: 0 })
+  }, [lieu.pathname])
 
   return (
     <HoteEnTete.Provider value={hote}>
-      <div className="mx-auto min-h-screen max-w-[110rem] px-4 pt-4 pb-10">
+      <div className="mx-auto flex h-dvh max-w-[110rem] flex-col px-4 pt-4">
         <a
           href="#contenu"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-moyen focus:bg-surface focus:px-4 focus:py-2 focus:shadow-eleve"
@@ -194,14 +200,17 @@ export default function Coque() {
           {L.coque.allerAuContenu}
         </a>
         <BarreDuHaut />
-        <div ref={setHote} className="empty:hidden mt-7 px-2" />
-        <div className="mt-6 flex flex-col gap-5 lg:flex-row">
+        {/* Le contenu défile sous la barre du haut, jamais derrière elle. */}
+        <div ref={defilement} className="defilement-fin -mx-4 mt-4 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pt-3 pb-10">
+        <div ref={setHote} className="empty:hidden mb-6 px-2" />
+        <div className="flex flex-col gap-5 lg:flex-row">
           <ColonneIcones />
           <main id="contenu" tabIndex={-1} className="min-w-0 flex-1">
             <div key={lieu.pathname} className="animate-flou">
               <Outlet />
             </div>
           </main>
+        </div>
         </div>
       </div>
     </HoteEnTete.Provider>

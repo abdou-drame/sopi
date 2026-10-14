@@ -8,23 +8,6 @@ import { Champ } from '../components/ui/Champs'
 import { IconeOeil } from '../components/ui/Icones'
 import { L } from '../i18n/libelles'
 
-/** Carte décorative inspirée d'une carte bancaire : donne la couleur de marque à l'écran de connexion. */
-function CarteDecorative() {
-  return (
-    <div aria-hidden="true" className="animate-apparition relative w-full max-w-sm rounded-grand bg-gradient-to-br from-primaire-700 via-primaire-600 to-primaire-400 p-6 text-white shadow-eleve">
-      <p className="text-sm text-primaire-100">Chiffre d’affaires du mois</p>
-      <p className="mt-1 text-3xl font-semibold">1 250 000 FCFA</p>
-      <div className="mt-6 flex gap-3">
-        {['Dossiers', 'Litiges', 'Retraits'].map((t) => (
-          <span key={t} className="flex-1 rounded-moyen bg-white/15 py-2 text-center text-xs backdrop-blur-sm">
-            {t}
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export default function ConnexionPage() {
   const { utilisateur, avis, connexion } = useAuth()
   const navigate = useNavigate()
@@ -63,8 +46,8 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div className="grid min-h-screen gap-4 p-4 lg:grid-cols-2">
-      <section className="animate-apparition hidden flex-col justify-between rounded-carte bg-gradient-to-br from-primaire-900 via-primaire-800 to-primaire-600 p-12 text-white shadow-eleve lg:flex">
+    <div className="grid min-h-screen gap-5 p-4 lg:grid-cols-2">
+      <section className="carte-sopi animate-apparition hidden flex-col justify-between rounded-[2rem] p-12 text-white lg:flex">
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="grid size-11 place-items-center rounded-full bg-white/15 text-xl font-bold">
             S
@@ -78,7 +61,13 @@ export default function ConnexionPage() {
               Réservations, paiements, litiges et modération des services de proximité de Keur Massar.
             </p>
           </div>
-          <CarteDecorative />
+          <ul className="flex flex-wrap gap-2">
+            {['Dossiers', 'Litiges', 'Retraits', 'Revenus'].map((t) => (
+              <li key={t} className="rounded-gelule bg-white/15 px-4 py-2 text-xs font-medium backdrop-blur-sm">
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
         <p className="text-xs text-primaire-200">{L.sousMarque}</p>
       </section>

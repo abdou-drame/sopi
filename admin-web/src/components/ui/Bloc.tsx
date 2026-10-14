@@ -14,13 +14,15 @@ interface Props {
   children: ReactNode
   /** Hauteur du squelette de chargement. */
   hauteur?: string
+  /** Faux : le titre reste lu par les lecteurs d'écran, la carte contenue porte déjà son propre titre. */
+  titreVisible?: boolean
 }
 
 /** Section d'écran avec ses propres états de chargement, d'erreur (avec « Réessayer ») et vide. */
-export default function Bloc({ titre, chargement, erreur, onReessayer, vide, messageVide, children, hauteur = 'h-40' }: Props) {
+export default function Bloc({ titre, chargement, erreur, onReessayer, vide, messageVide, children, hauteur = 'h-40', titreVisible = true }: Props) {
   return (
     <section aria-label={titre} className="flex flex-col gap-3">
-      <h2 className="text-lg font-bold text-titre">{titre}</h2>
+      <h2 className={titreVisible ? 'text-lg font-bold text-titre' : 'sr-only'}>{titre}</h2>
       {chargement ? (
         <div role="status" aria-label={`${L.commun.chargement} ${titre}`}>
           <Squelette className={`${hauteur} w-full rounded-carte`} />

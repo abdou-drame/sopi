@@ -66,7 +66,7 @@ function BlocAlertes() {
       hauteur="h-20"
     >
       {alertes.length === 0 ? (
-        <p role="status" className="rounded-grand bg-succes-fond px-5 py-4 text-sm font-medium text-succes-texte">
+        <p role="status" className="rounded-grand bg-primaire-50 px-5 py-4 text-sm font-medium text-primaire-700">
           {T.aucuneAlerte}
         </p>
       ) : (

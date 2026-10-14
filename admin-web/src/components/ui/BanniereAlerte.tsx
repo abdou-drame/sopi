@@ -6,9 +6,10 @@ import { IconeAttention, IconeCritique, IconeFleche, IconeInfo } from './Icones'
 export type Gravite = 'info' | 'attention' | 'critique'
 
 const styles: Record<Gravite, { boite: string; icone: ReactNode }> = {
-  info: { boite: 'bg-info-fond text-info-texte border-info/30', icone: <IconeInfo /> },
-  attention: { boite: 'bg-attention-fond text-attention-texte border-attention/40', icone: <IconeAttention /> },
-  critique: { boite: 'bg-erreur-fond text-erreur-texte border-erreur/40', icone: <IconeCritique /> },
+  // Toutes les alertes sont bleues ; la gravité se lit à l'intensité (clair, soutenu, plein) et à l'icône.
+  info: { boite: 'bg-primaire-50 text-primaire-800 border-primaire-100', icone: <IconeInfo /> },
+  attention: { boite: 'bg-primaire-100 text-primaire-800 border-primaire-300', icone: <IconeAttention /> },
+  critique: { boite: 'bg-primaire-600 text-white border-primaire-700 shadow-bouton', icone: <IconeCritique /> },
 }
 
 interface Props {

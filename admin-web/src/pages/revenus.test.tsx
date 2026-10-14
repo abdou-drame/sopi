@@ -27,6 +27,20 @@ describe('revenus', () => {
     sessionStorage.clear()
   })
 
+  it('pagine le tableau par 10 lignes', async () => {
+    const jour = (i: number) => `2030-01-${String(i + 1).padStart(2, '0')}`
+    const series = Array.from({ length: 25 }, (_, i) => ({ debut: jour(i), fin: jour(i), revenus: 100, acomptesEncaisses: 1000, remboursements: 0, retraitsVerses: 0 }))
+    simulerApi({ ...base, 'GET /admin/revenus': { corps: { ...REVENUS, series } } })
+    afficherApplication('/revenus')
+    const tableau = await screen.findByRole('table', { name: 'Détail par période' })
+    expect(within(tableau).getAllByRole('row')).toHaveLength(11) // en-tête + 10
+    await userEvent.click(screen.getByRole('button', { name: 'Suivant' }))
+    expect(within(screen.getByRole('table', { name: 'Détail par période' })).getAllByRole('row')).toHaveLength(11)
+    await userEvent.click(screen.getByRole('button', { name: 'Suivant' }))
+    expect(within(screen.getByRole('table', { name: 'Détail par période' })).getAllByRole('row')).toHaveLength(6) // en-tête + 5
+    expect(screen.getByRole('button', { name: 'Suivant' })).toBeDisabled()
+  })
+
   it('demande par défaut les 30 derniers jours, par jour (fuseau de Dakar)', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/revenus': { corps: REVENUS } })
     afficherApplication('/revenus')
