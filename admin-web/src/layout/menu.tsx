@@ -42,7 +42,7 @@ export const MENU: GroupeMenu[] = [
       { chemin: '/dossiers-prestataires', libelle: L.menu.demandes, icone: <IconeDossier />, disponible: true },
       { chemin: '/litiges', libelle: L.menu.litiges, icone: <IconeLitige />, disponible: true },
       { chemin: '/sanctions', libelle: L.menu.sanctions, icone: <IconeSanction />, disponible: true },
-      { chemin: '/avis', libelle: L.menu.avis, icone: <IconeAvis />, disponible: false },
+      { chemin: '/avis', libelle: L.menu.avis, icone: <IconeAvis />, disponible: true },
     ],
   },
   {

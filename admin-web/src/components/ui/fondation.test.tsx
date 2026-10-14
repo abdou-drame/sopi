@@ -79,7 +79,7 @@ describe('liste paginée et filtres dans l’adresse', () => {
 
   it('un filtre écrit dans l’adresse, revient à la page 1 et la valeur par défaut n’est pas écrite', async () => {
     const charger = vi.fn().mockResolvedValue(page(2, 3, [{ id: '1', nom: 'Alpha' }]))
-    enveloppe(<EcranListe charger={charger} />, '/?page=2')
+    enveloppe(<EcranListe charger={charger} />, '/?page=3')
     await screen.findByText('Alpha')
     expect(charger).toHaveBeenLastCalledWith({ statut: 'ouvert', page: 2 })
     await userEvent.selectOptions(screen.getByLabelText('Statut'), 'tous')
