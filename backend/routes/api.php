@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\Admin\ListeSanctionsController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\PaiementAdminController;
+use App\Http\Controllers\Api\V1\Admin\ReservationAdminController;
+use App\Http\Controllers\Api\V1\Admin\RetraitAdminController;
 use App\Http\Controllers\Api\V1\Admin\RevenusController;
 use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
 use App\Http\Controllers\Api\V1\Admin\TableauDeBordController;
@@ -69,6 +72,12 @@ Route::prefix('v1')->group(function () {
         Route::get('/utilisateurs', [UtilisateurController::class, 'index']);
         Route::get('/utilisateurs/{id}', [UtilisateurController::class, 'show']);
         Route::get('/sanctions', ListeSanctionsController::class);
+        Route::get('/reservations', [ReservationAdminController::class, 'index']);
+        Route::get('/reservations/{id}', [ReservationAdminController::class, 'show']);
+        Route::get('/paiements', [PaiementAdminController::class, 'index']);
+        Route::get('/paiements/{id}', [PaiementAdminController::class, 'show']);
+        Route::get('/retraits', [RetraitAdminController::class, 'index']);
+        Route::get('/retraits/{id}', [RetraitAdminController::class, 'show']);
 
         Route::post('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'store'])->middleware('throttle:sanction');
         Route::get('/utilisateurs/{id}/sanctions', [AdminSanctionController::class, 'index']);
