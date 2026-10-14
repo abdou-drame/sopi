@@ -197,3 +197,16 @@ export const IconeGraphique = (p: P) => (
     <path d="M16 16v-6" />
   </Icone>
 )
+
+export const IconeTelephone = (p: P) => (
+  <Icone {...p}>
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z" />
+  </Icone>
+)
+
+export const IconeCadenas = (p: P) => (
+  <Icone {...p}>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 018 0v3" />
+  </Icone>
+)

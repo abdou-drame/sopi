@@ -499,6 +499,12 @@ export const L = {
     bloque: (minutes: number) => `Trop de tentatives échouées. Réessayez dans ${minutes} minute${minutes > 1 ? 's' : ''}.`,
     identifiantsInvalides: 'Téléphone ou mot de passe incorrect.',
     deconnecte: 'Vous êtes déconnecté.',
+    droits: 'Sopi · Back-office · Tous droits réservés',
+    telephonePlaceholder: '+221 77 000 00 00',
+    motDePassePlaceholder: 'Saisissez votre mot de passe',
+    accrocheTitre: 'Un seul espace pour piloter Sopi',
+    accrocheTexte: 'Réservations, paiements, litiges et modération des services de proximité de Keur Massar, avec une vue claire sur toute la plateforme.',
+    apercu: { revenus: 'Revenus du mois', reservations: 'Réservations', litiges: 'Litiges ouverts', dossiers: 'Dossiers en attente' },
   },
   coque: {
     administrateur: 'Administrateur',

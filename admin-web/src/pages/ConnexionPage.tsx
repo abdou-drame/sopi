@@ -1,12 +1,80 @@
-import { useState } from 'react'
-import type { FormEvent } from 'react'
+import { useId, useState } from 'react'
+import type { FormEvent, InputHTMLAttributes, ReactNode } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, erreursParChamp } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Bouton from '../components/ui/Bouton'
-import { Champ } from '../components/ui/Champs'
-import { IconeOeil } from '../components/ui/Icones'
+import { IconeCadenas, IconeOeil, IconeTelephone } from '../components/ui/Icones'
 import { L } from '../i18n/libelles'
+
+type ChampConnexionProps = {
+  label: string
+  icone: ReactNode
+  erreur?: string
+  aide?: string
+  droite?: ReactNode
+} & InputHTMLAttributes<HTMLInputElement>
+
+/** Champ de la page de connexion : icône à gauche, libellé relié au champ, erreur annoncée. */
+function ChampConnexion({ label, icone, erreur, aide, droite, ...reste }: ChampConnexionProps) {
+  const id = useId()
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm font-medium text-texte">
+        {label}
+      </label>
+      <div className="relative">
+        <span aria-hidden="true" className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-texte-discret">
+          {icone}
+        </span>
+        <input
+          id={id}
+          aria-invalid={erreur ? true : undefined}
+          aria-describedby={erreur ? `${id}-erreur` : aide ? `${id}-aide` : undefined}
+          className={`w-full rounded-moyen border bg-surface py-3 pr-11 pl-11 text-sm text-texte transition-colors placeholder:text-texte-discret hover:border-primaire-300 focus:border-primaire-500 ${
+            erreur ? 'border-erreur' : 'border-bordure'
+          }`}
+          {...reste}
+        />
+        {droite}
+      </div>
+      {aide && !erreur && (
+        <p id={`${id}-aide`} className="text-xs text-texte-doux">
+          {aide}
+        </p>
+      )}
+      {erreur && (
+        <p id={`${id}-erreur`} role="alert" className="text-xs font-medium text-erreur-texte">
+          {erreur}
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** Mini-carte décorative du panneau de droite (chiffres d'illustration, sans lien avec les données réelles). */
+function MiniCarte({ titre, valeur, barre, className = '' }: { titre: string; valeur: string; barre: number; className?: string }) {
+  return (
+    <div className={`absolute w-56 rounded-grand border border-white/40 bg-white/90 p-4 shadow-eleve backdrop-blur-sm ${className}`}>
+      <p className="text-xs text-slate-500">{titre}</p>
+      <p className="mt-1 text-xl font-semibold text-slate-800">{valeur}</p>
+      <div className="mt-3 h-1.5 overflow-hidden rounded-gelule bg-slate-200">
+        <div className="h-full rounded-gelule bg-blue-600" style={{ width: `${barre}%` }} />
+      </div>
+    </div>
+  )
+}
+
+function Marque() {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span aria-hidden="true" className="grid size-8 place-items-center rounded-petit bg-primaire-700 text-sm font-bold text-white">
+        S
+      </span>
+      <span className="text-lg font-semibold text-primaire-800">{L.marque}</span>
+    </span>
+  )
+}
 
 export default function ConnexionPage() {
   const { utilisateur, avis, connexion } = useAuth()
@@ -46,90 +114,92 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div className="grid min-h-screen gap-5 p-4 lg:grid-cols-2">
-      <section className="carte-sopi animate-apparition hidden flex-col justify-between rounded-[2rem] p-12 text-white lg:flex">
-        <div className="flex items-center gap-3">
-          <span aria-hidden="true" className="grid size-11 place-items-center rounded-full bg-white/15 text-xl font-bold">
-            S
-          </span>
-          <span className="text-xl font-semibold">{L.marque}</span>
-        </div>
-        <div className="flex flex-col gap-8">
-          <div>
-            <h2 className="text-3xl font-semibold">Pilotez la plateforme en toute confiance.</h2>
-            <p className="mt-2 max-w-md text-primaire-100">
-              Réservations, paiements, litiges et modération des services de proximité de Keur Massar.
-            </p>
-          </div>
-          <ul className="flex flex-wrap gap-2">
-            {['Dossiers', 'Litiges', 'Retraits', 'Revenus'].map((t) => (
-              <li key={t} className="rounded-gelule bg-white/15 px-4 py-2 text-xs font-medium backdrop-blur-sm">
-                {t}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="text-xs text-primaire-200">{L.sousMarque}</p>
-      </section>
+    <div className="grid min-h-screen place-items-center bg-fond p-4">
+      <div className="animate-apparition grid w-full max-w-6xl gap-3 rounded-[2rem] bg-surface p-3 shadow-carte lg:h-[46rem] lg:grid-cols-2">
+        <main className="flex flex-col rounded-[1.5rem] border border-bordure p-8 sm:p-10">
+          <Marque />
+          <form onSubmit={soumettre} noValidate className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-5 py-8">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-primaire-800">{L.connexion.titre}</h1>
+              <p className="mt-2 text-sm text-texte-doux">{L.connexion.sousTitre}</p>
+            </div>
 
-      <main className="grid place-items-center p-6">
-        <form onSubmit={soumettre} noValidate className="animate-apparition flex w-full max-w-sm flex-col gap-5 rounded-carte bg-surface p-8 shadow-carte">
-          <div>
-            <h1 className="text-titre-page font-bold text-primaire-800">{L.connexion.titre}</h1>
-            <p className="mt-1 text-sm text-texte-doux">{L.connexion.sousTitre}</p>
-          </div>
+            {avis && (
+              <p role="status" className="rounded-moyen bg-attention-fond px-4 py-3 text-sm font-medium text-attention-texte">
+                {avis}
+              </p>
+            )}
+            {erreurGenerale && (
+              <p role="alert" className="rounded-moyen bg-erreur-fond px-4 py-3 text-sm font-medium text-erreur-texte">
+                {erreurGenerale}
+              </p>
+            )}
 
-          {avis && (
-            <p role="status" className="rounded-moyen bg-attention-fond px-4 py-3 text-sm font-medium text-attention-texte">
-              {avis}
-            </p>
-          )}
-          {erreurGenerale && (
-            <p role="alert" className="rounded-moyen bg-erreur-fond px-4 py-3 text-sm font-medium text-erreur-texte">
-              {erreurGenerale}
-            </p>
-          )}
-
-          <Champ
-            label={L.connexion.telephone}
-            type="tel"
-            name="telephone"
-            autoComplete="username"
-            inputMode="tel"
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
-            aide={L.connexion.telephoneAide}
-            erreur={erreursChamps.telephone}
-            required
-          />
-          <div className="relative">
-            <Champ
+            <ChampConnexion
+              label={L.connexion.telephone}
+              icone={<IconeTelephone width={18} height={18} />}
+              type="tel"
+              name="telephone"
+              autoComplete="username"
+              inputMode="tel"
+              placeholder={L.connexion.telephonePlaceholder}
+              value={telephone}
+              onChange={(e) => setTelephone(e.target.value)}
+              aide={L.connexion.telephoneAide}
+              erreur={erreursChamps.telephone}
+              required
+            />
+            <ChampConnexion
               label={L.connexion.motDePasse}
+              icone={<IconeCadenas width={18} height={18} />}
               type={visible ? 'text' : 'password'}
               name="password"
               autoComplete="current-password"
+              placeholder={L.connexion.motDePassePlaceholder}
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
               erreur={erreursChamps.password}
-              className="pr-11"
               required
+              droite={
+                <button
+                  type="button"
+                  onClick={() => setVisible((v) => !v)}
+                  aria-label={visible ? L.connexion.masquer : L.connexion.afficher}
+                  aria-pressed={visible}
+                  className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-petit text-texte-doux hover:text-primaire-700"
+                >
+                  <IconeOeil width={18} height={18} />
+                </button>
+              }
             />
-            <button
-              type="button"
-              onClick={() => setVisible((v) => !v)}
-              aria-label={visible ? L.connexion.masquer : L.connexion.afficher}
-              aria-pressed={visible}
-              className="absolute top-[2.15rem] right-2 grid size-8 place-items-center rounded-petit text-texte-doux hover:text-primaire-700"
-            >
-              <IconeOeil width={18} height={18} />
-            </button>
-          </div>
 
-          <Bouton type="submit" enCours={enCours} className="w-full">
-            {enCours ? L.connexion.enCours : L.connexion.action}
-          </Bouton>
-        </form>
-      </main>
+            <Bouton type="submit" enCours={enCours} className="w-full">
+              {enCours ? L.connexion.enCours : L.connexion.action}
+            </Bouton>
+          </form>
+          <p className="text-center text-xs text-texte-discret">{L.connexion.droits}</p>
+        </main>
+
+        <section aria-hidden="true" className="carte-sopi relative hidden flex-col overflow-hidden rounded-[1.5rem] text-white lg:flex">
+          <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgb(255_255_255/0.08)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.08)_1px,transparent_1px)] [background-size:56px_56px]" />
+          <div className="relative flex-1">
+            <MiniCarte titre={L.connexion.apercu.revenus} valeur="1 250 000 FCFA" barre={72} className="top-12 left-14" />
+            <MiniCarte titre={L.connexion.apercu.reservations} valeur="248" barre={58} className="top-44 right-10" />
+            <MiniCarte titre={L.connexion.apercu.litiges} valeur="3" barre={18} className="top-[19rem] left-24" />
+          </div>
+          <div className="relative flex flex-col items-center gap-4 px-12 pb-10 text-center">
+            <span className="grid size-14 place-items-center rounded-grand bg-white/15 text-2xl font-bold shadow-eleve backdrop-blur-sm">S</span>
+            <h2 className="text-2xl font-semibold">{L.connexion.accrocheTitre}</h2>
+            <p className="max-w-md text-sm text-primaire-100">{L.connexion.accrocheTexte}</p>
+            <div className="mt-4 flex w-full gap-2">
+              <span className="h-1 flex-[3] rounded-gelule bg-white" />
+              <span className="h-1 flex-1 rounded-gelule bg-white/40" />
+              <span className="h-1 flex-[3] rounded-gelule bg-white/25" />
+              <span className="h-1 flex-[3] rounded-gelule bg-white/25" />
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   )
 }
