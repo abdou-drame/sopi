@@ -30,7 +30,7 @@ describe('revenus', () => {
   it('demande par défaut les 30 derniers jours, par jour (fuseau de Dakar)', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/revenus': { corps: REVENUS } })
     afficherApplication('/revenus')
-    await screen.findByText('Commission retenue')
+    await screen.findAllByText('Commission retenue')
     const fin = aujourdhui()
     const revenus = appels.find((a) => a.chemin === '/admin/revenus')!
     expect(revenus.entetes.get('Authorization')).toMatch(/^Bearer /)
@@ -48,7 +48,12 @@ describe('revenus', () => {
     expect(within(totaux).getByText('150 000 FCFA')).toBeInTheDocument()
     expect(within(totaux).getByText('60 000 FCFA')).toBeInTheDocument()
     expect(within(totaux).getByText('9 000 FCFA')).toBeInTheDocument()
-    expect(screen.getByText(/Soldes des prestataires/)).toHaveTextContent('84 000 FCFA')
+    expect(screen.getByText(/Soldes des prestataires :/)).toHaveTextContent('84 000 FCFA')
+
+    // Carte Sopi : commission en grand, acomptes et soldes en lignes secondaires.
+    expect(screen.getAllByText('Sopi').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('42 000 FCFA').length).toBeGreaterThanOrEqual(2)
+    expect(screen.getAllByText('84 000 FCFA').length).toBeGreaterThanOrEqual(2)
 
     expect(screen.getByRole('img', { name: /Courbe de la commission et des acomptes/ })).toBeInTheDocument()
 
@@ -64,14 +69,14 @@ describe('revenus', () => {
   it('renvoie les filtres choisis à l’API (période et regroupement)', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/revenus': { corps: REVENUS } })
     afficherApplication('/revenus')
-    await screen.findByText('Commission retenue')
+    await screen.findAllByText('Commission retenue')
 
     fireEvent.change(screen.getByLabelText('Début'), { target: { value: '2030-01-01' } })
     fireEvent.change(screen.getByLabelText('Fin'), { target: { value: '2030-01-31' } })
     await userEvent.selectOptions(screen.getByLabelText('Regroupement'), 'semaine')
     await userEvent.click(screen.getByRole('button', { name: 'Appliquer' }))
 
-    await screen.findByText('Commission retenue')
+    await screen.findAllByText('Commission retenue')
     const dernier = appels.filter((a) => a.chemin === '/admin/revenus').at(-1)!
     expect(appels.filter((a) => a.chemin === '/admin/revenus')).toHaveLength(2)
     expect(dernier).toBeDefined()
@@ -87,7 +92,7 @@ describe('revenus', () => {
       },
     })
     afficherApplication('/revenus')
-    await screen.findByText('Commission retenue')
+    await screen.findAllByText('Commission retenue')
     fireEvent.change(screen.getByLabelText('Début'), { target: { value: '2030-01-01' } })
     fireEvent.change(screen.getByLabelText('Fin'), { target: { value: '2030-01-31' } })
     await userEvent.selectOptions(screen.getByLabelText('Regroupement'), 'mois')
@@ -101,7 +106,7 @@ describe('revenus', () => {
   it('refuse une période de plus de 366 jours sans appeler l’API', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/revenus': { corps: REVENUS } })
     afficherApplication('/revenus')
-    await screen.findByText('Commission retenue')
+    await screen.findAllByText('Commission retenue')
     fireEvent.change(screen.getByLabelText('Début'), { target: { value: '2028-01-01' } })
     fireEvent.change(screen.getByLabelText('Fin'), { target: { value: '2030-01-31' } })
     expect(await screen.findByText('La période ne peut pas dépasser 366 jours.')).toBeInTheDocument()

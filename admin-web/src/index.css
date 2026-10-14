@@ -312,3 +312,29 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Carte « Sopi » : dégradé du bleu de la marque. Les teintes sont fixées ici (et non via les jetons primaire-*,
+ * inversés en mode sombre) afin que le texte blanc garde le même contraste dans les deux modes.
+ */
+.carte-sopi {
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.16), transparent 55%),
+    linear-gradient(135deg, #2b66ae 0%, #1f4f95 48%, #112e5a 100%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.22) inset,
+    0 18px 40px rgb(17 46 90 / 0.28),
+    0 2px 6px rgb(17 46 90 / 0.18);
+}
+.carte-sopi::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(115deg, rgb(255 255 255 / 0.035) 0 2px, transparent 2px 14px);
+  pointer-events: none;
+}
+:root[data-theme="dark"] .carte-sopi {
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.14) inset,
+    0 18px 40px rgb(0 0 0 / 0.45);
+}

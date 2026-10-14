@@ -6,6 +6,7 @@ import type { PointRevenus, Regroupement } from '../api/types'
 import BarreFiltres from '../components/ui/BarreFiltres'
 import Bloc from '../components/ui/Bloc'
 import EnTetePage from '../components/ui/EnTetePage'
+import CarteSopi from '../components/ui/CarteSopi'
 import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
@@ -114,6 +115,16 @@ export default function RevenusPage() {
       </BarreFiltres>
 
       <div aria-busy={isFetching || undefined} className="flex flex-col gap-8">
+        <CarteSopi
+          libelle={T.revenus}
+          montant={data ? formatMontant(data.totaux.revenus) : ''}
+          lignes={[
+            { libelle: T.acomptesEncaisses, valeur: data ? formatMontant(data.totaux.acomptesEncaisses) : '' },
+            { libelle: T.soldePrestataires, valeur: data ? formatMontant(data.soldePrestataires) : '' },
+          ]}
+          note={data ? `${formatJourCalendaire(data.periode.debut, true)} – ${formatJourCalendaire(data.periode.fin, true)}` : undefined}
+          {...etat}
+        />
         <Bloc titre={T.totaux} {...etat} hauteur="h-32">
           {data && (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

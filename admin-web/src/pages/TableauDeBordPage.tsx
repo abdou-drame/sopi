@@ -6,6 +6,7 @@ import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import Bloc from '../components/ui/Bloc'
 import EnTetePage from '../components/ui/EnTetePage'
+import CarteSopi from '../components/ui/CarteSopi'
 import Carte from '../components/ui/Carte'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { GraphiqueBarres } from '../components/ui/Graphiques'
@@ -177,6 +178,18 @@ export default function TableauDeBordPage() {
       <EnTetePage titre={T.titre} sousTitre={`${T.sousTitre}${data ? ` ${T.misAJour(formatDateHeure(data.dateGeneration))}.` : ''}`} />
 
       <BlocAlertes />
+
+      <CarteSopi
+        libelle={T.carteTerminees30}
+        montant={data ? formatNombre(data.reservations.activiteRecente.derniers30Jours.terminees) : ''}
+        lignes={[
+          { libelle: T.carteCreees7, valeur: data ? formatNombre(data.reservations.activiteRecente.derniers7Jours.creees) : '' },
+          { libelle: T.cartePaiementsReussis, valeur: data ? formatNombre(data.paiements.parStatut.reussi.nombre) : '' },
+        ]}
+        chargement={isPending}
+        erreur={etat.erreur}
+        onReessayer={etat.onReessayer}
+      />
 
       <Bloc titre={T.effectifs} {...etat} hauteur="h-32">
         {data && <Effectifs d={data} />}

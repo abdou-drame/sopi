@@ -6,6 +6,7 @@ import BarreProgression from '../components/ui/BarreProgression'
 import Carte from '../components/ui/Carte'
 import Infobulle from '../components/ui/Infobulle'
 import Bouton from '../components/ui/Bouton'
+import CarteSopi from '../components/ui/CarteSopi'
 import CarteChiffre from '../components/ui/CarteChiffre'
 import { Champ, ChampDate, Selecteur, ZoneTexte } from '../components/ui/Champs'
 import Definitions from '../components/ui/Definitions'
@@ -123,6 +124,13 @@ export default function DemoPage() {
           {['en_attente', 'confirmee', 'terminee', 'refusee', 'annulee', 'actif', 'suspendu', 'banni', 'reussi', 'echoue', 'rembourse', 'ouvert'].map((s) => (
             <BadgeStatut key={s} statut={s} />
           ))}
+        </div>
+      </Section>
+
+      <Section titre="Carte Sopi">
+        <div className="flex flex-wrap gap-6">
+          <CarteSopi libelle="Commission retenue" montant={formatMontant(1350000)} lignes={[{ libelle: 'Acomptes encaissés', valeur: formatMontant(4500000) }, { libelle: 'Soldes des prestataires', valeur: formatMontant(820000) }]} note="1 sept. – 30 sept. 2030" />
+          <CarteSopi libelle="Chargement" montant="" lignes={[{ libelle: 'Ligne 1', valeur: '' }, { libelle: 'Ligne 2', valeur: '' }]} chargement />
         </div>
       </Section>
 
