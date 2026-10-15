@@ -225,7 +225,7 @@ describe('POST /prestataires/inscription', function () {
         expect(strlen($jeton))->toBeGreaterThanOrEqual(40)
             ->and($prestataire->jeton_suivi_hash)->not->toBe($jeton)
             ->and($prestataire->jeton_suivi_hash)->toBe(hash('sha256', $jeton))
-            ->and($reponse->json('lien_suivi'))->toBe(rtrim(config('app.url'), '/').'/api/v1/suivi/'.$jeton);
+            ->and($reponse->json('lien_suivi'))->toBe(rtrim(config('app.url'), '/').'/suivi/'.$jeton);
         $this->assertDatabaseMissing('prestataires', ['jeton_suivi_hash' => $jeton]);
     });
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SuiviDossierPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,3 +17,6 @@ Route::get('/paiement/echec', fn () => view('paiement.retour', [
     'titre' => 'Paiement non abouti',
     'message' => 'Le paiement n\'a pas abouti. Aucun montant ne vous sera prélevé. Retournez dans l\'application Sopi pour réessayer.',
 ]));
+
+// Page de suivi du dossier d'inscription (lien reçu par e-mail). Même limiteur que l'API JSON de suivi.
+Route::get('/suivi/{jeton}', SuiviDossierPageController::class)->middleware('throttle:suivi-dossier');

@@ -7,6 +7,7 @@ import {
   IconeLitige,
   IconePaiement,
   IconeRetrait,
+  IconeCloche,
   IconeReservation,
   IconeRevenus,
   IconeSanction,
@@ -25,7 +26,7 @@ export interface GroupeMenu {
   entrees: EntreeMenu[]
 }
 
-// Menu complet : les 12 écrans du back-office (l'écran de connexion est hors menu).
+// Menu complet : les 13 écrans du back-office (l'écran de connexion est hors menu).
 export const MENU: GroupeMenu[] = [
   {
     titre: L.menu.groupePilotage,
@@ -50,6 +51,7 @@ export const MENU: GroupeMenu[] = [
       { chemin: '/reservations', libelle: L.menu.reservations, icone: <IconeReservation /> },
       { chemin: '/paiements', libelle: L.menu.paiements, icone: <IconePaiement /> },
       { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait /> },
+      { chemin: '/notifications-en-echec', libelle: L.menu.notificationsEnEchec, icone: <IconeCloche /> },
     ],
   },
   {

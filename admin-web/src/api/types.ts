@@ -28,6 +28,7 @@ export type TypeAlerte =
   | 'remboursements_en_echec'
   | 'remboursements_en_retard'
   | 'suspensions_a_echeance'
+  | 'notifications_en_echec'
 
 export interface Alerte {
   type: TypeAlerte
