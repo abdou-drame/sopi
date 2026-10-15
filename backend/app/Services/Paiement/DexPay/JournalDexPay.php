@@ -20,10 +20,37 @@ final class JournalDexPay
 
     private const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 
-    /** @param array<string, scalar|null> $base identifiants (paiement_id, retrait_id…) */
-    public static function erreur(string $evenement, string $message, array $base, ?Throwable $e = null, ?int $codeHttp = null, string $extrait = ''): void
+    /**
+     * @param  array<string, scalar|null>  $base  identifiants (paiement_id, retrait_id…)
+     * @return array<string, mixed> le contexte journalisé, que l'appelant peut passer à diagnostic()
+     */
+    public static function erreur(string $evenement, string $message, array $base, ?Throwable $e = null, ?int $codeHttp = null, string $extrait = ''): array
     {
-        Log::error($evenement.' : '.$message, self::contexte($evenement, $base, $e, $codeHttp, $extrait));
+        $contexte = self::contexte($evenement, $base, $e, $codeHttp, $extrait);
+        Log::error($evenement.' : '.$message, $contexte);
+
+        return $contexte;
+    }
+
+    /**
+     * TEMPORAIRE (DEXPAY_DIAGNOSTIC_REPONSE) : ce qu'une réponse 503 peut révéler de l'échec, quand le réglage est actif. Seulement
+     * l'événement, la classe d'exception, le code HTTP, l'extrait masqué et les NOMS de variables manquantes ; null si le réglage est coupé.
+     *
+     * @param  array<string, mixed>  $contexte
+     * @return array<string, mixed>|null
+     */
+    public static function diagnostic(array $contexte): ?array
+    {
+        if (! config('sopi.paiement.dexpay.diagnostic_reponse')) {
+            return null;
+        }
+
+        $diagnostic = array_intersect_key($contexte, array_flip(['evenement', 'exception', 'code_http', 'extrait', 'variables_manquantes']));
+        if (isset($diagnostic['extrait'])) {
+            $diagnostic['extrait'] = self::extrait((string) $diagnostic['extrait']);
+        }
+
+        return $diagnostic;
     }
 
     /**

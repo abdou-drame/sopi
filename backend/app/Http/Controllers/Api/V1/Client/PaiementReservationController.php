@@ -45,7 +45,7 @@ class PaiementReservationController extends Controller
         try {
             [$paiement, $cree] = $this->service->initier($requete->user(), $id);
         } catch (ReservationImpossibleException $e) {
-            return response()->json(['message' => $e->getMessage()], $e->statut);
+            return response()->json(['message' => $e->getMessage()] + ($e->diagnostic !== null ? ['diagnostic' => $e->diagnostic] : []), $e->statut);
         }
 
         return (new PaiementReservationResource($paiement))->response()->setStatusCode($cree ? 201 : 200);
