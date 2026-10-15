@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import {
   IconeAccueil,
   IconeAvis,
-  IconeCloche,
   IconeDossier,
   IconeLitige,
   IconePaiement,
@@ -52,11 +51,5 @@ export const MENU: GroupeMenu[] = [
       { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait /> },
     ],
   },
-  {
-    titre: L.menu.groupeSysteme,
-    entrees: [
-      { chemin: '/notifications-en-echec', libelle: L.menu.notifications, icone: <IconeCloche /> },
-    ],
-  },
-]
 
+]

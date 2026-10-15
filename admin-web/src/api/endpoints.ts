@@ -8,7 +8,6 @@ import type {
   DemandeListe,
   Litige,
   LitigeDetail,
-  NotificationEchec,
   PaiementDetail,
   ReservationDetail,
   ReservationListe,
@@ -66,6 +65,4 @@ export const api = {
   paiement: (id: string) => requete<PaiementDetail>('GET', `/admin/paiements/${id}`),
   retraits: (params: Params) => requete<Page<RetraitListe>>('GET', '/admin/retraits', { params }),
   retrait: (id: string) => requete<RetraitDetail>('GET', `/admin/retraits/${id}`),
-  notificationsEnEchec: (params: Params) => requete<Page<NotificationEchec>>('GET', '/admin/notifications-en-echec', { params }),
-  notificationEnEchec: (id: string) => requete<NotificationEchec>('GET', `/admin/notifications-en-echec/${id}`),
 }

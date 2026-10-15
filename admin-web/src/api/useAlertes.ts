@@ -6,7 +6,15 @@ import type { Alerte, TypeAlerte } from './types'
 export function useAlertes() {
   return useQuery({
     queryKey: ['alertes'],
-    queryFn: api.alertes,
+    queryFn: async () => {
+      const reponse = await api.alertes()
+      // Les types d'alerte sans écran (ex. notifications en échec) sont ignorés, totaux recalculés.
+      const alertes = reponse.alertes.filter((a) => a.type in LIEN_ALERTE)
+      if (alertes.length === reponse.alertes.length) return reponse
+      const parGravite = { info: 0, attention: 0, critique: 0 }
+      for (const a of alertes) parGravite[a.gravite] += a.compteur
+      return { ...reponse, alertes, parGravite, total: alertes.reduce((t, a) => t + a.compteur, 0) }
+    },
     refetchInterval: 60_000,
     retry: false,
   })
@@ -20,7 +28,6 @@ export const LIEN_ALERTE: Record<TypeAlerte, string> = {
   retraits_bloques: '/retraits?bloques=true',
   remboursements_en_echec: '/paiements?remboursementDu=true',
   remboursements_en_retard: '/paiements?remboursementDu=true',
-  notifications_en_echec: '/notifications-en-echec',
   suspensions_a_echeance: '/sanctions?echeanceDansHeures=24',
 }
 

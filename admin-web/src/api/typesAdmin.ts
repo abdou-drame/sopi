@@ -218,12 +218,3 @@ export interface RetraitDetail extends RetraitListe {
   recrediteLe: string | null
 }
 
-export interface NotificationEchec {
-  id: string
-  type: string
-  destinataire: { id: string; role: string }
-  canauxEnEchec: ('email' | 'push')[]
-  tentatives: number
-  classeErreur: string
-  dateCreation: string
-}

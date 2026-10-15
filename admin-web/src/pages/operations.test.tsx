@@ -62,15 +62,6 @@ const RETRAIT = {
   recredite: false,
   telephoneVersement: '+22177***01',
 }
-const NOTIFICATION = {
-  id: 'n-1',
-  type: 'reservation_confirmee',
-  destinataire: { id: 'c-1', role: 'client' },
-  canauxEnEchec: ['email', 'push'],
-  tentatives: 5,
-  classeErreur: 'TransportException',
-  dateCreation: '2030-01-20T08:00:00+00:00',
-}
 
 describe('écrans de consultation', () => {
   beforeEach(() => sessionStorage.setItem('sopi.admin.jeton', 'jeton-factice-pour-test'))
@@ -145,30 +136,5 @@ describe('écrans de consultation', () => {
     expect(await screen.findByText('DXP-RET-9')).toBeInTheDocument()
     expect(screen.getByText('Ce retrait est en cours depuis plus longtemps que le délai normal.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir le prestataire' })).toHaveAttribute('href', '/utilisateurs/u-1')
-  })
-
-  it('notifications en échec : libellés lisibles, pagination sans last_page', async () => {
-    simulerApi({
-      ...base,
-      'GET /admin/notifications-en-echec': { corps: { data: [NOTIFICATION], links: {}, meta: { current_page: 1, per_page: 20, total: 1 } } },
-    })
-    afficherApplication('/notifications-en-echec')
-    const lien = await screen.findByRole('link', { name: 'Réservation confirmée' })
-    expect(lien).toHaveAttribute('href', '/notifications-en-echec/n-1')
-    expect(screen.getByText('E-mail, Push')).toBeInTheDocument()
-    expect(screen.getByText('TransportException')).toBeInTheDocument()
-  })
-
-  it('notification : détail et 404', async () => {
-    simulerApi({ ...base, 'GET /admin/notifications-en-echec/n-1': { corps: NOTIFICATION } })
-    afficherApplication('/notifications-en-echec/n-1')
-    expect(await screen.findByRole('heading', { level: 1, name: 'Réservation confirmée' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Voir le destinataire/ })).toHaveAttribute('href', '/utilisateurs/c-1')
-  })
-
-  it('notification inconnue : « introuvable »', async () => {
-    simulerApi({ ...base, 'GET /admin/notifications-en-echec/n-2': { status: 404, corps: { message: 'Notification introuvable.' } } })
-    afficherApplication('/notifications-en-echec/n-2')
-    expect(await screen.findByText('Élément introuvable')).toBeInTheDocument()
   })
 })
