@@ -8,6 +8,7 @@ import type {
   DemandeListe,
   Litige,
   LitigeDetail,
+  Metier,
   PaiementDetail,
   ReservationDetail,
   ReservationListe,
@@ -58,6 +59,9 @@ export const api = {
   conserverAvis: (id: string, motif?: string) =>
     requete<AvisAdmin>('POST', `/admin/avis/${id}/conserver`, { corps: motif ? { motif } : {} }),
   retablirAvis: (id: string) => requete<AvisAdmin>('POST', `/admin/avis/${id}/retablir`),
+  metiers: () => requete<{ data: Metier[] }>('GET', '/admin/metiers'),
+  creerMetier: (libelle: string) => requete<Metier>('POST', '/admin/metiers', { corps: { libelle } }),
+  modifierMetier: (id: string, corps: { libelle?: string; actif?: boolean }) => requete<Metier>('PATCH', `/admin/metiers/${id}`, { corps }),
 
   reservations: (params: Params) => requete<Page<ReservationListe>>('GET', '/admin/reservations', { params }),
   reservation: (id: string) => requete<ReservationDetail>('GET', `/admin/reservations/${id}`),

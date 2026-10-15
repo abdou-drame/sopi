@@ -57,6 +57,13 @@ export const IconeAvis = (p: P) => (
     <path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" />
   </Icone>
 )
+export const IconeMetier = (p: P) => (
+  <Icone {...p}>
+    <rect x="3" y="7" width="18" height="13" rx="2" />
+    <path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2" />
+    <path d="M3 13h18" />
+  </Icone>
+)
 export const IconeUtilisateurs = (p: P) => (
   <Icone {...p}>
     <circle cx="9" cy="8" r="3.5" />

@@ -62,7 +62,7 @@ async function lireCorps(reponse: Response): Promise<{ message?: string; errors?
   }
 }
 
-export async function requete<T>(methode: 'GET' | 'POST', chemin: string, options: Options = {}): Promise<T> {
+export async function requete<T>(methode: 'GET' | 'POST' | 'PATCH', chemin: string, options: Options = {}): Promise<T> {
   const entetes: Record<string, string> = { Accept: 'application/json' }
   const jeton = lireJeton()
   if (jeton && !options.publique) entetes.Authorization = `Bearer ${jeton}`

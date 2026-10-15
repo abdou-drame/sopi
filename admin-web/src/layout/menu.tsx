@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import {
   IconeAccueil,
   IconeAvis,
+  IconeMetier,
   IconeDossier,
   IconeLitige,
   IconePaiement,
@@ -50,6 +51,10 @@ export const MENU: GroupeMenu[] = [
       { chemin: '/paiements', libelle: L.menu.paiements, icone: <IconePaiement /> },
       { chemin: '/retraits', libelle: L.menu.retraits, icone: <IconeRetrait /> },
     ],
+  },
+  {
+    titre: L.menu.groupeCatalogue,
+    entrees: [{ chemin: '/metiers', libelle: L.menu.metiers, icone: <IconeMetier /> }],
   },
 
 ]

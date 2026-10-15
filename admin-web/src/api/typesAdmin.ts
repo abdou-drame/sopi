@@ -148,6 +148,16 @@ export interface UtilisateurDetail extends Omit<UtilisateurListe, 'prestataire'>
   nombreSanctions: number
 }
 
+/** Métier de la plateforme : le code est la valeur stockée chez les prestataires, il ne change jamais. */
+export interface Metier {
+  id: string
+  code: string
+  libelle: string
+  actif: boolean
+  nombrePrestataires: number
+  dateCreation: string
+}
+
 export interface AvisAdmin {
   id: string
   note: number
