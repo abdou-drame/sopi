@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Metier;
 use App\Enums\StatutCompte;
 use App\Models\Prestataire;
 use App\Models\Prestation;
@@ -14,7 +13,7 @@ uses(RefreshDatabase::class);
 const URL_RECHERCHE = '/api/v1/prestataires';
 
 /** Prestataire visible (compte actif) avec une prestation active au prix donné. */
-function prestataireRecherche(array $attributs = [], float $prix = 10000, StatutCompte $statut = StatutCompte::Actif, ?Metier $metier = null): Prestataire
+function prestataireRecherche(array $attributs = [], float $prix = 10000, StatutCompte $statut = StatutCompte::Actif, ?string $metier = null): Prestataire
 {
     $factory = Prestataire::factory()->for(User::factory()->prestataire()->statut($statut), 'user');
     if ($metier) {
@@ -76,7 +75,7 @@ it('renvoie les champs attendus calculés sur les prestations actives', function
     chercher()->assertOk()->assertJsonPath('data.0', [
         'id' => $p->id,
         'nomEntreprise' => 'Garage A',
-        'metier' => $p->metier->value,
+        'metier' => $p->metier,
         'quartier' => 'Malika',
         'adresse' => 'Rue 1',
         'prixMin' => 5000,
@@ -101,8 +100,8 @@ it('ne renvoie aucune donnée personnelle', function () {
 });
 
 it('filtre par métier', function () {
-    prestataireRecherche(['nom_entreprise' => 'Garage'], 10000, StatutCompte::Actif, Metier::Mecanique);
-    prestataireRecherche(['nom_entreprise' => 'Salon'], 10000, StatutCompte::Actif, Metier::Coiffure);
+    prestataireRecherche(['nom_entreprise' => 'Garage'], 10000, StatutCompte::Actif, 'mecanique');
+    prestataireRecherche(['nom_entreprise' => 'Salon'], 10000, StatutCompte::Actif, 'coiffure');
 
     expect(nomsTrouves(chercher(['metier' => 'coiffure'])))->toBe(['Salon']);
 });
@@ -153,10 +152,10 @@ it('filtre par fourchette de prix sur une même prestation active', function () 
 });
 
 it('combine les filtres', function () {
-    prestataireRecherche(['nom_entreprise' => 'Garage Malika', 'quartier' => 'Malika'], 10000, StatutCompte::Actif, Metier::Mecanique);
-    prestataireRecherche(['nom_entreprise' => 'Garage Jaxaay', 'quartier' => 'Jaxaay'], 10000, StatutCompte::Actif, Metier::Mecanique);
-    prestataireRecherche(['nom_entreprise' => 'Salon Malika', 'quartier' => 'Malika'], 10000, StatutCompte::Actif, Metier::Coiffure);
-    prestataireRecherche(['nom_entreprise' => 'Garage Malika cher', 'quartier' => 'Malika'], 90000, StatutCompte::Actif, Metier::Mecanique);
+    prestataireRecherche(['nom_entreprise' => 'Garage Malika', 'quartier' => 'Malika'], 10000, StatutCompte::Actif, 'mecanique');
+    prestataireRecherche(['nom_entreprise' => 'Garage Jaxaay', 'quartier' => 'Jaxaay'], 10000, StatutCompte::Actif, 'mecanique');
+    prestataireRecherche(['nom_entreprise' => 'Salon Malika', 'quartier' => 'Malika'], 10000, StatutCompte::Actif, 'coiffure');
+    prestataireRecherche(['nom_entreprise' => 'Garage Malika cher', 'quartier' => 'Malika'], 90000, StatutCompte::Actif, 'mecanique');
 
     $reponse = chercher(['metier' => 'mecanique', 'quartier' => 'malika', 'q' => 'garage', 'prix_max' => 20000]);
 

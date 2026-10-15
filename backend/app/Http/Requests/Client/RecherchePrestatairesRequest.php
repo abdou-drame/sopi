@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Client;
 
-use App\Enums\Metier;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +26,7 @@ class RecherchePrestatairesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'metier' => ['nullable', 'string', Rule::enum(Metier::class)],
+            'metier' => ['nullable', 'string', Rule::exists('metiers', 'code')],
             'quartier' => ['nullable', 'string', 'max:100'],
             'q' => ['nullable', 'string', 'max:100'],
             'prix_min' => ['nullable', 'numeric', 'min:0', 'max:'.self::PRIX_MAX, 'decimal:0,2'],
@@ -40,8 +39,8 @@ class RecherchePrestatairesRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'metier.enum' => 'Le métier doit être mecanique, coiffure ou pressing.',
-            'metier.string' => 'Le métier doit être mecanique, coiffure ou pressing.',
+            'metier.exists' => "Ce métier n'existe pas.",
+            'metier.string' => 'Le métier doit être un texte.',
             'quartier.string' => 'Le quartier doit être un texte.',
             'quartier.max' => 'Le quartier ne doit pas dépasser 100 caractères.',
             'q.string' => 'Le texte recherché doit être un texte.',
@@ -64,7 +63,7 @@ class RecherchePrestatairesRequest extends FormRequest
     public function queryParameters(): array
     {
         return [
-            'metier' => ['description' => 'Métier : mecanique, coiffure ou pressing.', 'example' => 'mecanique', 'required' => false],
+            'metier' => ['description' => "Code d'un métier de la plateforme (ex. : mecanique, coiffure, pressing).", 'example' => 'mecanique', 'required' => false],
             'quartier' => ['description' => 'Quartier (égalité exacte, sans tenir compte de la casse ni des espaces superflus).', 'example' => 'Malika', 'required' => false],
             'q' => ['description' => 'Texte contenu dans le nom de l\'entreprise ou dans le nom d\'une prestation active (sans tenir compte de la casse ; les accents comptent).', 'example' => 'vidange', 'required' => false],
             'prix_min' => ['description' => 'Le prestataire a une prestation active à ce prix ou plus (FCFA).', 'example' => 5000, 'required' => false],

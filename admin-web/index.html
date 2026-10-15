@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Applique le thème avant le premier affichage (évite un flash clair en mode sombre)
+      try {
+        var c = localStorage.getItem('sopi.admin.theme')
+        var sombre = c ? c === 'sombre' : window.matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = sombre ? 'dark' : 'light'
+      } catch (e) {}
+    </script>
     <title>Sopi — Back-office</title>
   </head>
   <body>

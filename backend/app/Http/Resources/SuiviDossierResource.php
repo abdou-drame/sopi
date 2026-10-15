@@ -22,7 +22,7 @@ class SuiviDossierResource extends JsonResource
 
         return [
             'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier->value,
+            'metier' => $this->metier,
             'statutCompte' => $statut->value,
             'motifRefus' => $statut === StatutCompte::Refuse ? $this->motif_refus : null,
             'dateSoumission' => $this->created_at?->toIso8601String(),

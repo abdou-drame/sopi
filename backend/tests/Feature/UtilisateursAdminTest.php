@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Metier;
 use App\Enums\StatutCompte;
 use App\Models\Avis;
 use App\Models\Creneau;
@@ -60,7 +59,7 @@ describe('utilisateurs — liste', function () {
     it('renvoie la forme exacte d\'un client et d\'un prestataire', function () {
         adminConnecte();
         $client = User::factory()->create(['nom' => 'Diallo', 'prenom' => 'Awa', 'email' => 'awa@example.com', 'telephone' => '+221770000001', 'created_at' => '2030-01-09 09:00:00']);
-        $prestataire = Prestataire::factory()->metier(Metier::Coiffure)->create([
+        $prestataire = Prestataire::factory()->metier('coiffure')->create([
             'quartier' => 'Malika', 'nom_entreprise' => 'Salon Awa', 'created_at' => '2030-01-10 09:00:00',
         ]);
         $prestataire->user->forceFill(['nom' => 'Diop', 'prenom' => 'Moussa', 'email' => 'moussa@example.com', 'telephone' => '+221770000002', 'created_at' => '2030-01-10 09:00:00'])->save();
@@ -251,7 +250,7 @@ describe('utilisateurs — fiche', function () {
 
     it('renvoie la fiche exacte d\'un prestataire, avis masqués exclus de la note', function () {
         adminConnecte();
-        $presta = Prestataire::factory()->metier(Metier::Mecanique)->avoirSolde(12000)->create(['quartier' => 'Malika', 'nom_entreprise' => 'Garage Exemple', 'adresse' => 'Rue 10']);
+        $presta = Prestataire::factory()->metier('mecanique')->avoirSolde(12000)->create(['quartier' => 'Malika', 'nom_entreprise' => 'Garage Exemple', 'adresse' => 'Rue 10']);
         $presta->user->forceFill(['nom' => 'Diop', 'prenom' => 'Moussa', 'email' => 'moussa@example.com', 'telephone' => '+221770000002', 'created_at' => '2030-01-10 09:00:00', 'statut' => StatutCompte::Suspendu])->save();
         Prestation::factory()->for($presta)->count(2)->create();
         Prestation::factory()->for($presta)->inactive()->create();

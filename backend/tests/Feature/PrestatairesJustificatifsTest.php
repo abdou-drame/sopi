@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Metier;
 use App\Enums\StatutJustificatif;
 use App\Enums\TypeDocument;
 use App\Models\Justificatif;
@@ -76,7 +75,7 @@ describe('valeurs par défaut', function () {
     it('applique les mêmes défauts sans passer par la factory', function () {
         $user = User::factory()->prestataire()->create();
         $prestataire = new Prestataire([
-            'metier' => Metier::Coiffure, 'quartier' => 'Malika', 'nom_entreprise' => 'Salon Awa', 'adresse' => 'Rue 10',
+            'metier' => 'coiffure', 'quartier' => 'Malika', 'nom_entreprise' => 'Salon Awa', 'adresse' => 'Rue 10',
         ]);
         $prestataire->user_id = $user->id;
         $prestataire->save();
@@ -103,11 +102,11 @@ describe('valeurs par défaut', function () {
 });
 
 describe('types et montants', function () {
-    it('convertit métier, type de document et statut en enums', function () {
+    it('convertit type de document et statut en enums', function () {
         $justificatif = Justificatif::factory()->create(['type_document' => TypeDocument::Cni]);
         $prestataire = $justificatif->prestataire->fresh();
 
-        expect($prestataire->metier)->toBeInstanceOf(Metier::class)
+        expect($prestataire->metier)->toBeString()
             ->and($justificatif->fresh()->type_document)->toBe(TypeDocument::Cni);
     });
 

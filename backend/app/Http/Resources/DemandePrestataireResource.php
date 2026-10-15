@@ -20,7 +20,7 @@ class DemandePrestataireResource extends JsonResource
             'nom' => $this->user->nom,
             'prenom' => $this->user->prenom,
             'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier->value,
+            'metier' => $this->metier,
             'quartier' => $this->quartier,
             'statutCompte' => $this->user->statut->value,
             'dateSoumission' => $this->created_at?->toIso8601String(),

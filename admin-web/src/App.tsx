@@ -1,17 +1,25 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import AccueilPage from './pages/AccueilPage'
+import { useState } from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import Routage from './Routage'
+import { ThemeProvider } from './theme/ThemeContext'
 
-const queryClient = new QueryClient()
+export function creerClientRequetes() {
+  return new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } })
+}
 
 export default function App() {
+  const [client] = useState(creerClientRequetes)
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="*" element={<AccueilPage />} />
-        </Routes>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={client}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routage />
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }

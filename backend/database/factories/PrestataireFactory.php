@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Enums\Metier;
 use App\Enums\StatutCompte;
 use App\Models\Prestataire;
 use App\Models\User;
@@ -17,7 +16,7 @@ class PrestataireFactory extends Factory
     {
         return [
             'user_id' => User::factory()->prestataire(),
-            'metier' => fake()->randomElement(Metier::cases()),
+            'metier' => fake()->randomElement(['mecanique', 'coiffure', 'pressing']),
             'quartier' => fake()->randomElement(['Keur Massar Nord', 'Keur Massar Sud', 'Malika', 'Jaxaay']),
             'nom_entreprise' => fake()->company(),
             'adresse' => fake()->streetAddress(),
@@ -30,7 +29,7 @@ class PrestataireFactory extends Factory
         return $this->afterMaking(fn (Prestataire $prestataire) => $prestataire->solde = number_format((float) $montant, 2, '.', ''));
     }
 
-    public function metier(Metier $metier): static
+    public function metier(string $metier): static
     {
         return $this->state(['metier' => $metier]);
     }
