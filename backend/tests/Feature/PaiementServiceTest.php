@@ -6,6 +6,7 @@ use App\Exceptions\EvenementPaiementIllisible;
 use App\Models\Paiement;
 use App\Models\Reservation;
 use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\DexPay\DexPayPaiementService;
 use App\Services\Paiement\EvenementPaiement;
 use App\Services\Paiement\FakePaiementService;
 use App\Services\Paiement\PaiementService;
@@ -105,12 +106,19 @@ describe('résolution du pilote', function () {
         expect(app(PaiementService::class))->toBeInstanceOf(FakePaiementService::class);
     });
 
-    it('refuse dexpay tant que M6.6 n\'existe pas', function () {
-        config(['sopi.paiement.driver' => 'dexpay']);
+    it('refuse dexpay sans clés, en nommant les variables manquantes', function () {
+        config(['sopi.paiement.driver' => 'dexpay', 'sopi.paiement.dexpay.public_key' => '', 'sopi.paiement.dexpay.secret_key' => '']);
         app()->forgetInstance(PaiementService::class);
 
         expect(fn () => app(PaiementService::class))
-            ->toThrow(ConfigurationPaiementInvalide::class, 'Le prestataire de paiement DexPay n\'est pas encore disponible.');
+            ->toThrow(ConfigurationPaiementInvalide::class, 'DEXPAY_PUBLIC_KEY, DEXPAY_SECRET_KEY');
+    });
+
+    it('donne le service DexPay quand les clés sont présentes', function () {
+        config(['sopi.paiement.driver' => 'dexpay', 'sopi.paiement.dexpay.public_key' => 'pk_factice', 'sopi.paiement.dexpay.secret_key' => 'sk_factice']);
+        app()->forgetInstance(PaiementService::class);
+
+        expect(app(PaiementService::class))->toBeInstanceOf(DexPayPaiementService::class);
     });
 
     it('refuse une valeur inconnue', function () {

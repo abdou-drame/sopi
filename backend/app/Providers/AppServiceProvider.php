@@ -29,6 +29,7 @@ use App\Services\Notification\LogEnvoiPush;
 use App\Services\Notification\NotificationService;
 use App\Services\Notification\SmtpEnvoiEmail;
 use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\DexPay\DexPayPaiementService;
 use App\Services\Paiement\FakePaiementService;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -41,10 +42,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Pilote de paiement choisi par PAYMENT_DRIVER (fake ou dexpay). DexPay arrive en M6.6.
+        // Pilote de paiement choisi par PAYMENT_DRIVER (fake ou dexpay).
         $this->app->singleton(PaiementService::class, fn () => match ($pilote = (string) config('sopi.paiement.driver')) {
             'fake' => new FakePaiementService(config('sopi.paiement.webhook_secret')),
-            'dexpay' => throw new ConfigurationPaiementInvalide('Le prestataire de paiement DexPay n\'est pas encore disponible.'),
+            'dexpay' => DexPayPaiementService::depuisConfiguration(),
             default => throw new ConfigurationPaiementInvalide("Le pilote de paiement « {$pilote} » est inconnu (valeurs possibles : fake, dexpay)."),
         });
 

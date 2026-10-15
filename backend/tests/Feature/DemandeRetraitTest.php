@@ -4,6 +4,7 @@ use App\Enums\StatutRetrait;
 use App\Models\Prestataire;
 use App\Models\Retrait;
 use App\Models\User;
+use App\Services\Paiement\ContexteVersement;
 use App\Services\Paiement\EvenementPaiement;
 use App\Services\Paiement\PaiementService;
 use App\Services\Paiement\ResultatOperation;
@@ -52,7 +53,7 @@ final class PaiementDeTestRetrait implements PaiementService
 
     public function __construct(public Closure $verser) {}
 
-    public function creerSession(string $reservationId, string $montantAcompte, string $description): SessionPaiement
+    public function creerSession(string $reservationId, string $montantAcompte, string $description, ?string $paiementId = null): SessionPaiement
     {
         throw new LogicException('Non utilisé');
     }
@@ -72,7 +73,12 @@ final class PaiementDeTestRetrait implements PaiementService
         throw new LogicException('Non utilisé');
     }
 
-    public function verser(string $montant, string $destinataire): ResultatOperation
+    public function consulterVersement(string $referenceMarchande): ?StatutRetrait
+    {
+        return null;
+    }
+
+    public function verser(string $montant, string $destinataire, ?ContexteVersement $contexte = null): ResultatOperation
     {
         $this->appels++;
 

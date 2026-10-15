@@ -72,6 +72,9 @@ return [
             'public_key' => env('DEXPAY_PUBLIC_KEY', ''),
             'secret_key' => env('DEXPAY_SECRET_KEY', ''),
             'country' => env('DEXPAY_COUNTRY', 'SN'),
+            // Pages où DexPay renvoie le client après le paiement (vides : APP_URL + /paiement/succes ou /paiement/echec).
+            'success_url' => env('DEXPAY_SUCCESS_URL', ''),
+            'failure_url' => env('DEXPAY_FAILURE_URL', ''),
             'timeout_seconds' => (int) env('DEXPAY_TIMEOUT_SECONDS', 15),
             // Facteur appliqué au montant en FCFA avant l'envoi (1 = FCFA entiers ; 100 si le bac à sable attend des centimes).
             'amount_factor' => (int) env('DEXPAY_AMOUNT_FACTOR', 1),

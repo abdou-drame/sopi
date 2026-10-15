@@ -9,6 +9,7 @@ use App\Exceptions\EvenementPaiementIllisible;
 use App\Models\Paiement;
 use App\Models\Reservation;
 use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\GenreEvenement;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -58,11 +59,19 @@ class WebhookPaiementService
             return [Response::HTTP_UNPROCESSABLE_ENTITY, 'Événement de paiement illisible.'];
         }
 
+        if ($evenement->genre === GenreEvenement::Ignore) {
+            return [Response::HTTP_OK, 'Événement ignoré.'];
+        }
+
         $paiement = Paiement::query()->where('reference_dexpay', $evenement->reference)->first();
         if ($paiement === null) {
             Log::warning('Événement de paiement ignoré : référence inconnue.');
 
             return [Response::HTTP_OK, 'Événement ignoré.'];
+        }
+
+        if ($evenement->genre === GenreEvenement::Remboursement) {
+            return $this->rembourse($paiement);
         }
 
         if (! $this->montantEgal($paiement->montant_acompte, $evenement->montant)) {
@@ -74,6 +83,21 @@ class WebhookPaiementService
         return $evenement->statut === StatutPaiement::Reussi
             ? $this->reussir($paiement)
             : $this->echouer($paiement);
+    }
+
+    /**
+     * Remboursement signalé par le prestataire (checkout.refunded) : le paiement passe à REMBOURSE, une seule fois, jamais
+     * depuis EN_ATTENTE (rien n'a été payé). Un paiement déjà remboursé ne change pas, le remboursement n'est jamais redemandé.
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function rembourse(Paiement $paiement): array
+    {
+        if ($paiement->rembourserSiStatut(StatutPaiement::Reussi, StatutPaiement::Echoue)) {
+            return [Response::HTTP_OK, 'Remboursement enregistré.'];
+        }
+
+        return [Response::HTTP_OK, 'Déjà traité.'];
     }
 
     /** Comparaison décimale exacte (« 4500 » = « 4500.00 »). Un montant mal formé est incohérent. */
