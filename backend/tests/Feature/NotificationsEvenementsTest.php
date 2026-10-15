@@ -347,7 +347,7 @@ describe('garanties', function () {
     it('un échec de la création de notification n\'empêche pas l\'action métier', function () {
         app()->instance(NotificationService::class, new class implements NotificationService
         {
-            public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = []): ?Notification
+            public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = [], ?string $secret = null): ?Notification
             {
                 throw new RuntimeException('base indisponible adresse@example.test');
             }

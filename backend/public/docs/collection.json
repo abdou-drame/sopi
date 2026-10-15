@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "09a59d7b-35a7-4de4-a57b-76ca16843401",
+        "_postman_id": "3e8cbe1b-2428-4fe6-97dc-4d67fa59ef53",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -3470,7 +3470,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T18:53:55+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T19:33:23+00:00\"}",
                             "name": ""
                         }
                     ]
