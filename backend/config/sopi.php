@@ -68,7 +68,7 @@ return [
 
         // Pilote DexPay (PAYMENT_DRIVER=dexpay). Les clés sont des secrets : variables d'environnement du serveur uniquement.
         'dexpay' => [
-            'base_url' => env('DEXPAY_BASE_URL', 'https://api.dexpay.africa/api/v1'),
+            'base_url' => env('DEXPAY_BASE_URL') ?: 'https://api.dexpay.africa/api/v1',
             'public_key' => env('DEXPAY_PUBLIC_KEY', ''),
             'secret_key' => env('DEXPAY_SECRET_KEY', ''),
             'country' => env('DEXPAY_COUNTRY', 'SN'),
