@@ -346,7 +346,7 @@ describe('événement réussi', function () {
 
         expect($paiement->fresh()->statut)->toBe(StatutPaiement::Reussi)->and($paiement->fresh()->rembourse_le)->toBeNull();
         $spy->shouldHaveReceived('error')->once()->withArgs(function (string $message, array $contexte) use ($paiement) {
-            return array_keys($contexte) === ['paiement_id', 'erreur']
+            return $contexte['evenement'] === 'dexpay.remboursement_echec'
                 && $contexte['paiement_id'] === $paiement->id
                 && ! str_contains(json_encode([$message, $contexte]), SECRET_WEBHOOK_TEST)
                 && ! str_contains(json_encode([$message, $contexte]), (string) $paiement->reference_dexpay);

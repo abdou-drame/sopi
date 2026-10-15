@@ -65,7 +65,7 @@ class DexPayPaiementService implements PaiementService
         ]);
 
         if (! $reponse->reussie()) {
-            throw new DexPayErreur('Création de la session de paiement refusée.', $reponse->statutHttp);
+            throw new DexPayErreur('Création de la session de paiement refusée.', $reponse->statutHttp, $reponse->extrait);
         }
 
         $url = $reponse->texte('payment_url');
@@ -74,7 +74,7 @@ class DexPayPaiementService implements PaiementService
             $url = $reponse->texte('sandbox_payment_url');
         }
         if ($url === null) {
-            throw new DexPayErreur('Réponse de création de session illisible.', $reponse->statutHttp);
+            throw new DexPayErreur('Réponse de création de session illisible.', $reponse->statutHttp, $reponse->extrait);
         }
 
         return new SessionPaiement($reponse->texte('reference') ?? $reference, $url);
@@ -101,7 +101,7 @@ class DexPayPaiementService implements PaiementService
             throw new EvenementPaiementIllisible('L\'événement de paiement est incomplet ou invalide.');
         }
 
-        return match ($type) {
+        $evenement = match ($type) {
             'checkout.completed' => $this->evenementPaiement($donnees, StatutPaiement::Reussi),
             'checkout.failed', 'checkout.cancelled' => $this->evenementPaiement($donnees, StatutPaiement::Echoue),
             'checkout.refunded' => $this->evenementRemboursement($donnees),
@@ -109,6 +109,9 @@ class DexPayPaiementService implements PaiementService
             'payout.failed', 'payout.cancelled' => $this->evenementVersement($donnees, StatutRetrait::Echoue),
             default => EvenementPaiement::ignore(),
         };
+
+        // Le type n'est gardé pour le journal que sous une forme inoffensive (lettres, points, tirets bas).
+        return $evenement->avecType(preg_match('/^[a-z0-9._-]{1,40}$/i', $type) === 1 ? $type : 'inconnu');
     }
 
     public function rembourser(string $reference, string $montant): ResultatOperation
@@ -120,17 +123,17 @@ class DexPayPaiementService implements PaiementService
         // Remboursement intégral uniquement : le montant n'est pas envoyé.
         try {
             $reponse = $this->client->post('/checkout-sessions/refund/'.rawurlencode($reference), null, true);
-        } catch (DexPayErreur) {
-            return new ResultatOperation(false, null, false, 'injoignable');
+        } catch (DexPayErreur $e) {
+            return new ResultatOperation(false, null, false, 'injoignable', null, $e->extrait);
         }
 
         if (! $reponse->reussie()) {
-            return new ResultatOperation(false, null, false, 'http_'.$reponse->statutHttp);
+            return new ResultatOperation(false, null, false, 'http_'.$reponse->statutHttp, $reponse->statutHttp, $reponse->extrait);
         }
 
         return $reponse->statut() === 'success'
             ? new ResultatOperation(true, $reference)
-            : new ResultatOperation(false, null, false, 'statut_'.($reponse->statut() ?? 'inconnu'));
+            : new ResultatOperation(false, null, false, 'statut_'.($reponse->statut() ?? 'inconnu'), $reponse->statutHttp, $reponse->extrait);
     }
 
     public function verser(string $montant, string $destinataire, ?ContexteVersement $contexte = null): ResultatOperation
@@ -151,11 +154,11 @@ class DexPayPaiementService implements PaiementService
         ], true, ['Idempotency-Key' => $contexte->retraitId]);
 
         if (in_array($reponse->statutHttp, self::REFUS_VERSEMENT, true)) {
-            return new ResultatOperation(false, null, false, 'http_'.$reponse->statutHttp);
+            return new ResultatOperation(false, null, false, 'http_'.$reponse->statutHttp, $reponse->statutHttp, $reponse->extrait);
         }
         if ($reponse->statutHttp !== 200 && $reponse->statutHttp !== 201) {
             // 409 (référence déjà utilisée), 5xx, 429… : on ne sait pas si le versement existe.
-            throw new DexPayErreur('Résultat du versement incertain.', $reponse->statutHttp);
+            throw new DexPayErreur('Résultat du versement incertain.', $reponse->statutHttp, $reponse->extrait);
         }
 
         $reference = $reponse->texte('reference') ?? $reference;
@@ -163,8 +166,8 @@ class DexPayPaiementService implements PaiementService
         return match ($reponse->statut()) {
             'completed' => new ResultatOperation(true, $reference),
             'pending', 'processing', 'frozen', 'initiated' => new ResultatOperation(true, $reference, true),
-            'failed', 'cancelled' => new ResultatOperation(false, $reference, false, 'statut_'.$reponse->statut()),
-            default => throw new DexPayErreur('Réponse de versement illisible.', $reponse->statutHttp),
+            'failed', 'cancelled' => new ResultatOperation(false, $reference, false, 'statut_'.$reponse->statut(), $reponse->statutHttp, $reponse->extrait),
+            default => throw new DexPayErreur('Réponse de versement illisible.', $reponse->statutHttp, $reponse->extrait),
         };
     }
 

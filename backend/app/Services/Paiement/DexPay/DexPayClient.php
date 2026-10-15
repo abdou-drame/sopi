@@ -33,7 +33,7 @@ class DexPayClient
             }
         }
         if ($manquantes !== []) {
-            throw new ConfigurationPaiementInvalide('La configuration DexPay est incomplète : variable(s) manquante(s) '.implode(', ', $manquantes).'.');
+            throw new ConfigurationPaiementInvalide('La configuration DexPay est incomplète : variable(s) manquante(s) '.implode(', ', $manquantes).'.', $manquantes);
         }
 
         return new self(
@@ -78,8 +78,9 @@ class DexPayClient
                     ->asJson()
                     ->withHeaders($entetes)
             );
-        } catch (ConnectionException) {
-            throw new DexPayErreur('DexPay est injoignable ou n\'a pas répondu à temps.');
+        } catch (ConnectionException $e) {
+            // Le texte de l'erreur réseau (résolution DNS, délai, TLS) aide au diagnostic ; il ne contient pas les en-têtes et est masqué.
+            throw new DexPayErreur('DexPay est injoignable ou n\'a pas répondu à temps.', null, JournalDexPay::extrait($e->getMessage()));
         }
 
         return $this->lire($reponse);
@@ -91,7 +92,7 @@ class DexPayClient
         $json = is_array($json) ? $json : [];
         $donnees = is_array($json['data'] ?? null) ? $json['data'] : $json;
 
-        // Le message d'erreur éventuel sert à décider, jamais à être affiché tel quel.
-        return new ReponseDexPay($reponse->status(), $donnees);
+        // Le message d'erreur éventuel sert à décider, jamais à être affiché tel quel ; seul un extrait masqué part au journal d'un échec.
+        return new ReponseDexPay($reponse->status(), $donnees, JournalDexPay::extrait($reponse->body()));
     }
 }

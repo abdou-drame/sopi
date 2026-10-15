@@ -8,6 +8,7 @@ use App\Exceptions\RetraitEchoueException;
 use App\Models\Prestataire;
 use App\Models\Retrait;
 use App\Services\Paiement\ContexteVersement;
+use App\Services\Paiement\DexPay\JournalDexPay;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -87,10 +88,14 @@ class RetraitService
 
                 return $retrait->refresh();
             }
-            Log::error('Retrait refusé par le prestataire de paiement : à vérifier (solde marchand, plafonds, compte).', [
-                'retrait_id' => $retrait->id,
-                'motif' => $resultat->motif,
-            ]);
+            JournalDexPay::erreur(
+                'dexpay.versement_echec',
+                'Retrait refusé par le prestataire de paiement : à vérifier (solde marchand, plafonds, compte).',
+                ['retrait_id' => $retrait->id, 'motif' => $resultat->motif],
+                null,
+                $resultat->statutHttp,
+                $resultat->extrait,
+            );
         } catch (Throwable $e) {
             return $this->resterEnCours($retrait, $e);
         }
@@ -156,10 +161,7 @@ class RetraitService
     /** Résultat ambigu : pas de recrédit ; journal sans donnée sensible (ni numéro, ni montant) ; le retrait reste EN_COURS. */
     private function resterEnCours(Retrait $retrait, Throwable $e): Retrait
     {
-        Log::error('Retrait au résultat incertain : laissé en cours, aucun recrédit.', [
-            'retrait_id' => $retrait->id,
-            'exception' => $e::class,
-        ]);
+        JournalDexPay::erreur('dexpay.versement_echec', 'Retrait au résultat incertain : laissé en cours, aucun recrédit.', ['retrait_id' => $retrait->id], $e);
 
         return $retrait->refresh();
     }

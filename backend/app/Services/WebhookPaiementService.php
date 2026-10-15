@@ -12,6 +12,7 @@ use App\Models\Reservation;
 use App\Models\Retrait;
 use App\Services\Paiement\CalculPaiement;
 use App\Services\Paiement\ContexteVersement;
+use App\Services\Paiement\DexPay\JournalDexPay;
 use App\Services\Paiement\EvenementPaiement;
 use App\Services\Paiement\GenreEvenement;
 use App\Services\Paiement\PaiementService;
@@ -49,12 +50,15 @@ class WebhookPaiementService
         try {
             $prestataire = app(PaiementService::class);
         } catch (ConfigurationPaiementInvalide $e) {
-            Log::error('Webhook de paiement impossible : pilote mal configuré.', ['erreur' => $e::class]);
+            JournalDexPay::erreur('webhook.configuration_invalide', 'Webhook de paiement impossible : pilote mal configuré.', [], $e);
 
             return [Response::HTTP_SERVICE_UNAVAILABLE, 'Le service de paiement est momentanément indisponible.'];
         }
 
         if (! $prestataire->verifierSignature($corpsBrut, $signature)) {
+            // Ni le corps, ni la signature reçue : le rejet seul est signalé.
+            Log::warning('webhook.signature_rejetee : signature du webhook de paiement refusée.', ['evenement' => 'webhook.signature_rejetee']);
+
             return [Response::HTTP_UNAUTHORIZED, 'Signature invalide.'];
         }
 
@@ -63,6 +67,13 @@ class WebhookPaiementService
         } catch (EvenementPaiementIllisible) {
             return [Response::HTTP_UNPROCESSABLE_ENTITY, 'Événement de paiement illisible.'];
         }
+
+        // Seuls le type d'événement et l'identifiant de paiement sont journalisés.
+        Log::info('webhook.evenement_recu : événement de paiement reçu.', [
+            'evenement' => 'webhook.evenement_recu',
+            'type' => $evenement->type ?? 'inconnu',
+            'paiement' => $evenement->reference !== '' ? $evenement->reference : null,
+        ]);
 
         if ($evenement->genre === GenreEvenement::Ignore) {
             return [Response::HTTP_OK, 'Événement ignoré.'];

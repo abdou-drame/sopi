@@ -19,7 +19,14 @@ final readonly class EvenementPaiement
         public ?StatutRetrait $statutVersement = null,
         public ?string $referenceMarchande = null,
         public ?string $retraitId = null,
+        public ?string $type = null,
     ) {}
+
+    /** Même événement, avec le type annoncé par le prestataire (« checkout.completed »…), pour le journal. */
+    public function avecType(string $type): self
+    {
+        return new self($this->reference, $this->statut, $this->montant, $this->genre, $this->statutVersement, $this->referenceMarchande, $this->retraitId, $type);
+    }
 
     /** Événement à acquitter sans rien faire. */
     public static function ignore(): self
