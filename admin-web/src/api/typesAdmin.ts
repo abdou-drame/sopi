@@ -211,6 +211,17 @@ export interface PaiementDetail extends PaiementAdmin {
   referenceDexpay: string | null
 }
 
+export interface NotificationEchec {
+  id: string
+  type: string
+  destinataire: { id: string; role: string | null }
+  canauxEnEchec: ('email' | 'push')[]
+  tentatives: number
+  classeErreur: string | null
+  messageErreur?: string | null
+  dateCreation: string
+}
+
 export interface RetraitListe {
   id: string
   prestataire: { id: string; userId: string; nomEntreprise: string }

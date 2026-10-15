@@ -21,7 +21,7 @@ describe('coque', () => {
     sessionStorage.clear()
   })
 
-  it('affiche le menu complet des 11 écrans de navigation', async () => {
+  it('affiche le menu complet des 12 écrans de navigation', async () => {
     simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
     afficherApplication('/')
     const nav = await screen.findByRole('navigation', { name: 'Navigation principale' })
@@ -37,6 +37,7 @@ describe('coque', () => {
       'Réservations',
       'Paiements',
       'Retraits',
+      'Notifications en échec',
       'Métiers',
     ])
   })

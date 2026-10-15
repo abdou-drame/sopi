@@ -8,6 +8,7 @@ import { LitigeDetailPage, LitigesListePage } from './pages/LitigesPages'
 import { ReservationsListePage, ReservationDetailPage } from './pages/ReservationsPages'
 import { PaiementsListePage, PaiementDetailPage } from './pages/PaiementsPages'
 import { RetraitsListePage, RetraitDetailPage } from './pages/RetraitsPages'
+import { NotificationEchecDetailPage, NotificationsEchecListePage } from './pages/NotificationsEchecPages'
 import AvisListePage from './pages/AvisPages'
 import MetiersPage from './pages/MetiersPage'
 import SanctionsListePage from './pages/SanctionsPages'
@@ -42,6 +43,8 @@ export default function Routage() {
             <Route path="/paiements/:id" element={<PaiementDetailPage />} />
             <Route path="/retraits" element={<RetraitsListePage />} />
             <Route path="/retraits/:id" element={<RetraitDetailPage />} />
+            <Route path="/notifications-en-echec" element={<NotificationsEchecListePage />} />
+            <Route path="/notifications-en-echec/:id" element={<NotificationEchecDetailPage />} />
             <Route path="/sanctions" element={<SanctionsListePage />} />
             <Route path="/utilisateurs" element={<UtilisateursListePage />} />
             <Route path="/utilisateurs/:id" element={<UtilisateurDetailPage />} />
