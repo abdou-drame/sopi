@@ -25,3 +25,6 @@ Schedule::command('sopi:sanctions:lever-expirees')->everyFiveMinutes()->withoutO
 
 // Envoi et reprise des notifications e-mail et push en attente (M10), chaque minute.
 Schedule::command('sopi:notifications:envoyer-en-attente')->everyMinute()->withoutOverlapping();
+
+// Réconciliation des retraits restés en cours avec DexPay (étape 1.1), toutes les 10 minutes.
+Schedule::command('sopi:retraits:reconcilier')->everyTenMinutes()->withoutOverlapping();

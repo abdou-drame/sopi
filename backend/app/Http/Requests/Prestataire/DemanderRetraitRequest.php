@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Prestataire;
 
+use App\Enums\OperateurRetrait;
 use App\Support\TelephoneSenegal;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DemanderRetraitRequest extends FormRequest
 {
@@ -26,6 +28,7 @@ class DemanderRetraitRequest extends FormRequest
             // « integer » : un décimal (« 5000.5 ») ou un texte est refusé. Les bornes viennent de la configuration.
             'montant' => ['required', 'integer', 'min:'.$this->minimum(), 'max:'.$this->maximum()],
             'telephone_versement' => ['required', 'string', 'regex:/^\+2217[05678]\d{7}$/'],
+            'operateur' => ['required', 'string', Rule::enum(OperateurRetrait::class)],
         ];
     }
 
@@ -40,6 +43,8 @@ class DemanderRetraitRequest extends FormRequest
             'montant.min' => "Le montant minimum d'un retrait est de {$minimum} FCFA.",
             'montant.max' => "Le montant maximum d'un retrait est de {$maximum} FCFA.",
             'telephone_versement.required' => 'Le numéro de versement est obligatoire.',
+            'operateur.required' => "L'opérateur du versement est obligatoire (wave ou orange_money).",
+            'operateur.enum' => "L'opérateur doit être wave ou orange_money.",
             'telephone_versement.regex' => 'Le numéro de versement doit être un mobile sénégalais valide (ex. : 77 123 45 67).',
         ];
     }
@@ -48,6 +53,7 @@ class DemanderRetraitRequest extends FormRequest
     {
         return [
             'montant' => ['description' => 'Montant à retirer, en FCFA (entier), entre le minimum et le maximum de la configuration.', 'example' => 5000],
+            'operateur' => ['description' => 'Opérateur mobile money qui reçoit le versement : `wave` ou `orange_money`.', 'example' => 'wave'],
             'telephone_versement' => ['description' => 'Mobile sénégalais (Wave ou Orange Money) qui reçoit le versement.', 'example' => '771234567'],
         ];
     }

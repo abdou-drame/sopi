@@ -55,7 +55,7 @@ describe('retraits — liste', function () {
         $reponse->assertJsonPath('data.0', [
             'id' => $retrait->id,
             'prestataire' => ['id' => $prestataire->id, 'userId' => $prestataire->user_id, 'nomEntreprise' => 'Garage Exemple'],
-            'montant' => 5000, 'statut' => 'reussi', 'bloque' => false, 'dateDemande' => '2030-01-20T08:00:00+00:00',
+            'montant' => 5000, 'statut' => 'reussi', 'operateur' => 'wave', 'bloque' => false, 'dateDemande' => '2030-01-20T08:00:00+00:00',
             'traiteLe' => '2030-01-20T08:05:00+00:00', 'recredite' => false, 'telephoneVersement' => '+221*******67',
         ]);
 
@@ -165,7 +165,7 @@ describe('retraits — détail', function () {
         $this->getJson(URL_RETRAITS_ADMIN.'/'.$retrait->id)->assertOk()->assertExactJson([
             'id' => $retrait->id,
             'prestataire' => ['id' => $prestataire->id, 'userId' => $prestataire->user_id, 'nomEntreprise' => 'Garage Exemple'],
-            'montant' => 5000, 'statut' => 'echoue', 'bloque' => false, 'dateDemande' => '2030-01-20T08:00:00+00:00',
+            'montant' => 5000, 'statut' => 'echoue', 'operateur' => 'wave', 'bloque' => false, 'dateDemande' => '2030-01-20T08:00:00+00:00',
             'traiteLe' => '2030-01-20T08:05:00+00:00', 'recredite' => true,
             'telephoneVersement' => '+221771234567', 'referenceDexpay' => 'DXP-RET-VISIBLE', 'recrediteLe' => '2030-01-20T08:06:00+00:00',
         ]);

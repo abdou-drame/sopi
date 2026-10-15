@@ -35,6 +35,7 @@ class RetraitAdminResource extends JsonResource
             'prestataire' => ['id' => $this->prestataire_id, 'userId' => $this->prestataire?->user_id, 'nomEntreprise' => $this->prestataire?->nom_entreprise],
             'montant' => PaiementAdminResource::montant($this->montant),
             'statut' => $this->statut->value,
+            'operateur' => $this->operateur?->value,
             'bloque' => $this->statut === StatutRetrait::EnCours && $this->created_at->lte(RetraitsAdminService::limiteBlocage()),
             'dateDemande' => $this->created_at->toIso8601String(),
             'traiteLe' => $this->traite_le?->toIso8601String(),

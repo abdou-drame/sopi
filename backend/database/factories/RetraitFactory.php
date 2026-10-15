@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OperateurRetrait;
 use App\Enums\StatutRetrait;
 use App\Models\Prestataire;
 use App\Models\Retrait;
@@ -22,6 +23,7 @@ class RetraitFactory extends Factory
             'montant' => '5000.00',
             'statut' => StatutRetrait::EnCours,
             'telephone_versement' => '+22177'.fake()->numerify('#######'),
+            'operateur' => OperateurRetrait::Wave,
             'reference_dexpay' => null,
             'traite_le' => null,
             'recredite_le' => null,
