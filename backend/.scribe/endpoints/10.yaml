@@ -53,6 +53,7 @@ endpoints:
         example: reservation_confirmee
         type: string
         enumValues:
+          - dossier_depose
           - demande_acceptee
           - demande_refusee
           - reservation_nouvelle_demande

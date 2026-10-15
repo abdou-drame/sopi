@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\Prestataire;
+use App\Services\SuiviDossierService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,7 +32,7 @@ class InscriptionPrestataireResource extends JsonResource
             'metier' => $this->metier,
             'statutCompte' => $this->user->statut->value,
             'jeton_suivi' => $this->jetonSuivi,
-            'lien_suivi' => rtrim(config('app.url'), '/').'/api/v1/suivi/'.$this->jetonSuivi,
+            'lien_suivi' => SuiviDossierService::lien($this->jetonSuivi),
             'justificatifs' => $this->justificatifs->map(fn ($justificatif) => [
                 'type' => $justificatif->type_document->value,
                 'statut' => $justificatif->statut->value,

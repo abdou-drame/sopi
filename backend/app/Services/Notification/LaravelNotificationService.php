@@ -16,7 +16,7 @@ use Throwable;
 
 class LaravelNotificationService implements NotificationService
 {
-    public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = [Canal::Email, Canal::Push]): ?Notification
+    public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = [Canal::Email, Canal::Push], ?string $secret = null): ?Notification
     {
         if ($utilisateur->role === Role::Administrateur) {
             return null;
@@ -34,6 +34,7 @@ class LaravelNotificationService implements NotificationService
         $notification->donnees = $donnees === [] ? null : $donnees;
         $notification->canal_email_statut = $email ? StatutEnvoi::EnAttente : StatutEnvoi::NonApplicable;
         $notification->canal_push_statut = $push ? StatutEnvoi::EnAttente : StatutEnvoi::NonApplicable;
+        $notification->definirSecret($email ? $secret : null);
         $notification->save();
 
         if ($email || $push) {
@@ -135,10 +136,11 @@ class LaravelNotificationService implements NotificationService
             }
         }
 
+        // Plus rien à envoyer : on libère la ligne et on efface le secret chiffré (envoi réussi ou échec définitif).
         Notification::query()->whereKey($id)
             ->where('canal_email_statut', '!=', StatutEnvoi::EnAttente->value)
             ->where('canal_push_statut', '!=', StatutEnvoi::EnAttente->value)
-            ->update(['prochain_essai_le' => null]);
+            ->update(['prochain_essai_le' => null, 'secret_chiffre' => null]);
     }
 
     /** Ne change que ce qui est encore en attente : un envoi déjà constaté n'est jamais écrasé. */

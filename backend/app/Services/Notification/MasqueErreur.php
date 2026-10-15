@@ -25,6 +25,8 @@ final class MasqueErreur
         }
         // Blocs de clé privée et adresses e-mail.
         $texte = (string) preg_replace('/-----BEGIN [A-Z ]*PRIVATE KEY-----.*?(-----END [A-Z ]*PRIVATE KEY-----|$)/s', self::MASQUE, $texte);
+        // Lien de suivi du dossier : le jeton fait partie du chemin.
+        $texte = (string) preg_replace('#/suivi/[^\s/?"<>]+#', '/suivi/'.self::MASQUE, $texte);
         $texte = (string) preg_replace('/[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+/', '[adresse masquée]', $texte);
 
         return JournalDexPay::extrait($texte);

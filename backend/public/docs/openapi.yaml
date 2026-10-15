@@ -2689,6 +2689,7 @@ paths:
             description: 'Type de notification, par exemple reservation_confirmee.'
             example: reservation_confirmee
             enum:
+              - dossier_depose
               - demande_acceptee
               - demande_refusee
               - reservation_nouvelle_demande
@@ -8735,7 +8736,7 @@ paths:
                   app: Sopi
                   version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-15T18:53:55+00:00'
+                  time: '2026-10-15T19:33:23+00:00'
                 properties:
                   status:
                     type: string
@@ -8751,7 +8752,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-15T18:53:55+00:00'
+                    example: '2026-10-15T19:33:23+00:00'
       tags:
         - Endpoints
       security: []

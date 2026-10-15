@@ -10,6 +10,12 @@ use App\Models\Prestataire;
  */
 class SuiviDossierService
 {
+    /** Lien personnel de suivi (route publique GET /api/v1/suivi/{jeton}). */
+    public static function lien(string $jeton): string
+    {
+        return rtrim(config('app.url'), '/').'/api/v1/suivi/'.$jeton;
+    }
+
     public function trouverParJeton(string $jeton): ?Prestataire
     {
         $prestataire = Prestataire::with(['user', 'justificatifs'])

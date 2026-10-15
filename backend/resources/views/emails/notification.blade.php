@@ -15,7 +15,13 @@
 <p style="margin:0 0 16px;font-size:14px;color:#475569;">{{ $accroche }}</p>
 <h1 style="margin:0 0 12px;font-size:18px;color:#1d4ed8;">{{ $titre }}</h1>
 <p style="margin:0 0 20px;font-size:15px;line-height:1.5;">{{ $corps }}</p>
+@if (! empty($lien))
+<p style="margin:0 0 20px;"><a href="{{ $lien }}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:6px;font-size:15px;font-weight:bold;">Suivre mon dossier</a></p>
+<p style="margin:0 0 12px;font-size:13px;color:#475569;word-break:break-all;">Si le bouton ne s'affiche pas, copiez ce lien dans votre navigateur : {{ $lien }}</p>
+<p style="margin:0;font-size:14px;color:#475569;">Ce lien est personnel : ne le partagez pas. Vous y suivrez la validation de votre compte (en attente, validé ou refusé).</p>
+@else
 <p style="margin:0;font-size:14px;color:#475569;">Ouvrez l'application Sopi pour voir le détail.</p>
+@endif
 </td></tr>
 <tr><td style="padding:16px 24px;background:#f8fafc;font-size:12px;color:#64748b;">Ce message est envoyé automatiquement, merci de ne pas y répondre. — L'équipe Sopi</td></tr>
 </table>
