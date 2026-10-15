@@ -2,11 +2,15 @@
 #
 # Nixpacks détecte une application Vite + React (monopage) et fait tout seul :
 #   - installation : npm ci ; build : npm run build (sortie dans dist/) ;
-#   - service statique avec Caddy, repli vers index.html pour toutes les routes,
-#     sur le port $PORT (3000 par défaut).
-# On ne redéfinit donc ni phases, ni commande de démarrage, ni NIXPACKS_SPA_OUTPUT_DIR.
+#   - service statique avec Caddy sur le port $PORT (3000 par défaut).
+# On ne redéfinit ni phases ni commande de démarrage.
+#
+# NIXPACKS_SPA_OUTPUT_DIR est fixé explicitement : Nixpacks sert alors dist/ en « application monopage »
+# (Caddy avec repli try_files {path} /index.html), donc recharger /revenus renvoie index.html et non une 404,
+# sans dépendre de la détection automatique.
 #
 # VITE_API_BASE_URL est lue AU BUILD : à fournir comme variable d'environnement dans Dokploy.
 
 [variables]
 NIXPACKS_NODE_VERSION = "22"
+NIXPACKS_SPA_OUTPUT_DIR = "dist"
