@@ -65,7 +65,7 @@ export function RetraitsListePage() {
           { cle: 'prestataire', type: 'texte', label: T.prestataire },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="retraits" charger={api.retraits} etat={etat} colonnes={colonnes} cleLigne={(r) => r.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="retraits" charger={api.retraits} etat={etat} colonnes={colonnes} cleLigne={(r) => r.id} lien={(r) => ({ vers: `/retraits/${r.id}`, nom: r.prestataire.nomEntreprise })} messageVide={T.vide} />
     </div>
   )
 }

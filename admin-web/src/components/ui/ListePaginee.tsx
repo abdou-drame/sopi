@@ -13,6 +13,8 @@ interface Props<T> {
   etat: FiltresUrl
   colonnes: Colonne<T>[]
   cleLigne: (ligne: T) => string
+  /** Adresse de la fiche de chaque ligne (ligne cliquable + bouton « Voir »). */
+  lien?: (ligne: T) => { vers: string; nom: string }
   messageVide?: string
 }
 
@@ -24,7 +26,7 @@ const LIGNES_API = 20
  * Liste paginée (10 lignes par page à l'écran, ordre fixé par le serveur) : requête, tableau, pagination et états vide / chargement / erreur.
  * Les filtres et la page viennent de l'adresse ; aucun tri côté client (l'API renvoie les plus récents d'abord).
  */
-export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes, cleLigne, messageVide }: Props<T>) {
+export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes, cleLigne, lien, messageVide }: Props<T>) {
   const pagesParPageApi = LIGNES_API / LIGNES_PAR_PAGE
   const pageApi = Math.ceil(etat.page / pagesParPageApi)
   const params = { ...etat.parametresApi }
@@ -49,6 +51,7 @@ export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes,
         colonnes={colonnes}
         lignes={lignes}
         cleLigne={cleLigne}
+        lien={lien}
         chargement={isPending}
         erreur={isError ? messageDErreur(error) : null}
         onReessayer={() => void refetch()}

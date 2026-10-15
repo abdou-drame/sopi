@@ -69,7 +69,7 @@ export function PaiementsListePage() {
           { cle: 'reservation', type: 'texte', label: T.reservation },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="paiements" charger={api.paiements} etat={etat} colonnes={colonnes} cleLigne={(p) => p.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="paiements" charger={api.paiements} etat={etat} colonnes={colonnes} cleLigne={(p) => p.id} lien={(p) => ({ vers: `/paiements/${p.id}`, nom: `Paiement ${p.reservationId.slice(0, 8)}` })} messageVide={T.vide} />
     </div>
   )
 }
