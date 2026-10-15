@@ -194,10 +194,10 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center p-4">
+    <div className="min-h-dvh">
       <FondArrierePlan />
-      <div className="animate-apparition grid w-full max-w-6xl gap-3 rounded-[2rem] bg-surface p-3 shadow-carte lg:h-[46rem] lg:grid-cols-2">
-        <main className="flex flex-col rounded-[1.5rem] border border-bordure p-8 sm:p-10">
+      <div className="animate-apparition grid min-h-dvh w-full lg:grid-cols-2">
+        <main className="flex flex-col bg-surface p-8 sm:p-10">
           <Marque />
           <form onSubmit={soumettre} noValidate className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-5 py-8">
             <div className="text-center">
@@ -261,7 +261,7 @@ export default function ConnexionPage() {
           <p className="text-center text-xs text-texte-discret">{L.connexion.droits}</p>
         </main>
 
-        <section aria-hidden="true" className="carte-sopi relative hidden flex-col overflow-hidden rounded-[1.5rem] text-white lg:flex">
+        <section aria-hidden="true" className="carte-sopi relative hidden flex-col overflow-hidden text-white lg:flex">
           <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgb(255_255_255/0.08)_1px,transparent_1px),linear-gradient(90deg,rgb(255_255_255/0.08)_1px,transparent_1px)] [background-size:56px_56px]" />
           <div className="relative flex flex-1 items-center justify-center px-8 pt-8">
             <Apercus />
