@@ -123,7 +123,7 @@ describe('résolution du pilote', function () {
     it('utilise fake par défaut et un secret vide par défaut quand les variables sont absentes', function () {
         $depot = Env::getRepository();
         $sauvegarde = [];
-        foreach (['PAYMENT_DRIVER', 'DEXPAY_WEBHOOK_SECRET'] as $nom) {
+        foreach (['PAYMENT_DRIVER', 'DEXPAY_SECRET_KEY'] as $nom) {
             $sauvegarde[$nom] = $depot->get($nom);
             $depot->clear($nom);
         }

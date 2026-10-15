@@ -58,12 +58,31 @@ return [
     | les montants à partir de ces taux. Valeurs initiales : un réglage administrable pourra venir plus tard.
     */
     'paiement' => [
-        // fake (tests, démonstration) ou dexpay (production, à partir de M6.6).
+        // fake (tests, démonstration) ou dexpay (production).
         'driver' => env('PAYMENT_DRIVER', 'fake'),
-        // Secret de signature HMAC des webhooks ; vide = aucune signature acceptée.
-        'webhook_secret' => env('DEXPAY_WEBHOOK_SECRET', ''),
-        // En-tête HTTP qui porte la signature HMAC-SHA256 du corps brut du webhook.
-        'signature_header' => env('PAYMENT_SIGNATURE_HEADER', 'X-Signature'),
+        // Secret de signature HMAC des webhooks : chez DexPay, c'est la clé secrète de l'API (aucun secret de webhook distinct).
+        // Vide = aucune signature acceptée.
+        'webhook_secret' => env('DEXPAY_SECRET_KEY', ''),
+        // En-tête HTTP qui porte la signature HMAC-SHA256 (hexadécimal) du corps brut du webhook.
+        'signature_header' => env('PAYMENT_SIGNATURE_HEADER', 'X-Webhook-Signature'),
+
+        // Pilote DexPay (PAYMENT_DRIVER=dexpay). Les clés sont des secrets : variables d'environnement du serveur uniquement.
+        'dexpay' => [
+            'base_url' => env('DEXPAY_BASE_URL', 'https://api.dexpay.africa/api/v1'),
+            'public_key' => env('DEXPAY_PUBLIC_KEY', ''),
+            'secret_key' => env('DEXPAY_SECRET_KEY', ''),
+            'country' => env('DEXPAY_COUNTRY', 'SN'),
+            'timeout_seconds' => (int) env('DEXPAY_TIMEOUT_SECONDS', 15),
+            // Facteur appliqué au montant en FCFA avant l'envoi (1 = FCFA entiers ; 100 si le bac à sable attend des centimes).
+            'amount_factor' => (int) env('DEXPAY_AMOUNT_FACTOR', 1),
+            // Champs de destination_details qui portent l'opérateur du versement (liste séparée par des virgules).
+            'payout_operator_fields' => env('DEXPAY_PAYOUT_OPERATOR_FIELDS', 'operator'),
+            // Opérateur de Sopi => code d'opérateur de versement DexPay.
+            'operateurs' => [
+                'wave' => env('DEXPAY_OPERATEUR_WAVE', 'wave_sn_payout'),
+                'orange_money' => env('DEXPAY_OPERATEUR_ORANGE_MONEY', 'orange_money_sn_payout'),
+            ],
+        ],
 
         // Reprise des remboursements en échec (M6.5) : essais maximum et délai minimal entre deux essais.
         'remboursement_max_tentatives' => (int) env('PAIEMENT_REMBOURSEMENT_MAX_TENTATIVES', 10),

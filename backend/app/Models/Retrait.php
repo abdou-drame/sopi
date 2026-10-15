@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OperateurRetrait;
 use App\Enums\StatutRetrait;
 use Database\Factories\RetraitFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -30,6 +31,7 @@ class Retrait extends Model
     {
         return [
             'statut' => StatutRetrait::class,
+            'operateur' => OperateurRetrait::class,
             'montant' => 'decimal:2',
             'traite_le' => 'datetime',
             'recredite_le' => 'datetime',

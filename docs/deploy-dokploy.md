@@ -60,8 +60,10 @@ Coller le contenu de `.secrets/backend.env` dans l'onglet « Environment » du s
 | `DB_CONNECTION=pgsql`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME` | Connexion à `sopi-db` |
 | `DB_PASSWORD` | Mot de passe PostgreSQL (**secret**) |
 | `CACHE_STORE=database`, `QUEUE_CONNECTION=database`, `SESSION_DRIVER=array` | Pilotes cache, files d'attente, sessions |
-| `PAYMENT_DRIVER` | `fake` tant que DexPay n'est pas branché, puis `dexpay` |
-| `DEXPAY_BASE_URL`, `DEXPAY_API_KEY`, `DEXPAY_WEBHOOK_SECRET` | Paiement DexPay (**secrets**, vides pour l'instant) |
+| `PAYMENT_DRIVER` | `fake` par défaut, `dexpay` pour le vrai paiement |
+| `DEXPAY_PUBLIC_KEY`, `DEXPAY_SECRET_KEY` | Clés DexPay (**secrets**). La clé secrète signe aussi les webhooks : il n'y a pas de secret de webhook distinct |
+| `DEXPAY_BASE_URL` (défaut `https://api.dexpay.africa/api/v1` ; bac à sable : `https://api-sandbox.dexpay.africa/api/v1`), `DEXPAY_COUNTRY` (`SN`), `DEXPAY_TIMEOUT_SECONDS` (`15`), `DEXPAY_AMOUNT_FACTOR` (`1`) | Réglages DexPay |
+| `DEXPAY_PAYOUT_OPERATOR_FIELDS`, `DEXPAY_OPERATEUR_WAVE`, `DEXPAY_OPERATEUR_ORANGE_MONEY`, `PAYMENT_SIGNATURE_HEADER` | Optionnels : champs et codes d'opérateur du versement, en-tête de signature (`X-Webhook-Signature`) |
 | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | E-mail SMTP (`log` tant que le SMTP n'est pas configuré) |
 | `FCM_CREDENTIALS` | Identifiants Firebase pour les notifications push (**secret**, vide pour l'instant) |
 | `ADMIN_NOM`, `ADMIN_PRENOM`, `ADMIN_TELEPHONE`, `ADMIN_EMAIL` (optionnel), `ADMIN_PASSWORD` | Premier administrateur, lu uniquement par la commande `php artisan sopi:creer-admin` (**secret** pour le mot de passe) ; voir la section 4b |

@@ -81,7 +81,7 @@ function appelerWebhook(string $corps, ?string $signature = 'auto'): TestRespons
     $serveur = ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'];
     $signature = $signature === 'auto' ? signerWebhook($corps) : $signature;
     if ($signature !== null) {
-        $serveur['HTTP_X_SIGNATURE'] = $signature;
+        $serveur['HTTP_X_WEBHOOK_SIGNATURE'] = $signature;
     }
 
     return test()->call('POST', URL_WEBHOOK, [], [], [], $serveur, $corps);

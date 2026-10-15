@@ -64,7 +64,7 @@ describe('solde du prestataire', function () {
 describe('table retraits', function () {
     it('a les colonnes prévues', function () {
         expect(Schema::getColumnListing('retraits'))->toEqualCanonicalizing([
-            'id', 'prestataire_id', 'montant', 'statut', 'telephone_versement', 'reference_dexpay', 'traite_le', 'recredite_le', 'created_at', 'updated_at',
+            'id', 'prestataire_id', 'montant', 'statut', 'telephone_versement', 'operateur', 'reference_dexpay', 'traite_le', 'recredite_le', 'created_at', 'updated_at',
         ]);
     });
 

@@ -69,7 +69,7 @@ function evenementPaye(Paiement $paiement): TestResponse
     $corps = json_encode(['reference' => $paiement->reference_dexpay, 'statut' => 'reussi', 'montant' => '4500.00']);
 
     return test()->call('POST', '/api/v1/webhooks/paiement', [], [], [], [
-        'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json', 'HTTP_X_SIGNATURE' => hash_hmac('sha256', $corps, SECRET_DUS_TEST),
+        'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json', 'HTTP_X_WEBHOOK_SIGNATURE' => hash_hmac('sha256', $corps, SECRET_DUS_TEST),
     ], $corps);
 }
 
