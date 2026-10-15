@@ -28,6 +28,8 @@ backend/database/*.sqlite-journal
 # --- Node (admin-web/) ---
 node_modules/
 dist/
+admin-web/test-results/
+admin-web/playwright-report/
 coverage/
 npm-debug.log*
 yarn-error.log*
