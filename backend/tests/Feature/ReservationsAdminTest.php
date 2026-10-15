@@ -240,7 +240,7 @@ describe('réservations — détail', function () {
             'motifRefus' => null,
             'paiement' => [
                 'id' => $paiement->id, 'statut' => 'reussi', 'montantAcompte' => 3000, 'commission' => 1000, 'remboursementDu' => false, 'remboursementDuLe' => null,
-                'tentativesRemboursement' => 0, 'tentativesEpuisees' => false, 'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => '2030-01-21T10:05:00+00:00',
+                'tentativesRemboursement' => 0, 'tentativesEpuisees' => false, 'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => '2030-01-21T10:05:00+00:00', 'remboursementDerniereErreur' => null,
             ],
             'nombrePaiements' => 1,
             'avis' => ['id' => $avis->id, 'note' => 4, 'statut' => 'publie', 'dateCreation' => '2030-01-21T12:00:00+00:00'],

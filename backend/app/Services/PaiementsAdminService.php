@@ -17,7 +17,7 @@ class PaiementsAdminService
 {
     public const PAR_PAGE = 20;
 
-    private const COLONNES = ['id', 'reservation_id', 'statut', 'montant_acompte', 'commission', 'paye_le', 'rembourse_le', 'remboursement_du_le', 'remboursement_tentatives', 'credite_le', 'created_at', 'updated_at'];
+    private const COLONNES = ['id', 'reservation_id', 'statut', 'montant_acompte', 'commission', 'paye_le', 'rembourse_le', 'remboursement_du_le', 'remboursement_tentatives', 'remboursement_derniere_erreur', 'credite_le', 'created_at', 'updated_at'];
 
     /**
      * @param  array{statut?: ?string, remboursementDu?: ?bool, retardRemboursementMinutes?: ?int, reservation?: ?string}  $filtres

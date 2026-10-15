@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StatutPaiement;
+use App\Exceptions\DexPayErreur;
 use App\Models\Paiement;
 use App\Services\Paiement\DexPay\JournalDexPay;
 use App\Services\Paiement\PaiementService;
@@ -81,6 +82,8 @@ class RemboursementPaiementService
 
     private function journaliser(Paiement $paiement, ?Throwable $e = null, ?ResultatOperation $resultat = null): void
     {
+        $this->noterErreur($paiement, $e, $resultat);
+
         JournalDexPay::erreur(
             'dexpay.remboursement_echec',
             'Échec du remboursement d\'un paiement.',
@@ -89,5 +92,20 @@ class RemboursementPaiementService
             $resultat?->statutHttp,
             $resultat?->extrait ?? '',
         );
+    }
+
+    /** « HTTP 400 (http_400) : extrait masqué », 300 caractères au plus, sans clé, jeton ni numéro (mêmes règles que le journal). */
+    private function noterErreur(Paiement $paiement, ?Throwable $e, ?ResultatOperation $resultat): void
+    {
+        try {
+            $code = $resultat?->statutHttp ?? ($e instanceof DexPayErreur ? $e->statutHttp : null);
+            $motif = $resultat?->motif ?? ($e !== null ? class_basename($e) : 'erreur');
+            $extrait = $resultat?->extrait ?? ($e instanceof DexPayErreur ? $e->extrait : '');
+
+            $texte = ($code !== null ? 'HTTP '.$code.' ('.$motif.')' : $motif).($extrait !== '' ? ' : '.$extrait : '');
+            $paiement->noterErreurRemboursement(JournalDexPay::extrait($texte));
+        } catch (Throwable) {
+            // La note est un confort de diagnostic : elle ne doit jamais empêcher la reprise du remboursement.
+        }
     }
 }

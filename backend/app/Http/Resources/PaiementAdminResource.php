@@ -70,6 +70,7 @@ class PaiementAdminResource extends JsonResource
             'payeLe' => $paiement->paye_le?->toIso8601String(),
             'rembourseLe' => $paiement->rembourse_le?->toIso8601String(),
             'crediteLe' => $paiement->credite_le?->toIso8601String(),
+            'remboursementDerniereErreur' => $paiement->remboursement_derniere_erreur,
         ];
     }
 
