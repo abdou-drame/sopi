@@ -34,6 +34,7 @@ class NotificationEnEchecAdminResource extends JsonResource
             'canauxEnEchec' => $canaux,
             'tentatives' => $this->tentatives,
             'classeErreur' => $this->dernier_echec_classe,
+            'messageErreur' => $this->dernier_echec_message,
             'dateCreation' => $this->created_at->toIso8601String(),
         ];
     }

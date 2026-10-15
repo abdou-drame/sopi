@@ -93,6 +93,7 @@ class LaravelNotificationService implements NotificationService
 
         $notification = Notification::query()->with('user')->findOrFail($id);
         $echec = null;
+        $message = null;
 
         foreach ([Canal::Email, Canal::Push] as $canal) {
             $colonne = "canal_{$canal->value}_statut";
@@ -108,22 +109,23 @@ class LaravelNotificationService implements NotificationService
                 $this->changerStatut($id, $colonne, StatutEnvoi::Envoye);
             } catch (Throwable $e) {
                 $echec = $e::class;
+                $message = MasqueErreur::message($e);
                 // Seul l'identifiant et la classe de l'erreur sont journalisés : jamais d'adresse, de jeton ni de texte.
                 Log::warning('Échec d\'envoi de notification.', ['notification' => $id, 'canal' => $canal->value, 'erreur' => $echec]);
             }
         }
 
-        $this->clore($id, (int) $notification->tentatives, $echec);
+        $this->clore($id, (int) $notification->tentatives, $echec, $message);
     }
 
     /** Après un passage : abandonne les canaux restants au maximum d'essais, libère la ligne quand il n'y a plus rien à envoyer. */
-    private function clore(string $id, int $tentativesLues, ?string $echec): void
+    private function clore(string $id, int $tentativesLues, ?string $echec, ?string $message = null): void
     {
         // $tentativesLues vient de la relecture faite après la réservation de la ligne : elle inclut déjà cet essai.
         $maximum = (int) config('sopi.notifications.max_tentatives');
 
         if ($echec !== null) {
-            Notification::query()->whereKey($id)->update(['dernier_echec_classe' => mb_substr($echec, 0, 150)]);
+            Notification::query()->whereKey($id)->update(['dernier_echec_classe' => mb_substr($echec, 0, 150), 'dernier_echec_message' => $message]);
         }
 
         if ($echec !== null && $tentativesLues >= $maximum) {
