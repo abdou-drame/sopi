@@ -51,7 +51,7 @@ describe('paiements — liste', function () {
         $reponse->assertJsonPath('data.0', [
             'id' => $paiement->id, 'reservationId' => $paiement->reservation_id, 'statut' => 'reussi', 'montantAcompte' => 3000, 'commission' => 1000,
             'remboursementDu' => true, 'remboursementDuLe' => '2030-01-20T10:00:00+00:00', 'tentativesRemboursement' => 3, 'tentativesEpuisees' => false,
-            'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => null,
+            'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => null, 'remboursementDerniereErreur' => null,
         ]);
 
         $corps = strtolower($reponse->getContent());
@@ -180,7 +180,7 @@ describe('paiements — détail', function () {
         $reponse->assertExactJson([
             'id' => $paiement->id, 'reservationId' => $reservation->id, 'statut' => 'reussi', 'montantAcompte' => 3000, 'commission' => 1000,
             'remboursementDu' => true, 'remboursementDuLe' => '2030-01-20T10:00:00+00:00', 'tentativesRemboursement' => 10, 'tentativesEpuisees' => true,
-            'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => '2030-01-20T11:00:00+00:00',
+            'payeLe' => '2030-01-20T09:00:00+00:00', 'rembourseLe' => null, 'crediteLe' => '2030-01-20T11:00:00+00:00', 'remboursementDerniereErreur' => null,
             'reservation' => [
                 'id' => $reservation->id, 'statut' => 'annulee', 'prixApplique' => 10000, 'clientId' => $reservation->client_id,
                 'prestataireId' => $reservation->creneau->prestataire_id,

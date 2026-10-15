@@ -133,9 +133,15 @@ class Paiement extends Model
         $modifies = static::query()
             ->whereKey($this->getKey())
             ->whereIn('statut', array_map(fn (StatutPaiement $s) => $s->value, $depuis))
-            ->update(['statut' => StatutPaiement::Rembourse->value, 'rembourse_le' => now(), 'updated_at' => now()]);
+            ->update(['statut' => StatutPaiement::Rembourse->value, 'rembourse_le' => now(), 'remboursement_derniere_erreur' => null, 'updated_at' => now()]);
 
         return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Garde la cause (code HTTP + extrait masqué, déjà bornés) du dernier remboursement échoué, pour l'administrateur. */
+    public function noterErreurRemboursement(string $erreur): void
+    {
+        static::query()->whereKey($this->getKey())->update(['remboursement_derniere_erreur' => $erreur, 'updated_at' => now()]);
     }
 
     /**

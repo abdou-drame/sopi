@@ -25,7 +25,7 @@ class ReservationsAdminService
     private const COLONNES = ['reservations.id', 'client_id', 'creneau_id', 'prestation_id', 'prix_applique', 'statut', 'motif_refus', 'acceptee_le', 'reservations.created_at', 'reservations.updated_at'];
 
     /** Colonnes du paiement : jamais reference_dexpay ni url_paiement. */
-    private const COLONNES_PAIEMENT = ['id', 'reservation_id', 'statut', 'montant_acompte', 'commission', 'paye_le', 'rembourse_le', 'remboursement_du_le', 'remboursement_tentatives', 'credite_le', 'created_at'];
+    private const COLONNES_PAIEMENT = ['id', 'reservation_id', 'statut', 'montant_acompte', 'commission', 'paye_le', 'rembourse_le', 'remboursement_du_le', 'remboursement_tentatives', 'remboursement_derniere_erreur', 'credite_le', 'created_at'];
 
     /**
      * @param  array{statut?: ?string, prestataire?: ?string, client?: ?string, q?: ?string, debut?: ?Carbon, fin?: ?Carbon}  $filtres  `fin` : borne haute exclue
