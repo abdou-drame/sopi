@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\StatutEnvoi;
-use App\Models\Notification;
+use App\Enums\PlateformeAppareil;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -14,34 +13,21 @@ use Illuminate\Support\Facades\DB;
  */
 class JetonPushService
 {
+    public function __construct(private readonly AppareilService $appareils) {}
+
+    /** Ancienne route PUT /me/jeton-push : la plateforme n'est pas connue, android par défaut. Les clients récents utilisent POST /appareils. */
     public function enregistrer(User $utilisateur, string $jeton): void
     {
         DB::transaction(function () use ($utilisateur, $jeton) {
-            $anciens = User::query()->where('jeton_push', $jeton)->where('id', '!=', $utilisateur->id)->pluck('id');
-            if ($anciens->isNotEmpty()) {
-                User::query()->whereIn('id', $anciens)->update(['jeton_push' => null]);
-                $this->abandonnerPushEnAttente($anciens->all());
-            }
-
+            $this->appareils->enregistrer($utilisateur, $jeton, PlateformeAppareil::Android);
             $utilisateur->forceFill(['jeton_push' => $jeton])->save();
         });
     }
 
-    /** Retire le jeton (déconnexion de l'appareil, notifications push désactivées). Sans effet si aucun jeton n'est enregistré. */
+    /** Retire tous les jetons de l'utilisateur (notifications push désactivées). Sans effet si aucun jeton n'est enregistré. */
     public function retirer(User $utilisateur): void
     {
-        DB::transaction(function () use ($utilisateur) {
-            $utilisateur->forceFill(['jeton_push' => null])->save();
-            $this->abandonnerPushEnAttente([$utilisateur->id]);
-        });
-    }
-
-    /** Sans jeton, les push encore en attente n'ont plus de destination : ils sont abandonnés (l'in-app et l'e-mail restent). */
-    private function abandonnerPushEnAttente(array $idsUtilisateurs): void
-    {
-        Notification::query()
-            ->whereIn('user_id', $idsUtilisateurs)
-            ->where('canal_push_statut', StatutEnvoi::EnAttente->value)
-            ->update(['canal_push_statut' => StatutEnvoi::NonApplicable->value]);
+        $this->appareils->retirerTous($utilisateur);
+        $utilisateur->refresh();
     }
 }

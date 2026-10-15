@@ -17,7 +17,7 @@ class NotificationsEnEchecAdminService
 {
     public const PAR_PAGE = 20;
 
-    private const COLONNES = ['id', 'user_id', 'type', 'canal_email_statut', 'canal_push_statut', 'tentatives', 'dernier_echec_classe', 'created_at'];
+    private const COLONNES = ['id', 'user_id', 'type', 'canal_email_statut', 'canal_push_statut', 'tentatives', 'dernier_echec_classe', 'dernier_echec_message', 'created_at'];
 
     /**
      * @param  array{canal?: ?string, type?: ?string, ancienneteMinutes?: ?int}  $filtres

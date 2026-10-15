@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "e06c0970-3705-4e02-928f-40571dfe71bb",
+        "_postman_id": "09a59d7b-35a7-4de4-a57b-76ca16843401",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -2137,6 +2137,99 @@
             ]
         },
         {
+            "name": "Appareils",
+            "description": "\nAppareils recevant les notifications push (jeton FCM). Client et prestataire uniquement. Le jeton n'est jamais renvoy\u00e9.",
+            "item": [
+                {
+                    "name": "Enregistrer mon appareil",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/appareils",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/appareils"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"jeton\":\"fcm-jeton-exemple-0123456789\",\"plateforme\":\"android\"}"
+                        },
+                        "description": "Enregistre ou met \u00e0 jour le jeton FCM de l'appareil. Un jeton n'appartient qu'\u00e0 un compte : s'il \u00e9tait \u00e0 un autre\nutilisateur, il lui est retir\u00e9 (le dernier connect\u00e9 l'emporte). R\u00e9serv\u00e9 aux comptes actifs."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"message\":\"Appareil enregistr\u00e9.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Votre compte n'est pas actif : les notifications ne peuvent pas \u00eatre activ\u00e9es.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 422,
+                            "body": "{\"message\":\"La plateforme doit \u00eatre android ou ios.\",\"errors\":{\"plateforme\":[\"La plateforme doit \u00eatre android ou ios.\"]}}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Retirer mon appareil",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/appareils\/:jeton",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/appareils\/:jeton",
+                            "variable": [
+                                {
+                                    "id": "jeton",
+                                    "key": "jeton",
+                                    "value": "fcm-jeton-exemple-0123456789",
+                                    "description": "Jeton FCM de l'appareil."
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "\u00c0 appeler \u00e0 la d\u00e9connexion. Sans effet (200) si le jeton n'est pas \u00e0 vous ou n'existe pas."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"message\":\"Appareil retir\u00e9.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "name": "Client \u2014 agenda d'un prestataire",
             "description": "\nRoutes r\u00e9serv\u00e9es aux clients (jeton Sanctum + r\u00f4le `client`). Seuls les prestataires dont le compte est actif sont visibles.",
             "item": [
@@ -3377,7 +3470,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T02:00:39+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T18:53:55+00:00\"}",
                             "name": ""
                         }
                     ]

@@ -247,8 +247,8 @@ it('choisit les pilotes selon la configuration', function () {
     expect(app(EnvoiEmail::class))->toBeInstanceOf(LogEnvoiEmail::class)
         ->and(app(EnvoiPush::class))->toBeInstanceOf(LogEnvoiPush::class);
 
-    config(['sopi.notifications.push_driver' => 'fcm']);
-    expect(fn () => app(EnvoiPush::class))->toThrow(ConfigurationNotificationInvalide::class, 'pas encore disponible');
+    config(['sopi.notifications.push_driver' => 'fcm', 'sopi.notifications.fcm.credentials' => null]);
+    expect(fn () => app(EnvoiPush::class))->toThrow(ConfigurationNotificationInvalide::class, 'FCM_CREDENTIALS');
 
     config(['sopi.notifications.email_driver' => 'x']);
     expect(fn () => app(EnvoiEmail::class))->toThrow(ConfigurationNotificationInvalide::class, 'inconnu');

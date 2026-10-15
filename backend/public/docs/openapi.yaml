@@ -41,6 +41,9 @@ tags:
     name: 'Administration — utilisateurs'
     description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les comptes administrateurs ne sont\njamais listés ni ouverts (404). Nom, e-mail et téléphone sont visibles (supervision) ; jamais de mot de passe ni de jeton."
   -
+    name: Appareils
+    description: "\nAppareils recevant les notifications push (jeton FCM). Client et prestataire uniquement. Le jeton n'est jamais renvoyé."
+  -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -6086,6 +6089,111 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/appareils:
+    post:
+      summary: 'Enregistrer mon appareil'
+      operationId: enregistrerMonAppareil
+      description: "Enregistre ou met à jour le jeton FCM de l'appareil. Un jeton n'appartient qu'à un compte : s'il était à un autre\nutilisateur, il lui est retiré (le dernier connecté l'emporte). Réservé aux comptes actifs."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Appareil enregistré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Appareil enregistré.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Votre compte n'est pas actif : les notifications ne peuvent pas être activées."
+                properties:
+                  message:
+                    type: string
+                    example: "Votre compte n'est pas actif : les notifications ne peuvent pas être activées."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'La plateforme doit être android ou ios.'
+                  errors:
+                    plateforme:
+                      - 'La plateforme doit être android ou ios.'
+                properties:
+                  message:
+                    type: string
+                    example: 'La plateforme doit être android ou ios.'
+                  errors:
+                    type: object
+                    properties:
+                      plateforme:
+                        type: array
+                        example:
+                          - 'La plateforme doit être android ou ios.'
+                        items:
+                          type: string
+      tags:
+        - Appareils
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jeton:
+                  type: string
+                  description: "Jeton FCM de l'appareil."
+                  example: fcm-jeton-exemple-0123456789
+                plateforme:
+                  type: string
+                  description: 'android ou ios.'
+                  example: android
+              required:
+                - jeton
+                - plateforme
+  '/api/v1/appareils/{jeton}':
+    delete:
+      summary: 'Retirer mon appareil'
+      operationId: retirerMonAppareil
+      description: "À appeler à la déconnexion. Sans effet (200) si le jeton n'est pas à vous ou n'existe pas."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Appareil retiré.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Appareil retiré.'
+      tags:
+        - Appareils
+    parameters:
+      -
+        in: path
+        name: jeton
+        description: "Jeton FCM de l'appareil."
+        example: fcm-jeton-exemple-0123456789
+        required: true
+        schema:
+          type: string
   '/api/v1/prestataires/{id}/agenda':
     get:
       summary: "Créneaux disponibles d'un prestataire"
@@ -8627,7 +8735,7 @@ paths:
                   app: Sopi
                   version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-15T02:00:39+00:00'
+                  time: '2026-10-15T18:53:55+00:00'
                 properties:
                   status:
                     type: string
@@ -8643,7 +8751,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-15T02:00:39+00:00'
+                    example: '2026-10-15T18:53:55+00:00'
       tags:
         - Endpoints
       security: []

@@ -68,6 +68,7 @@ describe('notifications en échec — liste', function () {
             'canauxEnEchec' => ['email', 'push'],
             'tentatives' => 5,
             'classeErreur' => 'TransportException',
+            'messageErreur' => null,
             'dateCreation' => '2030-01-20T08:00:00+00:00',
         ]);
     });
@@ -94,7 +95,7 @@ describe('notifications en échec — liste', function () {
             expect($corps)->not->toContain($interdit);
         }
         $ligne = $this->getJson(URL_NOTIFICATIONS_ECHEC)->json('data.0');
-        expect(array_keys($ligne))->toBe(['id', 'type', 'destinataire', 'canauxEnEchec', 'tentatives', 'classeErreur', 'dateCreation'])
+        expect(array_keys($ligne))->toBe(['id', 'type', 'destinataire', 'canauxEnEchec', 'tentatives', 'classeErreur', 'messageErreur', 'dateCreation'])
             ->and(array_keys($ligne['destinataire']))->toBe(['id', 'role']);
     });
 
@@ -205,6 +206,7 @@ describe('notifications en échec — détail', function () {
             'canauxEnEchec' => ['email'],
             'tentatives' => 3,
             'classeErreur' => 'TransportException',
+            'messageErreur' => null,
             'dateCreation' => '2030-01-20T08:00:00+00:00',
         ]);
         expect($reponse->getContent())->not->toContain('confidentiel');

@@ -51,6 +51,11 @@ class User extends Authenticatable
     }
 
     /** Réservations faites en tant que client. */
+    public function appareils(): HasMany
+    {
+        return $this->hasMany(Appareil::class);
+    }
+
     public function reservations(): HasMany
     {
         return $this->hasMany(Reservation::class, 'client_id');

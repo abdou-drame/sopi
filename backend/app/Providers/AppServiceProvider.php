@@ -23,6 +23,7 @@ use App\Exceptions\ConfigurationPaiementInvalide;
 use App\Listeners\NotifierLesUtilisateurs;
 use App\Services\Notification\EnvoiEmail;
 use App\Services\Notification\EnvoiPush;
+use App\Services\Notification\FcmEnvoiPush;
 use App\Services\Notification\LaravelNotificationService;
 use App\Services\Notification\LogEnvoiEmail;
 use App\Services\Notification\LogEnvoiPush;
@@ -60,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->bind(EnvoiPush::class, fn () => match ($pilote = (string) config('sopi.notifications.push_driver')) {
             'log' => new LogEnvoiPush,
-            'fcm' => throw new ConfigurationNotificationInvalide('Le service de notifications push FCM n\'est pas encore disponible.'),
+            'fcm' => FcmEnvoiPush::depuisConfiguration(),
             default => throw new ConfigurationNotificationInvalide("Le pilote push « {$pilote} » est inconnu (valeurs possibles : log, fcm)."),
         });
     }
@@ -112,6 +113,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('sanction', fn (Request $request) => Limit::perMinute(10)->by($parUtilisateur($request)));
         // Ouverture d'un litige par le client, réponse du prestataire et décision de l'administrateur.
         RateLimiter::for('litige', fn (Request $request) => Limit::perMinute(5)->by($parUtilisateur($request)));
+        RateLimiter::for('appareils', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
         RateLimiter::for('jeton-push', fn (Request $request) => Limit::perMinute(30)->by($parUtilisateur($request)));
         RateLimiter::for('notifications', fn (Request $request) => Limit::perMinute(60)->by($parUtilisateur($request)));
 

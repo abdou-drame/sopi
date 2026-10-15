@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\Admin\RevenusController;
 use App\Http\Controllers\Api\V1\Admin\SanctionController as AdminSanctionController;
 use App\Http\Controllers\Api\V1\Admin\TableauDeBordController;
 use App\Http\Controllers\Api\V1\Admin\UtilisateurController;
+use App\Http\Controllers\Api\V1\AppareilController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\Client\AgendaPrestataireController;
 use App\Http\Controllers\Api\V1\Client\AvisPrestataireController;
@@ -182,6 +183,12 @@ Route::prefix('v1')->group(function () {
         Route::put('/mot-de-passe', 'changerMotDePasse')->middleware('throttle:mot-de-passe');
         Route::put('/jeton-push', 'enregistrerJetonPush')->middleware('throttle:jeton-push');
         Route::delete('/jeton-push', 'retirerJetonPush')->middleware('throttle:jeton-push');
+    });
+
+    // Appareils push (FCM) : client et prestataire. L'administrateur ne reçoit ni e-mail ni push (RG35).
+    Route::middleware(['auth:sanctum', 'role:client,prestataire'])->prefix('appareils')->controller(AppareilController::class)->group(function () {
+        Route::post('/', 'enregistrer')->middleware('throttle:appareils');
+        Route::delete('/{jeton}', 'retirer')->middleware('throttle:appareils')->where('jeton', '[^/]+');
     });
 
     // Notifications dans l'application (M10.3) : client et prestataire. L'administrateur n'en reçoit pas (403).
