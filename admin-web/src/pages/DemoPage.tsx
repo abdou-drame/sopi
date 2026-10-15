@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import BasculeGelules from '../components/ui/BasculeGelules'
 import BoutonRond from '../components/ui/BoutonRond'
+import FondArrierePlan from '../components/ui/FondArrierePlan'
 import DerniersPaiements from '../components/ui/DerniersPaiements'
 import LienGelule from '../components/ui/LienGelule'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
@@ -92,6 +93,17 @@ export default function DemoPage() {
               <span className="size-3 rounded-full" style={{ background: `var(--color-${t})` }} />
               {t}
             </span>
+          ))}
+        </div>
+      </Section>
+
+      <Section titre="Fond">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {(['clair', 'sombre'] as const).map((v) => (
+            <div key={v} className="relative isolate h-56 overflow-hidden rounded-grand border border-bordure">
+              <FondArrierePlan variante={v} />
+              <p className="relative m-4 w-fit rounded-moyen bg-surface px-4 py-2 text-sm text-texte shadow-carte">Fond {v}</p>
+            </div>
           ))}
         </div>
       </Section>

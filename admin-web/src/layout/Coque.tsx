@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { compteursParEcran, useAlertes } from '../api/useAlertes'
 import BasculeTheme from '../theme/BasculeTheme'
 import Infobulle from '../components/ui/Infobulle'
+import FondArrierePlan from '../components/ui/FondArrierePlan'
 import { IconeChevronBas, IconeCloche, IconeDeconnexion } from '../components/ui/Icones'
 import { useAuth } from '../auth/AuthContext'
 import { L } from '../i18n/libelles'
@@ -192,6 +193,7 @@ export default function Coque() {
 
   return (
     <HoteEnTete.Provider value={hote}>
+      <FondArrierePlan />
       <div className="mx-auto flex h-dvh max-w-[110rem] flex-col px-4 pt-4">
         <a
           href="#contenu"

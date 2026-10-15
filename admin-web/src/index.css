@@ -190,6 +190,114 @@
 }
 
 /*
+ * Fond d'arrière-plan : couleur de page et trois taches floues (bleu, cyan, violet), valeurs claire et sombre.
+ * `.apercu-fond-*` applique les mêmes jetons à un cadre de la page de démonstration.
+ */
+:root,
+.apercu-fond-clair {
+  --fond-page: var(--color-fond);
+  --fond-tache-bleu: rgb(180 204 243 / 0.55);
+  --fond-tache-cyan: rgb(150 222 240 / 0.38);
+  --fond-tache-violet: rgb(206 188 246 / 0.3);
+}
+:root[data-theme="dark"],
+.apercu-fond-sombre {
+  --fond-page: color-mix(in srgb, var(--color-primaire-900) 45%, black);
+  --fond-tache-bleu: rgb(59 120 220 / 0.42);
+  --fond-tache-cyan: rgb(34 190 225 / 0.28);
+  --fond-tache-violet: rgb(139 92 246 / 0.34);
+}
+
+/* Couche fixe derrière tout le contenu ; les taches dérivent très lentement (transform uniquement) */
+.fond-sopi {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--fond-page);
+}
+.fond-sopi--apercu {
+  position: absolute;
+  z-index: 0;
+}
+.fond-tache {
+  position: absolute;
+  border-radius: 9999px;
+  animation: derive-fond var(--duree-derive) ease-in-out infinite alternate;
+}
+.fond-tache--bleu {
+  --duree-derive: 45s;
+  top: -18%;
+  right: -12%;
+  width: 62vmax;
+  height: 62vmax;
+  background: radial-gradient(closest-side, var(--fond-tache-bleu), transparent);
+}
+.fond-tache--cyan {
+  --duree-derive: 55s;
+  bottom: -22%;
+  left: -14%;
+  width: 56vmax;
+  height: 56vmax;
+  background: radial-gradient(closest-side, var(--fond-tache-cyan), transparent);
+}
+.fond-tache--violet {
+  --duree-derive: 38s;
+  bottom: -30%;
+  left: 28%;
+  width: 46vmax;
+  height: 46vmax;
+  background: radial-gradient(closest-side, var(--fond-tache-violet), transparent);
+}
+.fond-sopi--apercu .fond-tache--bleu {
+  width: 70%;
+  height: 140%;
+}
+.fond-sopi--apercu .fond-tache--cyan {
+  width: 60%;
+  height: 120%;
+}
+.fond-sopi--apercu .fond-tache--violet {
+  width: 50%;
+  height: 100%;
+}
+@keyframes derive-fond {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-4%, 5%, 0);
+  }
+}
+
+/* Petits écrans : taches plus petites, sans animation */
+@media (max-width: 40rem) {
+  .fond-sopi:not(.fond-sopi--apercu) .fond-tache {
+    animation: none;
+  }
+  .fond-sopi:not(.fond-sopi--apercu) .fond-tache--bleu {
+    width: 90vmin;
+    height: 90vmin;
+  }
+  .fond-sopi:not(.fond-sopi--apercu) .fond-tache--cyan {
+    width: 80vmin;
+    height: 80vmin;
+  }
+  .fond-sopi:not(.fond-sopi--apercu) .fond-tache--violet {
+    width: 66vmin;
+    height: 66vmin;
+  }
+}
+
+/* Impression : pas de fond */
+@media print {
+  .fond-sopi {
+    display: none;
+  }
+}
+
+/*
  * Panneau de verre (barre latérale, en-tête) : en mode sombre, les neutres sont redéfinis pour ce panneau
  * et ses descendants (texte clair, fonds translucides). Sans effet en mode clair.
  */
@@ -206,17 +314,8 @@
   --color-primaire-800: #ffffff;
 }
 
-:root[data-theme="dark"],
-:root[data-theme="dark"] body {
-  background-color: var(--fond-sombre);
-  background-image:
-    radial-gradient(60rem 40rem at 90% -10%, color-mix(in srgb, var(--color-primaire-600) 38%, transparent), transparent),
-    linear-gradient(150deg, var(--fond-sombre) 0%, var(--color-primaire-900) 55%, color-mix(in srgb, var(--color-primaire-800) 65%, black) 100%);
-  background-attachment: fixed;
-}
-
 html {
-  background: var(--color-fond);
+  background: var(--fond-page);
   color: var(--color-texte);
   font-family: var(--font-sans);
 }
@@ -224,7 +323,8 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--color-fond);
+  /* Transparent : le fond de page (html) et la couche de taches (z-index négatif) restent visibles derrière le contenu */
+  background: transparent;
 }
 
 /* Focus visible et cohérent pour la navigation au clavier */
@@ -310,6 +410,10 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Les taches restent fixes (sans cela l'alternance sauterait à sa position finale) */
+  .fond-tache {
+    animation: none !important;
   }
 }
 

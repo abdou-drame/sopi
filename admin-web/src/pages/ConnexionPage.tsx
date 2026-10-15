@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import type { FormEvent, InputHTMLAttributes, ReactNode } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import FondArrierePlan from '../components/ui/FondArrierePlan'
 import { ApiError, erreursParChamp } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Bouton from '../components/ui/Bouton'
@@ -193,7 +194,8 @@ export default function ConnexionPage() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center bg-fond p-4">
+    <div className="grid min-h-screen place-items-center p-4">
+      <FondArrierePlan />
       <div className="animate-apparition grid w-full max-w-6xl gap-3 rounded-[2rem] bg-surface p-3 shadow-carte lg:h-[46rem] lg:grid-cols-2">
         <main className="flex flex-col rounded-[1.5rem] border border-bordure p-8 sm:p-10">
           <Marque />
