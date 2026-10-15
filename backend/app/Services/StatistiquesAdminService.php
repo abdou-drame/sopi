@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Enums\Metier;
 use App\Enums\Role;
 use App\Enums\StatutCompte;
 use App\Enums\StatutLitige;
 use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Enums\TypeSanction;
+use App\Models\Metier;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -97,8 +97,8 @@ class StatistiquesAdminService
 
         // Par domaine : le domaine de la prestation réservée (une jointure, une requête).
         $parDomaine = [];
-        foreach (Metier::cases() as $metier) {
-            $parDomaine[$metier->value] = ['total' => 0, 'parStatut' => $this->zeros(StatutReservation::class)];
+        foreach (Metier::orderBy('code')->pluck('code') as $code) {
+            $parDomaine[$code] = ['total' => 0, 'parStatut' => $this->zeros(StatutReservation::class)];
         }
         $lignesDomaine = DB::table('reservations')
             ->join('prestations', 'prestations.id', '=', 'reservations.prestation_id')

@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Metier;
 use App\Models\Prestataire;
 use App\Models\Prestation;
 use App\Models\User;
@@ -11,7 +10,7 @@ uses(RefreshDatabase::class);
 
 const URL_PRESTATIONS = '/api/v1/prestataire/prestations';
 
-function prestataireCatalogue(Metier $metier = Metier::Mecanique): Prestataire
+function prestataireCatalogue(string $metier = 'mecanique'): Prestataire
 {
     return Prestataire::factory()->metier($metier)->create();
 }
@@ -54,28 +53,28 @@ describe('accès réservé aux prestataires', function () {
 });
 
 describe('POST /prestataire/prestations', function () {
-    it('crée une prestation dont le domaine est le métier du prestataire', function (Metier $metier) {
+    it('crée une prestation dont le domaine est le métier du prestataire', function (string $metier) {
         $prestataire = prestataireCatalogue($metier);
         agirCommePrestataire($prestataire);
 
         $this->postJson(URL_PRESTATIONS, corpsPrestation())
             ->assertCreated()
             ->assertExactJson([
-                'id' => Prestation::first()->id, 'nom' => 'Vidange complète', 'domaine' => $metier->value,
+                'id' => Prestation::first()->id, 'nom' => 'Vidange complète', 'domaine' => $metier,
                 'dureeMinutes' => 60, 'prix' => 15000, 'actif' => true,
             ]);
 
         expect(Prestation::first())->prestataire_id->toBe($prestataire->id)->domaine->toBe($metier);
-    })->with(Metier::cases());
+    })->with(['mecanique', 'coiffure', 'pressing']);
 
     it('ignore un domaine envoyé dans la requête', function () {
-        $prestataire = prestataireCatalogue(Metier::Coiffure);
+        $prestataire = prestataireCatalogue('coiffure');
         agirCommePrestataire($prestataire);
 
         $this->postJson(URL_PRESTATIONS, corpsPrestation(['domaine' => 'mecanique', 'actif' => false, 'prestataire_id' => Prestataire::factory()->create()->id]))
             ->assertCreated()->assertJsonPath('domaine', 'coiffure')->assertJsonPath('actif', true);
 
-        expect(Prestation::first())->domaine->toBe(Metier::Coiffure)->prestataire_id->toBe($prestataire->id);
+        expect(Prestation::first())->domaine->toBe('coiffure')->prestataire_id->toBe($prestataire->id);
     });
 
     it('retire les espaces superflus du nom', function () {
@@ -160,7 +159,7 @@ describe('PATCH /prestataire/prestations/{id}', function () {
 
         $this->patchJson(URL_PRESTATIONS.'/'.$prestation->id, ['prix' => 17500])
             ->assertOk()->assertExactJson([
-                'id' => $prestation->id, 'nom' => 'Vidange', 'domaine' => $prestation->domaine->value,
+                'id' => $prestation->id, 'nom' => 'Vidange', 'domaine' => $prestation->domaine,
                 'dureeMinutes' => 60, 'prix' => 17500, 'actif' => true,
             ]);
 
@@ -192,8 +191,8 @@ describe('PATCH /prestataire/prestations/{id}', function () {
         $domaine = $prestation->domaine;
         agirCommePrestataire($prestation->prestataire);
 
-        $this->patchJson(URL_PRESTATIONS.'/'.$prestation->id, ['nom' => 'Autre nom', 'domaine' => $domaine === Metier::Pressing ? 'coiffure' : 'pressing', 'prestataire_id' => Prestataire::factory()->create()->id])
-            ->assertOk()->assertJsonPath('domaine', $domaine->value);
+        $this->patchJson(URL_PRESTATIONS.'/'.$prestation->id, ['nom' => 'Autre nom', 'domaine' => $domaine === 'pressing' ? 'coiffure' : 'pressing', 'prestataire_id' => Prestataire::factory()->create()->id])
+            ->assertOk()->assertJsonPath('domaine', $domaine);
 
         expect($prestation->fresh())->domaine->toBe($domaine)->prestataire_id->toBe($prestation->prestataire_id);
     });
@@ -257,7 +256,7 @@ describe('PATCH /prestataire/prestations/{id}', function () {
 
 describe('GET /prestataire/prestations', function () {
     it('liste mes prestations actives et inactives, les plus récentes d\'abord, et seulement les miennes', function () {
-        $prestataire = prestataireCatalogue(Metier::Pressing);
+        $prestataire = prestataireCatalogue('pressing');
         $ancienne = Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Ancienne', 'created_at' => now()->subDays(3)]);
         $inactive = Prestation::factory()->inactive()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Inactive', 'created_at' => now()->subDay()]);
         $recente = Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Récente', 'created_at' => now()]);

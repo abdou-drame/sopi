@@ -44,7 +44,7 @@ class UtilisateurAdminResource extends JsonResource
             'dateCreation' => $this->created_at->toIso8601String(),
             'prestataire' => $prestataire === null ? null : [
                 'id' => $prestataire->id,
-                'metier' => $prestataire->metier->value,
+                'metier' => $prestataire->metier,
                 'quartier' => $prestataire->quartier,
                 'nomEntreprise' => $prestataire->nom_entreprise,
             ],

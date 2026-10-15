@@ -191,7 +191,7 @@ describe('profil public', function () {
         profilPublic($prestataire->id)->assertOk()->assertExactJson([
             'id' => $prestataire->id,
             'nomEntreprise' => 'Garage Moussa',
-            'metier' => $prestataire->metier->value,
+            'metier' => $prestataire->metier,
             'quartier' => 'Malika',
             'adresse' => 'Rue 10',
             'noteMoyenne' => null,
@@ -199,7 +199,7 @@ describe('profil public', function () {
             'prestations' => [[
                 'id' => $active->id,
                 'nom' => 'Vidange',
-                'domaine' => $prestataire->metier->value,
+                'domaine' => $prestataire->metier,
                 'dureeMinutes' => 60,
                 'prix' => 15000,
             ]],

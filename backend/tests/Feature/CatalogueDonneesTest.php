@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Metier;
 use App\Models\Prestataire;
 use App\Models\Prestation;
 use App\Models\User;
@@ -21,22 +20,22 @@ describe('prestations', function () {
             ->and($prestation->actif)->toBeTrue();
     });
 
-    it('garde, avec la factory, un domaine égal au métier du prestataire fourni', function (Metier $metier) {
+    it('garde, avec la factory, un domaine égal au métier du prestataire fourni', function (string $metier) {
         $prestataire = Prestataire::factory()->metier($metier)->create();
 
         $prestations = Prestation::factory()->count(3)->create(['prestataire_id' => $prestataire->id]);
 
         expect($prestations->every(fn (Prestation $p) => $p->fresh()->domaine === $metier))->toBeTrue();
-    })->with(Metier::cases());
+    })->with(['mecanique', 'coiffure', 'pressing']);
 
     it('est rattachée à son prestataire et reprend son métier comme domaine', function () {
-        $prestataire = Prestataire::factory()->metier(Metier::Coiffure)->create();
+        $prestataire = Prestataire::factory()->metier('coiffure')->create();
 
         $prestation = $prestataire->prestations()->create(['nom' => 'Coupe homme', 'duree_minutes' => 45, 'prix' => 7500]);
 
         expect($prestation->fresh())
             ->nom->toBe('Coupe homme')
-            ->domaine->toBe(Metier::Coiffure)
+            ->domaine->toBe('coiffure')
             ->prix->toBe('7500.00')
             ->duree_minutes->toBe(45)
             ->actif->toBeTrue()
@@ -66,15 +65,15 @@ describe('prestations', function () {
             ->toThrow(InvalidArgumentException::class, 'durée');
     });
 
-    it('refuse un domaine qui n\'est pas une valeur de l\'enum Metier', function () {
-        expect(fn () => Prestation::factory()->create(['domaine' => 'plomberie']))->toThrow(ValueError::class);
+    it('refuse un domaine qui n est pas le métier du prestataire', function () {
+        expect(fn () => Prestation::factory()->create(['domaine' => 'plomberie']))->toThrow(InvalidArgumentException::class);
         expect(Prestation::count())->toBe(0);
     });
 
     it('refuse un domaine différent du métier du prestataire', function () {
-        $prestataire = Prestataire::factory()->metier(Metier::Mecanique)->create();
+        $prestataire = Prestataire::factory()->metier('mecanique')->create();
 
-        expect(fn () => Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'domaine' => Metier::Pressing]))
+        expect(fn () => Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'domaine' => 'pressing']))
             ->toThrow(InvalidArgumentException::class, 'métier de son prestataire');
         expect(Prestation::count())->toBe(0);
     });
@@ -83,20 +82,20 @@ describe('prestations', function () {
         $prestation = Prestation::factory()->create();
         $domaine = $prestation->domaine;
 
-        $prestation->update(['domaine' => Metier::cases()[0] === $domaine ? 'pressing' : 'mecanique']);
+        $prestation->update(['domaine' => $domaine === 'mecanique' ? 'pressing' : 'mecanique']);
 
         expect($prestation->fresh()->domaine)->toBe($domaine);
     });
 
     it('refuse deux prestations de même nom chez un prestataire, mais l\'accepte chez un autre', function () {
-        $premier = Prestataire::factory()->metier(Metier::Mecanique)->create();
+        $premier = Prestataire::factory()->metier('mecanique')->create();
         Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Vidange']);
 
         expect(fn () => Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Vidange']))
             ->toThrow(QueryException::class);
 
         Prestation::factory()->create(['prestataire_id' => $premier->id, 'nom' => 'Freinage']);
-        Prestation::factory()->create(['prestataire_id' => Prestataire::factory()->metier(Metier::Mecanique)->create()->id, 'nom' => 'Vidange']);
+        Prestation::factory()->create(['prestataire_id' => Prestataire::factory()->metier('mecanique')->create()->id, 'nom' => 'Vidange']);
         expect(Prestation::count())->toBe(3);
     });
 
@@ -153,7 +152,7 @@ function pasJusquaAlignement(): int
 
 describe('migration d\'alignement', function () {
     it('reprend le nom et le domaine depuis le service lié, puis supprime services', function () {
-        $prestataire = Prestataire::factory()->metier(Metier::Mecanique)->create();
+        $prestataire = Prestataire::factory()->metier('mecanique')->create();
 
         // Retour à l'ancien schéma (M3.1), avec une prestation existante.
         $this->artisan('migrate:rollback', ['--step' => pasJusquaAlignement()])->assertSuccessful();
@@ -169,14 +168,14 @@ describe('migration d\'alignement', function () {
 
         $prestation = Prestation::findOrFail('b0000000-0000-7000-8000-000000000001');
         expect(Schema::hasTable('services'))->toBeFalse()
-            ->and($prestation)->nom->toBe('Vidange')->domaine->toBe(Metier::Mecanique)
+            ->and($prestation)->nom->toBe('Vidange')->domaine->toBe('mecanique')
             ->prix->toBe('15000.00')->duree_minutes->toBe(60)->actif->toBeFalse()
             ->and($prestation->prestataire_id)->toBe($prestataire->id);
     });
 
     it('revient en arrière en recréant un service par couple domaine/nom', function () {
-        $prestataire = Prestataire::factory()->metier(Metier::Coiffure)->create();
-        $autre = Prestataire::factory()->metier(Metier::Coiffure)->create();
+        $prestataire = Prestataire::factory()->metier('coiffure')->create();
+        $autre = Prestataire::factory()->metier('coiffure')->create();
         Prestation::factory()->create(['prestataire_id' => $prestataire->id, 'nom' => 'Tresses', 'prix' => 8000]);
         Prestation::factory()->create(['prestataire_id' => $autre->id, 'nom' => 'Tresses', 'prix' => 9000]);
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Admin\DemandePrestataireController;
 use App\Http\Controllers\Api\V1\Admin\JustificatifController;
 use App\Http\Controllers\Api\V1\Admin\ListeSanctionsController;
 use App\Http\Controllers\Api\V1\Admin\LitigeController as AdminLitigeController;
+use App\Http\Controllers\Api\V1\Admin\MetierController as AdminMetierController;
 use App\Http\Controllers\Api\V1\Admin\NotificationEnEchecController;
 use App\Http\Controllers\Api\V1\Admin\PaiementAdminController;
 use App\Http\Controllers\Api\V1\Admin\ReservationAdminController;
@@ -87,6 +88,11 @@ Route::prefix('v1')->group(function () {
         Route::post('/sanctions/{id}/lever', [AdminSanctionController::class, 'lever'])->middleware('throttle:sanction');
 
         // Modération des avis (M9.4).
+        // Métiers de la plateforme : ajout, renommage, activation (jamais de suppression).
+        Route::get('/metiers', [AdminMetierController::class, 'index']);
+        Route::post('/metiers', [AdminMetierController::class, 'store'])->middleware('throttle:sanction');
+        Route::patch('/metiers/{id}', [AdminMetierController::class, 'update'])->middleware('throttle:sanction');
+
         Route::get('/avis', [AdminAvisController::class, 'index']);
         Route::post('/avis/{id}/masquer', [AdminAvisController::class, 'masquer'])->middleware('throttle:sanction');
         Route::post('/avis/{id}/conserver', [AdminAvisController::class, 'conserver'])->middleware('throttle:sanction');

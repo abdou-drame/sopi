@@ -21,7 +21,7 @@ class PrestataireRechercheResource extends JsonResource
         return [
             'id' => $this->id,
             'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier->value,
+            'metier' => $this->metier,
             'quartier' => $this->quartier,
             'adresse' => $this->adresse,
             'prixMin' => (float) $this->prix_min,

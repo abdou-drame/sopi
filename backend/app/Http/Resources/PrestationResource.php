@@ -20,7 +20,7 @@ class PrestationResource extends JsonResource
         return [
             'id' => $this->id,
             'nom' => $this->nom,
-            'domaine' => $this->domaine->value,
+            'domaine' => $this->domaine,
             'dureeMinutes' => $this->duree_minutes,
             'prix' => (float) $this->prix,
             'actif' => $this->actif,

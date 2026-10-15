@@ -25,14 +25,14 @@ class ProfilPublicPrestataireResource extends JsonResource
         return [
             'id' => $this->id,
             'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier->value,
+            'metier' => $this->metier,
             'quartier' => $this->quartier,
             'adresse' => $this->adresse,
             ...ConsultationAvisService::formater($this->note_moyenne, $this->nombre_avis),
             'prestations' => $this->prestations->map(fn ($prestation) => [
                 'id' => $prestation->id,
                 'nom' => $prestation->nom,
-                'domaine' => $prestation->domaine->value,
+                'domaine' => $prestation->domaine,
                 'dureeMinutes' => $prestation->duree_minutes,
                 'prix' => (float) $prestation->prix,
             ])->values()->all(),

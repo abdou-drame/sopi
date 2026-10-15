@@ -27,7 +27,7 @@ class DemandePrestataireDetailResource extends JsonResource
             'telephone' => $this->user->telephone,
             'email' => $this->user->email,
             'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier->value,
+            'metier' => $this->metier,
             'quartier' => $this->quartier,
             'adresse' => $this->adresse,
             'statutCompte' => $statut->value,

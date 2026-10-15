@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Prestataire;
 
-use App\Enums\Metier;
 use App\Enums\TypeDocument;
 use App\Support\TelephoneSenegal;
 use Illuminate\Contracts\Validation\Validator;
@@ -41,7 +40,7 @@ class InscriptionPrestataireRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'mot_de_passe' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
             'nom_entreprise' => ['required', 'string', 'max:150'],
-            'metier' => ['required', 'string', Rule::enum(Metier::class)],
+            'metier' => ['required', 'string', Rule::exists('metiers', 'code')->where('actif', true)],
             'quartier' => ['required', 'string', 'max:100'],
             'adresse' => ['required', 'string', 'max:255'],
             // Une CNI et un justificatif professionnel au minimum (contrôlé plus bas), 5 fichiers au maximum.
@@ -56,7 +55,7 @@ class InscriptionPrestataireRequest extends FormRequest
     {
         return [
             'telephone.regex' => 'Le numéro de téléphone doit être un mobile sénégalais valide (ex. : 77 123 45 67).',
-            'metier.*' => 'Le métier choisi est invalide (mecanique, coiffure ou pressing).',
+            'metier.*' => "Le métier choisi est invalide ou n'est plus proposé.",
             'justificatifs.required' => 'Veuillez joindre vos justificatifs.',
             'justificatifs.min' => 'Le dossier doit contenir au moins une CNI et un justificatif professionnel (diplôme ou attestation).',
             'justificatifs.max' => 'Vous pouvez joindre 5 fichiers au maximum.',
@@ -97,7 +96,7 @@ class InscriptionPrestataireRequest extends FormRequest
             'mot_de_passe' => ['description' => '8 caractères minimum.', 'example' => 'mot-de-passe-exemple'],
             'mot_de_passe_confirmation' => ['description' => 'Identique à mot_de_passe.', 'example' => 'mot-de-passe-exemple'],
             'nom_entreprise' => ['description' => "Nom de l'entreprise ou de l'atelier.", 'example' => 'Garage Moussa'],
-            'metier' => ['description' => 'mecanique, coiffure ou pressing.', 'example' => 'mecanique'],
+            'metier' => ['description' => "Code d'un métier proposé (ex. : mecanique, coiffure, pressing).", 'example' => 'mecanique'],
             'quartier' => ['description' => 'Quartier de Keur Massar.', 'example' => 'Malika'],
             'adresse' => ['description' => 'Adresse.', 'example' => 'Rue 10, près du marché'],
             'justificatifs' => ['description' => 'De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation.'],

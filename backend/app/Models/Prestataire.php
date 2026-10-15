@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Metier;
 use Database\Factories\PrestataireFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,7 +42,6 @@ class Prestataire extends Model
     protected function casts(): array
     {
         return [
-            'metier' => Metier::class,
             'photos_atelier' => 'array',
             'solde' => 'decimal:2',
         ];

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\Metier;
 use Database\Factories\PrestationFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +37,6 @@ class Prestation extends Model
     protected function casts(): array
     {
         return [
-            'domaine' => Metier::class,
             'prix' => 'decimal:2',
             'duree_minutes' => 'integer',
             'actif' => 'boolean',
