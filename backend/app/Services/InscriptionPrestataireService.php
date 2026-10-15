@@ -2,13 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\Canal;
 use App\Enums\Role;
 use App\Enums\StatutCompte;
+use App\Enums\TypeNotification;
 use App\Models\Justificatif;
 use App\Models\Prestataire;
 use App\Models\User;
+use App\Services\Notification\NotificationService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Throwable;
@@ -32,7 +36,7 @@ class InscriptionPrestataireService
 
     /**
      * @param  array<string, mixed>  $donnees  Données validées (voir InscriptionPrestataireRequest).
-     * @return array{prestataire: Prestataire, jeton_suivi: string}  Le jeton en clair n'est renvoyé qu'ici, une seule fois.
+     * @return array{prestataire: Prestataire, jeton_suivi: string} Le jeton en clair n'est renvoyé qu'ici, une seule fois.
      */
     public function inscrire(array $donnees): array
     {
@@ -40,7 +44,7 @@ class InscriptionPrestataireService
         $dossier = null;
 
         try {
-            return DB::transaction(function () use ($donnees, $disque, &$dossier) {
+            $resultat = DB::transaction(function () use ($donnees, &$dossier) {
                 $user = new User([
                     'nom' => $donnees['nom'],
                     'prenom' => $donnees['prenom'],
@@ -85,6 +89,10 @@ class InscriptionPrestataireService
                     'jeton_suivi' => $jeton,
                 ];
             });
+
+            $this->notifierDepot($resultat['prestataire'], $resultat['jeton_suivi']);
+
+            return $resultat;
         } catch (Throwable $erreur) {
             // La base est annulée : on supprime aussi les fichiers déjà écrits.
             if ($dossier !== null) {
@@ -92,6 +100,28 @@ class InscriptionPrestataireService
             }
 
             throw $erreur;
+        }
+    }
+
+    /**
+     * E-mail de confirmation du dépôt avec le lien de suivi (RG06). Lancé une fois le dossier enregistré ; une panne de la
+     * notification ne doit jamais faire échouer l'inscription (elle est reprise par la commande planifiée). Le lien (donc le
+     * jeton en clair) n'est transmis qu'en donnée chiffrée, effacée après l'envoi.
+     */
+    private function notifierDepot(Prestataire $prestataire, string $jeton): void
+    {
+        try {
+            app(NotificationService::class)->creer(
+                $prestataire->user,
+                TypeNotification::DossierDepose,
+                'Dossier bien reçu',
+                'Nous avons bien reçu le dossier de « '.$prestataire->nom_entreprise.' ». Il est en cours d\'examen par l\'équipe Sopi. Le lien personnel de cet e-mail vous permet de suivre la validation de votre compte.',
+                ['prestataireId' => $prestataire->id],
+                [Canal::Email],
+                SuiviDossierService::lien($jeton),
+            );
+        } catch (Throwable $erreur) {
+            Log::warning('Notification de dépôt de dossier non créée.', ['erreur' => $erreur::class]);
         }
     }
 

@@ -5,6 +5,7 @@ namespace App\Enums;
 /** Type d'une notification : identifie l'événement métier qui l'a produite (cahier des charges, section « Notifications »). */
 enum TypeNotification: string
 {
+    case DossierDepose = 'dossier_depose';
     case DemandeAcceptee = 'demande_acceptee';
     case DemandeRefusee = 'demande_refusee';
     case ReservationNouvelleDemande = 'reservation_nouvelle_demande';
@@ -28,13 +29,14 @@ enum TypeNotification: string
      */
     public function ignoreStatutDuCompte(): bool
     {
-        return in_array($this, [self::DemandeAcceptee, self::DemandeRefusee, self::LitigeCloture, self::SanctionPosee, self::SanctionLevee], true);
+        return in_array($this, [self::DossierDepose, self::DemandeAcceptee, self::DemandeRefusee, self::LitigeCloture, self::SanctionPosee, self::SanctionLevee], true);
     }
 
     /** Phrase d'introduction de l'e-mail, propre à chaque type (le détail est dans le corps de la notification). */
     public function accrocheEmail(): string
     {
         return match ($this) {
+            self::DossierDepose => "Nous avons bien reçu votre dossier d'inscription.",
             self::DemandeAcceptee => 'Bonne nouvelle : votre dossier prestataire a été examiné.',
             self::DemandeRefusee => 'Votre dossier prestataire a été examiné.',
             self::ReservationNouvelleDemande => 'Une nouvelle demande de réservation vous attend.',

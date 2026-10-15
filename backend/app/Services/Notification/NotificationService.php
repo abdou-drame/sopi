@@ -16,8 +16,9 @@ interface NotificationService
      *
      * @param  array<string, mixed>  $donnees  identifiants utiles à l'application, jamais de donnée sensible
      * @param  list<Canal>  $canaux
+     * @param  string|null  $secret  information nécessaire à l'envoi seulement (ex. lien de suivi) : chiffrée, jamais exposée, effacée après l'envoi
      */
-    public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = [Canal::Email, Canal::Push]): ?Notification;
+    public function creer(User $utilisateur, TypeNotification $type, string $titre, string $corps, array $donnees = [], array $canaux = [Canal::Email, Canal::Push], ?string $secret = null): ?Notification;
 
     /**
      * Tente l'envoi des canaux en attente. Sans effet si un autre traitement a déjà pris la ligne, si l'essai n'est pas encore
