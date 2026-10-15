@@ -9,11 +9,11 @@ use App\Models\Paiement;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\DexPay\JournalDexPay;
 use App\Services\Paiement\PaiementService;
 use Carbon\CarbonInterface;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -72,7 +72,7 @@ class PaiementReservationService
         }
 
         if (! $paiement->enregistrerSessionSiEnAttente($session)) {
-            $this->journaliser($paiement, 'session non enregistrée');
+            JournalDexPay::erreur('dexpay.creer_session_echec', 'Session de paiement non enregistrée.', ['paiement_id' => $paiement->id]);
 
             throw $this->indisponible();
         }
@@ -146,15 +146,10 @@ class PaiementReservationService
     private function echouer(Paiement $paiement, Throwable $e): never
     {
         $paiement->echouerSiSansReference();
-        $this->journaliser($paiement, $e::class);
+        // Ni secret, ni corps de requête : l'identifiant du paiement, la classe de l'exception, le code HTTP et un extrait masqué.
+        JournalDexPay::erreur('dexpay.creer_session_echec', 'Échec de la création de la session de paiement.', ['paiement_id' => $paiement->id], $e);
 
         throw $this->indisponible();
-    }
-
-    /** Ni secret, ni corps de requête : seulement l'identifiant du paiement et le type d'erreur. */
-    private function journaliser(Paiement $paiement, string $erreur): void
-    {
-        Log::error('Échec de la création de la session de paiement.', ['paiement_id' => $paiement->id, 'erreur' => $erreur]);
     }
 
     private function indisponible(): ReservationImpossibleException

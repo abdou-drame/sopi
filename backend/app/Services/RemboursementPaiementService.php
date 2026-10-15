@@ -4,8 +4,9 @@ namespace App\Services;
 
 use App\Enums\StatutPaiement;
 use App\Models\Paiement;
+use App\Services\Paiement\DexPay\JournalDexPay;
 use App\Services\Paiement\PaiementService;
-use Illuminate\Support\Facades\Log;
+use App\Services\Paiement\ResultatOperation;
 use Throwable;
 
 /**
@@ -35,13 +36,13 @@ class RemboursementPaiementService
         try {
             $resultat = app(PaiementService::class)->rembourser($paiement->reference_dexpay, $paiement->montant_acompte);
         } catch (Throwable $e) {
-            $this->journaliser($paiement, $e::class);
+            $this->journaliser($paiement, $e);
 
             return false;
         }
 
         if (! $resultat->succes) {
-            $this->journaliser($paiement, 'remboursement refusé');
+            $this->journaliser($paiement, null, $resultat);
 
             return false;
         }
@@ -73,13 +74,20 @@ class RemboursementPaiementService
             try {
                 $this->rembourser($paiement);
             } catch (Throwable $e) {
-                $this->journaliser($paiement, $e::class);
+                $this->journaliser($paiement, $e);
             }
         }
     }
 
-    private function journaliser(Paiement $paiement, string $erreur): void
+    private function journaliser(Paiement $paiement, ?Throwable $e = null, ?ResultatOperation $resultat = null): void
     {
-        Log::error('Échec du remboursement d\'un paiement.', ['paiement_id' => $paiement->id, 'erreur' => $erreur]);
+        JournalDexPay::erreur(
+            'dexpay.remboursement_echec',
+            'Échec du remboursement d\'un paiement.',
+            ['paiement_id' => $paiement->id] + ($resultat?->motif !== null ? ['motif' => $resultat->motif] : []),
+            $e,
+            $resultat?->statutHttp,
+            $resultat?->extrait ?? '',
+        );
     }
 }

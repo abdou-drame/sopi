@@ -303,7 +303,7 @@ describe('échec du prestataire de paiement', function () {
         $espion = espionDePaiement();
         $espion->shouldReceive('creerSession')->once()->andThrow(new RuntimeException('clé secrète sk_live_123 refusée'));
         Log::shouldReceive('error')->once()->withArgs(function (string $message, array $contexte) {
-            return array_keys($contexte) === ['paiement_id', 'erreur'] && $contexte['erreur'] === RuntimeException::class
+            return $contexte['evenement'] === 'dexpay.creer_session_echec' && isset($contexte['paiement_id']) && $contexte['exception'] === RuntimeException::class
                 && ! str_contains(json_encode($contexte), 'sk_live');
         });
 

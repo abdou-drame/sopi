@@ -4,11 +4,12 @@ namespace App\Services\Paiement\DexPay;
 
 /**
  * Réponse de DexPay : code HTTP et contenu JSON. Les réponses sont parfois enveloppées dans « data » : $donnees est le contenu utile.
+ * $extrait : début masqué du corps brut, réservé au journal d'un échec.
  */
 final readonly class ReponseDexPay
 {
     /** @param array<string, mixed> $donnees */
-    public function __construct(public int $statutHttp, public array $donnees) {}
+    public function __construct(public int $statutHttp, public array $donnees, public string $extrait = '') {}
 
     public function reussie(): bool
     {
