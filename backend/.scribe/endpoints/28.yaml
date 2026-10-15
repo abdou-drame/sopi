@@ -1,23 +1,25 @@
-name: Profil
+name: 'Prestataire — litiges'
 description: |-
 
-  Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
+  le client n'y est identifié que par son prénom et l'initiale de son nom.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/me
+    uri: api/v1/prestataire/litiges
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — litiges'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
+        le client n'y est identifié que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Voir mon profil'
-      description: ''
+      title: 'Litiges me visant'
+      description: 'Paginée (20 par page), du plus récent au plus ancien.'
       authenticated: true
       deprecated: false
     headers:
@@ -35,13 +37,19 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","last":"https://api.exemple.test/api/v1/prestataire/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
         custom: []
         status: 401
         content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
     responseFields: []
@@ -55,277 +63,39 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PUT
-    uri: api/v1/me
+      - GET
+    uri: 'api/v1/prestataire/litiges/{id}'
     metadata:
       custom: []
-      groupName: Profil
+      groupName: 'Prestataire — litiges'
       groupDescription: |-
 
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
+        le client n'y est identifié que par son prénom et l'initiale de son nom.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Modifier mon profil'
-      description: "Modifie le nom, le prénom et le téléphone. L'e-mail et le rôle ne sont pas modifiables (ignorés s'ils sont envoyés)."
+      title: "Détail d'un litige me visant"
+      description: 'Le litige visant un autre prestataire répond 404.'
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      nom:
+    urlParameters:
+      id:
         custom: []
-        name: nom
-        description: Nom.
+        name: id
+        description: 'Identifiant du litige.'
         required: true
-        example: Diop
+        example: 0198a1b2-0000-7000-8000-000000000090
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
-      prenom:
-        custom: []
-        name: prenom
-        description: Prénom.
-        required: true
-        example: Awa
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      telephone:
-        custom: []
-        name: telephone
-        description: 'Mobile sénégalais, avec ou sans +221.'
-        required: true
-        example: '77 123 45 67'
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: Diop
-      prenom: Awa
-      telephone: '77 123 45 67'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Ce numéro de téléphone est déjà utilisé.","errors":{"telephone":["Ce numéro de téléphone est déjà utilisé."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/mot-de-passe
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Changer mon mot de passe'
-      description: "Vérifie le mot de passe actuel, puis révoque tous les autres jetons de l'utilisateur. Le jeton courant reste valide."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      mot_de_passe_actuel:
-        custom: []
-        name: mot_de_passe_actuel
-        description: 'Mot de passe actuel.'
-        required: true
-        example: ancienmotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      nouveau_mot_de_passe:
-        custom: []
-        name: nouveau_mot_de_passe
-        description: '8 caractères minimum.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      confirmation:
-        custom: []
-        name: confirmation
-        description: 'Identique au nouveau mot de passe.'
-        required: true
-        example: nouveaumotdepasse
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      mot_de_passe_actuel: ancienmotdepasse
-      nouveau_mot_de_passe: nouveaumotdepasse
-      confirmation: nouveaumotdepasse
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Votre mot de passe a été modifié."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le mot de passe actuel est incorrect.","errors":{"mot_de_passe_actuel":["Le mot de passe actuel est incorrect."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - PUT
-    uri: api/v1/me/jeton-push
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Enregistrer mon jeton push'
-      description: |-
-        Enregistre le jeton FCM de l'appareil pour les notifications push. Un jeton désigne un appareil : s'il était déjà
-        enregistré par un autre compte, il lui est retiré (la dernière affectation l'emporte). Le jeton n'est jamais renvoyé par l'API.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      jetonPush:
-        custom: []
-        name: jetonPush
-        description: 'Jeton FCM.'
-        required: true
-        example: fcm-jeton-exemple
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      jetonPush: fcm-jeton-exemple
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"message":"Jeton de notification enregistré."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le champ jeton push est obligatoire.","errors":{"jetonPush":["Le champ jeton push est obligatoire."]}}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - DELETE
-    uri: api/v1/me/jeton-push
-    metadata:
-      custom: []
-      groupName: Profil
-      groupDescription: |-
-
-        Profil de l'utilisateur connecté (client, prestataire ou administrateur).
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Retirer mon jeton push'
-      description: "À appeler quand l'appareil se déconnecte ou que les notifications push sont désactivées. Sans effet si aucun jeton n'est enregistré."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -335,13 +105,191 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"message":"Jeton de notification retiré."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"prenom":"Awa","initialeNom":"D"}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Litige introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/prestataire/litiges/{id}/preuves/{preuve}'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — litiges'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
+        le client n'y est identifié que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Afficher une preuve d'un litige me visant"
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      preuve:
+        custom: []
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000091
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+      preuve: 0198a1b2-0000-7000-8000-000000000091
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: "[Contenu binaire de l'image]"
+        headers: []
+        description: image
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Preuve introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/prestataire/litiges/{id}/reponse'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — litiges'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les litiges qui le visent ;
+        le client n'y est identifié que par son prénom et l'initiale de son nom.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Répondre à un litige'
+      description: "Donne votre version des faits (10 à 1000 caractères). Une seule réponse par litige, tant qu'il est ouvert."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      reponse:
+        custom: []
+        name: reponse
+        description: 'Votre version des faits, de 10 à 1000 caractères. Une seule réponse par litige. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        required: true
+        example: "J'étais sur place à l'heure convenue."
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      reponse: "J'étais sur place à l'heure convenue."
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","reponsePrestataire":"J''étais sur place à l''heure convenue.","reponseLe":"2030-01-16T13:00:00+00:00"}'
         headers: []
         description: ''
       -
         custom: []
         status: 401
         content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Litige introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Vous avez déjà répondu à ce litige."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"La réponse doit contenir au moins 10 caractères.","errors":{"reponse":["La réponse doit contenir au moins 10 caractères."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []

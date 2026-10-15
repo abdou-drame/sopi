@@ -100,14 +100,11 @@ endpoints:
       metier:
         custom: []
         name: metier
-        description: 'mecanique, coiffure ou pressing.'
+        description: "Code d'un métier proposé (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
         required: true
         example: mecanique
         type: string
-        enumValues:
-          - mecanique
-          - coiffure
-          - pressing
+        enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
