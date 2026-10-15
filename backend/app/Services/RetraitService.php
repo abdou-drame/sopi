@@ -72,6 +72,7 @@ class RetraitService
             return Retrait::ouvrir($prestataire->getKey(), $montant, $telephone, $operateur);
         });
 
+        $contexteEchec = [];
         try {
             $resultat = $this->paiements->verser(number_format($montant, 2, '.', ''), $telephone, new ContexteVersement($retrait->id, $operateur));
 
@@ -88,7 +89,7 @@ class RetraitService
 
                 return $retrait->refresh();
             }
-            JournalDexPay::erreur(
+            $contexteEchec = JournalDexPay::erreur(
                 'dexpay.versement_echec',
                 'Retrait refusé par le prestataire de paiement : à vérifier (solde marchand, plafonds, compte).',
                 ['retrait_id' => $retrait->id, 'motif' => $resultat->motif],
@@ -106,7 +107,7 @@ class RetraitService
             return $this->resterEnCours($retrait, $e);
         }
 
-        throw new RetraitEchoueException;
+        throw new RetraitEchoueException(JournalDexPay::diagnostic($contexteEchec));
     }
 
     /**

@@ -72,9 +72,9 @@ class PaiementReservationService
         }
 
         if (! $paiement->enregistrerSessionSiEnAttente($session)) {
-            JournalDexPay::erreur('dexpay.creer_session_echec', 'Session de paiement non enregistrée.', ['paiement_id' => $paiement->id]);
+            $contexte = JournalDexPay::erreur('dexpay.creer_session_echec', 'Session de paiement non enregistrée.', ['paiement_id' => $paiement->id]);
 
-            throw $this->indisponible();
+            throw $this->indisponible(JournalDexPay::diagnostic($contexte));
         }
 
         return [$this->charger($paiement), true];
@@ -147,14 +147,15 @@ class PaiementReservationService
     {
         $paiement->echouerSiSansReference();
         // Ni secret, ni corps de requête : l'identifiant du paiement, la classe de l'exception, le code HTTP et un extrait masqué.
-        JournalDexPay::erreur('dexpay.creer_session_echec', 'Échec de la création de la session de paiement.', ['paiement_id' => $paiement->id], $e);
+        $contexte = JournalDexPay::erreur('dexpay.creer_session_echec', 'Échec de la création de la session de paiement.', ['paiement_id' => $paiement->id], $e);
 
-        throw $this->indisponible();
+        throw $this->indisponible(JournalDexPay::diagnostic($contexte));
     }
 
-    private function indisponible(): ReservationImpossibleException
+    /** @param array<string, mixed>|null $diagnostic détail masqué, seulement si DEXPAY_DIAGNOSTIC_REPONSE est actif */
+    private function indisponible(?array $diagnostic = null): ReservationImpossibleException
     {
-        return new ReservationImpossibleException('Le service de paiement est momentanément indisponible. Veuillez réessayer.', Response::HTTP_SERVICE_UNAVAILABLE);
+        return new ReservationImpossibleException('Le service de paiement est momentanément indisponible. Veuillez réessayer.', Response::HTTP_SERVICE_UNAVAILABLE, $diagnostic);
     }
 
     private function charger(Paiement $paiement): Paiement

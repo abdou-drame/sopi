@@ -76,6 +76,8 @@ return [
             'success_url' => env('DEXPAY_SUCCESS_URL', ''),
             'failure_url' => env('DEXPAY_FAILURE_URL', ''),
             'timeout_seconds' => (int) env('DEXPAY_TIMEOUT_SECONDS', 15),
+            // TEMPORAIRE, à désactiver après les essais : ajoute un champ « diagnostic » (sans secret) aux réponses 503 liées à DexPay.
+            'diagnostic_reponse' => (bool) env('DEXPAY_DIAGNOSTIC_REPONSE', false),
             // Facteur appliqué au montant en FCFA avant l'envoi (1 = FCFA entiers ; 100 si le bac à sable attend des centimes).
             'amount_factor' => (int) env('DEXPAY_AMOUNT_FACTOR', 1),
             // Champs de destination_details qui portent l'opérateur du versement (liste séparée par des virgules).
