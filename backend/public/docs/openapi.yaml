@@ -17,6 +17,9 @@ tags:
     name: 'Administration — modération des avis'
     description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note\nmoyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec\nl'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées\nà 10 requêtes par minute."
   -
+    name: 'Administration — métiers'
+    description: "\nRoutes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des\nprestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses\nprestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute."
+  -
     name: 'Administration — notifications en échec'
     description: "\nRoutes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées\ndu destinataire ne sont jamais exposés."
   -
@@ -2305,6 +2308,350 @@ paths:
         name: id
         description: "Identifiant de l'avis."
         example: 0198a1b2-0000-7000-8000-000000000080
+        required: true
+        schema:
+          type: string
+  /api/v1/admin/metiers:
+    get:
+      summary: 'Liste des métiers'
+      operationId: listeDesMtiers
+      description: 'Tous les métiers (actifs ou non), par libellé, sans pagination, avec le nombre de prestataires rattachés.'
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000090
+                      code: coiffure
+                      libelle: Coiffure
+                      actif: true
+                      nombrePrestataires: 4
+                      dateCreation: '2030-01-01T09:00:00+00:00'
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000091
+                      code: mecanique
+                      libelle: Mécanique
+                      actif: true
+                      nombrePrestataires: 7
+                      dateCreation: '2030-01-01T09:00:00+00:00'
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000090
+                        code: coiffure
+                        libelle: Coiffure
+                        actif: true
+                        nombrePrestataires: 4
+                        dateCreation: '2030-01-01T09:00:00+00:00'
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000091
+                        code: mecanique
+                        libelle: Mécanique
+                        actif: true
+                        nombrePrestataires: 7
+                        dateCreation: '2030-01-01T09:00:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000090
+                        code:
+                          type: string
+                          example: coiffure
+                        libelle:
+                          type: string
+                          example: Coiffure
+                        actif:
+                          type: boolean
+                          example: true
+                        nombrePrestataires:
+                          type: integer
+                          example: 4
+                        dateCreation:
+                          type: string
+                          example: '2030-01-01T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Administration — métiers'
+    post:
+      summary: 'Ajouter un métier'
+      operationId: ajouterUnMtier
+      description: "Seul le nom est saisi ; le code est déduit (minuscules, sans accent ni espace, 20 caractères au plus). Un nom dont le code existe\ndéjà répond 422."
+      parameters: []
+      responses:
+        201:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000092
+                  code: plomberie
+                  libelle: Plomberie
+                  actif: true
+                  nombrePrestataires: 0
+                  dateCreation: '2030-01-20T09:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000092
+                  code:
+                    type: string
+                    example: plomberie
+                  libelle:
+                    type: string
+                    example: Plomberie
+                  actif:
+                    type: boolean
+                    example: true
+                  nombrePrestataires:
+                    type: integer
+                    example: 0
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Un métier portant ce nom existe déjà.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Un métier portant ce nom existe déjà.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Un métier portant ce nom existe déjà.'
+                  errors:
+                    libelle:
+                      - 'Un métier portant ce nom existe déjà.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Un métier portant ce nom existe déjà.'
+                  errors:
+                    type: object
+                    properties:
+                      libelle:
+                        type: array
+                        example:
+                          - 'Un métier portant ce nom existe déjà.'
+                        items:
+                          type: string
+      tags:
+        - 'Administration — métiers'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                libelle:
+                  type: string
+                  description: 'Nom affiché du métier (2 à 60 caractères). Le code en est déduit : minuscules, sans accent ni espace. Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
+                  example: Plomberie
+              required:
+                - libelle
+  '/api/v1/admin/metiers/{id}':
+    patch:
+      summary: 'Modifier un métier'
+      operationId: modifierUnMtier
+      description: "Renomme le métier et/ou l'active ou le désactive. Le dernier métier actif ne peut pas être désactivé (409)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  id: 0198a1b2-0000-7000-8000-000000000092
+                  code: plomberie
+                  libelle: 'Plomberie et chauffage'
+                  actif: false
+                  nombrePrestataires: 0
+                  dateCreation: '2030-01-20T09:00:00+00:00'
+                properties:
+                  id:
+                    type: string
+                    example: 0198a1b2-0000-7000-8000-000000000092
+                  code:
+                    type: string
+                    example: plomberie
+                  libelle:
+                    type: string
+                    example: 'Plomberie et chauffage'
+                  actif:
+                    type: boolean
+                    example: false
+                  nombrePrestataires:
+                    type: integer
+                    example: 0
+                  dateCreation:
+                    type: string
+                    example: '2030-01-20T09:00:00+00:00'
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+        404:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Métier introuvable.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Métier introuvable.'
+        409:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Au moins un métier doit rester actif.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Au moins un métier doit rester actif.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Indiquez le nouveau nom ou l'état du métier."
+                  errors:
+                    libelle:
+                      - "Indiquez le nouveau nom ou l'état du métier."
+                properties:
+                  message:
+                    type: string
+                    example: "Indiquez le nouveau nom ou l'état du métier."
+                  errors:
+                    type: object
+                    properties:
+                      libelle:
+                        type: array
+                        example:
+                          - "Indiquez le nouveau nom ou l'état du métier."
+                        items:
+                          type: string
+      tags:
+        - 'Administration — métiers'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                libelle:
+                  type: string
+                  description: 'Nouveau nom affiché (le code ne change pas). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
+                  example: 'Plomberie et chauffage'
+                actif:
+                  type: boolean
+                  description: 'false : plus de nouvelle inscription pour ce métier ; true : de nouveau proposé.'
+                  example: true
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'Identifiant du métier.'
+        example: 0198a1b2-0000-7000-8000-000000000092
         required: true
         schema:
           type: string
@@ -7136,17 +7483,13 @@ paths:
         -
           in: query
           name: metier
-          description: 'Métier : mecanique, coiffure ou pressing.'
+          description: "Code d'un métier de la plateforme (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
           example: mecanique
           required: false
           schema:
             type: string
-            description: 'Métier : mecanique, coiffure ou pressing.'
+            description: "Code d'un métier de la plateforme (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
             example: mecanique
-            enum:
-              - mecanique
-              - coiffure
-              - pressing
             nullable: true
         -
           in: query
@@ -8282,9 +8625,9 @@ paths:
                 example:
                   status: ok
                   app: Sopi
-                  version: 0.1.0
+                  version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-14T12:55:27+00:00'
+                  time: '2026-10-15T02:00:39+00:00'
                 properties:
                   status:
                     type: string
@@ -8294,13 +8637,13 @@ paths:
                     example: Sopi
                   version:
                     type: string
-                    example: 0.1.0
+                    example: 0.0.0-dev
                   database:
                     type: string
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-14T12:55:27+00:00'
+                    example: '2026-10-15T02:00:39+00:00'
       tags:
         - Endpoints
       security: []
@@ -8970,12 +9313,8 @@ paths:
                   example: 'Garage Moussa'
                 metier:
                   type: string
-                  description: 'mecanique, coiffure ou pressing.'
+                  description: "Code d'un métier proposé (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
                   example: mecanique
-                  enum:
-                    - mecanique
-                    - coiffure
-                    - pressing
                 quartier:
                   type: string
                   description: 'Quartier de Keur Massar. Le champ value ne doit pas dépasser 100 caractères.'
@@ -12292,7 +12631,7 @@ paths:
     post:
       summary: 'Demander un retrait'
       operationId: demanderUnRetrait
-      description: "Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un\nentier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.\nStatuts renvoyés : `reussi` (versement accepté), ou `en_cours` si le résultat est incertain (délai dépassé, panne) : le montant\nreste alors débité et le retrait est traité par l'équipe, sans nouveau débit. Un refus définitif répond 503 : le solde est\nrecrédité (une seule fois) et la demande peut être refaite."
+      description: "Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un\nentier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.\n`operateur` (obligatoire) : `wave` ou `orange_money`. Statuts renvoyés : `reussi` (versement terminé), ou `en_cours` :\nversement accepté mais pas encore terminé, ou résultat incertain (délai dépassé, panne). Le montant reste alors débité, sans\nnouveau débit : le retrait passe à `reussi` ou `echoue` (montant recrédité une seule fois) à la confirmation du prestataire de\npaiement. Un refus définitif répond 503 : le solde est recrédité (une seule fois) et la demande peut être refaite."
       parameters: []
       responses:
         201:
@@ -12416,9 +12755,17 @@ paths:
                   type: string
                   description: 'Mobile sénégalais (Wave ou Orange Money) qui reçoit le versement. Must match the regex /^\+2217[05678]\d{7}$/.'
                   example: '771234567'
+                operateur:
+                  type: string
+                  description: 'Opérateur mobile money qui reçoit le versement : `wave` ou `orange_money`.'
+                  example: wave
+                  enum:
+                    - wave
+                    - orange_money
               required:
                 - montant
                 - telephone_versement
+                - operateur
   '/api/v1/prestataire/retraits/{id}':
     get:
       summary: "Détail d'un retrait"

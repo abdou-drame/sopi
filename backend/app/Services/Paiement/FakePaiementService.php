@@ -3,6 +3,7 @@
 namespace App\Services\Paiement;
 
 use App\Enums\StatutPaiement;
+use App\Enums\StatutRetrait;
 use App\Exceptions\EvenementPaiementIllisible;
 use JsonException;
 
@@ -16,7 +17,7 @@ class FakePaiementService implements PaiementService
 {
     public function __construct(private readonly ?string $secret = null) {}
 
-    public function creerSession(string $reservationId, string $montantAcompte, string $description): SessionPaiement
+    public function creerSession(string $reservationId, string $montantAcompte, string $description, ?string $paiementId = null): SessionPaiement
     {
         $reference = $this->reference('');
 
@@ -65,9 +66,14 @@ class FakePaiementService implements PaiementService
         return $this->operation($reference !== '' && $this->montant($montant) !== null, 'RMB-');
     }
 
-    public function verser(string $montant, string $destinataire): ResultatOperation
+    public function verser(string $montant, string $destinataire, ?ContexteVersement $contexte = null): ResultatOperation
     {
         return $this->operation($destinataire !== '' && $this->montant($montant) !== null, 'VRS-');
+    }
+
+    public function consulterVersement(string $referenceMarchande): ?StatutRetrait
+    {
+        return null;
     }
 
     private function operation(bool $valide, string $type): ResultatOperation

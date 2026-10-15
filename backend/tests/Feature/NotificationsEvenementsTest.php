@@ -410,7 +410,7 @@ describe('bout en bout par les vraies routes', function () {
         $paiement = Paiement::query()->where('reservation_id', $id)->firstOrFail();
         $corps = json_encode(['reference' => $paiement->reference_dexpay, 'statut' => 'reussi', 'montant' => $paiement->montant_acompte]);
         test()->call('POST', '/api/v1/webhooks/paiement', [], [], [], [
-            'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json', 'HTTP_X_SIGNATURE' => hash_hmac('sha256', $corps, SECRET_NOTIFS),
+            'CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json', 'HTTP_X_WEBHOOK_SIGNATURE' => hash_hmac('sha256', $corps, SECRET_NOTIFS),
         ], $corps)->assertOk();
         $code = Reservation::findOrFail($id)->code_reservation;
         expect(notifsDe($prestataire->user)->pluck('type')->last())->toBe(TypeNotification::ReservationConfirmee);

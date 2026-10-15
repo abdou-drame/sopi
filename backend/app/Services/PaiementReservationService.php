@@ -63,7 +63,7 @@ class PaiementReservationService
 
         // Hors transaction : appel au prestataire de paiement, puis enregistrement conditionnel de la session.
         try {
-            $session = app(PaiementService::class)->creerSession($reservation->id, $paiement->montant_acompte, 'Acompte de réservation Sopi');
+            $session = app(PaiementService::class)->creerSession($reservation->id, $paiement->montant_acompte, 'Acompte de réservation Sopi', $paiement->id);
             if ($session->reference === '' || $session->urlPaiement === '') {
                 throw new \UnexpectedValueException('Session de paiement incomplète.');
             }

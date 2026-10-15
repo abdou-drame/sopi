@@ -3,16 +3,22 @@
 namespace App\Services;
 
 use App\Enums\StatutPaiement;
+use App\Enums\StatutRetrait;
 use App\Events\Reservation\ReservationConfirmee;
 use App\Exceptions\ConfigurationPaiementInvalide;
 use App\Exceptions\EvenementPaiementIllisible;
 use App\Models\Paiement;
 use App\Models\Reservation;
+use App\Models\Retrait;
 use App\Services\Paiement\CalculPaiement;
+use App\Services\Paiement\ContexteVersement;
+use App\Services\Paiement\EvenementPaiement;
+use App\Services\Paiement\GenreEvenement;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
@@ -58,11 +64,23 @@ class WebhookPaiementService
             return [Response::HTTP_UNPROCESSABLE_ENTITY, 'Événement de paiement illisible.'];
         }
 
+        if ($evenement->genre === GenreEvenement::Ignore) {
+            return [Response::HTTP_OK, 'Événement ignoré.'];
+        }
+
+        if ($evenement->genre === GenreEvenement::Versement) {
+            return $this->versement($evenement);
+        }
+
         $paiement = Paiement::query()->where('reference_dexpay', $evenement->reference)->first();
         if ($paiement === null) {
             Log::warning('Événement de paiement ignoré : référence inconnue.');
 
             return [Response::HTTP_OK, 'Événement ignoré.'];
+        }
+
+        if ($evenement->genre === GenreEvenement::Remboursement) {
+            return $this->rembourse($paiement);
         }
 
         if (! $this->montantEgal($paiement->montant_acompte, $evenement->montant)) {
@@ -74,6 +92,55 @@ class WebhookPaiementService
         return $evenement->statut === StatutPaiement::Reussi
             ? $this->reussir($paiement)
             : $this->echouer($paiement);
+    }
+
+    /**
+     * Résultat d'un versement (payout.completed, payout.failed, payout.cancelled). Le retrait est retrouvé par l'identifiant des
+     * métadonnées, par la référence DexPay mémorisée, ou par notre référence déterministe. Rejeu : « Déjà traité », sans second recrédit.
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function versement(EvenementPaiement $evenement): array
+    {
+        $retrait = $this->trouverRetrait($evenement);
+        if ($retrait === null || $evenement->statutVersement === null) {
+            Log::warning('Événement de versement ignoré : retrait inconnu.');
+
+            return [Response::HTTP_OK, 'Événement ignoré.'];
+        }
+
+        $change = app(RetraitService::class)->appliquerResultat($retrait, $evenement->statutVersement, $evenement->reference !== '' ? $evenement->reference : null);
+
+        return [Response::HTTP_OK, $change ? ($evenement->statutVersement === StatutRetrait::Reussi ? 'Retrait réussi enregistré.' : 'Échec du retrait enregistré.') : 'Déjà traité.'];
+    }
+
+    private function trouverRetrait(EvenementPaiement $evenement): ?Retrait
+    {
+        $id = $evenement->retraitId
+            ?? ContexteVersement::retraitIdDe($evenement->referenceMarchande)
+            ?? ContexteVersement::retraitIdDe($evenement->reference);
+        if ($id !== null && Str::isUuid($id) && ($retrait = Retrait::query()->find($id)) !== null) {
+            return $retrait;
+        }
+
+        $references = array_filter([$evenement->reference, $evenement->referenceMarchande], fn (?string $r) => $r !== null && $r !== '');
+
+        return $references === [] ? null : Retrait::query()->whereIn('reference_dexpay', $references)->first();
+    }
+
+    /**
+     * Remboursement signalé par le prestataire (checkout.refunded) : le paiement passe à REMBOURSE, une seule fois, jamais
+     * depuis EN_ATTENTE (rien n'a été payé). Un paiement déjà remboursé ne change pas, le remboursement n'est jamais redemandé.
+     *
+     * @return array{0: int, 1: string}
+     */
+    private function rembourse(Paiement $paiement): array
+    {
+        if ($paiement->rembourserSiStatut(StatutPaiement::Reussi, StatutPaiement::Echoue)) {
+            return [Response::HTTP_OK, 'Remboursement enregistré.'];
+        }
+
+        return [Response::HTTP_OK, 'Déjà traité.'];
     }
 
     /** Comparaison décimale exacte (« 4500 » = « 4500.00 »). Un montant mal formé est incohérent. */

@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\OperateurRetrait;
+use App\Enums\StatutRetrait;
 use App\Exceptions\RetraitEchoueException;
 use App\Models\Prestataire;
 use App\Models\Retrait;
+use App\Services\Paiement\ContexteVersement;
 use App\Services\Paiement\PaiementService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -52,9 +55,9 @@ class RetraitService
      * @throws ValidationException solde insuffisant (clé « montant »)
      * @throws RetraitEchoueException refus définitif du prestataire de paiement
      */
-    public function demander(Prestataire $prestataire, int $montant, string $telephone): Retrait
+    public function demander(Prestataire $prestataire, int $montant, string $telephone, OperateurRetrait $operateur): Retrait
     {
-        $retrait = DB::transaction(function () use ($prestataire, $montant, $telephone) {
+        $retrait = DB::transaction(function () use ($prestataire, $montant, $telephone, $operateur) {
             // Jamais « lire puis écrire en PHP » : la condition est dans l'UPDATE, donc deux demandes simultanées ne dépassent pas le solde.
             $debites = Prestataire::query()
                 ->whereKey($prestataire->getKey())
@@ -65,17 +68,29 @@ class RetraitService
                 throw ValidationException::withMessages(['montant' => ['Solde insuffisant.']]);
             }
 
-            return Retrait::ouvrir($prestataire->getKey(), $montant, $telephone);
+            return Retrait::ouvrir($prestataire->getKey(), $montant, $telephone, $operateur);
         });
 
         try {
-            $resultat = $this->paiements->verser(number_format($montant, 2, '.', ''), $telephone);
+            $resultat = $this->paiements->verser(number_format($montant, 2, '.', ''), $telephone, new ContexteVersement($retrait->id, $operateur));
 
-            if ($resultat->succes) {
+            if ($resultat->succes && ! $resultat->enCours) {
                 $retrait->reussirSiEnCours($resultat->reference);
 
                 return $retrait;
             }
+            if ($resultat->succes) {
+                // Versement accepté mais pas encore terminé : le retrait reste EN_COURS (montant débité), le webhook ou la réconciliation conclura.
+                if ($resultat->reference !== null) {
+                    $retrait->enregistrerReferenceSiEnCours($resultat->reference);
+                }
+
+                return $retrait->refresh();
+            }
+            Log::error('Retrait refusé par le prestataire de paiement : à vérifier (solde marchand, plafonds, compte).', [
+                'retrait_id' => $retrait->id,
+                'motif' => $resultat->motif,
+            ]);
         } catch (Throwable $e) {
             return $this->resterEnCours($retrait, $e);
         }
@@ -87,6 +102,41 @@ class RetraitService
         }
 
         throw new RetraitEchoueException;
+    }
+
+    /**
+     * Applique le résultat final d'un versement connu par le webhook ou la réconciliation. Idempotent : seules des mises à jour
+     * conditionnelles depuis EN_COURS changent le statut, et le recrédit n'a lieu qu'une fois (garde recredite_le).
+     *
+     * @return bool vrai si ce passage a changé le retrait
+     */
+    public function appliquerResultat(Retrait $retrait, StatutRetrait $statut, ?string $reference = null): bool
+    {
+        if ($statut === StatutRetrait::Reussi) {
+            if ($retrait->reussirSiEnCours($reference ?? $retrait->reference_dexpay)) {
+                return true;
+            }
+            if ($retrait->refresh()->statut === StatutRetrait::Echoue) {
+                Log::error('Versement terminé chez le prestataire alors que le retrait est ECHOUE : à vérifier à la main.', ['retrait_id' => $retrait->id]);
+            }
+
+            return false;
+        }
+        if ($statut !== StatutRetrait::Echoue) {
+            return false;
+        }
+
+        $change = false;
+        DB::transaction(function () use ($retrait, &$change) {
+            $change = $retrait->echouerSiEnCours();
+            if ($retrait->recrediterSiPossible()) {
+                Prestataire::query()
+                    ->whereKey($retrait->prestataire_id)
+                    ->update(['solde' => DB::raw('solde + '.(int) $retrait->montant)]);
+            }
+        });
+
+        return $change;
     }
 
     /** ECHOUE puis recrédit, dans UNE transaction ; la garde recredite_le garantit un seul recrédit quoi qu'il arrive. */

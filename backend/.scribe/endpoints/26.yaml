@@ -1,25 +1,25 @@
-name: 'Prestataire — mes avis'
+name: 'Prestataire — solde et retraits'
 description: |-
 
-  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+  Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses
+  propres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/prestataire/avis
+    uri: api/v1/prestataire/solde
     metadata:
       custom: []
-      groupName: 'Prestataire — mes avis'
+      groupName: 'Prestataire — solde et retraits'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses
+        propres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Mes avis'
-      description: |-
-        Avis masqués par l'administrateur exclus. Mêmes données que la consultation par les clients : paginée (20 par page), du plus récent au plus ancien, auteur réduit au
-        prénom et à l'initiale du nom, `noteMoyenne` (une décimale, `null` sans avis) et `nombreAvis`.
+      title: 'Mon solde'
+      description: "Solde disponible et limites d'un retrait (en FCFA)."
       authenticated: true
       deprecated: false
     headers:
@@ -37,7 +37,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":4,"commentaire":"Travail soigné et ponctuel.","auteur":"Awa D.","dateCreation":"2030-01-17T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/avis?page=1","last":"https://api.exemple.test/api/v1/prestataire/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1},"noteMoyenne":4.0,"nombreAvis":1}'
+        content: '{"solde":12500.0,"montantMinimumRetrait":1000,"montantMaximumRetrait":500000}'
         headers: []
         description: ''
       -
@@ -63,20 +63,75 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/prestataire/avis/{id}/signaler'
+      - GET
+    uri: api/v1/prestataire/retraits
     metadata:
       custom: []
-      groupName: 'Prestataire — mes avis'
+      groupName: 'Prestataire — solde et retraits'
       groupDescription: |-
 
-        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que les avis qui le concernent.
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses
+        propres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Signaler un avis'
-      description: |-
-        Demande à l'administrateur d'examiner un avis reçu (RF20). Un seul signalement par avis ; l'avis reste affiché tant que
-        l'administrateur n'a pas décidé. Un avis d'un autre prestataire ou masqué répond 404.
+      title: 'Mes retraits'
+      description: 'Historique paginé (20 par page), du plus récent au plus ancien. Le numéro de versement est masqué (3 derniers chiffres).'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","last":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/prestataire/retraits/{id}'
+    metadata:
+      custom: []
+      groupName: 'Prestataire — solde et retraits'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses
+        propres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Détail d'un retrait"
+      description: ''
       authenticated: true
       deprecated: false
     headers:
@@ -87,38 +142,26 @@ endpoints:
       id:
         custom: []
         name: id
-        description: "Identifiant de l'avis."
+        description: 'Identifiant du retrait.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
+        example: 0198a1b2-0000-7000-8000-000000000070
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
+      id: 0198a1b2-0000-7000-8000-000000000070
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      motif:
-        custom: []
-        name: motif
-        description: 'Pourquoi cet avis doit être examiné (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
-        required: true
-        example: 'Cet avis concerne une autre prestation que la mienne.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      motif: 'Cet avis concerne une autre prestation que la mienne.'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","signale":true,"signaleLe":"2030-01-18T08:00:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}'
         headers: []
         description: ''
       -
@@ -136,25 +179,125 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Avis introuvable."}'
+        content: '{"message":"Retrait introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/v1/prestataire/retraits
+    metadata:
+      custom: []
+      groupName: 'Prestataire — solde et retraits'
+      groupDescription: |-
+
+        Routes réservées aux prestataires (jeton Sanctum + rôle `prestataire`). Un prestataire ne voit que son propre solde et ses
+        propres retraits ; le retrait d'un autre prestataire répond 404, comme un retrait inexistant. Les montants sont en FCFA.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Demander un retrait'
+      description: |-
+        Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un
+        entier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.
+        `operateur` (obligatoire) : `wave` ou `orange_money`. Statuts renvoyés : `reussi` (versement terminé), ou `en_cours` :
+        versement accepté mais pas encore terminé, ou résultat incertain (délai dépassé, panne). Le montant reste alors débité, sans
+        nouveau débit : le retrait passe à `reussi` ou `echoue` (montant recrédité une seule fois) à la confirmation du prestataire de
+        paiement. Un refus définitif répond 503 : le solde est recrédité (une seule fois) et la demande peut être refaite.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      montant:
+        custom: []
+        name: montant
+        description: 'Montant à retirer, en FCFA (entier), entre le minimum et le maximum de la configuration. Le champ value doit être au moins égal à 1000. Le champ value ne doit pas dépasser 500000.'
+        required: true
+        example: 5000
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      telephone_versement:
+        custom: []
+        name: telephone_versement
+        description: 'Mobile sénégalais (Wave ou Orange Money) qui reçoit le versement. Must match the regex /^\+2217[05678]\d{7}$/.'
+        required: true
+        example: '771234567'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      operateur:
+        custom: []
+        name: operateur
+        description: 'Opérateur mobile money qui reçoit le versement : `wave` ou `orange_money`.'
+        required: true
+        example: wave
+        type: string
+        enumValues:
+          - wave
+          - orange_money
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      montant: 5000
+      telephone_versement: '771234567'
+      operateur: wave
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}'
         headers: []
         description: ''
       -
         custom: []
-        status: 409
-        content: '{"message":"Cet avis a déjà été signalé."}'
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le motif du signalement est obligatoire.","errors":{"motif":["Le motif du signalement est obligatoire."]}}'
+        content: '{"message":"Solde insuffisant.","errors":{"montant":["Solde insuffisant."]}}'
         headers: []
         description: ''
       -
         custom: []
         status: 429
         content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 503
+        content: '{"message":"Le versement n''a pas pu être effectué. Votre solde n''a pas été débité. Veuillez réessayer."}'
         headers: []
         description: ''
     responseFields: []

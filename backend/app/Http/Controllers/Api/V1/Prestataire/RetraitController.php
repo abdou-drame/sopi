@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Prestataire;
 
+use App\Enums\OperateurRetrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Prestataire\DemanderRetraitRequest;
 use App\Http\Resources\RetraitResource;
@@ -84,9 +85,10 @@ class RetraitController extends Controller
      *
      * Débite immédiatement le solde puis demande le versement au prestataire de paiement (Wave ou Orange Money). Le montant est un
      * entier de FCFA entre le minimum et le maximum (voir `/prestataire/solde`). Limité à 5 demandes par minute.
-     * Statuts renvoyés : `reussi` (versement accepté), ou `en_cours` si le résultat est incertain (délai dépassé, panne) : le montant
-     * reste alors débité et le retrait est traité par l'équipe, sans nouveau débit. Un refus définitif répond 503 : le solde est
-     * recrédité (une seule fois) et la demande peut être refaite.
+     * `operateur` (obligatoire) : `wave` ou `orange_money`. Statuts renvoyés : `reussi` (versement terminé), ou `en_cours` :
+     * versement accepté mais pas encore terminé, ou résultat incertain (délai dépassé, panne). Le montant reste alors débité, sans
+     * nouveau débit : le retrait passe à `reussi` ou `echoue` (montant recrédité une seule fois) à la confirmation du prestataire de
+     * paiement. Un refus définitif répond 503 : le solde est recrédité (une seule fois) et la demande peut être refaite.
      *
      * @authenticated
      *
@@ -103,6 +105,7 @@ class RetraitController extends Controller
             $this->prestataire($request),
             (int) $request->validated('montant'),
             $request->validated('telephone_versement'),
+            OperateurRetrait::from($request->validated('operateur')),
         );
 
         return (new RetraitResource($retrait))->response()->setStatusCode(Response::HTTP_CREATED);

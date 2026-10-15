@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\OperateurRetrait;
 use App\Enums\StatutRetrait;
 use App\Models\Prestataire;
 use App\Models\Retrait;
 use App\Models\User;
+use App\Services\Paiement\ContexteVersement;
 use App\Services\Paiement\EvenementPaiement;
 use App\Services\Paiement\PaiementService;
 use App\Services\Paiement\ResultatOperation;
@@ -27,7 +29,7 @@ function prestataireRetirant(string|int|float $solde = 20000): Prestataire
 
 function demanderRetrait(array $donnees = [])
 {
-    return test()->postJson('/api/v1/prestataire/retraits', array_merge(['montant' => 5000, 'telephone_versement' => '771234567'], $donnees));
+    return test()->postJson('/api/v1/prestataire/retraits', array_merge(['montant' => 5000, 'telephone_versement' => '771234567', 'operateur' => 'wave'], $donnees));
 }
 
 /**
@@ -52,7 +54,7 @@ final class PaiementDeTestRetrait implements PaiementService
 
     public function __construct(public Closure $verser) {}
 
-    public function creerSession(string $reservationId, string $montantAcompte, string $description): SessionPaiement
+    public function creerSession(string $reservationId, string $montantAcompte, string $description, ?string $paiementId = null): SessionPaiement
     {
         throw new LogicException('Non utilisé');
     }
@@ -72,7 +74,12 @@ final class PaiementDeTestRetrait implements PaiementService
         throw new LogicException('Non utilisé');
     }
 
-    public function verser(string $montant, string $destinataire): ResultatOperation
+    public function consulterVersement(string $referenceMarchande): ?StatutRetrait
+    {
+        return null;
+    }
+
+    public function verser(string $montant, string $destinataire, ?ContexteVersement $contexte = null): ResultatOperation
     {
         $this->appels++;
 
@@ -226,11 +233,11 @@ describe('solde insuffisant', function () {
         $copiePerimee = Prestataire::query()->findOrFail($prestataire->id);
         $service = app(RetraitService::class);
 
-        $service->demander($prestataire, 5000, '+221771234567');
+        $service->demander($prestataire, 5000, '+221771234567', OperateurRetrait::Wave);
 
         // La copie lue avant le premier retrait croit encore avoir 7 000 : la condition SQL la refuse.
         expect($copiePerimee->solde)->toBe('7000.00')
-            ->and(fn () => $service->demander($copiePerimee, 5000, '+221771234567'))->toThrow(ValidationException::class);
+            ->and(fn () => $service->demander($copiePerimee, 5000, '+221771234567', OperateurRetrait::Wave))->toThrow(ValidationException::class);
 
         expect($prestataire->fresh()->solde)->toBe('2000.00');
     });
@@ -334,7 +341,7 @@ describe('résultat ambigu', function () {
         $prestataire = prestataireRetirant(20000);
         paiementQuiVerse(fn () => throw new RuntimeException('Délai dépassé vers 771234567 avec la clé SECRETE-123'));
 
-        $reponse = demanderRetrait(['montant' => 5000, 'telephone_versement' => '771234567'])->assertCreated()
+        $reponse = demanderRetrait(['montant' => 5000, 'telephone_versement' => '771234567', 'operateur' => 'wave'])->assertCreated()
             ->assertJsonPath('statut', 'en_cours')->assertJsonPath('dateTraitement', null);
 
         $retrait = Retrait::query()->firstOrFail();

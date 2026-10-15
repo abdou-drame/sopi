@@ -18,7 +18,7 @@ class RetraitsAdminService
 {
     public const PAR_PAGE = 20;
 
-    private const COLONNES = ['id', 'prestataire_id', 'montant', 'statut', 'telephone_versement', 'traite_le', 'recredite_le', 'created_at', 'updated_at'];
+    private const COLONNES = ['id', 'prestataire_id', 'montant', 'statut', 'operateur', 'telephone_versement', 'traite_le', 'recredite_le', 'created_at', 'updated_at'];
 
     /**
      * @param  array{statut?: ?string, prestataire?: ?string, bloques?: ?bool}  $filtres

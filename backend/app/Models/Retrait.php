@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OperateurRetrait;
 use App\Enums\StatutRetrait;
 use Database\Factories\RetraitFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -30,6 +31,7 @@ class Retrait extends Model
     {
         return [
             'statut' => StatutRetrait::class,
+            'operateur' => OperateurRetrait::class,
             'montant' => 'decimal:2',
             'traite_le' => 'datetime',
             'recredite_le' => 'datetime',
@@ -37,12 +39,13 @@ class Retrait extends Model
     }
 
     /** Crée le retrait EN_COURS d'un prestataire (jamais en masse). Le débit du solde est fait par l'appelant, dans la même transaction. */
-    public static function ouvrir(string $prestataireId, int $montant, string $telephoneVersement): self
+    public static function ouvrir(string $prestataireId, int $montant, string $telephoneVersement, ?OperateurRetrait $operateur = null): self
     {
         $retrait = new self;
         $retrait->prestataire_id = $prestataireId;
         $retrait->montant = $montant;
         $retrait->telephone_versement = $telephoneVersement;
+        $retrait->operateur = $operateur;
         $retrait->save();
 
         return $retrait;
@@ -55,6 +58,17 @@ class Retrait extends Model
             ->whereKey($this->getKey())
             ->where('statut', StatutRetrait::EnCours->value)
             ->update(['statut' => StatutRetrait::Reussi->value, 'reference_dexpay' => $reference, 'traite_le' => now(), 'updated_at' => now()]);
+
+        return $modifies === 1 && $this->refresh() !== null;
+    }
+
+    /** Mémorise la référence du versement chez le prestataire de paiement tant que le retrait est EN_COURS (versement accepté, pas encore terminé). */
+    public function enregistrerReferenceSiEnCours(string $reference): bool
+    {
+        $modifies = static::query()
+            ->whereKey($this->getKey())
+            ->where('statut', StatutRetrait::EnCours->value)
+            ->update(['reference_dexpay' => $reference, 'updated_at' => now()]);
 
         return $modifies === 1 && $this->refresh() !== null;
     }
