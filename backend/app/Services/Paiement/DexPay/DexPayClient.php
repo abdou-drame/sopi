@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Http;
  */
 class DexPayClient
 {
+    public const URL_BASE_PAR_DEFAUT = 'https://api.dexpay.africa/api/v1';
+
     public function __construct(
         private readonly string $urlBase,
         private readonly string $clePublique,
@@ -27,7 +29,7 @@ class DexPayClient
     {
         $config = (array) config('sopi.paiement.dexpay');
         $manquantes = [];
-        foreach (['base_url' => 'DEXPAY_BASE_URL', 'public_key' => 'DEXPAY_PUBLIC_KEY', 'secret_key' => 'DEXPAY_SECRET_KEY'] as $cle => $variable) {
+        foreach (['public_key' => 'DEXPAY_PUBLIC_KEY', 'secret_key' => 'DEXPAY_SECRET_KEY'] as $cle => $variable) {
             if (! is_string($config[$cle] ?? null) || trim($config[$cle]) === '') {
                 $manquantes[] = $variable;
             }
@@ -37,11 +39,28 @@ class DexPayClient
         }
 
         return new self(
-            rtrim(trim($config['base_url']), '/'),
+            self::urlBase($config['base_url'] ?? null),
             trim($config['public_key']),
             trim($config['secret_key']),
             max(1, (int) ($config['timeout_seconds'] ?? 15)),
         );
+    }
+
+    /**
+     * Adresse de base : absente ou vide = adresse de production par défaut ; fournie = https:// obligatoire, pas de « / » final.
+     * Le message ne cite jamais la valeur reçue.
+     */
+    private static function urlBase(mixed $valeur): string
+    {
+        $url = is_string($valeur) ? trim($valeur) : '';
+        if ($url === '') {
+            return self::URL_BASE_PAR_DEFAUT;
+        }
+        if (! str_starts_with($url, 'https://') || strlen($url) <= 8 || str_ends_with($url, '/') || preg_match('/\s/', $url)) {
+            throw new ConfigurationPaiementInvalide('DEXPAY_BASE_URL est invalide : elle doit commencer par https:// et ne pas se terminer par « / » (exemple : '.self::URL_BASE_PAR_DEFAUT.'). Laissez-la vide pour utiliser l\'adresse par défaut.', ['DEXPAY_BASE_URL']);
+        }
+
+        return $url;
     }
 
     /**

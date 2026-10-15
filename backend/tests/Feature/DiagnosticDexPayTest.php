@@ -123,14 +123,14 @@ describe('réglage actif', function () {
     });
 
     it('donne les NOMS des variables manquantes, jamais leurs valeurs', function () {
-        config(['sopi.paiement.dexpay.secret_key' => '', 'sopi.paiement.dexpay.base_url' => '']);
+        config(['sopi.paiement.dexpay.secret_key' => '', 'sopi.paiement.dexpay.public_key' => '']);
         app()->forgetInstance(PaiementService::class);
 
         $reponse = ddPayer()->assertStatus(503);
 
         $diagnostic = $reponse->json('diagnostic');
         expect($diagnostic['exception'])->toBe(ConfigurationPaiementInvalide::class)
-            ->and($diagnostic['variables_manquantes'])->toBe(['DEXPAY_BASE_URL', 'DEXPAY_SECRET_KEY'])
+            ->and($diagnostic['variables_manquantes'])->toBe(['DEXPAY_PUBLIC_KEY', 'DEXPAY_SECRET_KEY'])
             ->and($diagnostic)->not->toHaveKey('code_http');
         ddAucuneFuite($reponse);
     });

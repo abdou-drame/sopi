@@ -164,7 +164,7 @@ describe('création de session de paiement', function () {
 
     it('journalise les NOMS des variables manquantes, jamais leurs valeurs', function () {
         $lignes = jdCapturer();
-        config(['sopi.paiement.dexpay.secret_key' => '', 'sopi.paiement.dexpay.base_url' => '']);
+        config(['sopi.paiement.dexpay.secret_key' => '', 'sopi.paiement.dexpay.public_key' => '']);
         app()->forgetInstance(PaiementService::class);
 
         jdPayer()->assertStatus(503)->assertJsonPath('message', 'Le service de paiement est momentanément indisponible. Veuillez réessayer.');
@@ -172,7 +172,7 @@ describe('création de session de paiement', function () {
         $ligne = jdLignes($lignes, 'dexpay.creer_session_echec')[0];
         expect($ligne['niveau'])->toBe('error')
             ->and($ligne['contexte']['exception'])->toBe(ConfigurationPaiementInvalide::class)
-            ->and($ligne['contexte']['variables_manquantes'])->toBe(['DEXPAY_BASE_URL', 'DEXPAY_SECRET_KEY']);
+            ->and($ligne['contexte']['variables_manquantes'])->toBe(['DEXPAY_PUBLIC_KEY', 'DEXPAY_SECRET_KEY']);
         jdAucunSecret($lignes);
     });
 });
