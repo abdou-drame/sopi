@@ -188,7 +188,7 @@ endpoints:
       -
         custom: []
         status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","jeton_suivi":"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","lien_suivi":"https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","justificatifs":[{"type":"cni","statut":"en_attente"},{"type":"diplome","statut":"en_attente"}]}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","jeton_suivi":"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","lien_suivi":"https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","justificatifs":[{"type":"cni","statut":"en_attente"},{"type":"diplome","statut":"en_attente"}]}'
         headers: []
         description: ''
       -

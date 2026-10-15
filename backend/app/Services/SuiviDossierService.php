@@ -10,10 +10,10 @@ use App\Models\Prestataire;
  */
 class SuiviDossierService
 {
-    /** Lien personnel de suivi (route publique GET /api/v1/suivi/{jeton}). */
+    /** Lien personnel de suivi : la page web publique GET /suivi/{jeton} (l'API JSON /api/v1/suivi/{jeton} reste pour le mobile). */
     public static function lien(string $jeton): string
     {
-        return rtrim(config('app.url'), '/').'/api/v1/suivi/'.$jeton;
+        return rtrim(config('app.url'), '/').'/suivi/'.$jeton;
     }
 
     public function trouverParJeton(string $jeton): ?Prestataire

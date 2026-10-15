@@ -81,15 +81,16 @@ it('envoie au dépôt un e-mail français avec le lien de suivi personnel', func
         ->and($notification->secret_chiffre)->toBeNull();
 });
 
-it('envoie un lien qui ouvre bien la route de suivi', function () {
+it('envoie un lien qui ouvre bien la page de suivi', function () {
     configurerSmtp();
     Mail::fake();
 
     $lien = depotDossier()->assertCreated()->json('lien_suivi');
     Mail::assertSent(NotificationMail::class, fn (NotificationMail $m) => str_contains($m->render(), 'href="'.$lien.'"'));
 
-    $this->getJson(parse_url($lien, PHP_URL_PATH))->assertOk()
-        ->assertJsonPath('statutCompte', 'en_attente')->assertJsonPath('nomEntreprise', 'Garage Moussa');
+    $this->get(parse_url($lien, PHP_URL_PATH))->assertOk()->assertSee('Garage Moussa')->assertSee("En cours d'examen");
+    // L'API JSON reste disponible pour le mobile avec le même jeton.
+    $this->getJson('/api/v1/suivi/'.basename($lien))->assertOk()->assertJsonPath('statutCompte', 'en_attente');
 });
 
 it('garde la réponse 201 avec jeton_suivi et lien_suivi cohérents', function () {
@@ -98,7 +99,7 @@ it('garde la réponse 201 avec jeton_suivi et lien_suivi cohérents', function (
 
     $reponse = depotDossier()->assertCreated()->assertJsonStructure(['jeton_suivi', 'lien_suivi']);
 
-    expect($reponse->json('lien_suivi'))->toEndWith('/api/v1/suivi/'.$reponse->json('jeton_suivi'));
+    expect($reponse->json('lien_suivi'))->toEndWith('/suivi/'.$reponse->json('jeton_suivi'));
 });
 
 it('ne bloque pas l\'inscription si l\'envoi échoue : la notification reste en attente puis est retentée', function () {

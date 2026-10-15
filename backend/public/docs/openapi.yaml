@@ -8736,7 +8736,7 @@ paths:
                   app: Sopi
                   version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-15T19:33:23+00:00'
+                  time: '2026-10-15T19:52:38+00:00'
                 properties:
                   status:
                     type: string
@@ -8752,7 +8752,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-15T19:33:23+00:00'
+                    example: '2026-10-15T19:52:38+00:00'
       tags:
         - Endpoints
       security: []
@@ -9300,7 +9300,7 @@ paths:
                   metier: mecanique
                   statutCompte: en_attente
                   jeton_suivi: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
-                  lien_suivi: 'https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
+                  lien_suivi: 'https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
                   justificatifs:
                     -
                       type: cni
@@ -9332,7 +9332,7 @@ paths:
                     example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
                   lien_suivi:
                     type: string
-                    example: 'https://api.exemple.test/api/v1/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
+                    example: 'https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop'
                   justificatifs:
                     type: array
                     example:

@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "3e8cbe1b-2428-4fe6-97dc-4d67fa59ef53",
+        "_postman_id": "0660e3c6-113c-4b01-8f72-92c1e4bf4509",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -3470,7 +3470,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T19:33:23+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-15T19:52:38+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -3957,7 +3957,7 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"statutCompte\":\"en_attente\",\"jeton_suivi\":\"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"lien_suivi\":\"https:\/\/api.exemple.test\/api\/v1\/suivi\/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"justificatifs\":[{\"type\":\"cni\",\"statut\":\"en_attente\"},{\"type\":\"diplome\",\"statut\":\"en_attente\"}]}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Diop\",\"prenom\":\"Moussa\",\"nomEntreprise\":\"Garage Moussa\",\"metier\":\"mecanique\",\"statutCompte\":\"en_attente\",\"jeton_suivi\":\"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"lien_suivi\":\"https:\/\/api.exemple.test\/suivi\/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop\",\"justificatifs\":[{\"type\":\"cni\",\"statut\":\"en_attente\"},{\"type\":\"diplome\",\"statut\":\"en_attente\"}]}",
                             "name": ""
                         },
                         {
