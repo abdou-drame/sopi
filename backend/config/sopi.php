@@ -109,7 +109,7 @@ return [
 
     /*
     | Notifications (M10) : pilotes d'envoi, essais et lot de la commande planifiée. Pilote « log » par défaut : rien n'est envoyé.
-    | e-mail : log ou smtp (transport et accès via les variables MAIL_* du serveur). push : log ou fcm (pas encore disponible).
+    | e-mail : log ou smtp (transport et accès via les variables MAIL_* du serveur). push : log ou fcm (FCM HTTP v1, compte de service dans FCM_CREDENTIALS).
     */
     'notifications' => [
         'email_driver' => env('NOTIFICATION_EMAIL_DRIVER', 'log'),
@@ -117,5 +117,10 @@ return [
         'max_tentatives' => (int) env('NOTIFICATION_MAX_TENTATIVES', 5),
         'delai_essai_minutes' => (int) env('NOTIFICATION_DELAI_ESSAI_MINUTES', 5),
         'taille_lot' => (int) env('NOTIFICATION_TAILLE_LOT', 100),
+        // Secret : JSON du compte de service Firebase, son équivalent base64 ou le chemin du fichier. Jamais affiché ni journalisé.
+        'fcm' => [
+            'credentials' => env('FCM_CREDENTIALS'),
+            'project_id' => env('FCM_PROJECT_ID'),
+        ],
     ],
 ];

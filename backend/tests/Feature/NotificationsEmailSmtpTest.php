@@ -6,7 +6,6 @@ use App\Exceptions\ConfigurationNotificationInvalide;
 use App\Mail\NotificationMail;
 use App\Models\Notification;
 use App\Models\User;
-use App\Services\Notification\EnvoiEmail;
 use App\Services\Notification\NotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
@@ -14,20 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
-function configurerSmtp(array $surcharge = []): void
-{
-    config(array_merge([
-        'sopi.notifications.email_driver' => 'smtp',
-        'sopi.notifications.push_driver' => 'log',
-        'mail.default' => 'smtp',
-        'mail.mailers.smtp.host' => 'smtp.exemple.test',
-        'mail.mailers.smtp.port' => 587,
-        'mail.mailers.smtp.username' => 'utilisateur-secret-smtp',
-        'mail.mailers.smtp.password' => 'motdepasse-secret-smtp',
-        'mail.from.address' => 'no-reply@sopi.test',
-    ], $surcharge));
-    app()->forgetInstance(EnvoiEmail::class);
-}
+require_once __DIR__.'/../Helpers/notifications_reelles.php';
 
 function notificationEmail(TypeNotification $type = TypeNotification::ReservationConfirmee, string $corps = 'Votre réservation du 12 mars est confirmée.'): Notification
 {

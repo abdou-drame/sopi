@@ -9,6 +9,7 @@ use App\Enums\StatutEnvoi;
 use App\Enums\TypeNotification;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\AppareilService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -23,7 +24,7 @@ class LaravelNotificationService implements NotificationService
 
         $envoiPossible = $type->ignoreStatutDuCompte() || $utilisateur->statut === StatutCompte::Actif;
         $email = $envoiPossible && in_array(Canal::Email, $canaux, true) && filled($utilisateur->email);
-        $push = $envoiPossible && in_array(Canal::Push, $canaux, true) && filled($utilisateur->jeton_push);
+        $push = $envoiPossible && in_array(Canal::Push, $canaux, true) && app(AppareilService::class)->aDesJetons($utilisateur);
 
         $notification = new Notification;
         $notification->user_id = $utilisateur->id;
