@@ -16,3 +16,7 @@ String urlApi() {
       : urlApiParDefaut;
   return brute.replaceAll(RegExp(r'/+$'), '');
 }
+
+/// Adresse du support, injectée au build : --dart-define=SUPPORT_EMAIL=... Vide par défaut : aucun lien de contact
+/// n'est alors proposé (aucune adresse en dur dans le dépôt).
+const supportEmail = String.fromEnvironment('SUPPORT_EMAIL');
