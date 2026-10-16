@@ -9,6 +9,7 @@ import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/reservation/accueil_client_page.dart';
+import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -151,7 +152,12 @@ GoRouter creerRouteur({
       ),
 
       // — Espace client : parcours plein écran
-      _provisoire(Chemins.prestataires, 'Liste des prestataires'),
+      GoRoute(
+        path: Chemins.prestataires,
+        builder: (context, state) => ListePrestatairesPage(
+          metier: state.uri.queryParameters['metier'] ?? '',
+        ),
+      ),
       _provisoire(
         '${Chemins.prestataires}/:id',
         'Fiche prestataire',

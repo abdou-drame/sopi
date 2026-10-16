@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
 import '../../aide_api.dart';
-import '../auth/aide_acces.dart';
 
 /// Réponses simulées fidèles au format réel de l'API (`/api/v1`).
 

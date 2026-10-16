@@ -181,7 +181,7 @@ class _EnteteAccueil extends ConsumerWidget {
                         const SizedBox(width: 10),
                         Semantics(
                           button: true,
-                          label: 'Profil',
+                          label: 'Mon profil',
                           child: GestureDetector(
                             onTap: () => context.go(Chemins.profil),
                             child: Container(
