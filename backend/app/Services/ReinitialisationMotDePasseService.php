@@ -54,9 +54,10 @@ class ReinitialisationMotDePasseService
             Log::warning('Demande de réinitialisation de mot de passe non traitée.', ['erreur' => $erreur::class]);
         }
 
-        $reste = (int) config('securite.reinitialisation.duree_minimale_ms') - (int) ((hrtime(true) - $debut) / 1_000_000);
-        if ($reste > 0) {
-            usleep($reste * 1000);
+        // Marge de 2 ms : usleep peut rendre la main légèrement trop tôt.
+        $resteMicrosecondes = (int) config('securite.reinitialisation.duree_minimale_ms') * 1000 - (int) ((hrtime(true) - $debut) / 1000);
+        if ($resteMicrosecondes > 0) {
+            usleep($resteMicrosecondes + 2000);
         }
     }
 

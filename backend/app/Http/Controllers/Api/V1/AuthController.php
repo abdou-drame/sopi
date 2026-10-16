@@ -37,29 +37,29 @@ class AuthController extends Controller
 
     public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage, SanctionService $sanctions): JsonResponse
     {
-        $telephone = $request->validated('telephone');
+        $identifiant = $request->validated('identifiant');
 
         // Pendant le blocage, même le bon mot de passe est refusé (et sans consulter la base).
-        $secondes = $blocage->secondesRestantes($telephone);
+        $secondes = $blocage->secondesRestantes($identifiant);
         if ($secondes > 0) {
             return response()->json(['message' => $blocage->message($secondes)], 429, ['Retry-After' => $secondes]);
         }
 
-        $user = User::where('telephone', $telephone)->first();
+        $user = User::where(str_contains($identifiant, '@') ? 'email' : 'telephone', $identifiant)->first();
 
         // Le contrôle du mot de passe est fait même quand le compte n'existe pas, pour garder
-        // un temps de réponse comparable et ne pas révéler quels numéros sont inscrits.
+        // un temps de réponse comparable et ne pas révéler quels identifiants sont inscrits.
         $motDePasseValide = Hash::check(
             $request->validated('password'),
             $user?->password ?? $this->empreinteFactice(),
         );
         if (! $user || ! $motDePasseValide) {
             // Même traitement que le compte existe ou non.
-            $blocage->enregistrerEchec($telephone);
+            $blocage->enregistrerEchec($identifiant);
 
-            return response()->json(['message' => 'Téléphone ou mot de passe incorrect.'], 401);
+            return response()->json(['message' => 'Identifiant ou mot de passe incorrect.'], 401);
         }
-        $blocage->reinitialiser($telephone);
+        $blocage->reinitialiser($identifiant);
 
         // Seul un compte actif s'authentifie ; le statut n'est révélé qu'avec le bon mot de passe.
         if (! $user->estActif()) {

@@ -100,7 +100,7 @@ describe('connexion', function () {
         $mauvaisMdp->assertStatus(401);
         $inconnu->assertStatus(401);
         expect($mauvaisMdp->json())->toBe($inconnu->json())
-            ->and($mauvaisMdp->json('message'))->toBe('Téléphone ou mot de passe incorrect.');
+            ->and($mauvaisMdp->json('message'))->toBe('Identifiant ou mot de passe incorrect.');
     });
 
     it('refuse un compte suspendu', function () {
@@ -117,7 +117,7 @@ describe('connexion', function () {
 
         $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'faux'])
             ->assertStatus(401)
-            ->assertJsonPath('message', 'Téléphone ou mot de passe incorrect.');
+            ->assertJsonPath('message', 'Identifiant ou mot de passe incorrect.');
     });
 
     it('refuse les comptes qui ne sont pas actifs', function (StatutCompte $statut) {
@@ -199,6 +199,6 @@ it('renvoie les erreurs courantes de l\'API en français', function () {
     }
     $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'x'])
         ->assertStatus(429)
-        ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes.")
+        ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.")
         ->assertHeader('Retry-After');
 });

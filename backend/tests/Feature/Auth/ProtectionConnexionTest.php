@@ -30,7 +30,7 @@ describe('blocage après des échecs consécutifs', function () {
 
         tenter('771234567', 'mauvais-mot-de-passe')
             ->assertStatus(429)
-            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes.")
+            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.")
             ->assertHeader('Retry-After', '900');
     });
 
@@ -48,7 +48,7 @@ describe('blocage après des échecs consécutifs', function () {
         $this->travel(14)->minutes();
         tenter('771234567', 'motdepasse1')
             ->assertStatus(429)
-            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans moins d'une minute.");
+            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans moins d'une minute, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.");
     });
 
     it('indique le délai restant qui diminue avec le temps', function () {
@@ -57,13 +57,13 @@ describe('blocage après des échecs consécutifs', function () {
         $this->travel(10)->minutes();
         tenter('771234567', 'motdepasse1')
             ->assertStatus(429)
-            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 5 minutes.");
+            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 5 minutes, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.");
 
         $this->travel(4)->minutes();
         $this->travel(30)->seconds();
         tenter('771234567', 'motdepasse1')
             ->assertStatus(429)
-            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans moins d'une minute.");
+            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans moins d'une minute, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.");
     });
 
     it('débloque après 15 minutes', function () {
@@ -103,7 +103,7 @@ describe('blocage après des échecs consécutifs', function () {
 
         $inconnu = tenter('701112233', 'motdepasse1');
         $inconnu->assertStatus(429)
-            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes.");
+            ->assertJsonPath('message', "Trop d'échecs de connexion. Réessayez dans 15 minutes, ou utilisez « Mot de passe oublié » pour choisir un nouveau mot de passe.");
 
         // Même réponse que pour un compte existant bloqué.
         echouer('771234567', 5);
