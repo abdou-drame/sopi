@@ -103,6 +103,13 @@ class DepotReservation {
     return [for (final e in (corps['data'] as List? ?? const [])) e.toString()];
   }
 
+  /// Nombre de notifications non lues (GET /notifications/non-lues/compteur).
+  Future<int> notificationsNonLues() async {
+    final corps = await _lire('/notifications/non-lues/compteur');
+    final n = corps['nonLues'];
+    return n is num ? n.toInt() : 0;
+  }
+
   Future<ReservationAVenir?> prochaineReservation() async {
     final corps = await _lire('/reservations', requete: {'groupe': 'a_venir'});
     return ReservationAVenir.premiereDepuisJson(corps);
@@ -196,4 +203,10 @@ final metiersProvider = FutureProvider<List<Metier>>(
 final quartiersProvider = FutureProvider<List<String>>(
   retry: sansRelance,
   (ref) => ref.watch(depotReservationProvider).quartiers(),
+);
+
+/// Nombre de notifications non lues, pour la pastille de la cloche.
+final notificationsNonLuesProvider = FutureProvider<int>(
+  retry: sansRelance,
+  (ref) => ref.watch(depotReservationProvider).notificationsNonLues(),
 );

@@ -21,9 +21,16 @@ import 'widgets/feuilles_filtres.dart';
 
 /// Liste des prestataires, éventuellement limitée à un métier ([metier] = code, '' = tous).
 class ListePrestatairesPage extends ConsumerStatefulWidget {
-  const ListePrestatairesPage({super.key, this.metier = ''});
+  const ListePrestatairesPage({
+    super.key,
+    this.metier = '',
+    this.avecRetour = true,
+  });
 
   final String metier;
+
+  /// Faux quand la liste est un onglet de la barre (pas de retour possible).
+  final bool avecRetour;
 
   @override
   ConsumerState<ListePrestatairesPage> createState() =>
@@ -170,6 +177,7 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
               SliverToBoxAdapter(
                 child: _Entete(
                   titre: titre,
+                  avecRetour: widget.avecRetour,
                   filtres: filtres,
                   recherche: _recherche,
                   onRecherche: _surRecherche,
@@ -210,6 +218,7 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
 class _Entete extends StatelessWidget {
   const _Entete({
     required this.titre,
+    required this.avecRetour,
     required this.filtres,
     required this.recherche,
     required this.onRecherche,
@@ -220,6 +229,7 @@ class _Entete extends StatelessWidget {
   });
 
   final String titre;
+  final bool avecRetour;
   final FiltresPrestataires filtres;
   final TextEditingController recherche;
   final ValueChanged<String> onRecherche;
@@ -258,7 +268,10 @@ class _Entete extends StatelessWidget {
                 Row(
                   children: [
                     const SizedBox(width: 4),
-                    BoutonRetour(onPressed: () => context.pop()),
+                    if (avecRetour)
+                      BoutonRetour(onPressed: () => context.pop())
+                    else
+                      const SizedBox(width: DimensionsSopi.largeurRetour),
                     Expanded(
                       child: Text(
                         titre,

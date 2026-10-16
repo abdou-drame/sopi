@@ -109,29 +109,28 @@ void main() {
       expect(chemin(tester), Chemins.connexion);
     });
 
-    testWidgets(
-      'client : coque Accueil / Réservations / Notifications / Profil',
-      (tester) async {
-        final serveur = AdaptateurSimule({
-          'GET /me': const Simulee(200, {'id': '1', 'role': 'client'}),
-        });
-        await lancer(tester, serveur, jeton: 'abc');
-        expect(chemin(tester), Chemins.accueil);
-        expect(find.text('Accueil'), findsWidgets);
+    testWidgets('client : coque Accueil / Rechercher / Réservations / Profil', (
+      tester,
+    ) async {
+      final serveur = AdaptateurSimule({
+        'GET /me': const Simulee(200, {'id': '1', 'role': 'client'}),
+      });
+      await lancer(tester, serveur, jeton: 'abc');
+      expect(chemin(tester), Chemins.accueil);
+      expect(find.text('Accueil'), findsWidgets);
 
-        await tester.tap(find.bySemanticsLabel('Réservations'));
-        await tester.pumpAndSettle();
-        expect(chemin(tester), Chemins.reservations);
+      await tester.tap(find.bySemanticsLabel('Rechercher').last);
+      await tester.pumpAndSettle();
+      expect(chemin(tester), Chemins.rechercher);
 
-        await tester.tap(find.bySemanticsLabel('Notifications'));
-        await tester.pumpAndSettle();
-        expect(chemin(tester), Chemins.notifications);
+      await tester.tap(find.bySemanticsLabel('Réservations'));
+      await tester.pumpAndSettle();
+      expect(chemin(tester), Chemins.reservations);
 
-        await tester.tap(find.bySemanticsLabel('Profil'));
-        await tester.pumpAndSettle();
-        expect(chemin(tester), Chemins.profil);
-      },
-    );
+      await tester.tap(find.bySemanticsLabel('Profil'));
+      await tester.pumpAndSettle();
+      expect(chemin(tester), Chemins.profil);
+    });
 
     testWidgets(
       'prestataire : coque Tableau / Agenda / Portefeuille / Profil',

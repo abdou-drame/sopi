@@ -71,11 +71,40 @@ final accueilProvider = FutureProvider.autoDispose<AccueilDonnees>((ref) async {
 });
 
 /// Onglet Accueil du client (maquette Main).
-class AccueilClientPage extends ConsumerWidget {
+class AccueilClientPage extends ConsumerStatefulWidget {
   const AccueilClientPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AccueilClientPage> createState() => _AccueilClientPageState();
+}
+
+class _AccueilClientPageState extends ConsumerState<AccueilClientPage>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // À l'ouverture de l'accueil, le compteur est relu.
+    Future.microtask(() {
+      if (mounted) ref.invalidate(notificationsNonLuesProvider);
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState etat) {
+    if (etat == AppLifecycleState.resumed) {
+      ref.invalidate(notificationsNonLuesProvider);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final etat = ref.watch(accueilProvider);
     final donnees = etat.asData?.value;
 
@@ -169,14 +198,18 @@ class _EnteteAccueil extends ConsumerWidget {
                     _PilulePleine(
                       libelle: 'Menu',
                       icone: Icons.menu_rounded,
-                      onTap: null,
+                      onTap: () => context.go(Chemins.profil),
                     ),
                     Row(
                       children: [
                         _RondBlanc(
                           libelle: 'Notifications',
                           icone: Icons.notifications_none_rounded,
-                          onTap: () => context.go(Chemins.notifications),
+                          pastille:
+                              (ref.watch(notificationsNonLuesProvider).value ??
+                                  0) >
+                              0,
+                          onTap: () => context.push(Chemins.notifications),
                         ),
                         const SizedBox(width: 10),
                         Semantics(
@@ -316,11 +349,15 @@ class _RondBlanc extends StatelessWidget {
     required this.libelle,
     required this.icone,
     required this.onTap,
+    this.pastille = false,
   });
 
   final String libelle;
   final IconData icone;
   final VoidCallback onTap;
+
+  /// Petit point bleu : des notifications attendent d'être lues.
+  final bool pastille;
 
   @override
   Widget build(BuildContext context) {
@@ -336,7 +373,30 @@ class _RondBlanc extends StatelessWidget {
           child: SizedBox(
             width: 44,
             height: 44,
-            child: Icon(icone, size: 20, color: CouleursSopi.marine),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(icone, size: 20, color: CouleursSopi.marine),
+                if (pastille)
+                  Positioned(
+                    top: 11,
+                    right: 12,
+                    child: Container(
+                      key: const ValueKey('pastille-notifications'),
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: CouleursSopi.bleu,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: CouleursSopi.blanc,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),

@@ -49,8 +49,8 @@ String? redirectionSopi(EtatSession session, String chemin) {
 
 const _ongletsClient = [
   OngletSopi(libelle: 'Accueil', icone: Icons.home_rounded),
+  OngletSopi(libelle: 'Rechercher', icone: Icons.search_rounded),
   OngletSopi(libelle: 'Réservations', icone: Icons.event_note_rounded),
-  OngletSopi(libelle: 'Notifications', icone: Icons.notifications_rounded),
   OngletSopi(libelle: 'Profil', icone: Icons.person_rounded),
 ];
 
@@ -145,18 +145,19 @@ GoRouter creerRouteur({
         branches: [
           _onglet(Chemins.accueil, () => const AccueilClientPage()),
           _onglet(
-            Chemins.reservations,
-            () => const EcranProvisoire(nom: 'Réservations'),
+            Chemins.rechercher,
+            () => const ListePrestatairesPage(avecRetour: false),
           ),
           _onglet(
-            Chemins.notifications,
-            () => const EcranProvisoire(nom: 'Notifications'),
+            Chemins.reservations,
+            () => const EcranProvisoire(nom: 'Réservations'),
           ),
           _onglet(Chemins.profil, () => const ProfilProvisoire()),
         ],
       ),
 
       // — Espace client : parcours plein écran
+      _provisoire(Chemins.notifications, 'Notifications'),
       GoRoute(
         path: Chemins.prestataires,
         builder: (context, state) => ListePrestatairesPage(
