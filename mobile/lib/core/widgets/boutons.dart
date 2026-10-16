@@ -202,6 +202,7 @@ class BoutonCompact extends StatelessWidget {
     this.taille = 13,
     this.margeHorizontale = 18,
     this.chargement = false,
+    this.pleineLargeur = false,
   });
 
   final String libelle;
@@ -211,6 +212,7 @@ class BoutonCompact extends StatelessWidget {
   final double taille;
   final double margeHorizontale;
   final bool chargement;
+  final bool pleineLargeur;
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +227,7 @@ class BoutonCompact extends StatelessWidget {
           ? CouleursSopi.marine
           : (clair ? CouleursSopi.bleu : CouleursSopi.blanc),
       bordure: contour ? CouleursSopi.bordureForte : null,
-      pleineLargeur: false,
+      pleineLargeur: pleineLargeur,
       hauteur: hauteur,
       taille: taille,
       margeHorizontale: margeHorizontale,

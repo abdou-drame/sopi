@@ -12,6 +12,7 @@ import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
 import '../../features/reservation/choix_creneau_page.dart';
 import '../../features/reservation/demande_envoyee_page.dart';
+import '../../features/reservation/detail_reservation_page.dart';
 import '../../features/reservation/fiche_prestataire_page.dart';
 import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
@@ -189,10 +190,10 @@ GoRouter creerRouteur({
         builder: (context, state) =>
             DemandeEnvoyeePage(reservation: state.extra as ReservationCreee),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id',
-        'Détail de la réservation',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id',
+        builder: (context, state) =>
+            DetailReservationPage(reservationId: state.pathParameters['id']!),
       ),
       _provisoire(
         '${Chemins.reservations}/:id/paiement',
