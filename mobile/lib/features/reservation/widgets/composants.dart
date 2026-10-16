@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/animation/apparition.dart';
 import '../../../core/animation/chargement.dart';
 import '../../../core/theme/couleurs.dart';
+import '../../../core/widgets/boutons.dart';
 import '../../../core/widgets/en_tete_degrade.dart';
 import '../formats.dart';
 import '../modeles.dart';
@@ -190,6 +191,97 @@ class SqueletteCartePrestataire extends StatelessWidget {
               ],
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Barre bleue du bas (64 px, coins 32) : petit libellé + valeur à gauche, bouton blanc à droite.
+/// Sans [etiquette] ni [valeur], c'est [texteVide] qui occupe la gauche.
+class BarreBasBleue extends StatelessWidget {
+  const BarreBasBleue({
+    super.key,
+    required this.libelleBouton,
+    required this.onPressed,
+    this.etiquette,
+    this.valeur,
+    this.texteVide = '',
+    this.chargement = false,
+  });
+
+  final String? etiquette;
+  final String? valeur;
+  final String texteVide;
+  final String libelleBouton;
+  final VoidCallback? onPressed;
+  final bool chargement;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      height: 64,
+      padding: const EdgeInsets.fromLTRB(22, 0, 10, 0),
+      decoration: BoxDecoration(
+        color: CouleursSopi.bleu,
+        borderRadius: BorderRadius.circular(32),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: valeur == null
+                ? Text(
+                    texteVide,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursSopi.blanc,
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (etiquette != null)
+                        Text(
+                          etiquette!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 11,
+                            color: CouleursSopi.blanc.withValues(alpha: 0.85),
+                          ),
+                        ),
+                      Text(
+                        valeur!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: CouleursSopi.blanc,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            flex: 2,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: BoutonCompact(
+                libelle: libelleBouton,
+                ton: TonBoutonCompact.clair,
+                hauteur: 46,
+                taille: 15,
+                margeHorizontale: 24,
+                chargement: chargement,
+                onPressed: onPressed,
+              ),
+            ),
+          ),
         ],
       ),
     );

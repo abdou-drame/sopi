@@ -10,6 +10,7 @@ import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
+import '../../features/reservation/choix_creneau_page.dart';
 import '../../features/reservation/fiche_prestataire_page.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/auth/utilisateur.dart';
@@ -172,9 +173,16 @@ GoRouter creerRouteur({
           ),
         ],
       ),
+      GoRoute(
+        path: '${Chemins.prestataires}/:id/creneau',
+        builder: (context, state) => ChoixCreneauPage(
+          prestataireId: state.pathParameters['id']!,
+          prestationId: state.uri.queryParameters['prestation'] ?? '',
+        ),
+      ),
       _provisoire(
-        '${Chemins.prestataires}/:id/creneau',
-        'Choix du créneau',
+        '${Chemins.reservations}/:id/envoyee',
+        'Demande envoyée',
         parametres: ['id'],
       ),
       _provisoire(

@@ -8,7 +8,6 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
-import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_degrade.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
@@ -207,9 +206,14 @@ class _FichePrestatairePageState extends ConsumerState<FichePrestatairePage> {
               bottom: 20 + bas,
               child: ApparitionApresEntete(
                 rang: 4,
-                child: _BarreChoix(
-                  prestation: prestation,
-                  onContinuer: prestation == null
+                child: BarreBasBleue(
+                  etiquette: prestation?.nom,
+                  valeur: prestation == null
+                      ? null
+                      : formaterArgent(prestation.prix),
+                  texteVide: 'Choisissez un service',
+                  libelleBouton: 'Choisir un créneau',
+                  onPressed: prestation == null
                       ? null
                       : () => context.push(
                           '${Chemins.creneau(widget.prestataireId)}'
@@ -671,83 +675,6 @@ class _CarteService extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Barre bleue du bas : service choisi + prix, et bouton « Choisir un créneau » (inactif sans service).
-class _BarreChoix extends StatelessWidget {
-  const _BarreChoix({required this.prestation, required this.onContinuer});
-
-  final Prestation? prestation;
-  final VoidCallback? onContinuer;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final p = prestation;
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.fromLTRB(22, 0, 10, 0),
-      decoration: BoxDecoration(
-        color: CouleursSopi.bleu,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: p == null
-                ? Text(
-                    'Choisissez un service',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: CouleursSopi.blanc,
-                    ),
-                  )
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        p.nom,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 11,
-                          color: CouleursSopi.blanc.withValues(alpha: 0.85),
-                        ),
-                      ),
-                      Text(
-                        formaterArgent(p.prix),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: CouleursSopi.blanc,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            flex: 2,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: BoutonCompact(
-                libelle: 'Choisir un créneau',
-                ton: TonBoutonCompact.clair,
-                hauteur: 46,
-                taille: 15,
-                margeHorizontale: 24,
-                onPressed: onContinuer,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
