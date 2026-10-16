@@ -262,6 +262,16 @@ void main() {
       expect(cheminCourant(tester), Chemins.paiement('r-2'));
     });
 
+    testWidgets('« Annuler » ouvre la feuille de confirmation', (tester) async {
+      final serveur = _serveur();
+      await _ouvrir(tester, serveur);
+      await toucher(tester, find.text('Annuler'));
+      await passerTransition(tester);
+      expect(find.text('Annuler cette réservation ?'), findsOneWidget);
+      expect(find.text('Garder ma réservation'), findsOneWidget);
+      expect(serveur.requetes.where((r) => r.method == 'POST'), isEmpty);
+    });
+
     testWidgets('petit écran 320×568 : pas de débordement', (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1;

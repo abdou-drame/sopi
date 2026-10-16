@@ -229,11 +229,13 @@ class _LigneRecap extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          libelle,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontSize: 14,
-            color: CouleursSopi.texteSecondaire,
+        Flexible(
+          child: Text(
+            libelle,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 14,
+              color: CouleursSopi.texteSecondaire,
+            ),
           ),
         ),
         const SizedBox(width: 12),
@@ -315,10 +317,14 @@ class _Recapitulatif extends ConsumerWidget {
                             ? context.pop()
                             : context.go(Chemins.reservations),
                       ),
-                      Text(
-                        'Récapitulatif',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                      Expanded(
+                        child: Text(
+                          'Récapitulatif',
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
                       ),
                       const SizedBox(width: DimensionsSopi.largeurRetour),
                     ],

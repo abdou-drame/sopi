@@ -476,11 +476,15 @@ class _BarreHaute extends StatelessWidget {
               ? context.pop()
               : context.go(Chemins.reservations),
         ),
-        Text(
-          'Réservation',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        Expanded(
+          child: Text(
+            'Réservation',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
         ),
         const SizedBox(width: DimensionsSopi.largeurRetour),
       ],
@@ -656,13 +660,16 @@ class _BlocCode extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Code de démarrage',
-                style: theme.textTheme.labelLarge?.copyWith(
-                  color: CouleursSopi.blanc,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  'Code de démarrage',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: CouleursSopi.blanc,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Semantics(
                 button: true,
                 label: 'Copier le code',
