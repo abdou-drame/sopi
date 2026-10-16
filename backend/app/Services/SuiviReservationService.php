@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\GroupeReservation;
 use App\Enums\Role;
 use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
@@ -20,15 +21,21 @@ class SuiviReservationService
 {
     public const PAR_PAGE = 20;
 
-    public function lister(User $client, ?StatutReservation $statut = null): LengthAwarePaginator
+    /** Sans groupe : plus récentes d'abord. Avec un groupe (onglet) : statuts et ordre du groupe, combinables avec $statut. */
+    public function lister(User $client, ?StatutReservation $statut = null, ?GroupeReservation $groupe = null): LengthAwarePaginator
     {
-        return $client->reservations()
+        $requete = $client->reservations()
             ->with(['creneau', 'prestation.prestataire', 'paiements', 'avis'])
             ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
-            ->when($statut, fn ($q) => $q->where('statut', $statut->value))
-            ->orderByDesc('created_at')
-            ->orderByDesc('id')
-            ->paginate(self::PAR_PAGE);
+            ->when($statut, fn ($q) => $q->where('statut', $statut->value));
+
+        if ($groupe !== null) {
+            $groupe->appliquer($requete->getQuery());
+        } else {
+            $requete->orderByDesc('created_at')->orderByDesc('id');
+        }
+
+        return $requete->paginate(self::PAR_PAGE);
     }
 
     /** Réservation du client, ou null si elle n'existe pas ou appartient à quelqu'un d'autre. */

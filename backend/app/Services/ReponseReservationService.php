@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\GroupeReservation;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationAcceptee;
 use App\Events\Reservation\ReservationRefusee;
@@ -21,14 +22,19 @@ class ReponseReservationService
     public const PAR_PAGE = 20;
 
     /** Demandes des créneaux du prestataire, les plus récentes d'abord, filtrées par statut si demandé. */
-    public function lister(Prestataire $prestataire, ?StatutReservation $statut = null): LengthAwarePaginator
+    public function lister(Prestataire $prestataire, ?StatutReservation $statut = null, ?GroupeReservation $groupe = null): LengthAwarePaginator
     {
-        return $this->demandes($prestataire)
+        $requete = $this->demandes($prestataire)
             ->with(['creneau', 'prestation', 'client'])
-            ->when($statut, fn (Builder $q) => $q->where('statut', $statut->value))
-            ->orderByDesc('created_at')
-            ->orderByDesc('id')
-            ->paginate(self::PAR_PAGE);
+            ->when($statut, fn (Builder $q) => $q->where('statut', $statut->value));
+
+        if ($groupe !== null) {
+            $groupe->appliquer($requete);
+        } else {
+            $requete->orderByDesc('created_at')->orderByDesc('id');
+        }
+
+        return $requete->paginate(self::PAR_PAGE);
     }
 
     /** Détail d'une demande, ou null si elle n'existe pas ou n'appartient pas à ce prestataire. */

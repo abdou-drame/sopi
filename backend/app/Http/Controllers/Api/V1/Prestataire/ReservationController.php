@@ -32,7 +32,7 @@ class ReservationController extends Controller
     /**
      * Mes demandes de réservation
      *
-     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`.
+     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre).
      *
      * @authenticated
      *
@@ -43,7 +43,7 @@ class ReservationController extends Controller
      */
     public function index(ListerReservationsRequest $request)
     {
-        return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut()));
+        return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut(), $request->groupe()));
     }
 
     /**
