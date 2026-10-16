@@ -10,7 +10,7 @@ final supportEmailProvider = Provider<String>((ref) => supportEmail);
 /// système réel n'y est fait.
 final lanceurUrlProvider = Provider<Future<bool> Function(Uri)>(
   (ref) =>
-      (uri) => launchUrl(uri),
+      (uri) => launchUrl(uri, mode: LaunchMode.externalApplication),
 );
 
 /// Ouvre la messagerie vers le support. Renvoie faux si le support n'est pas configuré ou si rien ne s'ouvre.

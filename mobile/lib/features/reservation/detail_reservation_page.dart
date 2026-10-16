@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/animation/chargement.dart';
 import '../../core/api/erreurs.dart';
+import '../../core/config/support.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
@@ -20,7 +21,6 @@ import 'annulation_reservation.dart';
 import 'demande_envoyee_page.dart'
     show delaiPaiementHeures, delaiReponsePrestataireHeures;
 import 'depot_reservation.dart';
-import 'lanceur_url.dart';
 import 'modeles.dart';
 import 'presentation_reservation.dart';
 import 'reservations_controleur.dart';
@@ -103,7 +103,12 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
 
   Future<void> _appeler(String telephone) async {
     final lance = ref.read(lanceurUrlProvider);
-    final ouvert = await lance(Uri(scheme: 'tel', path: telephone));
+    var ouvert = false;
+    try {
+      ouvert = await lance(Uri(scheme: 'tel', path: telephone));
+    } catch (_) {
+      ouvert = false;
+    }
     if (!mounted) return;
     setState(
       () => _erreurAction = ouvert
