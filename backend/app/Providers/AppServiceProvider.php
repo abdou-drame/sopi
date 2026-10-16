@@ -68,6 +68,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Le pilote de session « array » (valeur historique) ne survit pas entre deux requêtes : le jeton CSRF du formulaire de
+        // réinitialisation du mot de passe serait toujours refusé. On passe au pilote « cookie » (chiffré, sans stockage serveur).
+        if (config('session.driver') === 'array' && ! $this->app->runningUnitTests()) {
+            config(['session.driver' => 'cookie']);
+        }
+
         // Notifications (M10.2) : un écouteur par événement métier, enregistrés explicitement (pas de découverte automatique).
         Event::listen(AvisDepose::class, [NotifierLesUtilisateurs::class, 'surAvisDepose']);
         Event::listen(AvisModere::class, [NotifierLesUtilisateurs::class, 'surAvisModere']);
@@ -119,6 +125,24 @@ class AppServiceProvider extends ServiceProvider
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
         // par BlocageConnexionService.
+        // Demande de réinitialisation : limite par IP ET par adresse e-mail saisie (même si elle n'existe pas : rien n'est révélé).
+        RateLimiter::for('mot-de-passe-oublie', function (Request $request) {
+            $email = mb_strtolower(trim((string) $request->input('email')));
+
+            return [
+                Limit::perMinute(config('securite.reinitialisation.max_par_minute_par_ip'))->by('ip:'.$request->ip()),
+                Limit::perHour(config('securite.reinitialisation.max_par_heure_par_email'))->by('email:'.sha1($email)),
+            ];
+        });
+        // Page et API de réinitialisation : limite par IP et par jeton essayé (contre l'essai de jetons).
+        RateLimiter::for('reinitialisation', function (Request $request) {
+            $jeton = (string) ($request->route('jeton') ?? $request->input('jeton'));
+
+            return [
+                Limit::perMinute(config('securite.reinitialisation.max_validations_par_minute_par_ip'))->by('ip:'.$request->ip()),
+                Limit::perHour(config('securite.reinitialisation.max_validations_par_heure_par_jeton'))->by('jeton:'.sha1($jeton)),
+            ];
+        });
         RateLimiter::for('connexion', fn (Request $request) => Limit::perMinute(config('securite.connexion.max_par_minute_par_ip'))
             ->by($request->ip()));
     }

@@ -22,6 +22,8 @@ enum TypeNotification: string
     case LitigeCloture = 'litige_cloture';
     case SanctionPosee = 'sanction_posee';
     case SanctionLevee = 'sanction_levee';
+    case ReinitialisationMotDePasse = 'reinitialisation_mot_de_passe';
+    case MotDePasseModifie = 'mot_de_passe_modifie';
 
     /**
      * Vrai si le message doit atteindre l'utilisateur même quand son compte n'est pas actif : le résultat de l'examen d'un dossier
@@ -30,6 +32,24 @@ enum TypeNotification: string
     public function ignoreStatutDuCompte(): bool
     {
         return in_array($this, [self::DossierDepose, self::DemandeAcceptee, self::DemandeRefusee, self::LitigeCloture, self::SanctionPosee, self::SanctionLevee], true);
+    }
+
+    /** Vrai si l'e-mail contient un lien secret (transmis chiffré, jamais stocké en clair). */
+    public function aUnLien(): bool
+    {
+        return in_array($this, [self::DossierDepose, self::ReinitialisationMotDePasse], true);
+    }
+
+    public function libelleLien(): string
+    {
+        return $this === self::ReinitialisationMotDePasse ? 'Choisir un nouveau mot de passe' : 'Suivre mon dossier';
+    }
+
+    public function noteLien(): string
+    {
+        return $this === self::ReinitialisationMotDePasse
+            ? 'Ce lien est personnel, valable 60 minutes et utilisable une seule fois : ne le partagez pas. Si vous n\'êtes pas à l\'origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.'
+            : 'Ce lien est personnel : ne le partagez pas. Vous y suivrez la validation de votre compte (en attente, validé ou refusé).';
     }
 
     /** Phrase d'introduction de l'e-mail, propre à chaque type (le détail est dans le corps de la notification). */
@@ -53,6 +73,8 @@ enum TypeNotification: string
             self::LitigeCloture => "Un litige a été clôturé par l'équipe Sopi.",
             self::SanctionPosee => 'Une décision concerne votre compte Sopi.',
             self::SanctionLevee => 'Une décision concerne votre compte Sopi.',
+            self::ReinitialisationMotDePasse => 'Vous avez demandé à réinitialiser votre mot de passe.',
+            self::MotDePasseModifie => 'La sécurité de votre compte Sopi.',
         };
     }
 }

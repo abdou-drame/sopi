@@ -30,7 +30,7 @@ endpoints:
       -
         custom: []
         status: 503
-        content: '{"status":"ok","app":"Sopi","version":"0.0.0-dev","database":"erreur","time":"2026-10-15T19:52:38+00:00"}'
+        content: '{"status":"ok","app":"Sopi","version":"0.0.0-dev","database":"erreur","time":"2026-10-16T12:59:44+00:00"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -155,12 +155,12 @@ endpoints:
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      telephone:
+      identifiant:
         custom: []
-        name: telephone
-        description: 'Le champ value ne doit pas dépasser 30 caractères.'
+        name: identifiant
+        description: 'Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères.'
         required: true
-        example: vmqeopfuudtdsufvyvddq
+        example: awa@example.com
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -169,17 +169,17 @@ endpoints:
       password:
         custom: []
         name: password
-        description: 'Le champ value ne doit pas dépasser 255 caractères.'
+        description: 'Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères.'
         required: true
-        example: OP>@;4
+        example: MotDePasse123
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      telephone: vmqeopfuudtdsufvyvddq
-      password: OP>@;4
+      identifiant: awa@example.com
+      password: MotDePasse123
     fileParameters: []
     responses: []
     responseFields: []
