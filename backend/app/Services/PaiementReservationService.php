@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OperateurRetrait;
 use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Exceptions\ReservationImpossibleException;
@@ -36,7 +37,7 @@ class PaiementReservationService
      *
      * @throws ReservationImpossibleException 404 (introuvable), 409 (statut, délai, déjà payée, en cours d'initialisation) ou 503 (prestataire de paiement)
      */
-    public function initier(User $client, string $id): array
+    public function initier(User $client, string $id, ?OperateurRetrait $operateur = null): array
     {
         $reservation = Str::isUuid($id) ? Reservation::query()->where('client_id', $client->id)->find($id) : null;
         if ($reservation === null) {
@@ -44,14 +45,14 @@ class PaiementReservationService
         }
 
         // Transaction 1 : verrou de ligne sur la réservation, puis paiement EN_ATTENTE. Aucun appel externe ici.
-        [$paiement, $existant] = DB::transaction(function () use ($reservation, $client) {
+        [$paiement, $existant] = DB::transaction(function () use ($reservation, $client, $operateur) {
             if (! $reservation->prendreVerrouPaiement($client->id, self::limitePaiement())) {
                 throw $this->refus($reservation, $client);
             }
 
             $actif = $this->paiementActif($reservation);
             if ($actif === null) {
-                return $this->ouvrir($reservation);
+                return $this->ouvrir($reservation, $operateur);
             }
 
             return [$this->reutiliser($actif), true];
@@ -102,13 +103,13 @@ class PaiementReservationService
     }
 
     /** @return array{0: Paiement, 1: bool} */
-    private function ouvrir(Reservation $reservation): array
+    private function ouvrir(Reservation $reservation, ?OperateurRetrait $operateur = null): array
     {
         $montants = $this->calcul->calculer($reservation->prix_applique);
 
         try {
             // Transaction imbriquée = point de sauvegarde : un refus de l'index ne casse pas la transaction (PostgreSQL).
-            return [DB::transaction(fn () => Paiement::ouvrir($reservation->id, $montants)), false];
+            return [DB::transaction(fn () => Paiement::ouvrir($reservation->id, $montants, $operateur?->value)), false];
         } catch (UniqueConstraintViolationException) {
             // Dernière protection (index unique partiel) : un paiement actif est apparu entre-temps, on le renvoie.
             $actif = $this->paiementActif($reservation) ?? throw $this->indisponible();

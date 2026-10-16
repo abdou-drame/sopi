@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Exceptions\ReservationImpossibleException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\PayerReservationRequest;
 use App\Http\Resources\PaiementReservationResource;
 use App\Services\PaiementReservationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 /**
  * @group Client — paiement
@@ -22,14 +22,20 @@ class PaiementReservationController extends Controller
      * Payer l'acompte d'une réservation
      *
      * Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
-     * l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
+     * l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Le corps est facultatif : le montant est toujours calculé par le
      * serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code
      * généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
      * pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.
      *
+     * Le champ facultatif `operateur` (`wave` ou `orange_money`) est validé et enregistré avec le paiement, mais n'a aucun effet
+     * pour l'instant : DexPay ne permet pas de présélectionner l'opérateur à la création de la session, le client le choisit
+     * sur la page de paiement. Sans `operateur`, rien ne change.
+     *
      * @authenticated
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
+     *
+     * @bodyParam operateur string Opérateur souhaité : `wave` ou `orange_money` (sans effet pour l'instant). Example: wave
      *
      * @response 201 {"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}
      * @response 200 {"paiement":{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"en_attente","montantAcompte":"4500.00","devise":"XOF"},"montantRestantSurPlace":"10500.00","urlPaiement":"https://paiement.exemple.test/session/abc123","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee"}}
@@ -40,10 +46,10 @@ class PaiementReservationController extends Controller
      * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
      * @response 503 {"message":"Le service de paiement est momentanément indisponible. Veuillez réessayer."}
      */
-    public function __invoke(Request $requete, string $id): JsonResponse
+    public function __invoke(PayerReservationRequest $requete, string $id): JsonResponse
     {
         try {
-            [$paiement, $cree] = $this->service->initier($requete->user(), $id);
+            [$paiement, $cree] = $this->service->initier($requete->user(), $id, $requete->operateur());
         } catch (ReservationImpossibleException $e) {
             return response()->json(['message' => $e->getMessage()] + ($e->diagnostic !== null ? ['diagnostic' => $e->diagnostic] : []), $e->statut);
         }
