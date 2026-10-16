@@ -4,6 +4,7 @@ use App\Enums\Role;
 use App\Enums\StatutCompte;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\PersonalAccessToken;
 
 uses(RefreshDatabase::class);
 
@@ -136,7 +137,7 @@ describe('déconnexion et profil', function () {
 
         $this->withToken($token)->postJson('/api/v1/auth/deconnexion')->assertOk();
 
-        expect(\Laravel\Sanctum\PersonalAccessToken::count())->toBe(0);
+        expect(PersonalAccessToken::count())->toBe(0);
         // Le guard met l'utilisateur en cache dans la même requête de test : on le réinitialise.
         $this->app['auth']->forgetGuards();
         $this->withToken($token)->getJson('/api/v1/auth/moi')->assertUnauthorized();

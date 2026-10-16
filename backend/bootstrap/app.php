@@ -8,8 +8,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
-use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -44,8 +44,8 @@ return Application::configure(basePath: dirname(__DIR__))
             $request->is('reinitialiser-mot-de-passe/*') => response()->view('reinitialisation.erreur', ['titre' => 'Trop de tentatives', 'message' => 'Trop de tentatives. Réessayez dans quelques instants.'], 429, $e->getHeaders()),
             default => null,
         });
-        // Formulaire de réinitialisation : page d'erreur lisible quand le jeton CSRF a expiré.
-        $exceptions->render(fn (TokenMismatchException $e, Request $request) => $request->is('reinitialiser-mot-de-passe/*')
+        // Formulaire de réinitialisation : page lisible quand le jeton CSRF a expiré (le framework convertit TokenMismatchException en HttpException 419).
+        $exceptions->render(fn (HttpException $e, Request $request) => $e->getStatusCode() === 419 && $request->is('reinitialiser-mot-de-passe/*')
             ? response()->view('reinitialisation.erreur', ['titre' => 'Page expirée', 'message' => 'Cette page a expiré. Rouvrez le lien reçu par e-mail pour réessayer.'], 419) : null);
         $exceptions->render(fn (AuthorizationException|AccessDeniedHttpException $e, Request $request) => $request->is('api/*')
             ? response()->json(['message' => "Vous n'avez pas le droit d'effectuer cette action."], 403) : null);
