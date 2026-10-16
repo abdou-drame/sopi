@@ -1,0 +1,29 @@
+import 'package:flutter/material.dart';
+
+/// Palette Sopi. Aucune couleur n'est écrite en dur ailleurs que dans ce fichier.
+abstract final class CouleursSopi {
+  static const bleu = Color(0xFF1D4ED8);
+  static const marine = Color(0xFF0F1B3D);
+  static const texteSecondaire = Color(0xFF4A5678);
+  static const texteDiscret = Color(0xFF64708F);
+  static const fond = Color(0xFFF4F7FD);
+  static const bordure = Color(0xFFE3E9F6);
+  static const bordureForte = Color(0xFFD5DDF0);
+  static const champ = Color(0xFFF7F9FF);
+  static const bleuPastel = Color(0xFFDBEAFE);
+  static const blanc = Color(0xFFFFFFFF);
+
+  static const erreurFond = Color(0xFFFEE2E2);
+  static const erreurTexte = Color(0xFFB91C1C);
+  static const succesFond = Color(0xFFDCFCE7);
+  static const succesTexte = Color(0xFF15803D);
+
+  // En-tête dégradé
+  static const enteteFond = Color(0xFFEEF4FF);
+  static const enteteTacheBleue = Color(0xFFBFDBFE);
+  static const enteteTacheIndigo = Color(0xFFC7D2FE);
+
+  // Squelettes de chargement
+  static const squelette = Color(0xFFE3E9F6);
+  static const squeletteClair = Color(0xFFEEF2FB);
+}
