@@ -185,10 +185,15 @@ final depotReservationProvider = Provider<DepotReservation>(
 );
 
 /// Liste des métiers (publique), gardée en mémoire : sert à l'accueil et aux titres.
+/// Pas de relance automatique des chargements : l'écran propose « Réessayer ».
+Duration? sansRelance(int essais, Object erreur) => null;
+
 final metiersProvider = FutureProvider<List<Metier>>(
+  retry: sansRelance,
   (ref) => ref.watch(depotReservationProvider).metiers(),
 );
 
 final quartiersProvider = FutureProvider<List<String>>(
+  retry: sansRelance,
   (ref) => ref.watch(depotReservationProvider).quartiers(),
 );

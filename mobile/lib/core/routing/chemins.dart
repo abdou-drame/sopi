@@ -23,6 +23,7 @@ abstract final class Chemins {
   // — Client : parcours
   static const prestataires = '/prestataires';
   static String fichePrestataire(String id) => '/prestataires/$id';
+  static String avisPrestataire(String id) => '/prestataires/$id/avis';
   static String creneau(String prestataireId) =>
       '/prestataires/$prestataireId/creneau';
   static String paiement(String reservationId) =>

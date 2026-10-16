@@ -9,6 +9,8 @@ import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/reservation/accueil_client_page.dart';
+import '../../features/reservation/avis_prestataire_page.dart';
+import '../../features/reservation/fiche_prestataire_page.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
@@ -158,10 +160,17 @@ GoRouter creerRouteur({
           metier: state.uri.queryParameters['metier'] ?? '',
         ),
       ),
-      _provisoire(
-        '${Chemins.prestataires}/:id',
-        'Fiche prestataire',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.prestataires}/:id',
+        builder: (context, state) =>
+            FichePrestatairePage(prestataireId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'avis',
+            builder: (context, state) =>
+                AvisPrestatairePage(prestataireId: state.pathParameters['id']!),
+          ),
+        ],
       ),
       _provisoire(
         '${Chemins.prestataires}/:id/creneau',
