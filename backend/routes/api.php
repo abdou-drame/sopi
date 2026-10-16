@@ -166,6 +166,7 @@ Route::prefix('v1')->group(function () {
 
         // Solde et retraits (M7). Pas de whereUuid : un identifiant invalide répond comme un retrait inconnu.
         Route::get('/solde', [RetraitController::class, 'solde']);
+        Route::get('/portefeuille/mouvements', [RetraitController::class, 'mouvements']);
         Route::get('/retraits', [RetraitController::class, 'index']);
         Route::get('/retraits/{id}', [RetraitController::class, 'show']);
         Route::post('/retraits', [RetraitController::class, 'store'])->middleware('throttle:retrait');

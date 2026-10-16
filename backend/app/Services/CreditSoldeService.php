@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\StatutPaiement;
+use App\Enums\TypeMouvementPortefeuille;
 use App\Exceptions\CreditSoldeImpossibleException;
+use App\Models\MouvementPortefeuille;
 use App\Models\Paiement;
 use App\Models\Prestataire;
 use App\Models\Reservation;
@@ -71,6 +73,7 @@ class CreditSoldeService
         $part = CalculPaiement::soustraire($paiement->montant_acompte, $paiement->commission);
         Prestataire::query()->whereKey($prestataireId)->update(['solde' => DB::raw('solde + '.$part)]);
         $solde = Prestataire::query()->whereKey($prestataireId)->value('solde');
+        MouvementPortefeuille::enregistrer($prestataireId, TypeMouvementPortefeuille::Credit, $part, 'Prestation terminée (acompte moins commission)', $solde, reservationId: $paiement->reservation_id);
 
         return new CreditEffectue((string) $paiement->montant_acompte, (string) $paiement->commission, $part, (string) $solde);
     }
