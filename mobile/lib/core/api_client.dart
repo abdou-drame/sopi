@@ -1,26 +1,29 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// URL de l'API, injectée au build : --dart-define=API_BASE_URL=...
-const apiBaseUrl = String.fromEnvironment(
-  'API_BASE_URL',
-  defaultValue: 'https://sopi-api.duckdns.org',
+import '../features/auth/session.dart';
+import 'api/client_api.dart';
+import 'api/stockage_jeton.dart';
+
+export 'config/environnement.dart' show urlApi;
+
+/// Stockage du jeton (chiffré sur l'appareil ; remplacé en mémoire dans les tests).
+final stockageJetonProvider = Provider<StockageJeton>(
+  (ref) => StockageJetonSecurise(),
 );
 
-/// Client HTTP unique de l'application. Toute requête vers l'API passe par lui.
+/// Client HTTP unique de l'application. Toute requête vers l'API passe par lui :
+/// jeton Bearer, langue française, erreurs converties en [ErreurApi] (voir `api/erreurs.dart`).
 final dioProvider = Provider<Dio>((ref) {
-  final base = apiBaseUrl.replaceAll(RegExp(r'/+$'), '');
-  return Dio(
-    BaseOptions(
-      baseUrl: '$base/api/v1',
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      headers: {'Accept': 'application/json'},
-    ),
+  return creerClientApi(
+    stockage: ref.watch(stockageJetonProvider),
+    // Lecture à la demande : évite la dépendance circulaire client ↔ session.
+    surSessionExpiree: () => ref.read(sessionProvider.notifier).expirer(),
   );
 });
 
 /// Erreur d'API présentable à l'utilisateur (message en français).
+/// Conservée pour l'écran de diagnostic ; le reste de l'application utilise `ErreurApi`.
 class ApiException implements Exception {
   ApiException(this.message, {this.statusCode});
 
