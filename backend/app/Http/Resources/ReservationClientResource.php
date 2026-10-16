@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\StatutReservation;
+use App\Models\Prestataire;
 use App\Models\Reservation;
 use App\Services\PaiementReservationService;
 use App\Services\SuiviReservationService;
@@ -11,7 +12,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * Réservation vue par son client propriétaire (seul destinataire de codeReservation, null tant qu'il n'existe pas).
- * Aucune donnée personnelle du prestataire (ni téléphone, e-mail, nom, prénom, identifiant utilisateur).
+ * Aucune donnée personnelle du prestataire (ni e-mail, nom, prénom, identifiant utilisateur), sauf son téléphone une fois la
+ * réservation confirmée, en cours ou terminée (null avant, et pour une réservation refusée ou annulée).
  *
  * @mixin Reservation
  */
@@ -28,6 +30,14 @@ class ReservationClientResource extends JsonResource
             'statut' => $paiement->statut->value,
             'montantAcompte' => (float) $paiement->montant_acompte,
         ];
+    }
+
+    /** Téléphone du prestataire, communiqué au client seulement une fois la réservation confirmée (jamais avant, ni après annulation ou refus). */
+    private function telephonePrestataire(Prestataire $prestataire): ?string
+    {
+        $visible = in_array($this->statut, [StatutReservation::Confirmee, StatutReservation::EnCours, StatutReservation::Terminee], true);
+
+        return $visible ? $prestataire->user->telephone : null;
     }
 
     public function toArray(Request $request): array
@@ -62,6 +72,7 @@ class ReservationClientResource extends JsonResource
                 'nomEntreprise' => $prestataire->nom_entreprise,
                 'quartier' => $prestataire->quartier,
                 'adresse' => $prestataire->adresse,
+                'telephone' => $this->telephonePrestataire($prestataire),
             ],
         ];
     }

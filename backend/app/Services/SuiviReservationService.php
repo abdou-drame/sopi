@@ -25,7 +25,7 @@ class SuiviReservationService
     public function lister(User $client, ?StatutReservation $statut = null, ?GroupeReservation $groupe = null): LengthAwarePaginator
     {
         $requete = $client->reservations()
-            ->with(['creneau', 'prestation.prestataire', 'paiements', 'avis'])
+            ->with(['creneau', 'prestation.prestataire.user', 'paiements', 'avis'])
             ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
             ->when($statut, fn ($q) => $q->where('statut', $statut->value));
 
@@ -45,7 +45,7 @@ class SuiviReservationService
             return null;
         }
 
-        return $client->reservations()->with(['creneau', 'prestation.prestataire', 'paiements', 'avis'])
+        return $client->reservations()->with(['creneau', 'prestation.prestataire.user', 'paiements', 'avis'])
             ->withExists(['paiements as a_paiement_reussi' => fn ($q) => $q->where('statut', StatutPaiement::Reussi->value)])
             ->find($id);
     }
@@ -78,7 +78,7 @@ class SuiviReservationService
 
         ReservationAnnulee::dispatch($reservation, Role::Client);
 
-        return $reservation->load(['creneau', 'prestation.prestataire', 'paiements']);
+        return $reservation->load(['creneau', 'prestation.prestataire.user', 'paiements']);
     }
 
     /** Une réservation dont le créneau commence avant cet instant (UTC) n'est plus annulable. */
