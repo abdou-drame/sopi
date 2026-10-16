@@ -187,6 +187,37 @@ class SanctionService
         return $base.' Motif : '.$sanction->motif;
     }
 
+    /**
+     * Champs structurés ajoutés à la réponse 403 de connexion : « motif » (sanction active, ou motif du refus d'inscription) et,
+     * pour une suspension temporaire, « finSuspension » (ISO 8601). Un champ sans valeur connue est absent.
+     *
+     * @return array{motif?: string, finSuspension?: string}
+     */
+    public function detailRefusConnexion(User $utilisateur): array
+    {
+        if ($utilisateur->statut === StatutCompte::Refuse) {
+            $motif = $utilisateur->prestataire?->motif_refus;
+
+            return $motif === null ? [] : ['motif' => $motif];
+        }
+
+        if (! in_array($utilisateur->statut, [StatutCompte::Suspendu, StatutCompte::Banni], true)) {
+            return [];
+        }
+
+        $sanction = Sanction::query()->bloquantesActives()->where('user_id', $utilisateur->id)->latest()->first();
+        if ($sanction === null) {
+            return [];
+        }
+
+        $detail = ['motif' => $sanction->motif];
+        if ($sanction->type === TypeSanction::SuspensionTemporaire && $sanction->date_fin !== null) {
+            $detail['finSuspension'] = $sanction->date_fin->toIso8601String();
+        }
+
+        return $detail;
+    }
+
     /** @throws ReservationImpossibleException */
     private function verifierLiens(User $cible, ?Litige $litige, ?Avis $avis): void
     {

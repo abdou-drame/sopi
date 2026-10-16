@@ -35,6 +35,22 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Connexion
+     *
+     * Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations
+     * structurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire
+     * seulement). Ces champs sont absents sinon.
+     *
+     * @group Authentification
+     *
+     * @unauthenticated
+     *
+     * @response 200 {"token":"1|abcdef","user":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client","statut":"actif"}}
+     * @response 401 {"message":"Identifiant ou mot de passe incorrect."}
+     * @response 403 scenario="Compte suspendu" {"message":"Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés.","motif":"Retards répétés.","finSuspension":"2030-03-10T14:30:00+00:00"}
+     * @response 403 scenario="Inscription refusée" {"message":"Votre demande d'inscription a été refusée.","motif":"Pièces illisibles."}
+     */
     public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage, SanctionService $sanctions): JsonResponse
     {
         $identifiant = $request->validated('identifiant');
@@ -63,7 +79,7 @@ class AuthController extends Controller
 
         // Seul un compte actif s'authentifie ; le statut n'est révélé qu'avec le bon mot de passe.
         if (! $user->estActif()) {
-            return response()->json(['message' => $sanctions->messageRefusConnexion($user)], 403);
+            return response()->json(['message' => $sanctions->messageRefusConnexion($user)] + $sanctions->detailRefusConnexion($user), 403);
         }
 
         return response()->json([
