@@ -119,6 +119,15 @@ class AppServiceProvider extends ServiceProvider
 
         // Anti-balayage par adresse IP. Le blocage par numéro (5 échecs => 15 min) est géré
         // par BlocageConnexionService.
+        // Demande de réinitialisation : limite par IP ET par adresse e-mail saisie (même si elle n'existe pas : rien n'est révélé).
+        RateLimiter::for('mot-de-passe-oublie', function (Request $request) {
+            $email = mb_strtolower(trim((string) $request->input('email')));
+
+            return [
+                Limit::perMinute(config('securite.reinitialisation.max_par_minute_par_ip'))->by('ip:'.$request->ip()),
+                Limit::perHour(config('securite.reinitialisation.max_par_heure_par_email'))->by('email:'.sha1($email)),
+            ];
+        });
         RateLimiter::for('connexion', fn (Request $request) => Limit::perMinute(config('securite.connexion.max_par_minute_par_ip'))
             ->by($request->ip()));
     }

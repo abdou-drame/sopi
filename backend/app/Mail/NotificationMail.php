@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Enums\TypeNotification;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Mail\Mailable;
@@ -15,10 +14,10 @@ class NotificationMail extends Mailable
 {
     public function __construct(public Notification $notification, public User $destinataire) {}
 
-    /** Lien secret (déchiffré au dernier moment) : seulement pour « dossier déposé ». Sans lien lisible, l'envoi échoue plutôt que de partir incomplet. */
+    /** Lien secret (déchiffré au dernier moment) : seulement pour les types qui en ont un. Sans lien lisible, l'envoi échoue plutôt que de partir incomplet. */
     private function lien(): ?string
     {
-        if ($this->notification->type !== TypeNotification::DossierDepose) {
+        if (! $this->notification->type->aUnLien()) {
             return null;
         }
 
@@ -38,6 +37,8 @@ class NotificationMail extends Mailable
             'corps' => $this->notification->corps,
             'accroche' => $this->notification->type->accrocheEmail(),
             'lien' => $this->lien(),
+            'libelleLien' => $this->notification->type->libelleLien(),
+            'noteLien' => $this->notification->type->noteLien(),
         ];
 
         return new Content(view: 'emails.notification', text: 'emails.notification-texte', with: $donnees);

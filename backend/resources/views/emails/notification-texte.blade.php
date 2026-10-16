@@ -6,9 +6,9 @@ Bonjour {{ $prenom }},
 {{ $corps }}
 
 @if (! empty($lien))
-Suivre mon dossier : {{ $lien }}
+{{ $libelleLien }} : {{ $lien }}
 
-Ce lien est personnel : ne le partagez pas. Vous y suivrez la validation de votre compte (en attente, validé ou refusé).
+{{ $noteLien }}
 @else
 Ouvrez l'application Sopi pour voir le détail.
 @endif

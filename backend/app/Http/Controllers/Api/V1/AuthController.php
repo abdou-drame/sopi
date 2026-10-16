@@ -7,9 +7,11 @@ use App\Enums\StatutCompte;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ConnexionRequest;
 use App\Http\Requests\Auth\InscriptionRequest;
+use App\Http\Requests\Auth\MotDePasseOublieRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\BlocageConnexionService;
+use App\Services\ReinitialisationMotDePasseService;
 use App\Services\SanctionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -67,6 +69,28 @@ class AuthController extends Controller
             'token' => $user->createToken('api')->plainTextToken,
             'user' => new UserResource($user),
         ]);
+    }
+
+    /**
+     * Mot de passe oublié
+     *
+     * Envoie un lien de réinitialisation (valable 60 minutes, usage unique) à l'adresse e-mail d'un compte actif. La réponse est
+     * toujours la même, que l'adresse corresponde à un compte ou non (compte inconnu, sans e-mail, suspendu, banni, en attente,
+     * refusé ou administrateur : aucun e-mail n'est envoyé). Limité par adresse IP et par adresse e-mail.
+     *
+     * @group Authentification
+     *
+     * @unauthenticated
+     *
+     * @response 200 {"message":"Si un compte correspond à cette adresse, un lien de réinitialisation vient d'être envoyé."}
+     * @response 422 {"message":"L'adresse e-mail n'est pas valide.","errors":{"email":["L'adresse e-mail n'est pas valide."]}}
+     * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
+     */
+    public function motDePasseOublie(MotDePasseOublieRequest $request, ReinitialisationMotDePasseService $reinitialisation): JsonResponse
+    {
+        $reinitialisation->demander($request->validated('email'));
+
+        return response()->json(['message' => ReinitialisationMotDePasseService::MESSAGE_DEMANDE]);
     }
 
     public function deconnexion(Request $request): JsonResponse

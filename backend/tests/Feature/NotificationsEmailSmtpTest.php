@@ -25,7 +25,7 @@ function notificationEmail(TypeNotification $type = TypeNotification::Reservatio
     $notification->corps = $corps;
     $notification->canal_email_statut = StatutEnvoi::EnAttente;
     $notification->canal_push_statut = StatutEnvoi::NonApplicable;
-    if ($type === TypeNotification::DossierDepose) {
+    if ($type->aUnLien()) {
         $notification->definirSecret('https://api.exemple.test/api/v1/suivi/jeton-de-test');
     }
     $notification->save();
