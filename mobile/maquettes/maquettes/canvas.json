@@ -254,6 +254,27 @@
       "w": 390,
       "h": 844,
       "title": "Prestataire · Code validé"
+    },
+    "DemandeEnvoyee.dc.html": {
+      "x": 1410,
+      "y": 7712,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Demande envoyée"
+    },
+    "DetailEnAttente.dc.html": {
+      "x": 0,
+      "y": 8676,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Réservation en attente"
+    },
+    "DetailAPayer.dc.html": {
+      "x": 470,
+      "y": 8676,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Réservation acceptée, à payer"
     }
   },
   "order": [
@@ -265,10 +286,13 @@
     "Prestataires.dc.html",
     "Fiche.dc.html",
     "Creneau.dc.html",
+    "DemandeEnvoyee.dc.html",
     "Paiement.dc.html",
     "PaiementOk.dc.html",
     "PaiementEchec.dc.html",
     "Reservations.dc.html",
+    "DetailEnAttente.dc.html",
+    "DetailAPayer.dc.html",
     "DetailReservation.dc.html",
     "Annulation.dc.html",
     "Avis.dc.html",
@@ -297,7 +321,7 @@
     "titre": {
       "x": 0,
       "y": -300,
-      "text": "Sopi · Application mobile — 35 écrans, client et prestataire",
+      "text": "Sopi · Application mobile — 38 écrans, client et prestataire",
       "kind": "title1",
       "maxW": 1800
     }

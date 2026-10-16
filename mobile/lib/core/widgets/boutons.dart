@@ -14,6 +14,9 @@ class _BoutonPilule extends StatelessWidget {
     this.bordure,
     this.icone,
     this.pleineLargeur = true,
+    this.hauteur = DimensionsSopi.hauteurBouton,
+    this.taille = 16,
+    this.margeHorizontale = 28,
   });
 
   final String libelle;
@@ -24,16 +27,19 @@ class _BoutonPilule extends StatelessWidget {
   final Color? bordure;
   final IconData? icone;
   final bool pleineLargeur;
+  final double hauteur;
+  final double taille;
+  final double margeHorizontale;
 
   @override
   Widget build(BuildContext context) {
     final actif = onPressed != null && !chargement;
     final style = ButtonStyle(
       minimumSize: WidgetStatePropertyAll(
-        Size(pleineLargeur ? double.infinity : 0, DimensionsSopi.hauteurBouton),
+        Size(pleineLargeur ? double.infinity : 0, hauteur),
       ),
-      padding: const WidgetStatePropertyAll(
-        EdgeInsets.symmetric(horizontal: 28),
+      padding: WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: margeHorizontale),
       ),
       elevation: const WidgetStatePropertyAll(0),
       backgroundColor: WidgetStateProperty.resolveWith(
@@ -53,13 +59,13 @@ class _BoutonPilule extends StatelessWidget {
       ),
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(DimensionsSopi.rayonBouton),
+          borderRadius: BorderRadius.circular(hauteur / 2),
         ),
       ),
       textStyle: WidgetStatePropertyAll(
         Theme.of(context).textTheme.labelLarge?.copyWith(
           fontWeight: FontWeight.w800,
-          fontSize: 16,
+          fontSize: taille,
         ),
       ),
     );
@@ -180,4 +186,45 @@ class BoutonMarine extends StatelessWidget {
     icone: icone,
     pleineLargeur: pleineLargeur,
   );
+}
+
+enum TonBoutonCompact { primaire, clair }
+
+/// Bouton pilule de petite taille (cartes de liste, barres d'action) : « Réserver », « Voir », « Continuer ».
+/// [clair] : fond blanc, texte bleu, pour une pose sur fond bleu.
+class BoutonCompact extends StatelessWidget {
+  const BoutonCompact({
+    super.key,
+    required this.libelle,
+    required this.onPressed,
+    this.ton = TonBoutonCompact.primaire,
+    this.hauteur = 40,
+    this.taille = 13,
+    this.margeHorizontale = 18,
+    this.chargement = false,
+  });
+
+  final String libelle;
+  final VoidCallback? onPressed;
+  final TonBoutonCompact ton;
+  final double hauteur;
+  final double taille;
+  final double margeHorizontale;
+  final bool chargement;
+
+  @override
+  Widget build(BuildContext context) {
+    final clair = ton == TonBoutonCompact.clair;
+    return _BoutonPilule(
+      libelle: libelle,
+      onPressed: onPressed,
+      chargement: chargement,
+      fond: clair ? CouleursSopi.blanc : CouleursSopi.bleu,
+      texte: clair ? CouleursSopi.bleu : CouleursSopi.blanc,
+      pleineLargeur: false,
+      hauteur: hauteur,
+      taille: taille,
+      margeHorizontale: margeHorizontale,
+    );
+  }
 }

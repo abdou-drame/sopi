@@ -26,6 +26,10 @@ abstract final class CouleursSopi {
   static const enteteTacheBleue = Color(0xFFBFDBFE);
   static const enteteTacheIndigo = Color(0xFFC7D2FE);
 
+  // Pastilles d'icône des métiers (bleu, indigo, cyan clairs)
+  static const indigoPastel = Color(0xFFE0E7FF);
+  static const cyanPastel = Color(0xFFCFFAFE);
+
   // Squelettes de chargement
   static const squelette = Color(0xFFE3E9F6);
   static const squeletteClair = Color(0xFFEEF2FB);

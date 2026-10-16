@@ -8,6 +8,13 @@ import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
+import '../../features/reservation/accueil_client_page.dart';
+import '../../features/reservation/avis_prestataire_page.dart';
+import '../../features/reservation/choix_creneau_page.dart';
+import '../../features/reservation/demande_envoyee_page.dart';
+import '../../features/reservation/fiche_prestataire_page.dart';
+import '../../features/reservation/modeles.dart';
+import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -136,7 +143,7 @@ GoRouter creerRouteur({
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => _coque(_ongletsClient, shell),
         branches: [
-          _onglet(Chemins.accueil, () => const EcranProvisoire(nom: 'Accueil')),
+          _onglet(Chemins.accueil, () => const AccueilClientPage()),
           _onglet(
             Chemins.reservations,
             () => const EcranProvisoire(nom: 'Réservations'),
@@ -150,16 +157,38 @@ GoRouter creerRouteur({
       ),
 
       // — Espace client : parcours plein écran
-      _provisoire(Chemins.prestataires, 'Liste des prestataires'),
-      _provisoire(
-        '${Chemins.prestataires}/:id',
-        'Fiche prestataire',
-        parametres: ['id'],
+      GoRoute(
+        path: Chemins.prestataires,
+        builder: (context, state) => ListePrestatairesPage(
+          metier: state.uri.queryParameters['metier'] ?? '',
+        ),
       ),
-      _provisoire(
-        '${Chemins.prestataires}/:id/creneau',
-        'Choix du créneau',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.prestataires}/:id',
+        builder: (context, state) =>
+            FichePrestatairePage(prestataireId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'avis',
+            builder: (context, state) =>
+                AvisPrestatairePage(prestataireId: state.pathParameters['id']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '${Chemins.prestataires}/:id/creneau',
+        builder: (context, state) => ChoixCreneauPage(
+          prestataireId: state.pathParameters['id']!,
+          prestationId: state.uri.queryParameters['prestation'] ?? '',
+        ),
+      ),
+      GoRoute(
+        path: '${Chemins.reservations}/:id/envoyee',
+        // Sans la réponse de la création (lien ouvert directement), il n'y a rien à afficher.
+        redirect: (_, state) =>
+            state.extra is ReservationCreee ? null : Chemins.accueil,
+        builder: (context, state) =>
+            DemandeEnvoyeePage(reservation: state.extra as ReservationCreee),
       ),
       _provisoire(
         '${Chemins.reservations}/:id',
