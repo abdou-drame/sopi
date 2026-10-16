@@ -51,6 +51,7 @@ sealed class ErreurApi implements Exception {
           finSuspension: _date(
             corps['finSuspension'] ?? _dedans(corps['detail'], 'finSuspension'),
           ),
+          statutCompte: _texte(corps['statutCompte']),
         );
       case 422:
         return ErreurValidation(
@@ -131,10 +132,18 @@ class ErreurTropDeRequetes extends ErreurApi {
 
 /// 403 : action refusée. Sur la connexion, [motif] et [finSuspension] décrivent la sanction ou le refus.
 class ErreurAccesRefuse extends ErreurApi {
-  const ErreurAccesRefuse(super.message, {this.motif, this.finSuspension});
+  const ErreurAccesRefuse(
+    super.message, {
+    this.motif,
+    this.finSuspension,
+    this.statutCompte,
+  });
 
   final String? motif;
   final DateTime? finSuspension;
+
+  /// Statut du compte donné par la connexion : `en_attente`, `refuse`, `suspendu` ou `banni`. Null s'il est absent.
+  final String? statutCompte;
 }
 
 /// 404, 409 ou 503 : le message du serveur est affiché tel quel.

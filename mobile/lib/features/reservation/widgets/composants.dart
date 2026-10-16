@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/animation/apparition.dart';
 import '../../../core/animation/chargement.dart';
 import '../../../core/theme/couleurs.dart';
+import '../../../core/widgets/decompte.dart';
 import '../../../core/widgets/boutons.dart';
 import '../../../core/widgets/en_tete_degrade.dart';
 import '../formats.dart';
@@ -284,6 +285,77 @@ class BarreBasBleue extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Pastille « Il reste 1 h 52 » posée sur un fond bleu (maquettes DetailAPayer et Paiement). À zéro, elle affiche
+/// « Délai dépassé » et prévient [onExpire] une seule fois, pour que l'écran relise la réservation.
+class PastilleDecompte extends StatefulWidget {
+  const PastilleDecompte({
+    super.key,
+    required this.expiration,
+    required this.hauteur,
+    this.onExpire,
+    this.maintenant = DateTime.now,
+  });
+
+  final DateTime expiration;
+  final double hauteur;
+  final VoidCallback? onExpire;
+
+  /// Horloge injectable pour les tests.
+  final DateTime Function() maintenant;
+
+  @override
+  State<PastilleDecompte> createState() => _EtatPastilleDecompte();
+}
+
+class _EtatPastilleDecompte extends State<PastilleDecompte> {
+  bool _expire = false;
+
+  @override
+  void didUpdateWidget(PastilleDecompte ancienne) {
+    super.didUpdateWidget(ancienne);
+    if (ancienne.expiration != widget.expiration) _expire = false;
+  }
+
+  void _surExpiration() {
+    if (!mounted) return;
+    setState(() => _expire = true);
+    widget.onExpire?.call();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelMedium?.copyWith(
+      fontSize: 12,
+      height: 14 / 12,
+      fontWeight: FontWeight.w700,
+      color: CouleursSopi.blanc,
+    );
+    return Container(
+      height: widget.hauteur,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc.withValues(alpha: .18),
+        borderRadius: BorderRadius.circular(widget.hauteur / 2),
+      ),
+      child: _expire
+          ? Text('Délai dépassé', style: style, textAlign: TextAlign.center)
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Il reste', style: style, textAlign: TextAlign.center),
+                Decompte(
+                  expiration: widget.expiration,
+                  onExpire: _surExpiration,
+                  maintenant: widget.maintenant,
+                  style: style,
+                ),
+              ],
+            ),
     );
   }
 }

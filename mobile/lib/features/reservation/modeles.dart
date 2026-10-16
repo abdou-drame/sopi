@@ -8,6 +8,9 @@ num? _nombre(Object? brut) {
 
 DateTime _date(Object? brut) => DateTime.parse(brut.toString()).toUtc();
 
+DateTime? _dateFacultative(Object? brut) =>
+    brut is String ? DateTime.tryParse(brut)?.toUtc() : null;
+
 Map<String, dynamic> _objet(Object? brut) =>
     brut is Map ? Map<String, dynamic>.from(brut) : <String, dynamic>{};
 
@@ -419,6 +422,8 @@ class ReservationClient {
     this.quartier,
     this.adresse,
     this.telephone,
+    this.paiementAvant,
+    this.reponseAvant,
   });
 
   final String id;
@@ -442,6 +447,11 @@ class ReservationClient {
 
   /// Téléphone du prestataire : renvoyé seulement une fois la réservation confirmée.
   final String? telephone;
+
+  /// Limite pour payer l'acompte (réservation acceptée) et pour que le prestataire réponde (en attente), en UTC.
+  /// Null si l'API ne les donne pas : les écrans retombent sur le texte fixe de la règle.
+  final DateTime? paiementAvant;
+  final DateTime? reponseAvant;
 
   factory ReservationClient.depuisJson(Map<String, dynamic> j) {
     final creneau = _objet(j['creneau']);
@@ -476,6 +486,8 @@ class ReservationClient {
       quartier: prestataire['quartier'] as String?,
       adresse: prestataire['adresse'] as String?,
       telephone: telephone.isEmpty ? null : telephone,
+      paiementAvant: _dateFacultative(j['paiementAvant']),
+      reponseAvant: _dateFacultative(j['reponseAvant']),
     );
   }
 }
