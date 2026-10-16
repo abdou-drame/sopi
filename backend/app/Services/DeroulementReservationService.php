@@ -51,16 +51,30 @@ class DeroulementReservationService
      */
     public function terminer(Prestataire $prestataire, string $id): Reservation
     {
+        return $this->terminerAvecCredit($prestataire, $id)[0];
+    }
+
+    /**
+     * Comme terminer(), avec le détail du crédit réellement effectué (null si rien n'a été crédité).
+     *
+     * @return array{0: Reservation, 1: ?CreditEffectue}
+     *
+     * @throws ReservationImpossibleException 404 (introuvable) ou 409 (statut différent de EN_COURS)
+     * @throws CreditSoldeImpossibleException 500 (le crédit a échoué, rien n'est enregistré)
+     */
+    public function terminerAvecCredit(Prestataire $prestataire, string $id): array
+    {
         $reservation = $this->trouverOuEchouer($prestataire, $id);
 
-        DB::transaction(function () use ($reservation, $prestataire) {
+        $credit = DB::transaction(function () use ($reservation, $prestataire) {
             $this->passerATerminee($reservation, $prestataire);
-            $this->credits->crediter($reservation);
+
+            return $this->credits->crediterAvecDetail($reservation);
         });
 
         ReservationTerminee::dispatch($reservation);
 
-        return $reservation;
+        return [$reservation, $credit];
     }
 
     /** Changement de statut de « terminer » (409 si la réservation n'est plus EN_COURS : le crédit n'est alors jamais tenté). */
