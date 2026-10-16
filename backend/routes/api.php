@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
 use App\Http\Controllers\Api\V1\Prestataire\RetraitController;
 use App\Http\Controllers\Api\V1\ProfilController;
+use App\Http\Controllers\Api\V1\QuartierController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
 use App\Http\Controllers\Api\V1\WebhookPaiementController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,7 @@ Route::prefix('v1')->group(function () {
 
     // Référentiels publics (sans authentification).
     Route::get('/metiers', [MetierController::class, 'index'])->middleware('throttle:60,1');
+    Route::get('/quartiers', [QuartierController::class, 'index'])->middleware('throttle:60,1');
 
     Route::post('/prestataires/inscription', InscriptionPrestataireController::class)->middleware('throttle:inscription-prestataire');
     Route::get('/suivi/{jeton}', SuiviDossierController::class)->middleware('throttle:suivi-dossier');
