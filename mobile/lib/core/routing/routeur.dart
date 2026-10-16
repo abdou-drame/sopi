@@ -11,7 +11,9 @@ import '../../features/auth/session.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
 import '../../features/reservation/choix_creneau_page.dart';
+import '../../features/reservation/demande_envoyee_page.dart';
 import '../../features/reservation/fiche_prestataire_page.dart';
+import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
@@ -180,10 +182,13 @@ GoRouter creerRouteur({
           prestationId: state.uri.queryParameters['prestation'] ?? '',
         ),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id/envoyee',
-        'Demande envoyée',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id/envoyee',
+        // Sans la réponse de la création (lien ouvert directement), il n'y a rien à afficher.
+        redirect: (_, state) =>
+            state.extra is ReservationCreee ? null : Chemins.accueil,
+        builder: (context, state) =>
+            DemandeEnvoyeePage(reservation: state.extra as ReservationCreee),
       ),
       _provisoire(
         '${Chemins.reservations}/:id',
