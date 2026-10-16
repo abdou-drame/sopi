@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ConnexionRequest;
 use App\Http\Requests\Auth\InscriptionRequest;
 use App\Http\Requests\Auth\MotDePasseOublieRequest;
+use App\Http\Requests\Auth\ReinitialiserMotDePasseRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\BlocageConnexionService;
@@ -91,6 +92,32 @@ class AuthController extends Controller
         $reinitialisation->demander($request->validated('email'));
 
         return response()->json(['message' => ReinitialisationMotDePasseService::MESSAGE_DEMANDE]);
+    }
+
+    /**
+     * Réinitialiser le mot de passe
+     *
+     * Choisit un nouveau mot de passe avec le jeton du lien reçu par e-mail (valable 60 minutes, usage unique). Tous les appareils
+     * du compte sont déconnectés et un e-mail de confirmation est envoyé.
+     *
+     * @group Authentification
+     *
+     * @unauthenticated
+     *
+     * @response 200 {"message":"Votre mot de passe a été modifié. Vous pouvez vous reconnecter."}
+     * @response 422 {"message":"Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.","errors":{"jeton":["Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation."]}}
+     * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
+     */
+    public function reinitialiserMotDePasse(ReinitialiserMotDePasseRequest $request, ReinitialisationMotDePasseService $reinitialisation): JsonResponse
+    {
+        if (! $reinitialisation->reinitialiser($request->validated('jeton'), $request->validated('mot_de_passe'))) {
+            return response()->json([
+                'message' => ReinitialiserMotDePasseRequest::MESSAGE_LIEN_INVALIDE,
+                'errors' => ['jeton' => [ReinitialiserMotDePasseRequest::MESSAGE_LIEN_INVALIDE]],
+            ], 422);
+        }
+
+        return response()->json(['message' => 'Votre mot de passe a été modifié. Vous pouvez vous reconnecter.']);
     }
 
     public function deconnexion(Request $request): JsonResponse

@@ -203,6 +203,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/inscription', [AuthController::class, 'inscription'])->middleware('throttle:inscription');
         Route::post('/connexion', [AuthController::class, 'connexion'])->middleware('throttle:connexion');
         Route::post('/mot-de-passe-oublie', [AuthController::class, 'motDePasseOublie'])->middleware('throttle:mot-de-passe-oublie');
+        Route::post('/reinitialiser-mot-de-passe', [AuthController::class, 'reinitialiserMotDePasse'])->middleware('throttle:reinitialisation');
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('/deconnexion', [AuthController::class, 'deconnexion']);

@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\ReinitialisationMotDePassePageController;
 use App\Http\Controllers\SuiviDossierPageController;
+use App\Http\Middleware\EntetesPagePrivee;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,3 +22,9 @@ Route::get('/paiement/echec', fn () => view('paiement.retour', [
 
 // Page de suivi du dossier d'inscription (lien reçu par e-mail). Même limiteur que l'API JSON de suivi.
 Route::get('/suivi/{jeton}', SuiviDossierPageController::class)->middleware('throttle:suivi-dossier');
+
+// Réinitialisation du mot de passe (lien reçu par e-mail) : page sans mise en cache ni adresse de provenance, formulaire protégé par CSRF.
+Route::middleware([EntetesPagePrivee::class, 'throttle:reinitialisation'])->prefix('reinitialiser-mot-de-passe')->controller(ReinitialisationMotDePassePageController::class)->group(function () {
+    Route::get('/{jeton}', 'formulaire');
+    Route::post('/{jeton}', 'enregistrer');
+});

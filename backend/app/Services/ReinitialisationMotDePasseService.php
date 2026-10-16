@@ -60,6 +60,71 @@ class ReinitialisationMotDePasseService
         }
     }
 
+    /** Jeton encore utilisable (connu, non utilisé, non expiré) dont le compte reste éligible. Comparaison du hachage à temps constant. */
+    public function trouverValide(string $jeton): ?ReinitialisationMotDePasse
+    {
+        $hash = hash('sha256', $jeton);
+        $ligne = ReinitialisationMotDePasse::query()->with('user')->where('jeton_hash', $hash)->first();
+
+        if ($ligne === null || ! hash_equals($ligne->jeton_hash, $hash) || $ligne->utilise_le !== null || $ligne->expire_le->isPast()) {
+            return null;
+        }
+
+        return $this->estEligible($ligne->user) ? $ligne : null;
+    }
+
+    /**
+     * Change le mot de passe avec un jeton valide. Usage unique (réservation par mise à jour conditionnelle, sûre en cas de requêtes
+     * simultanées), tous les jetons d'accès de l'utilisateur sont révoqués, un e-mail de confirmation (sans lien) est envoyé.
+     * Renvoie false si le jeton est inconnu, expiré, déjà utilisé ou si le compte n'est plus éligible.
+     */
+    public function reinitialiser(string $jeton, string $motDePasse): bool
+    {
+        $ligne = $this->trouverValide($jeton);
+        if ($ligne === null) {
+            return false;
+        }
+
+        $user = DB::transaction(function () use ($ligne, $motDePasse) {
+            $pris = ReinitialisationMotDePasse::query()->whereKey($ligne->id)->whereNull('utilise_le')->update(['utilise_le' => now()]);
+            if ($pris !== 1) {
+                return null;
+            }
+
+            $user = $ligne->user;
+            $user->password = $motDePasse;
+            $user->save();
+            ReinitialisationMotDePasse::query()->where('user_id', $user->id)->whereNull('utilise_le')->update(['utilise_le' => now()]);
+            $user->tokens()->delete();
+
+            return $user;
+        });
+        if ($user === null) {
+            return false;
+        }
+
+        $this->notifierChangement($user);
+
+        return true;
+    }
+
+    /** Une panne de la notification ne doit jamais annuler le changement de mot de passe. */
+    private function notifierChangement(User $user): void
+    {
+        try {
+            app(NotificationService::class)->creer(
+                $user,
+                TypeNotification::MotDePasseModifie,
+                'Mot de passe modifié',
+                'Le mot de passe de votre compte Sopi vient d\'être modifié et vous avez été déconnecté de vos appareils. Si vous n\'êtes pas à l\'origine de ce changement, réinitialisez-le immédiatement avec « Mot de passe oublié ».',
+                [],
+                [Canal::Email],
+            );
+        } catch (Throwable $erreur) {
+            Log::warning('Notification de changement de mot de passe non créée.', ['erreur' => $erreur::class]);
+        }
+    }
+
     private function envoyerLien(User $user): void
     {
         $jeton = bin2hex(random_bytes(32));

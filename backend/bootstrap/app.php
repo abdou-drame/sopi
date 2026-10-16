@@ -8,6 +8,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
+use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -38,8 +39,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // Messages d'erreur en français, au format { "message": "..." }.
         $exceptions->render(fn (AuthenticationException $e, Request $request) => $request->is('api/*')
             ? response()->json(['message' => 'Authentification requise.'], 401) : null);
-        $exceptions->render(fn (ThrottleRequestsException $e, Request $request) => $request->is('api/*')
-            ? response()->json(['message' => 'Trop de tentatives. Réessayez dans quelques instants.'], 429, $e->getHeaders()) : null);
+        $exceptions->render(fn (ThrottleRequestsException $e, Request $request) => match (true) {
+            $request->is('api/*') => response()->json(['message' => 'Trop de tentatives. Réessayez dans quelques instants.'], 429, $e->getHeaders()),
+            $request->is('reinitialiser-mot-de-passe/*') => response()->view('reinitialisation.erreur', ['titre' => 'Trop de tentatives', 'message' => 'Trop de tentatives. Réessayez dans quelques instants.'], 429, $e->getHeaders()),
+            default => null,
+        });
+        // Formulaire de réinitialisation : page d'erreur lisible quand le jeton CSRF a expiré.
+        $exceptions->render(fn (TokenMismatchException $e, Request $request) => $request->is('reinitialiser-mot-de-passe/*')
+            ? response()->view('reinitialisation.erreur', ['titre' => 'Page expirée', 'message' => 'Cette page a expiré. Rouvrez le lien reçu par e-mail pour réessayer.'], 419) : null);
         $exceptions->render(fn (AuthorizationException|AccessDeniedHttpException $e, Request $request) => $request->is('api/*')
             ? response()->json(['message' => "Vous n'avez pas le droit d'effectuer cette action."], 403) : null);
         $exceptions->render(fn (NotFoundHttpException $e, Request $request) => $request->is('api/*')
@@ -48,5 +55,5 @@ return Application::configure(basePath: dirname(__DIR__))
             ? response()->json(['message' => 'Méthode non autorisée.'], 405) : null);
 
         // Ne jamais journaliser les champs sensibles d'une requête.
-        $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'token']);
+        $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'token', 'mot_de_passe', 'mot_de_passe_confirmation', 'jeton']);
     })->create();
