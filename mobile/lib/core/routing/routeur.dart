@@ -12,9 +12,12 @@ import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
 import '../../features/reservation/choix_creneau_page.dart';
 import '../../features/reservation/demande_envoyee_page.dart';
+import '../../features/reservation/detail_reservation_page.dart';
+import '../../features/reservation/paiement_page.dart';
 import '../../features/reservation/fiche_prestataire_page.dart';
 import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
+import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -49,8 +52,8 @@ String? redirectionSopi(EtatSession session, String chemin) {
 
 const _ongletsClient = [
   OngletSopi(libelle: 'Accueil', icone: Icons.home_rounded),
+  OngletSopi(libelle: 'Rechercher', icone: Icons.search_rounded),
   OngletSopi(libelle: 'Réservations', icone: Icons.event_note_rounded),
-  OngletSopi(libelle: 'Notifications', icone: Icons.notifications_rounded),
   OngletSopi(libelle: 'Profil', icone: Icons.person_rounded),
 ];
 
@@ -145,18 +148,16 @@ GoRouter creerRouteur({
         branches: [
           _onglet(Chemins.accueil, () => const AccueilClientPage()),
           _onglet(
-            Chemins.reservations,
-            () => const EcranProvisoire(nom: 'Réservations'),
+            Chemins.rechercher,
+            () => const ListePrestatairesPage(avecRetour: false),
           ),
-          _onglet(
-            Chemins.notifications,
-            () => const EcranProvisoire(nom: 'Notifications'),
-          ),
+          _onglet(Chemins.reservations, () => const MesReservationsPage()),
           _onglet(Chemins.profil, () => const ProfilProvisoire()),
         ],
       ),
 
       // — Espace client : parcours plein écran
+      _provisoire(Chemins.notifications, 'Notifications'),
       GoRoute(
         path: Chemins.prestataires,
         builder: (context, state) => ListePrestatairesPage(
@@ -190,15 +191,15 @@ GoRouter creerRouteur({
         builder: (context, state) =>
             DemandeEnvoyeePage(reservation: state.extra as ReservationCreee),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id',
-        'Détail de la réservation',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id',
+        builder: (context, state) =>
+            DetailReservationPage(reservationId: state.pathParameters['id']!),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id/paiement',
-        'Paiement',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id/paiement',
+        builder: (context, state) =>
+            PaiementPage(reservationId: state.pathParameters['id']!),
       ),
       _provisoire(
         '${Chemins.reservations}/:id/annulation',

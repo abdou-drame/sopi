@@ -16,6 +16,7 @@ abstract final class Chemins {
 
   // — Client : onglets
   static const accueil = '/accueil';
+  static const rechercher = '/rechercher';
   static const reservations = '/reservations';
   static const notifications = '/notifications';
   static const profil = '/profil';
