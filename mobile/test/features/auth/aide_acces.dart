@@ -43,6 +43,7 @@ Future<ProviderContainer> lancerAcces(
   String supportEmail = '',
   List<Uri>? urlsOuvertes,
   bool sansAnimation = true,
+  List<Override> surcharges = const [],
 }) async {
   final conteneur = ProviderContainer(
     overrides: <Override>[
@@ -52,6 +53,7 @@ Future<ProviderContainer> lancerAcces(
         urlsOuvertes?.add(uri);
         return true;
       }),
+      ...surcharges,
     ],
   );
   addTearDown(conteneur.dispose);

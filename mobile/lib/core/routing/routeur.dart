@@ -8,6 +8,7 @@ import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
+import '../../features/reservation/accueil_client_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -136,7 +137,7 @@ GoRouter creerRouteur({
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => _coque(_ongletsClient, shell),
         branches: [
-          _onglet(Chemins.accueil, () => const EcranProvisoire(nom: 'Accueil')),
+          _onglet(Chemins.accueil, () => const AccueilClientPage()),
           _onglet(
             Chemins.reservations,
             () => const EcranProvisoire(nom: 'Réservations'),
