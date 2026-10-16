@@ -69,7 +69,7 @@ export function UtilisateursListePage() {
           { cle: 'q', type: 'texte', label: T.recherche, placeholder: T.recherchePlaceholder },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="utilisateurs" charger={api.utilisateurs} etat={etat} colonnes={colonnes} cleLigne={(u) => u.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="utilisateurs" charger={api.utilisateurs} etat={etat} colonnes={colonnes} cleLigne={(u) => u.id} lien={(u) => ({ vers: `/utilisateurs/${u.id}`, nom: `${u.prenom} ${u.nom}` })} messageVide={T.vide} />
     </div>
   )
 }

@@ -39,6 +39,8 @@ export const L = {
     dateHeure: 'Date',
     statut: 'Statut',
     voir: 'Voir le détail',
+    voirCourt: 'Voir',
+    actionsLigne: 'Actions',
     action: 'Action effectuée.',
     jusquAu: (date: string) => `jusqu’au ${date}`,
     agrandir: 'Agrandir l’image',
@@ -80,6 +82,8 @@ export const L = {
   metiers: { mecanique: 'Mécanique', coiffure: 'Coiffure', pressing: 'Pressing' } as Record<string, string>,
   roles: { client: 'Client', prestataire: 'Prestataire', administrateur: 'Administrateur' } as Record<string, string>,
   dossiers: {
+    dejaRefuse: 'Ce dossier a été refusé.',
+    dejaAccepte: 'Ce dossier a été accepté.',
     titre: 'Dossiers prestataires',
     sousTitre: 'Demandes d’inscription à valider ou déjà traitées.',
     legende: 'Liste des demandes de prestataires',

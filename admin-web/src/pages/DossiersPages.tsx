@@ -61,6 +61,7 @@ export function DossiersListePage() {
         etat={etat}
         colonnes={colonnes}
         cleLigne={(d) => d.id}
+        lien={(d) => ({ vers: `/dossiers-prestataires/${d.id}`, nom: d.nomEntreprise })}
         messageVide={T.vide}
       />
     </div>
@@ -143,6 +144,8 @@ export function DossierDetailPage() {
       {(d) => (
         <>
           {message && <BanniereAlerte gravite="info" titre={message} />}
+          {d.statutCompte === 'refuse' && <BanniereAlerte gravite="attention" titre={T.dejaRefuse} detail={d.motifRefus ?? undefined} />}
+          {d.statutCompte === 'actif' && <BanniereAlerte gravite="info" titre={T.dejaAccepte} />}
           <Carte titre={T.identite}>
             <Definitions
               elements={[
@@ -154,7 +157,6 @@ export function DossierDetailPage() {
                 { libelle: T.quartier, valeur: d.quartier },
                 { libelle: T.adresse, valeur: d.adresse, large: true },
                 { libelle: T.soumisLe, valeur: formatDateHeure(d.dateSoumission) },
-                ...(d.motifRefus ? [{ libelle: T.motifRefus, valeur: d.motifRefus, large: true }] : []),
               ]}
             />
           </Carte>

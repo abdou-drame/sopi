@@ -59,6 +59,7 @@ export function NotificationsEchecListePage() {
         etat={etat}
         colonnes={colonnes}
         cleLigne={(n) => n.id}
+        lien={(n) => ({ vers: `/notifications-en-echec/${n.id}`, nom: libelleType(n.type) })}
         messageVide={T.vide}
       />
     </div>

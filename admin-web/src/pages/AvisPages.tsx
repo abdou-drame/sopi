@@ -150,7 +150,7 @@ export default function AvisListePage() {
           { cle: 'prestataire', type: 'texte', label: T.prestataire },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="avis" charger={chargerAvis} etat={etat} colonnes={colonnes} cleLigne={(a) => a.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="avis" charger={chargerAvis} etat={etat} colonnes={colonnes} cleLigne={(a) => a.id} lien={(a) => ({ vers: `/reservations/${a.reservationId}`, nom: a.prestataire.nomEntreprise })} messageVide={T.vide} />
     </div>
   )
 }

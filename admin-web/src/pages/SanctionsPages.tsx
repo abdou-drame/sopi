@@ -119,7 +119,7 @@ export default function SanctionsListePage() {
           { cle: 'utilisateur', type: 'texte', label: T.utilisateurFiltre },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="sanctions" charger={api.sanctions} etat={etat} colonnes={colonnes} cleLigne={(s) => s.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="sanctions" charger={api.sanctions} etat={etat} colonnes={colonnes} cleLigne={(s) => s.id} lien={(s) => ({ vers: `/utilisateurs/${s.utilisateur.id}`, nom: `${s.utilisateur.prenom} ${s.utilisateur.nom}` })} messageVide={T.vide} />
     </div>
   )
 }

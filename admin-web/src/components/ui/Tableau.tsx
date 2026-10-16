@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { L } from '../../i18n/libelles'
 import Bouton from './Bouton'
 import { IconeTri } from './Icones'
@@ -22,6 +23,8 @@ interface Props<T> {
   colonnes: Colonne<T>[]
   lignes: T[]
   cleLigne: (ligne: T) => string
+  /** Fiche de chaque ligne (adresse et nom lisible) : la ligne entière devient un lien (clic, clic molette, clavier) avec un bouton « Voir ». */
+  lien?: (ligne: T) => { vers: string; nom: string }
   chargement?: boolean
   erreur?: string | null
   onReessayer?: () => void
@@ -34,12 +37,41 @@ interface Props<T> {
   onPage?: (page: number) => void
 }
 
+/**
+ * Ligne dont toute la surface mène à la fiche : le vrai lien « Voir » étire une zone invisible sur toute la ligne (lien étiré).
+ * Le clic, le clic molette (nouvel onglet), Ctrl/Cmd+clic et le clavier sont donc ceux d'un lien natif. Les liens et boutons propres
+ * à la ligne (nom, actions de modération...) restent au-dessus de cette zone et gardent leur comportement.
+ */
+function LigneAvecLien({ href, nom, style, children }: { href: string; nom: string; style: React.CSSProperties; children: ReactNode }) {
+  const { search } = useLocation()
+  return (
+    <tr
+      style={style}
+      className="animate-apparition relative cursor-pointer border-t border-bordure/60 transition-colors hover:bg-primaire-50 focus-within:bg-primaire-50 [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10"
+    >
+      {children}
+      <td className="px-5 py-4 text-right">
+        <Link
+          to={href}
+          data-voir
+          state={{ recherche: search }}
+          aria-label={`${L.commun.voir} : ${nom}`}
+          className="inline-flex items-center rounded-gelule border border-bordure bg-surface px-3 py-1 text-xs font-semibold text-primaire-700 after:absolute after:inset-0 after:z-0 after:content-[''] hover:bg-fond focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
+        >
+          {L.commun.voirCourt}
+        </Link>
+      </td>
+    </tr>
+  )
+}
+
 /** Tableau paginé avec tri (contrôlé par le parent) et états vide / chargement / erreur. */
 export default function Tableau<T>({
   legende,
   colonnes,
   lignes,
   cleLigne,
+  lien,
   chargement,
   erreur,
   onReessayer,
@@ -85,6 +117,11 @@ export default function Tableau<T>({
                   </th>
                 )
               })}
+              {lien && (
+                <th scope="col" className="px-5 py-3 text-right">
+                  <span className="sr-only">{L.commun.actionsLigne}</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -96,23 +133,32 @@ export default function Tableau<T>({
                       <Squelette className="h-4 w-full max-w-40" />
                     </td>
                   ))}
+                  {lien && <td className="px-5 py-4" />}
                 </tr>
               ))}
             {!chargement &&
               !erreur &&
-              lignes.map((ligne, i) => (
-                <tr
-                  key={cleLigne(ligne)}
-                  style={{ animationDelay: `${Math.min(i * 25, 250)}ms` }}
-                  className="animate-apparition border-t border-bordure/60 transition-colors hover:bg-fond"
-                >
-                  {colonnes.map((c) => (
-                    <td key={c.cle} className={`px-5 py-4 text-texte ${aligne(c)}`}>
-                      {c.rendu(ligne)}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              lignes.map((ligne, i) => {
+                const style = { animationDelay: `${Math.min(i * 25, 250)}ms` }
+                const cellules = colonnes.map((c) => (
+                  <td key={c.cle} className={`px-5 py-4 text-texte ${aligne(c)}`}>
+                    {c.rendu(ligne)}
+                  </td>
+                ))
+                if (!lien) {
+                  return (
+                    <tr key={cleLigne(ligne)} style={style} className="animate-apparition border-t border-bordure/60 transition-colors hover:bg-fond">
+                      {cellules}
+                    </tr>
+                  )
+                }
+                const { vers: href, nom } = lien(ligne)
+                return (
+                  <LigneAvecLien key={cleLigne(ligne)} href={href} nom={nom} style={style}>
+                    {cellules}
+                  </LigneAvecLien>
+                )
+              })}
           </tbody>
         </table>
       </div>

@@ -50,7 +50,7 @@ export function LitigesListePage() {
     <div className="flex flex-col gap-6">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FiltresListe legende={T.filtres} etat={etat} filtres={[{ cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT }]} />
-      <ListePaginee legende={T.legende} cle="litiges" charger={api.litiges} etat={etat} colonnes={colonnes} cleLigne={(l) => l.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="litiges" charger={api.litiges} etat={etat} colonnes={colonnes} cleLigne={(l) => l.id} lien={(l) => ({ vers: `/litiges/${l.id}`, nom: l.motif })} messageVide={T.vide} />
     </div>
   )
 }

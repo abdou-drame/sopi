@@ -53,7 +53,7 @@ export function ReservationsListePage() {
           { cle: 'q', type: 'texte', label: T.recherche, placeholder: T.recherchePlaceholder },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="reservations" charger={api.reservations} etat={etat} colonnes={colonnes} cleLigne={(r) => r.id} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="reservations" charger={api.reservations} etat={etat} colonnes={colonnes} cleLigne={(r) => r.id} lien={(r) => ({ vers: `/reservations/${r.id}`, nom: r.prestation.nom })} messageVide={T.vide} />
     </div>
   )
 }
