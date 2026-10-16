@@ -1,4 +1,4 @@
-name: 'Administration — retraits'
+name: 'Administration — paiements'
 description: |-
 
   Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
@@ -7,21 +7,20 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/retraits
+    uri: api/v1/admin/paiements
     metadata:
       custom: []
-      groupName: 'Administration — retraits'
+      groupName: 'Administration — paiements'
       groupDescription: |-
 
         Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des retraits'
+      title: 'Liste des paiements'
       description: |-
-        Retraits des prestataires, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `prestataire`
-        (identifiant du profil prestataire) et `bloques` (retraits en_cours depuis plus longtemps que le délai de blocage : point
-        d'arrivée de l'alerte `retraits_bloques`). Le téléphone de versement est masqué dans la liste ; la référence DexPay n'apparaît
-        que dans le détail.
+        Paiements d'acompte, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `remboursementDu`,
+        `retardRemboursementMinutes` (remboursements dus depuis au moins N minutes, essais épuisés compris : point d'arrivée des alertes
+        `remboursements_en_retard` et `remboursements_en_echec`) et `reservation`. La référence DexPay n'apparaît que dans le détail.
       authenticated: true
       deprecated: false
     headers:
@@ -34,35 +33,47 @@ endpoints:
       statut:
         custom: []
         name: statut
-        description: 'en_cours, reussi ou echoue.'
+        description: 'en_attente, reussi, echoue ou rembourse.'
         required: false
-        example: en_cours
+        example: reussi
         type: string
         enumValues:
-          - en_cours
+          - en_attente
           - reussi
           - echoue
+          - rembourse
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      prestataire:
+      remboursementDu:
         custom: []
-        name: prestataire
-        description: 'Identifiant du profil prestataire. validation.uuid.'
+        name: remboursementDu
+        description: 'true : paiements reçus (reussi ou echoue) marqués « à rembourser » ; false : tous les autres. Alias : remboursement_du.'
         required: false
-        example: 0198a1b2-0000-7000-8000-000000000012
-        type: string
+        example: true
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      bloques:
+      retardRemboursementMinutes:
         custom: []
-        name: bloques
-        description: "true : retraits en_cours depuis plus longtemps que le délai de blocage (point d'arrivée de l'alerte `retraits_bloques`) ; false : tous les autres."
+        name: retardRemboursementMinutes
+        description: "Remboursements dus depuis au moins N minutes (1 à 525600), y compris ceux dont les essais sont épuisés : point d'arrivée des alertes `remboursements_en_retard` et `remboursements_en_echec`. Alias : retard_remboursement_minutes. validation.between."
         required: false
-        example: true
-        type: boolean
+        example: 30
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      reservation:
+        custom: []
+        name: reservation
+        description: 'Identifiant de la réservation. validation.uuid.'
+        required: false
+        example: 0198a1b2-0000-7000-8000-000000000020
+        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
@@ -79,9 +90,10 @@ endpoints:
         nullable: true
         deprecated: false
     cleanQueryParameters:
-      statut: en_cours
-      prestataire: 0198a1b2-0000-7000-8000-000000000012
-      bloques: true
+      statut: reussi
+      remboursementDu: true
+      retardRemboursementMinutes: 30
+      reservation: 0198a1b2-0000-7000-8000-000000000020
       page: 1
     bodyParameters: []
     cleanBodyParameters: []
@@ -90,7 +102,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"en_cours","bloque":true,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":null,"recredite":false,"telephoneVersement":"+221*******67"}],"links":{"first":"https://api.exemple.test/api/v1/admin/retraits?page=1","last":"https://api.exemple.test/api/v1/admin/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","reservationId":"0198a1b2-0000-7000-8000-000000000020","statut":"reussi","montantAcompte":3000,"commission":1000,"remboursementDu":true,"remboursementDuLe":"2030-01-20T10:00:00+00:00","tentativesRemboursement":3,"tentativesEpuisees":false,"payeLe":"2030-01-20T09:00:00+00:00","rembourseLe":null,"crediteLe":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/paiements?page=1","last":"https://api.exemple.test/api/v1/admin/paiements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -108,7 +120,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Le statut doit être en_cours, reussi ou echoue.","errors":{"statut":["Le statut doit être en_cours, reussi ou echoue."]}}'
+        content: '{"message":"Le statut doit être en_attente, reussi, echoue ou rembourse.","errors":{"statut":["Le statut doit être en_attente, reussi, echoue ou rembourse."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -123,19 +135,19 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/admin/retraits/{id}'
+    uri: 'api/v1/admin/paiements/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — retraits'
+      groupName: 'Administration — paiements'
       groupDescription: |-
 
         Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: "Détail d'un retrait"
+      title: "Détail d'un paiement"
       description: |-
-        Prestataire, montant, statut, dates de demande et de traitement, téléphone de versement complet, référence DexPay et
-        `recredite` / `recrediteLe` (le montant d'un retrait échoué a-t-il été remis au solde).
+        Réservation concernée, acompte, commission, statut, dates (dont `crediteLe`, crédit du prestataire), remboursement dû ou non,
+        tentatives et leur maximum, et référence DexPay (`null` tant que la session n'a pas été créée).
       authenticated: true
       deprecated: false
     headers:
@@ -146,16 +158,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du retrait.'
+        description: 'Identifiant du paiement.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
+        example: 0198a1b2-0000-7000-8000-000000000060
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
+      id: 0198a1b2-0000-7000-8000-000000000060
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -165,13 +177,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"echoue","bloque":false,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":"2030-01-20T08:05:00+00:00","recredite":true,"telephoneVersement":"+221771234567","referenceDexpay":"DXP-RET-EXEMPLE","recrediteLe":"2030-01-20T08:05:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000060","reservationId":"0198a1b2-0000-7000-8000-000000000020","statut":"reussi","montantAcompte":3000,"commission":1000,"remboursementDu":true,"remboursementDuLe":"2030-01-20T10:00:00+00:00","tentativesRemboursement":10,"tentativesEpuisees":true,"payeLe":"2030-01-20T09:00:00+00:00","rembourseLe":null,"crediteLe":null,"reservation":{"id":"0198a1b2-0000-7000-8000-000000000020","statut":"annulee","prixApplique":10000,"clientId":"0198a1b2-0000-7000-8000-000000000001","prestataireId":"0198a1b2-0000-7000-8000-000000000012"},"creeLe":"2030-01-20T08:45:00+00:00","tentativesMaximum":10,"referenceDexpay":"DXP-EXEMPLE"}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Retrait introuvable."}'
+        content: '{"message":"Paiement introuvable."}'
         headers: []
         description: ''
     responseFields: []

@@ -106,6 +106,9 @@ tags:
   -
     name: Profil
     description: "\nProfil de l'utilisateur connecté (client, prestataire ou administrateur)."
+  -
+    name: 'Référentiels publics'
+    description: "\nListes utilisées par l'application avant la connexion (accueil, filtres, inscription d'un prestataire)."
 components:
   securitySchemes:
     default:
@@ -6200,6 +6203,110 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/auth/connexion:
+    post:
+      summary: Connexion
+      operationId: connexion
+      description: "Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations\nstructurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire\nseulement). Ces champs sont absents sinon."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  token: 1|abcdef
+                  user:
+                    id: 0198a1b2-0000-7000-8000-000000000001
+                    role: client
+                    statut: actif
+                properties:
+                  token:
+                    type: string
+                    example: 1|abcdef
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      role:
+                        type: string
+                        example: client
+                      statut:
+                        type: string
+                        example: actif
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Identifiant ou mot de passe incorrect.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Identifiant ou mot de passe incorrect.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  -
+                    description: 'Compte suspendu'
+                    type: object
+                    example:
+                      message: "Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés."
+                      motif: 'Retards répétés.'
+                      finSuspension: '2030-03-10T14:30:00+00:00'
+                    properties:
+                      message:
+                        type: string
+                        example: "Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés."
+                      motif:
+                        type: string
+                        example: 'Retards répétés.'
+                      finSuspension:
+                        type: string
+                        example: '2030-03-10T14:30:00+00:00'
+                  -
+                    description: 'Inscription refusée'
+                    type: object
+                    example:
+                      message: "Votre demande d'inscription a été refusée."
+                      motif: 'Pièces illisibles.'
+                    properties:
+                      message:
+                        type: string
+                        example: "Votre demande d'inscription a été refusée."
+                      motif:
+                        type: string
+                        example: 'Pièces illisibles.'
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identifiant:
+                  type: string
+                  description: 'Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: awa@example.com
+                password:
+                  type: string
+                  description: 'Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: MotDePasse123
+              required:
+                - identifiant
+                - password
+      security: []
   /api/v1/auth/mot-de-passe-oublie:
     post:
       summary: 'Mot de passe oublié'
@@ -7341,7 +7448,7 @@ paths:
     post:
       summary: "Payer l'acompte d'une réservation"
       operationId: payerLacompteDuneRservation
-      description: "Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le\nserveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code\ngénéré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours\npour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200."
+      description: "Pour une réservation `acceptee` dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Le corps est facultatif : le montant est toujours calculé par le\nserveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste `acceptee` : elle ne sera confirmée (et son code\ngénéré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours\npour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.\n\nLe champ facultatif `operateur` (`wave` ou `orange_money`) est validé et enregistré avec le paiement, mais n'a aucun effet\npour l'instant : DexPay ne permet pas de présélectionner l'opérateur à la création de la session, le client le choisit\nsur la page de paiement. Sans `operateur`, rien ne change."
       parameters: []
       responses:
         200:
@@ -7514,6 +7621,18 @@ paths:
                     example: 'Le service de paiement est momentanément indisponible. Veuillez réessayer.'
       tags:
         - 'Client — paiement'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operateur:
+                  type: string
+                  description: "Opérateur souhaité : `wave` ou `orange_money` (sans effet pour l'instant)."
+                  example: wave
+                  nullable: true
     parameters:
       -
         in: path
@@ -7798,18 +7917,30 @@ paths:
             nullable: true
         -
           in: query
+          name: note_min
+          description: 'Note moyenne minimale (0 à 5) ; exclut les prestataires sans avis. Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 5.'
+          example: 4.0
+          required: false
+          schema:
+            type: number
+            description: 'Note moyenne minimale (0 à 5) ; exclut les prestataires sans avis. Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 5.'
+            example: 4.0
+            nullable: true
+        -
+          in: query
           name: tri
-          description: 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives).'
-          example: prix_asc
+          description: 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives), ou note (note moyenne décroissante, prestataires sans avis en dernier).'
+          example: note
           required: false
           schema:
             type: string
-            description: 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives).'
-            example: prix_asc
+            description: 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives), ou note (note moyenne décroissante, prestataires sans avis en dernier).'
+            example: note
             enum:
               - nom
               - prix_asc
               - prix_desc
+              - note
             nullable: true
         -
           in: query
@@ -8167,7 +8298,7 @@ paths:
     get:
       summary: 'Mes réservations'
       operationId: mesRservations
-      description: "Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe\nqu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles\nde l'annulation."
+      description: "Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe\nqu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles\nde l'annulation."
       parameters:
         -
           in: query
@@ -8187,6 +8318,21 @@ paths:
               - terminee
               - refusee
               - annulee
+            nullable: true
+        -
+          in: query
+          name: groupe
+          description: 'Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut.'
+          example: a_venir
+          required: false
+          schema:
+            type: string
+            description: 'Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut.'
+            example: a_venir
+            enum:
+              - a_venir
+              - terminees
+              - annulees
             nullable: true
       responses:
         200:
@@ -8888,7 +9034,7 @@ paths:
                   app: Sopi
                   version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-16T12:59:44+00:00'
+                  time: '2026-10-16T14:57:24+00:00'
                 properties:
                   status:
                     type: string
@@ -8904,7 +9050,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-16T12:59:44+00:00'
+                    example: '2026-10-16T14:57:24+00:00'
       tags:
         - Endpoints
       security: []
@@ -8949,34 +9095,6 @@ paths:
                 - nom
                 - prenom
                 - telephone
-                - password
-      security: []
-  /api/v1/auth/connexion:
-    post:
-      summary: ''
-      operationId: postApiV1AuthConnexion
-      description: ''
-      parameters: []
-      responses: {  }
-      tags:
-        - Endpoints
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                identifiant:
-                  type: string
-                  description: 'Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères.'
-                  example: awa@example.com
-                password:
-                  type: string
-                  description: 'Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères.'
-                  example: MotDePasse123
-              required:
-                - identifiant
                 - password
       security: []
   /api/v1/auth/deconnexion:
@@ -10498,7 +10616,7 @@ paths:
     get:
       summary: 'Mes demandes de réservation'
       operationId: mesDemandesDeRservation
-      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`.'
+      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre).'
       parameters:
         -
           in: query
@@ -10518,6 +10636,21 @@ paths:
               - terminee
               - refusee
               - annulee
+            nullable: true
+        -
+          in: query
+          name: groupe
+          description: 'Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut.'
+          example: a_venir
+          required: false
+          schema:
+            type: string
+            description: 'Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut.'
+            example: a_venir
+            enum:
+              - a_venir
+              - terminees
+              - annulees
             nullable: true
       responses:
         200:
@@ -11554,7 +11687,7 @@ paths:
     post:
       summary: 'Terminer la prestation'
       operationId: terminerLaPrestation
-      description: 'La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps.'
+      description: "La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps. La réponse ajoute le détail du crédit\ndu portefeuille : `montantTotal` (prix de la prestation), `commission` (retenue de la plateforme), `montantCredite`\n(acompte − commission, ajouté au solde) et `soldeApres` (solde du portefeuille après le crédit). Les trois derniers\nvalent `null` si aucun crédit n'a eu lieu."
       parameters: []
       responses:
         200:
@@ -11580,6 +11713,10 @@ paths:
                   client:
                     prenom: Awa
                     initialeNom: D
+                  montantTotal: 15000
+                  commission: 1500
+                  montantCredite: 3000
+                  soldeApres: 3000
                 properties:
                   id:
                     type: string
@@ -11630,6 +11767,18 @@ paths:
                       initialeNom:
                         type: string
                         example: D
+                  montantTotal:
+                    type: integer
+                    example: 15000
+                  commission:
+                    type: integer
+                    example: 1500
+                  montantCredite:
+                    type: integer
+                    example: 3000
+                  soldeApres:
+                    type: integer
+                    example: 3000
         401:
           description: ''
           content:
@@ -12767,6 +12916,139 @@ paths:
                     example: "Vous n'avez pas le droit d'effectuer cette action."
       tags:
         - 'Prestataire — solde et retraits'
+  /api/v1/prestataire/portefeuille/mouvements:
+    get:
+      summary: 'Historique du portefeuille'
+      operationId: historiqueDuPortefeuille
+      description: "Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),\ndu plus récent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA)."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000080
+                      type: credit
+                      montant: 3000.0
+                      libelle: 'Prestation terminée (acompte moins commission)'
+                      soldeApres: 8000.0
+                      reservationId: 0198a1b2-0000-7000-8000-000000000020
+                      retraitId: null
+                      date: '2030-01-15T08:50:00+00:00'
+                  links:
+                    first: 'https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1'
+                    last: 'https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1'
+                    prev: null
+                    next: null
+                  meta:
+                    current_page: 1
+                    last_page: 1
+                    per_page: 20
+                    total: 1
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000080
+                        type: credit
+                        montant: 3000
+                        libelle: 'Prestation terminée (acompte moins commission)'
+                        soldeApres: 8000
+                        reservationId: 0198a1b2-0000-7000-8000-000000000020
+                        retraitId: null
+                        date: '2030-01-15T08:50:00+00:00'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000080
+                        type:
+                          type: string
+                          example: credit
+                        montant:
+                          type: number
+                          example: 3000.0
+                        libelle:
+                          type: string
+                          example: 'Prestation terminée (acompte moins commission)'
+                        soldeApres:
+                          type: number
+                          example: 8000.0
+                        reservationId:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000020
+                        retraitId:
+                          type: string
+                          example: null
+                          nullable: true
+                        date:
+                          type: string
+                          example: '2030-01-15T08:50:00+00:00'
+                  links:
+                    type: object
+                    properties:
+                      first:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1'
+                      last:
+                        type: string
+                        example: 'https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1'
+                      prev:
+                        type: string
+                        example: null
+                        nullable: true
+                      next:
+                        type: string
+                        example: null
+                        nullable: true
+                  meta:
+                    type: object
+                    properties:
+                      current_page:
+                        type: integer
+                        example: 1
+                      last_page:
+                        type: integer
+                        example: 1
+                      per_page:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 1
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Authentification requise.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Authentification requise.'
+        403:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Vous n'avez pas le droit d'effectuer cette action."
+                properties:
+                  message:
+                    type: string
+                    example: "Vous n'avez pas le droit d'effectuer cette action."
+      tags:
+        - 'Prestataire — solde et retraits'
   /api/v1/prestataire/retraits:
     get:
       summary: 'Mes retraits'
@@ -13463,3 +13745,83 @@ paths:
                     example: 'Authentification requise.'
       tags:
         - Profil
+  /api/v1/metiers:
+    get:
+      summary: 'Lister les métiers'
+      operationId: listerLesMtiers
+      description: "Métiers actifs uniquement, triés par nom. Sans authentification. Le `code` est la valeur à passer aux filtres\n(`GET /prestataires?metier=`) et à l'inscription d'un prestataire. Aucune icône n'est stockée : l'application en associe une au code."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000010
+                      code: coiffure
+                      nom: Coiffure
+                    -
+                      id: 0198a1b2-0000-7000-8000-000000000011
+                      code: mecanique
+                      nom: Mécanique
+                properties:
+                  data:
+                    type: array
+                    example:
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000010
+                        code: coiffure
+                        nom: Coiffure
+                      -
+                        id: 0198a1b2-0000-7000-8000-000000000011
+                        code: mecanique
+                        nom: Mécanique
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: 0198a1b2-0000-7000-8000-000000000010
+                        code:
+                          type: string
+                          example: coiffure
+                        nom:
+                          type: string
+                          example: Coiffure
+      tags:
+        - 'Référentiels publics'
+      security: []
+  /api/v1/quartiers:
+    get:
+      summary: 'Lister les quartiers'
+      operationId: listerLesQuartiers
+      description: "Quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces superflus ignorés), triés\npar ordre alphabétique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.\nPassez la valeur telle quelle au filtre `GET /prestataires?quartier=`."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  data:
+                    - Jaxaay
+                    - 'Keur Massar Nord'
+                    - Malika
+                properties:
+                  data:
+                    type: array
+                    example:
+                      - Jaxaay
+                      - 'Keur Massar Nord'
+                      - Malika
+                    items:
+                      type: string
+      tags:
+        - 'Référentiels publics'
+      security: []

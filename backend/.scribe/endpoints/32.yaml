@@ -1,57 +1,87 @@
-name: Authentification
-description: ''
+name: Notifications
+description: |-
+
+  Notifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.
+  L'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).
+  Les e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone.
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: api/v1/auth/mot-de-passe-oublie
+      - GET
+    uri: api/v1/notifications
     metadata:
       custom: []
-      groupName: Authentification
-      groupDescription: ''
+      groupName: Notifications
+      groupDescription: |-
+
+        Notifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.
+        L'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).
+        Les e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Mot de passe oublié'
-      description: |-
-        Envoie un lien de réinitialisation (valable 60 minutes, usage unique) à l'adresse e-mail d'un compte actif. La réponse est
-        toujours la même, que l'adresse corresponde à un compte ou non (compte inconnu, sans e-mail, suspendu, banni, en attente,
-        refusé ou administrateur : aucun e-mail n'est envoyé). Limité par adresse IP et par adresse e-mail.
-      authenticated: false
+      title: 'Mes notifications'
+      description: 'Paginée (20 par page), de la plus récente à la plus ancienne. `nonLues=true` ne renvoie que les notifications non lues.'
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      email:
+    queryParameters:
+      nonLues:
         custom: []
-        name: email
-        description: 'Adresse e-mail du compte. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: awa@example.com
-        type: string
+        name: nonLues
+        description: 'Si vrai, ne renvoie que les notifications non lues.'
+        required: false
+        example: true
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
-        nullable: false
+        nullable: true
         deprecated: false
-    cleanBodyParameters:
-      email: awa@example.com
+      page:
+        custom: []
+        name: page
+        description: 'Numéro de page (20 notifications par page). Le champ value doit être au moins égal à 1.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      nonLues: true
+      page: 1
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Si un compte correspond à cette adresse, un lien de réinitialisation vient d''être envoyé."}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000a01","type":"reservation_acceptee","titre":"Demande acceptée","corps":"Garage Sow a accepté votre demande. Payez l''acompte dans les 2 heures pour confirmer.","donnees":{"reservationId":"0198a1b2-0000-7000-8000-000000000060"},"lue":false,"lueLe":null,"dateCreation":"2030-01-13T10:00:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/notifications?page=1","last":"https://api.exemple.test/api/v1/notifications?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"L''adresse e-mail n''est pas valide.","errors":{"email":["L''adresse e-mail n''est pas valide."]}}'
+        content: '{"message":"Le filtre « non lues » doit être vrai ou faux.","errors":{"nonLues":["Le filtre « non lues » doit être vrai ou faux."]}}'
         headers: []
         description: ''
       -
@@ -61,7 +91,73 @@ endpoints:
         headers: []
         description: ''
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/v1/notifications/non-lues/compteur
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        Notifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.
+        L'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).
+        Les e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Nombre de notifications non lues'
+      description: ''
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"nonLues":3}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
     controller: null
     method: null
     route: null
@@ -69,64 +165,49 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/auth/reinitialiser-mot-de-passe
+    uri: api/v1/notifications/lire-tout
     metadata:
       custom: []
-      groupName: Authentification
-      groupDescription: ''
+      groupName: Notifications
+      groupDescription: |-
+
+        Notifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.
+        L'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).
+        Les e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Réinitialiser le mot de passe'
-      description: |-
-        Choisit un nouveau mot de passe avec le jeton du lien reçu par e-mail (valable 60 minutes, usage unique). Tous les appareils
-        du compte sont déconnectés et un e-mail de confirmation est envoyé.
-      authenticated: false
+      title: 'Tout marquer comme lu'
+      description: ''
+      authenticated: true
       deprecated: false
     headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      jeton:
-        custom: []
-        name: jeton
-        description: 'Jeton contenu dans le lien reçu par e-mail. Le champ value ne doit pas dépasser 200 caractères.'
-        required: true
-        example: jeton-recu-par-email
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      mot_de_passe:
-        custom: []
-        name: mot_de_passe
-        description: 'Nouveau mot de passe (8 caractères minimum). Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: nouveau-mot-de-passe
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      jeton: jeton-recu-par-email
-      mot_de_passe: nouveau-mot-de-passe
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"message":"Votre mot de passe a été modifié. Vous pouvez vous reconnecter."}'
+        content: '{"marquees":3}'
         headers: []
         description: ''
       -
         custom: []
-        status: 422
-        content: '{"message":"Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.","errors":{"jeton":["Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation."]}}'
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
       -
@@ -136,7 +217,91 @@ endpoints:
         headers: []
         description: ''
     responseFields: []
-    auth: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/notifications/{id}/lire'
+    metadata:
+      custom: []
+      groupName: Notifications
+      groupDescription: |-
+
+        Notifications reçues dans l'application (jeton Sanctum + rôle `client` ou `prestataire`). Chacun ne voit que les siennes.
+        L'administrateur ne reçoit aucune notification : il est alerté par les bannières de son tableau de bord (403 sur ces routes).
+        Les e-mails et les push partent séparément ; les textes ne contiennent jamais de code de réservation, de montant ni de téléphone.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Marquer une notification comme lue'
+      description: "Sans effet si elle est déjà lue (la date de première lecture est conservée). La notification d'un autre utilisateur répond 404."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant de la notification.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000a01
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000a01
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000a01","type":"reservation_acceptee","titre":"Demande acceptée","corps":"Garage Sow a accepté votre demande. Payez l''acompte dans les 2 heures pour confirmer.","donnees":{"reservationId":"0198a1b2-0000-7000-8000-000000000060"},"lue":true,"lueLe":"2030-01-13T10:05:00+00:00","dateCreation":"2030-01-13T10:00:00+00:00"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Notification introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
     controller: null
     method: null
     route: null

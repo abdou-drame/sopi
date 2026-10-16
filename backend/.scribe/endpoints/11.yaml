@@ -1,27 +1,28 @@
-name: 'Administration — métiers'
+name: 'Administration — notifications en échec'
 description: |-
 
-  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
-  prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
-  prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
+  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
+  du destinataire ne sont jamais exposés.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/metiers
+    uri: api/v1/admin/notifications-en-echec
     metadata:
       custom: []
-      groupName: 'Administration — métiers'
+      groupName: 'Administration — notifications en échec'
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
-        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
-        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
+        du destinataire ne sont jamais exposés.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des métiers'
-      description: 'Tous les métiers (actifs ou non), par libellé, sans pagination, avec le nombre de prestataires rattachés.'
+      title: 'Liste des notifications en échec'
+      description: |-
+        Notifications dont au moins un canal (e-mail ou push) a échoué définitivement : point d'arrivée de l'alerte
+        `notifications_en_echec`. Du plus récent au plus ancien (20 par page). Filtres combinables : `canal`, `type`, `ancienneteMinutes`.
+        Chaque ligne donne le type, le destinataire (id et rôle), les canaux en échec, le nombre d'essais, la classe de l'erreur et la date.
       authenticated: true
       deprecated: false
     headers:
@@ -30,8 +31,77 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      canal:
+        custom: []
+        name: canal
+        description: 'email ou push : ne garde que les notifications dont CE canal est en échec.'
+        required: false
+        example: email
+        type: string
+        enumValues:
+          - email
+          - push
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'Type de notification, par exemple reservation_confirmee.'
+        required: false
+        example: reservation_confirmee
+        type: string
+        enumValues:
+          - dossier_depose
+          - demande_acceptee
+          - demande_refusee
+          - reservation_nouvelle_demande
+          - reservation_acceptee
+          - reservation_refusee
+          - reservation_expiree
+          - reservation_annulee
+          - reservation_confirmee
+          - reservation_demarree
+          - reservation_terminee
+          - avis_recu
+          - avis_modere
+          - litige_ouvert
+          - litige_cloture
+          - sanction_posee
+          - sanction_levee
+          - reinitialisation_mot_de_passe
+          - mot_de_passe_modifie
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      ancienneteMinutes:
+        custom: []
+        name: ancienneteMinutes
+        description: 'Notifications créées depuis au moins N minutes (alias : anciennete_minutes). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 525600.'
+        required: false
+        example: 60
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      page:
+        custom: []
+        name: page
+        description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanQueryParameters:
+      canal: email
+      type: reservation_confirmee
+      ancienneteMinutes: 60
+      page: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -39,7 +109,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","code":"coiffure","libelle":"Coiffure","actif":true,"nombrePrestataires":4,"dateCreation":"2030-01-01T09:00:00+00:00"},{"id":"0198a1b2-0000-7000-8000-000000000091","code":"mecanique","libelle":"Mécanique","actif":true,"nombrePrestataires":7,"dateCreation":"2030-01-01T09:00:00+00:00"}]}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","type":"reservation_confirmee","destinataire":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client"},"canauxEnEchec":["email"],"tentatives":5,"classeErreur":"TransportException","dateCreation":"2030-01-20T08:00:00+00:00"}],"links":{},"meta":{"current_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -52,89 +122,12 @@ endpoints:
         custom: []
         status: 403
         content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/admin/metiers
-    metadata:
-      custom: []
-      groupName: 'Administration — métiers'
-      groupDescription: |-
-
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
-        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
-        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Ajouter un métier'
-      description: |-
-        Seul le nom est saisi ; le code est déduit (minuscules, sans accent ni espace, 20 caractères au plus). Un nom dont le code existe
-        déjà répond 422.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      libelle:
-        custom: []
-        name: libelle
-        description: 'Nom affiché du métier (2 à 60 caractères). Le code en est déduit : minuscules, sans accent ni espace. Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
-        required: true
-        example: Plomberie
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      libelle: Plomberie
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000092","code":"plomberie","libelle":"Plomberie","actif":true,"nombrePrestataires":0,"dateCreation":"2030-01-20T09:00:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Un métier portant ce nom existe déjà."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Un métier portant ce nom existe déjà.","errors":{"libelle":["Un métier portant ce nom existe déjà."]}}'
+        content: '{"message":"Le canal doit être email ou push.","errors":{"canal":["Le canal doit être email ou push."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -148,20 +141,21 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - PATCH
-    uri: 'api/v1/admin/metiers/{id}'
+      - GET
+    uri: 'api/v1/admin/notifications-en-echec/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — métiers'
+      groupName: 'Administration — notifications en échec'
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
-        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
-        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
+        du destinataire ne sont jamais exposés.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Modifier un métier'
-      description: "Renomme le métier et/ou l'active ou le désactive. Le dernier métier actif ne peut pas être désactivé (409)."
+      title: "Détail d'une notification en échec"
+      description: |-
+        Même forme qu'une ligne de la liste. Permet d'ouvrir un identifiant renvoyé par l'alerte `notifications_en_echec`, quelle que
+        soit sa page dans la liste. Une notification qui n'est pas (ou plus) en échec répond 404.
       authenticated: true
       deprecated: false
     headers:
@@ -172,80 +166,32 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du métier.'
+        description: 'Identifiant de la notification.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000092
+        example: 0198a1b2-0000-7000-8000-000000000090
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000092
+      id: 0198a1b2-0000-7000-8000-000000000090
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      libelle:
-        custom: []
-        name: libelle
-        description: 'Nouveau nom affiché (le code ne change pas). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
-        required: false
-        example: 'Plomberie et chauffage'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      actif:
-        custom: []
-        name: actif
-        description: 'false : plus de nouvelle inscription pour ce métier ; true : de nouveau proposé.'
-        required: false
-        example: true
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      libelle: 'Plomberie et chauffage'
-      actif: true
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000092","code":"plomberie","libelle":"Plomberie et chauffage","actif":false,"nombrePrestataires":0,"dateCreation":"2030-01-20T09:00:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","type":"reservation_confirmee","destinataire":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client"},"canauxEnEchec":["email"],"tentatives":5,"classeErreur":"TransportException","dateCreation":"2030-01-20T08:00:00+00:00"}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Métier introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Au moins un métier doit rester actif."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Indiquez le nouveau nom ou l''état du métier.","errors":{"libelle":["Indiquez le nouveau nom ou l''état du métier."]}}'
+        content: '{"message":"Notification introuvable."}'
         headers: []
         description: ''
     responseFields: []

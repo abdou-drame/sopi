@@ -1,172 +1,208 @@
-name: 'Administration — tableau de bord'
-description: |-
-
-  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Lecture seule : rien n'est modifié ni envoyé.
-  Les agrégats sont calculés à chaque appel par des requêtes groupées (nombre de requêtes constant, quel que soit le volume).
-  Aucune donnée personnelle n'est renvoyée : seulement des compteurs et des montants globaux en FCFA (entiers).
+name: Prestataires
+description: ''
 endpoints:
   -
     custom: []
     httpMethods:
-      - GET
-    uri: api/v1/admin/tableau-de-bord
+      - POST
+    uri: api/v1/prestataires/inscription
     metadata:
       custom: []
-      groupName: 'Administration — tableau de bord'
-      groupDescription: |-
-
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Lecture seule : rien n'est modifié ni envoyé.
-        Les agrégats sont calculés à chaque appel par des requêtes groupées (nombre de requêtes constant, quel que soit le volume).
-        Aucune donnée personnelle n'est renvoyée : seulement des compteurs et des montants globaux en FCFA (entiers).
+      groupName: Prestataires
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Statistiques générales'
+      title: "Inscription d'un prestataire"
       description: |-
-        Comptes (clients et prestataires par statut, dossiers en attente), réservations (total, par statut, par domaine de métier et activité
-        des 7 et 30 derniers jours glissants), paiements (nombre et montant d'acompte par statut), litiges, avis (dont signalés à modérer,
-        note moyenne des avis non masqués) et sanctions actives. Les réservations « terminées » d'une fenêtre sont datées par leur passage
-        à TERMINEE. Les fenêtres et les dates sont interprétées dans le fuseau de l'application (Africa/Dakar).
-      authenticated: true
+        Envoi en `multipart/form-data`. Crée le compte (statut `en_attente`, il ne peut pas se connecter avant validation
+        par un administrateur), le profil et les justificatifs. Le dossier doit contenir au moins une CNI et un diplôme
+        ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à 10 requêtes par heure et par adresse IP.
+
+        Le `jeton_suivi` n'est renvoyé qu'une seule fois : seul son hachage est conservé. Les chemins des fichiers ne sont jamais renvoyés.
+      authenticated: false
       deprecated: false
     headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
+    bodyParameters:
+      nom:
         custom: []
-        status: 200
-        content: '{"dateGeneration":"2030-01-20T10:00:00+00:00","comptes":{"clients":{"total":120,"parStatut":{"en_attente":0,"actif":115,"refuse":0,"suspendu":3,"banni":2}},"prestataires":{"total":18,"parStatut":{"en_attente":2,"actif":14,"refuse":1,"suspendu":1,"banni":0},"dossiersEnAttente":2},"administrateurs":1},"reservations":{"total":340,"parStatut":{"en_attente":4,"acceptee":2,"confirmee":10,"en_cours":1,"terminee":280,"refusee":15,"annulee":28},"parDomaine":{"mecanique":{"total":150,"parStatut":{"en_attente":2,"acceptee":1,"confirmee":5,"en_cours":1,"terminee":130,"refusee":5,"annulee":6}},"coiffure":{"total":120,"parStatut":{"en_attente":2,"acceptee":1,"confirmee":4,"en_cours":0,"terminee":100,"refusee":6,"annulee":7}},"pressing":{"total":70,"parStatut":{"en_attente":0,"acceptee":0,"confirmee":1,"en_cours":0,"terminee":50,"refusee":4,"annulee":15}}},"activiteRecente":{"derniers7Jours":{"creees":30,"terminees":25},"derniers30Jours":{"creees":110,"terminees":95}}},"paiements":{"total":{"nombre":300,"montant":1350000},"parStatut":{"en_attente":{"nombre":3,"montant":9000},"reussi":{"nombre":280,"montant":1260000},"echoue":{"nombre":7,"montant":31500},"rembourse":{"nombre":10,"montant":49500}}},"litiges":{"total":9,"ouverts":2,"clos":7},"avis":{"total":210,"signales":3,"masques":4,"noteMoyenne":4.35},"sanctions":{"suspensionsEnCours":1,"bannissements":2}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: api/v1/admin/revenus
-    metadata:
-      custom: []
-      groupName: 'Administration — tableau de bord'
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Revenus de la plateforme'
-      description: |-
-        Série par jour, semaine (lundi à dimanche) ou mois calendaire, sur une période de 366 jours au plus (bornes incluses, fuseau
-        Africa/Dakar). Par défaut : les 30 derniers jours, par jour. Les périodes vides sont présentes avec des zéros.
-        Définitions : **revenus** = commissions des paiements réussis dont le crédit au prestataire est fait (prestation terminée), datées
-        par ce crédit, paiements remboursés exclus ; **acomptesEncaisses** = acomptes des paiements réussis, datés par le paiement ;
-        **remboursements** = acomptes remboursés, datés par le remboursement ; **retraitsVerses** = retraits réussis, datés par leur traitement.
-        **soldePrestataires** est le cumul des soldes à l'instant de la demande. Montants en FCFA entiers.
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters:
-      debut:
-        custom: []
-        name: debut
-        description: 'Premier jour de la période (AAAA-MM-JJ, inclus). Par défaut : 29 jours avant la fin. Must be a valid date in the format <code>Y-m-d</code>.'
-        required: false
-        example: '2030-01-01'
+        name: nom
+        description: 'Nom. Le champ value ne doit pas dépasser 100 caractères.'
+        required: true
+        example: Diop
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-      fin:
+      prenom:
         custom: []
-        name: fin
-        description: "Dernier jour de la période (AAAA-MM-JJ, inclus). Par défaut : aujourd'hui. Au plus 366 jours après le début. Must be a valid date in the format <code>Y-m-d</code>."
-        required: false
-        example: '2030-01-31'
+        name: prenom
+        description: 'Prénom. Le champ value ne doit pas dépasser 100 caractères.'
+        required: true
+        example: Moussa
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-      regroupement:
+      telephone:
         custom: []
-        name: regroupement
-        description: 'Pas de la série : `jour` (défaut), `semaine` (lundi à dimanche) ou `mois` (mois calendaire).'
-        required: false
-        example: semaine
+        name: telephone
+        description: 'Mobile sénégalais (avec ou sans +221), unique. Must match the regex /^\+2217[05678]\d{7}$/.'
+        required: true
+        example: '77 123 45 67'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      email:
+        custom: []
+        name: email
+        description: 'Adresse e-mail, unique. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
+        required: true
+        example: moussa@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      mot_de_passe:
+        custom: []
+        name: mot_de_passe
+        description: '8 caractères minimum. Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
+        required: true
+        example: mot-de-passe-exemple
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      nom_entreprise:
+        custom: []
+        name: nom_entreprise
+        description: "Nom de l'entreprise ou de l'atelier. Le champ value ne doit pas dépasser 150 caractères."
+        required: true
+        example: 'Garage Moussa'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      metier:
+        custom: []
+        name: metier
+        description: "Code d'un métier proposé (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
+        required: true
+        example: mecanique
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      quartier:
+        custom: []
+        name: quartier
+        description: 'Quartier de Keur Massar. Le champ value ne doit pas dépasser 100 caractères.'
+        required: true
+        example: Malika
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      adresse:
+        custom: []
+        name: adresse
+        description: 'Adresse. Le champ value ne doit pas dépasser 255 caractères.'
+        required: true
+        example: 'Rue 10, près du marché'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      justificatifs:
+        custom: []
+        name: justificatifs
+        description: 'De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation. Le champ value doit contenir au moins 2 éléments. Le champ value ne doit pas contenir plus de 5 éléments.'
+        required: true
+        example:
+          - []
+        type: 'object[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      'justificatifs[].type_document':
+        custom: []
+        name: 'justificatifs[].type_document'
+        description: 'cni, diplome ou attestation.'
+        required: true
+        example: cni
         type: string
         enumValues:
-          - jour
-          - semaine
-          - mois
+          - cni
+          - diplome
+          - attestation
         exampleWasSpecified: false
-        nullable: true
+        nullable: false
         deprecated: false
-    cleanQueryParameters:
-      debut: '2030-01-01'
-      fin: '2030-01-31'
-      regroupement: semaine
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
+      'justificatifs[].fichier':
+        custom: []
+        name: 'justificatifs[].fichier'
+        description: 'PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
+        required: true
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      nom: Diop
+      prenom: Moussa
+      telephone: '77 123 45 67'
+      email: moussa@example.com
+      mot_de_passe: mot-de-passe-exemple
+      nom_entreprise: 'Garage Moussa'
+      metier: mecanique
+      quartier: Malika
+      adresse: 'Rue 10, près du marché'
+      justificatifs:
+        -
+          type_document: cni
+    fileParameters:
+      justificatifs:
+        -
+          fichier: null
     responses:
       -
         custom: []
-        status: 200
-        content: '{"dateGeneration":"2030-01-20T10:00:00+00:00","periode":{"debut":"2030-01-01","fin":"2030-01-10","regroupement":"semaine","fuseau":"Africa/Dakar"},"totaux":{"revenus":42000,"acomptesEncaisses":150000,"remboursements":9000,"retraitsVerses":60000},"soldePrestataires":84000,"series":[{"debut":"2030-01-01","fin":"2030-01-06","revenus":30000,"acomptesEncaisses":90000,"remboursements":0,"retraitsVerses":60000},{"debut":"2030-01-07","fin":"2030-01-10","revenus":12000,"acomptesEncaisses":60000,"remboursements":9000,"retraitsVerses":0}]}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","jeton_suivi":"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","lien_suivi":"https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","justificatifs":[{"type":"cni","statut":"en_attente"},{"type":"diplome","statut":"en_attente"}]}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"La période ne peut pas dépasser 366 jours.","errors":{"fin":["La période ne peut pas dépasser 366 jours."]}}'
+        content: '{"message":"Le dossier doit contenir une copie de votre CNI.","errors":{"justificatifs":["Le dossier doit contenir une copie de votre CNI."]}}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
+    auth: []
     controller: null
     method: null
     route: null
@@ -174,29 +210,37 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/alertes
+    uri: 'api/v1/suivi/{jeton}'
     metadata:
       custom: []
-      groupName: 'Administration — tableau de bord'
+      groupName: Prestataires
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: Alertes
+      title: "Suivi du dossier d'inscription"
       description: |-
-        Éléments qui demandent l'attention de l'administrateur, calculés à la demande (rien n'est envoyé : l'administrateur ne reçoit ni
-        e-mail ni notification push). Liste vide quand tout est calme. Triées de la plus grave à la moins grave. Types : `dossiers_en_attente`,
-        `litiges_ouverts`, `avis_signales`, `retraits_bloques`, `remboursements_en_echec`, `remboursements_en_retard`,
-        `notifications_en_echec`, `suspensions_a_echeance`. Gravités : `info`, `attention`, `critique` (seuils configurables, `sopi.admin.alertes.*`).
-        `ids` : au plus 20 identifiants, les plus anciens d'abord, pour ouvrir les éléments (le dossier est identifié par l'id du prestataire) ;
-        `compteur` donne le total réel. `ressource` : où ouvrir les `ids` dans l'administration (`demandes-prestataires` : `/admin/prestataires/{id}`, `litiges`, `retraits`, `paiements`, `notifications` : `/admin/notifications-en-echec/{id}` ; `avis` : liste `/admin/avis?aTraiter=1` ; `sanctions` : liste `/admin/sanctions?echeanceDansHeures=24`). `ageMinutes` : ancienneté du plus ancien élément ; `echeanceDansMinutes` : délai avant la première fin de suspension.
-      authenticated: true
+        Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription.
+        Ne renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.
+        Un jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP.
+      authenticated: false
       deprecated: false
     headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      jeton:
+        custom: []
+        name: jeton
+        description: "Jeton de suivi reçu à l'inscription."
+        required: true
+        example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      jeton: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -206,26 +250,23 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"dateGeneration":"2030-01-20T10:00:00+00:00","total":2,"parGravite":{"critique":1,"attention":0,"info":1},"alertes":[{"type":"litiges_ouverts","gravite":"critique","compteur":2,"message":"2 litiges ouverts sont à traiter.","ids":["0198a1b2-0000-7000-8000-000000000020","0198a1b2-0000-7000-8000-000000000021"],"ageMinutes":4500,"echeanceDansMinutes":null},{"type":"suspensions_a_echeance","gravite":"info","compteur":1,"message":"1 suspension temporaire se termine bientôt.","ids":["0198a1b2-0000-7000-8000-000000000030"],"ageMinutes":null,"echeanceDansMinutes":600}]}'
+        content: '{"nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"typeDocument":"cni","statut":"en_attente"},{"typeDocument":"diplome","statut":"en_attente"}]}'
         headers: []
         description: ''
       -
         custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
+        status: 404
+        content: '{"message":"Lien de suivi invalide ou expiré."}'
         headers: []
         description: ''
       -
         custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        status: 429
+        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
         headers: []
         description: ''
     responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
+    auth: []
     controller: null
     method: null
     route: null

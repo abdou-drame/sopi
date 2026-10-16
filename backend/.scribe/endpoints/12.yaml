@@ -1,31 +1,27 @@
-name: 'Administration — modération des avis'
+name: 'Administration — métiers'
 description: |-
 
-  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note
-  moyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec
-  l'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées
-  à 10 requêtes par minute.
+  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
+  prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
+  prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/avis
+    uri: api/v1/admin/metiers
     metadata:
       custom: []
-      groupName: 'Administration — modération des avis'
+      groupName: 'Administration — métiers'
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note
-        moyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec
-        l'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées
-        à 10 requêtes par minute.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
+        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
+        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des avis'
-      description: |-
-        Paginée (20 par page), du plus récent au plus ancien, tous prestataires confondus. Filtres facultatifs : `prestataire`, `note`,
-        `masque`, `signale`, `aTraiter` (signalés et pas encore modérés).
+      title: 'Liste des métiers'
+      description: 'Tous les métiers (actifs ou non), par libellé, sans pagination, avec le nombre de prestataires rattachés.'
       authenticated: true
       deprecated: false
     headers:
@@ -34,80 +30,8 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters:
-      prestataire:
-        custom: []
-        name: prestataire
-        description: 'Identifiant du prestataire noté. validation.uuid.'
-        required: false
-        example: 0198a1b2-0000-7000-8000-000000000002
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      note:
-        custom: []
-        name: note
-        description: 'Note de 1 à 5. validation.between.'
-        required: false
-        example: 2
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      masque:
-        custom: []
-        name: masque
-        description: 'true : avis masqués ; false : avis affichés ; absent : tous.'
-        required: false
-        example: false
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      signale:
-        custom: []
-        name: signale
-        description: 'true : avis signalés par le prestataire ; false : jamais signalés.'
-        required: false
-        example: true
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      aTraiter:
-        custom: []
-        name: aTraiter
-        description: 'true : avis signalés et pas encore modérés.'
-        required: false
-        example: true
-        type: boolean
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      page:
-        custom: []
-        name: page
-        description: 'Numéro de page (20 résultats par page). Le champ value doit être au moins égal à 1.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanQueryParameters:
-      prestataire: 0198a1b2-0000-7000-8000-000000000002
-      note: 2
-      masque: false
-      signale: true
-      aTraiter: true
-      page: 1
+    queryParameters: []
+    cleanQueryParameters: []
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -115,7 +39,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"signale","signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Cet avis concerne une autre prestation que la mienne.","modereLe":null,"moderePar":null,"motifModeration":null,"masque":false,"masqueLe":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/avis?page=1","last":"https://api.exemple.test/api/v1/admin/avis?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","code":"coiffure","libelle":"Coiffure","actif":true,"nombrePrestataires":4,"dateCreation":"2030-01-01T09:00:00+00:00"},{"id":"0198a1b2-0000-7000-8000-000000000091","code":"mecanique","libelle":"Mécanique","actif":true,"nombrePrestataires":7,"dateCreation":"2030-01-01T09:00:00+00:00"}]}'
         headers: []
         description: ''
       -
@@ -130,12 +54,6 @@ endpoints:
         content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
         headers: []
         description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"La note doit être comprise entre 1 et 5.","errors":{"note":["La note doit être comprise entre 1 et 5."]}}'
-        headers: []
-        description: ''
     responseFields: []
     auth:
       - headers
@@ -148,64 +66,51 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/admin/avis/{id}/masquer'
+    uri: api/v1/admin/metiers
     metadata:
       custom: []
-      groupName: 'Administration — modération des avis'
+      groupName: 'Administration — métiers'
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note
-        moyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec
-        l'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées
-        à 10 requêtes par minute.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
+        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
+        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Masquer un avis'
+      title: 'Ajouter un métier'
       description: |-
-        Retire l'avis de l'affichage public. Motif obligatoire. Un avis déjà masqué répond 409, y compris si deux requêtes arrivent
-        en même temps.
+        Seul le nom est saisi ; le code est déduit (minuscules, sans accent ni espace, 20 caractères au plus). Un nom dont le code existe
+        déjà répond 422.
       authenticated: true
       deprecated: false
     headers:
       Authorization: 'Bearer {VOTRE_JETON}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: "Identifiant de l'avis."
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      motif:
+      libelle:
         custom: []
-        name: motif
-        description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        name: libelle
+        description: 'Nom affiché du métier (2 à 60 caractères). Le code en est déduit : minuscules, sans accent ni espace. Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
         required: true
-        example: 'Propos injurieux sans rapport avec la prestation.'
+        example: Plomberie
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
     cleanBodyParameters:
-      motif: 'Propos injurieux sans rapport avec la prestation.'
+      libelle: Plomberie
     fileParameters: []
     responses:
       -
         custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"supprime","signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":true,"masqueLe":"2030-01-19T09:00:00+00:00"}'
+        status: 201
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000092","code":"plomberie","libelle":"Plomberie","actif":true,"nombrePrestataires":0,"dateCreation":"2030-01-20T09:00:00+00:00"}'
         headers: []
         description: ''
       -
@@ -222,20 +127,14 @@ endpoints:
         description: ''
       -
         custom: []
-        status: 404
-        content: '{"message":"Avis introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
         status: 409
-        content: '{"message":"Cet avis est déjà masqué."}'
+        content: '{"message":"Un métier portant ce nom existe déjà."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le motif de la modération est obligatoire.","errors":{"motif":["Le motif de la modération est obligatoire."]}}'
+        content: '{"message":"Un métier portant ce nom existe déjà.","errors":{"libelle":["Un métier portant ce nom existe déjà."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -249,21 +148,20 @@ endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: 'api/v1/admin/avis/{id}/conserver'
+      - PATCH
+    uri: 'api/v1/admin/metiers/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — modération des avis'
+      groupName: 'Administration — métiers'
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note
-        moyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec
-        l'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées
-        à 10 requêtes par minute.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les métiers sont proposés à l'inscription des
+        prestataires et à la recherche. Un métier n'est jamais supprimé : on le désactive (il n'est plus proposé à l'inscription, ses
+        prestataires le gardent). Les créations et modifications sont limitées à 10 requêtes par minute.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Conserver un avis'
-      description: "Décide, après examen d'un signalement, que l'avis reste affiché. Motif facultatif. Un avis déjà modéré répond 409."
+      title: 'Modifier un métier'
+      description: "Renomme le métier et/ou l'active ou le désactive. Le dernier métier actif ne peut pas être désactivé (409)."
       authenticated: true
       deprecated: false
     headers:
@@ -274,120 +172,50 @@ endpoints:
       id:
         custom: []
         name: id
-        description: "Identifiant de l'avis."
+        description: 'Identifiant du métier.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
+        example: 0198a1b2-0000-7000-8000-000000000092
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
+      id: 0198a1b2-0000-7000-8000-000000000092
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      motif:
+      libelle:
         custom: []
-        name: motif
-        description: 'Motif de la décision (10 à 1000 caractères). Obligatoire pour masquer. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        name: libelle
+        description: 'Nouveau nom affiché (le code ne change pas). Le champ value doit contenir au moins 2 caractères. Le champ value ne doit pas dépasser 60 caractères.'
         required: false
-        example: 'Propos injurieux sans rapport avec la prestation.'
+        example: 'Plomberie et chauffage'
         type: string
         enumValues: []
         exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      motif: 'Propos injurieux sans rapport avec la prestation.'
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"publie","signaleLe":"2030-01-18T08:00:00+00:00","motifSignalement":"Avis injuste.","modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":null,"masque":false,"masqueLe":null}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Avis introuvable."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 409
-        content: '{"message":"Cet avis a déjà été modéré."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: 'api/v1/admin/avis/{id}/retablir'
-    metadata:
-      custom: []
-      groupName: 'Administration — modération des avis'
-      groupDescription: |-
-
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Masquer un avis (« supprimer ») le retire de la note
-        moyenne, des listes d'avis, de la recherche et du profil public ; la ligne est conservée et son auteur continue de la voir, avec
-        l'indicateur `affichePubliquement: false`. Chaque décision est tracée (administrateur, date, motif). Les modifications sont limitées
-        à 10 requêtes par minute.
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Rétablir un avis masqué'
-      description: "L'avis est de nouveau affiché et compte dans la note moyenne. La trace de la modération est conservée. Un avis non masqué répond 409."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: "Identifiant de l'avis."
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000080
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
         nullable: false
         deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000080
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+      actif:
+        custom: []
+        name: actif
+        description: 'false : plus de nouvelle inscription pour ce métier ; true : de nouveau proposé.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      libelle: 'Plomberie et chauffage'
+      actif: true
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","note":1,"commentaire":"Service décevant.","dateCreation":"2030-01-17T10:00:00+00:00","reservationId":"0198a1b2-0000-7000-8000-000000000060","client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa"},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Garage Exemple"},"statut":"publie","signaleLe":null,"motifSignalement":null,"modereLe":"2030-01-19T09:00:00+00:00","moderePar":"0198a1b2-0000-7000-8000-000000000009","motifModeration":"Propos injurieux sans rapport avec la prestation.","masque":false,"masqueLe":null}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000092","code":"plomberie","libelle":"Plomberie et chauffage","actif":false,"nombrePrestataires":0,"dateCreation":"2030-01-20T09:00:00+00:00"}'
         headers: []
         description: ''
       -
@@ -405,13 +233,19 @@ endpoints:
       -
         custom: []
         status: 404
-        content: '{"message":"Avis introuvable."}'
+        content: '{"message":"Métier introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 409
-        content: '{"message":"Cet avis n''est pas masqué."}'
+        content: '{"message":"Au moins un métier doit rester actif."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Indiquez le nouveau nom ou l''état du métier.","errors":{"libelle":["Indiquez le nouveau nom ou l''état du métier."]}}'
         headers: []
         description: ''
     responseFields: []

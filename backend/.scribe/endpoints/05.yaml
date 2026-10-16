@@ -1,29 +1,25 @@
-name: 'Administration — utilisateurs'
+name: 'Administration — litiges'
 description: |-
 
-  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les comptes administrateurs ne sont
-  jamais listés ni ouverts (404). Nom, e-mail et téléphone sont visibles (supervision) ; jamais de mot de passe ni de jeton.
+  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
+  elle ne déclenche aucun mouvement d'argent automatique.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/utilisateurs
+    uri: api/v1/admin/litiges
     metadata:
       custom: []
-      groupName: 'Administration — utilisateurs'
+      groupName: 'Administration — litiges'
       groupDescription: |-
 
-        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les comptes administrateurs ne sont
-        jamais listés ni ouverts (404). Nom, e-mail et téléphone sont visibles (supervision) ; jamais de mot de passe ni de jeton.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
+        elle ne déclenche aucun mouvement d'argent automatique.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des utilisateurs'
-      description: |-
-        Clients et prestataires, tous statuts confondus, du plus récent au plus ancien (20 par page). Filtres combinables : `role`,
-        `statut`, `q` (recherche partielle, insensible à la casse, dans nom, prénom, « prénom nom », e-mail, téléphone et nom d'entreprise ;
-        les accents ne sont pas ignorés), `debut` / `fin` (date de création). `prestataire` vaut `null` pour un client ; son `id` est
-        l'identifiant du profil prestataire, celui des autres routes d'administration.
+      title: 'Liste des litiges'
+      description: 'Paginée (20 par page). Par défaut les litiges `ouvert`, du plus ancien au plus récent.'
       authenticated: true
       deprecated: false
     headers:
@@ -33,43 +29,17 @@ endpoints:
     urlParameters: []
     cleanUrlParameters: []
     queryParameters:
-      role:
-        custom: []
-        name: role
-        description: 'client ou prestataire (les administrateurs ne sont jamais listés).'
-        required: false
-        example: prestataire
-        type: string
-        enumValues:
-          - client
-          - prestataire
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
       statut:
         custom: []
         name: statut
-        description: 'Statut du compte : en_attente, actif, refuse, suspendu ou banni.'
+        description: 'ouvert (défaut), cloture ou tous.'
         required: false
-        example: actif
+        example: ouvert
         type: string
         enumValues:
-          - en_attente
-          - actif
-          - refuse
-          - suspendu
-          - banni
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      q:
-        custom: []
-        name: q
-        description: "Recherche partielle, sans tenir compte des majuscules, dans le nom, le prénom, l'e-mail, le téléphone et le nom d'entreprise. Le champ value ne doit pas dépasser 100 caractères."
-        required: false
-        example: diop
-        type: string
-        enumValues: []
+          - ouvert
+          - cloture
+          - tous
         exampleWasSpecified: false
         nullable: true
         deprecated: false
@@ -84,35 +54,9 @@ endpoints:
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      debut:
-        custom: []
-        name: debut
-        description: 'Comptes créés à partir de ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>.'
-        required: false
-        example: '2030-01-01'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      fin:
-        custom: []
-        name: fin
-        description: "Comptes créés jusqu'à ce jour (AAAA-MM-JJ, inclus). Must be a valid date in the format <code>Y-m-d</code>."
-        required: false
-        example: '2030-01-31'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
     cleanQueryParameters:
-      role: prestataire
-      statut: actif
-      q: diop
+      statut: ouvert
       page: 1
-      debut: '2030-01-01'
-      fin: '2030-01-31'
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -120,7 +64,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000002","role":"prestataire","prenom":"Moussa","nom":"Diop","email":"moussa@example.com","telephone":"+221770000002","statut":"actif","dateCreation":"2030-01-10T09:00:00+00:00","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","metier":"mecanique","quartier":"Malika","nomEntreprise":"Garage Exemple"}},{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client","prenom":"Awa","nom":"Diallo","email":null,"telephone":"+221770000001","statut":"actif","dateCreation":"2030-01-09T09:00:00+00:00","prestataire":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/utilisateurs?page=1","last":"https://api.exemple.test/api/v1/admin/utilisateurs?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":2}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa","telephone":"+221770000001","email":null},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221770000002","email":null,"nomEntreprise":"Garage Exemple"},"prixApplique":15000,"paiements":[],"decidePar":null,"sanctionId":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/litiges?page=1","last":"https://api.exemple.test/api/v1/admin/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -138,7 +82,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Le rôle doit être client ou prestataire.","errors":{"role":["Le rôle doit être client ou prestataire."]}}'
+        content: '{"message":"Le statut doit être ouvert, cloture ou tous.","errors":{"statut":["Le statut doit être ouvert, cloture ou tous."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -153,22 +97,18 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/admin/utilisateurs/{id}'
+    uri: 'api/v1/admin/litiges/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — utilisateurs'
+      groupName: 'Administration — litiges'
       groupDescription: |-
 
-        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Les comptes administrateurs ne sont
-        jamais listés ni ouverts (404). Nom, e-mail et téléphone sont visibles (supervision) ; jamais de mot de passe ni de jeton.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
+        elle ne déclenche aucun mouvement d'argent automatique.
       subgroup: ''
       subgroupDescription: ''
-      title: "Fiche d'un utilisateur"
-      description: |-
-        Identité, statut, `sanctionActive` (blocage en cours, sinon avertissement non levé, sinon `null`) et `nombreSanctions`.
-        Un client a un bloc `client` (`reservationsParStatut`, `nombreAvisDonnes`, `litiges`), un prestataire un bloc `prestataire`
-        (adresse, `solde` en FCFA, `prestationsActives`, `reservationsParStatut`, `noteMoyenne` et `nombreAvis` hors avis masqués,
-        `nombreRetraits`, `litiges`) ; l'autre bloc vaut `null`. `litiges` : `total` et `ouverts` (concernant le compte).
+      title: "Détail d'un litige"
+      description: 'Réservation, parties (coordonnées complètes), paiements de la réservation, preuves, réponse du prestataire et décision.'
       authenticated: true
       deprecated: false
     headers:
@@ -179,16 +119,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: "Identifiant de l'utilisateur."
+        description: 'Identifiant du litige.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000002
+        example: 0198a1b2-0000-7000-8000-000000000090
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000002
+      id: 0198a1b2-0000-7000-8000-000000000090
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -198,13 +138,229 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","role":"prestataire","prenom":"Moussa","nom":"Diop","email":"moussa@example.com","telephone":"+221770000002","statut":"suspendu","dateCreation":"2030-01-10T09:00:00+00:00","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","metier":"mecanique","quartier":"Malika","nomEntreprise":"Garage Exemple","adresse":"Rue 10, près du marché","solde":12000,"prestationsActives":3,"reservationsParStatut":{"en_attente":1,"acceptee":0,"confirmee":2,"en_cours":0,"terminee":14,"refusee":1,"annulee":2},"noteMoyenne":4.5,"nombreAvis":10,"nombreRetraits":2,"litiges":{"total":1,"ouverts":0}},"sanctionActive":{"id":"0198a1b2-0000-7000-8000-000000000040","type":"suspension_temporaire","dateFin":"2030-02-01T09:00:00+00:00"},"nombreSanctions":2,"client":null}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa","telephone":"+221770000001","email":null},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221770000002","email":null,"nomEntreprise":"Garage Exemple"},"prixApplique":15000,"paiements":[{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"paye","montantAcompte":4500,"commission":1500,"payeLe":"2030-01-15T09:00:00+00:00","rembourseLe":null}],"decidePar":null,"sanctionId":null}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Utilisateur introuvable."}'
+        content: '{"message":"Litige introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/litiges/{id}/preuves/{preuve}'
+    metadata:
+      custom: []
+      groupName: 'Administration — litiges'
+      groupDescription: |-
+
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
+        elle ne déclenche aucun mouvement d'argent automatique.
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Afficher une preuve d'un litige"
+      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      preuve:
+        custom: []
+        name: preuve
+        description: 'Identifiant de la preuve.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000091
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+      preuve: 0198a1b2-0000-7000-8000-000000000091
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: "[Contenu binaire de l'image]"
+        headers: []
+        description: image
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Preuve introuvable."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/litiges/{id}/trancher'
+    metadata:
+      custom: []
+      groupName: 'Administration — litiges'
+      groupDescription: |-
+
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
+        elle ne déclenche aucun mouvement d'argent automatique.
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Trancher un litige'
+      description: |-
+        Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris
+        si deux décisions arrivent en même temps : une seule est retenue.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du litige.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000090
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000090
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      decision:
+        custom: []
+        name: decision
+        description: 'Décision : rejet, avertissement, suspension_temporaire, bannissement_definitif.'
+        required: true
+        example: rejet
+        type: string
+        enumValues:
+          - rejet
+          - avertissement
+          - suspension_temporaire
+          - bannissement_definitif
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      motif:
+        custom: []
+        name: motif
+        description: 'Motif de la décision, de 10 à 1000 caractères. Il sert aussi de motif à la sanction éventuelle. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
+        required: true
+        example: 'Le prestataire a prouvé sa présence sur place.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      cible:
+        custom: []
+        name: cible
+        description: 'Compte sanctionné par une décision de sanction : prestataire, client (défaut : prestataire).'
+        required: false
+        example: prestataire
+        type: string
+        enumValues:
+          - prestataire
+          - client
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      dateFin:
+        custom: []
+        name: dateFin
+        description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>decision</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
+        required: false
+        example: '2030-02-01T00:00:00+00:00'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+    cleanBodyParameters:
+      decision: rejet
+      motif: 'Le prestataire a prouvé sa présence sur place.'
+      cible: prestataire
+      dateFin: '2030-02-01T00:00:00+00:00'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"cloture","decision":"rejet","motifDecision":"Signalement non fondé.","clotureLe":"2030-01-17T09:00:00+00:00"}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 401
+        content: '{"message":"Authentification requise."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Litige introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Ce litige est déjà clôturé."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 422
+        content: '{"message":"Le motif de la décision est obligatoire.","errors":{"motif":["Le motif de la décision est obligatoire."]}}'
         headers: []
         description: ''
     responseFields: []

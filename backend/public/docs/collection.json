@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "1ab62e02-857c-4d78-aea4-5df09614f9b6",
+        "_postman_id": "412e6a7f-6461-4970-a73f-847c2bceced0",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -2234,6 +2234,62 @@
             "description": "",
             "item": [
                 {
+                    "name": "Connexion",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/auth\/connexion",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/auth\/connexion"
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"identifiant\":\"awa@example.com\",\"password\":\"MotDePasse123\"}"
+                        },
+                        "description": "Authentifie un compte actif. Un compte non actif re\u00e7oit 403 avec `message` et, quand elles existent, des informations\nstructur\u00e9es : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire\nseulement). Ces champs sont absents sinon.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"token\":\"1|abcdef\",\"user\":{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"role\":\"client\",\"statut\":\"actif\"}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Identifiant ou mot de passe incorrect.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Votre compte est suspendu jusqu'au 10\/03\/2030 \u00e0 14:30. Motif : Retards r\u00e9p\u00e9t\u00e9s.\",\"motif\":\"Retards r\u00e9p\u00e9t\u00e9s.\",\"finSuspension\":\"2030-03-10T14:30:00+00:00\"}",
+                            "name": "Compte suspendu"
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Votre demande d'inscription a \u00e9t\u00e9 refus\u00e9e.\",\"motif\":\"Pi\u00e8ces illisibles.\"}",
+                            "name": "Inscription refus\u00e9e"
+                        }
+                    ]
+                },
+                {
                     "name": "Mot de passe oubli\u00e9",
                     "request": {
                         "url": {
@@ -2844,8 +2900,11 @@
                                 "value": "application\/json"
                             }
                         ],
-                        "body": null,
-                        "description": "Pour une r\u00e9servation `acceptee` dont le d\u00e9lai de paiement (2 h apr\u00e8s l'acceptation) n'est pas d\u00e9pass\u00e9, cr\u00e9e le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calcul\u00e9 par le\nserveur \u00e0 partir du prix convenu, fig\u00e9 dans la r\u00e9servation \u00e0 sa cr\u00e9ation. La r\u00e9servation reste `acceptee` : elle ne sera confirm\u00e9e (et son code\ng\u00e9n\u00e9r\u00e9) qu'\u00e0 la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est d\u00e9j\u00e0 en cours\npour cette r\u00e9servation, le m\u00eame paiement et la m\u00eame adresse sont renvoy\u00e9s avec le code 200."
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"operateur\":\"wave\"}"
+                        },
+                        "description": "Pour une r\u00e9servation `acceptee` dont le d\u00e9lai de paiement (2 h apr\u00e8s l'acceptation) n'est pas d\u00e9pass\u00e9, cr\u00e9e le paiement de\nl'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Le corps est facultatif : le montant est toujours calcul\u00e9 par le\nserveur \u00e0 partir du prix convenu, fig\u00e9 dans la r\u00e9servation \u00e0 sa cr\u00e9ation. La r\u00e9servation reste `acceptee` : elle ne sera confirm\u00e9e (et son code\ng\u00e9n\u00e9r\u00e9) qu'\u00e0 la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est d\u00e9j\u00e0 en cours\npour cette r\u00e9servation, le m\u00eame paiement et la m\u00eame adresse sont renvoy\u00e9s avec le code 200.\n\nLe champ facultatif `operateur` (`wave` ou `orange_money`) est valid\u00e9 et enregistr\u00e9 avec le paiement, mais n'a aucun effet\npour l'instant : DexPay ne permet pas de pr\u00e9s\u00e9lectionner l'op\u00e9rateur \u00e0 la cr\u00e9ation de la session, le client le choisit\nsur la page de paiement. Sans `operateur`, rien ne change."
                     },
                     "response": [
                         {
@@ -3070,9 +3129,15 @@
                                     "disabled": false
                                 },
                                 {
+                                    "key": "note_min",
+                                    "value": "4",
+                                    "description": "Note moyenne minimale (0 \u00e0 5) ; exclut les prestataires sans avis. Le champ value doit \u00eatre au moins \u00e9gal \u00e0 0. Le champ value ne doit pas d\u00e9passer 5.",
+                                    "disabled": false
+                                },
+                                {
                                     "key": "tri",
-                                    "value": "prix_asc",
-                                    "description": "nom (d\u00e9faut), prix_asc ou prix_desc (selon le prix minimal des prestations actives).",
+                                    "value": "note",
+                                    "description": "nom (d\u00e9faut), prix_asc ou prix_desc (selon le prix minimal des prestations actives), ou note (note moyenne d\u00e9croissante, prestataires sans avis en dernier).",
                                     "disabled": false
                                 },
                                 {
@@ -3082,7 +3147,7 @@
                                     "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/api\/v1\/prestataires?metier=mecanique&quartier=Malika&q=vidange&prix_min=5000&prix_max=20000&tri=prix_asc&page=1"
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataires?metier=mecanique&quartier=Malika&q=vidange&prix_min=5000&prix_max=20000&note_min=4&tri=note&page=1"
                         },
                         "method": "GET",
                         "header": [
@@ -3214,9 +3279,15 @@
                                     "value": "en_attente",
                                     "description": "Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par d\u00e9faut : tous.",
                                     "disabled": false
+                                },
+                                {
+                                    "key": "groupe",
+                                    "value": "a_venir",
+                                    "description": "Onglet : a_venir (en attente, accept\u00e9e, confirm\u00e9e ou en cours, cr\u00e9neau non termin\u00e9 ; date de cr\u00e9neau croissante), terminees ou annulees (annul\u00e9e ou refus\u00e9e) ; les deux derniers du plus r\u00e9cent au plus ancien. Combinable avec statut.",
+                                    "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/api\/v1\/reservations?statut=en_attente"
+                            "raw": "{{baseUrl}}\/api\/v1\/reservations?statut=en_attente&groupe=a_venir"
                         },
                         "method": "GET",
                         "header": [
@@ -3230,7 +3301,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe\nqu'apr\u00e8s le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les r\u00e8gles\nde l'annulation."
+                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe\nqu'apr\u00e8s le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les r\u00e8gles\nde l'annulation."
                     },
                     "response": [
                         {
@@ -3576,7 +3647,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-16T12:59:44+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.0.0-dev\",\"database\":\"erreur\",\"time\":\"2026-10-16T14:57:24+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -3604,37 +3675,6 @@
                         "body": {
                             "mode": "raw",
                             "raw": "{\"nom\":\"vmqeopfuudtdsufvyvddq\",\"prenom\":\"amniihfqcoynlazghdtqt\",\"telephone\":\"+221705627717\",\"email\":\"reichel.charity@example.net\",\"password\":\"o,+]\\\"OP>@;4[*UyPJ\\\"}6\"}"
-                        },
-                        "description": "",
-                        "auth": {
-                            "type": "noauth"
-                        }
-                    },
-                    "response": []
-                },
-                {
-                    "name": "POST api\/v1\/auth\/connexion",
-                    "request": {
-                        "url": {
-                            "host": "{{baseUrl}}",
-                            "path": "api\/v1\/auth\/connexion",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/v1\/auth\/connexion"
-                        },
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application\/json"
-                            },
-                            {
-                                "key": "Accept",
-                                "value": "application\/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\"identifiant\":\"awa@example.com\",\"password\":\"MotDePasse123\"}"
                         },
                         "description": "",
                         "auth": {
@@ -4568,9 +4608,15 @@
                                     "value": "en_attente",
                                     "description": "Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par d\u00e9faut : tous.",
                                     "disabled": false
+                                },
+                                {
+                                    "key": "groupe",
+                                    "value": "a_venir",
+                                    "description": "Onglet : a_venir (en attente, accept\u00e9e, confirm\u00e9e ou en cours, cr\u00e9neau non termin\u00e9 ; date de cr\u00e9neau croissante), terminees ou annulees (annul\u00e9e ou refus\u00e9e) ; les deux derniers du plus r\u00e9cent au plus ancien. Combinable avec statut.",
+                                    "disabled": false
                                 }
                             ],
-                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations?statut=en_attente"
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/reservations?statut=en_attente&groupe=a_venir"
                         },
                         "method": "GET",
                         "header": [
@@ -4584,7 +4630,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtre optionnel `statut`."
+                        "description": "Pagin\u00e9e (20 par page), de la plus r\u00e9cente \u00e0 la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre)."
                     },
                     "response": [
                         {
@@ -5007,13 +5053,13 @@
                             }
                         ],
                         "body": null,
-                        "description": "La r\u00e9servation `en_cours` passe \u00e0 `terminee`. Le cr\u00e9neau reste r\u00e9serv\u00e9. Aucun corps."
+                        "description": "La r\u00e9servation `en_cours` passe \u00e0 `terminee`. Le cr\u00e9neau reste r\u00e9serv\u00e9. Aucun corps. La r\u00e9ponse ajoute le d\u00e9tail du cr\u00e9dit\ndu portefeuille : `montantTotal` (prix de la prestation), `commission` (retenue de la plateforme), `montantCredite`\n(acompte \u2212 commission, ajout\u00e9 au solde) et `soldeApres` (solde du portefeuille apr\u00e8s le cr\u00e9dit). Les trois derniers\nvalent `null` si aucun cr\u00e9dit n'a eu lieu."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"terminee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"terminee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"},\"montantTotal\":15000,\"commission\":1500,\"montantCredite\":3000,\"soldeApres\":3000}",
                             "name": ""
                         },
                         {
@@ -5680,6 +5726,50 @@
                     ]
                 },
                 {
+                    "name": "Historique du portefeuille",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/prestataire\/portefeuille\/mouvements",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/prestataire\/portefeuille\/mouvements"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Mouvements du solde (cr\u00e9dit de fin de prestation, demande de retrait, recr\u00e9dit d'un retrait \u00e9chou\u00e9), pagin\u00e9s (20 par page),\ndu plus r\u00e9cent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste apr\u00e8s le mouvement (FCFA)."
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"type\":\"credit\",\"montant\":3000.0,\"libelle\":\"Prestation termin\u00e9e (acompte moins commission)\",\"soldeApres\":8000.0,\"reservationId\":\"0198a1b2-0000-7000-8000-000000000020\",\"retraitId\":null,\"date\":\"2030-01-15T08:50:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 401,
+                            "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        },
+                        {
+                            "header": [],
+                            "code": 403,
+                            "body": "{\"message\":\"Vous n'avez pas le droit d'effectuer cette action.\"}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
                     "name": "Mes retraits",
                     "request": {
                         "url": {
@@ -6065,6 +6155,82 @@
                             "header": [],
                             "code": 401,
                             "body": "{\"message\":\"Authentification requise.\"}",
+                            "name": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "R\u00e9f\u00e9rentiels publics",
+            "description": "\nListes utilis\u00e9es par l'application avant la connexion (accueil, filtres, inscription d'un prestataire).",
+            "item": [
+                {
+                    "name": "Lister les m\u00e9tiers",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/metiers",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/metiers"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "M\u00e9tiers actifs uniquement, tri\u00e9s par nom. Sans authentification. Le `code` est la valeur \u00e0 passer aux filtres\n(`GET \/prestataires?metier=`) et \u00e0 l'inscription d'un prestataire. Aucune ic\u00f4ne n'est stock\u00e9e : l'application en associe une au code.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000010\",\"code\":\"coiffure\",\"nom\":\"Coiffure\"},{\"id\":\"0198a1b2-0000-7000-8000-000000000011\",\"code\":\"mecanique\",\"nom\":\"M\u00e9canique\"}]}",
+                            "name": ""
+                        }
+                    ]
+                },
+                {
+                    "name": "Lister les quartiers",
+                    "request": {
+                        "url": {
+                            "host": "{{baseUrl}}",
+                            "path": "api\/v1\/quartiers",
+                            "query": [],
+                            "raw": "{{baseUrl}}\/api\/v1\/quartiers"
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application\/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application\/json"
+                            }
+                        ],
+                        "body": null,
+                        "description": "Quartiers o\u00f9 au moins un prestataire au compte actif est install\u00e9, sans doublon (casse et espaces superflus ignor\u00e9s), tri\u00e9s\npar ordre alphab\u00e9tique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.\nPassez la valeur telle quelle au filtre `GET \/prestataires?quartier=`.",
+                        "auth": {
+                            "type": "noauth"
+                        }
+                    },
+                    "response": [
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"data\":[\"Jaxaay\",\"Keur Massar Nord\",\"Malika\"]}",
                             "name": ""
                         }
                     ]
