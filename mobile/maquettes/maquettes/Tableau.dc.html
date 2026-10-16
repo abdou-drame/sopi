@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tableau de bord prestataire</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 330px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 22%, #c7d2fe 0%, rgba(199,210,254,0) 60%), radial-gradient(70% 60% at 55% 100%, #dbeafe 0%, rgba(219,234,254,0) 70%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px; display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Menu" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <div style="display: flex; gap: 10px; align-items: center">
+      <button aria-label="Notifications" style="position: relative; width: 44px; height: 44px; border: none; border-radius: 22px; background: #ffffff; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f1b3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span style="position: absolute; top: 10px; right: 11px; width: 9px; height: 9px; border-radius: 5px; background: #1d4ed8; border: 2px solid #ffffff"></span>
+      </button>
+      <div style="width: 44px; height: 44px; border-radius: 22px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px">F</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Bonjour<br><span style="font-weight: 800">Fatou !</span></div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 190px; height: 124px; box-sizing: border-box; padding: 18px 20px; border-radius: 26px; background: #1d4ed8; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between">
+    <div style="font-size: 12px; font-weight: 500; opacity: 0.85">Solde disponible</div>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <div style="font-size: 30px; font-weight: 800; line-height: 36px">42 500 <span style="font-size: 16px; font-weight: 600">FCFA</span></div>
+      <button style="height: 44px; padding: 0 18px; border: none; border-radius: 22px; background: #ffffff; color: #1d4ed8; font-size: 14px; font-weight: 700">Retirer</button>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 350px; display: flex; gap: 10px">
+    <div style="flex: 1; height: 88px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between">
+      <span style="font-size: 11px; color: #64708f">Demandes à traiter</span>
+      <span style="font-size: 26px; font-weight: 800; color: #1d4ed8">3</span>
+    </div>
+    <div style="flex: 1; height: 88px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between">
+      <span style="font-size: 11px; color: #64708f">Aujourd'hui</span>
+      <span style="font-size: 26px; font-weight: 800">2</span>
+    </div>
+    <div style="flex: 1; height: 88px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; display: flex; flex-direction: column; justify-content: space-between">
+      <span style="font-size: 11px; color: #64708f">Ce mois</span>
+      <span style="font-size: 26px; font-weight: 800">18</span>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 462px; display: flex; align-items: center; justify-content: space-between">
+    <div style="font-size: 17px; font-weight: 700">Nouvelles demandes</div>
+    <div style="font-size: 13px; font-weight: 600; color: #1d4ed8">Tout voir</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 500px; display: flex; flex-direction: column; gap: 10px">
+    <div style="box-sizing: border-box; padding: 14px 16px; border: 1px solid #e3e9f6; border-radius: 24px; background: #ffffff">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <div style="font-size: 15px; font-weight: 700">Aminata D.</div>
+        <div style="font-size: 12px; color: #64708f">Sam. 24 oct., 10h00</div>
+      </div>
+      <div style="margin-top: 2px; font-size: 13px; color: #64708f">Coupe femme · 5 000 FCFA</div>
+      <div style="display: flex; gap: 8px; margin-top: 12px">
+        <button style="flex: 1; height: 42px; border: none; border-radius: 21px; background: #1d4ed8; color: #ffffff; font-size: 13px; font-weight: 700">Accepter</button>
+        <button style="flex: 1; height: 42px; border: 1px solid #d5ddf0; border-radius: 21px; background: #ffffff; color: #0f1b3d; font-size: 13px; font-weight: 600">Refuser</button>
+      </div>
+    </div>
+    <div style="box-sizing: border-box; padding: 14px 16px; border: 1px solid #e3e9f6; border-radius: 24px; background: #ffffff">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <div style="font-size: 15px; font-weight: 700">Khadija S.</div>
+        <div style="font-size: 12px; color: #64708f">Sam. 24 oct., 14h00</div>
+      </div>
+      <div style="margin-top: 2px; font-size: 13px; color: #64708f">Tresses · 12 000 FCFA</div>
+      <div style="display: flex; gap: 8px; margin-top: 12px">
+        <button style="flex: 1; height: 42px; border: none; border-radius: 21px; background: #1d4ed8; color: #ffffff; font-size: 13px; font-weight: 700">Accepter</button>
+        <button style="flex: 1; height: 42px; border: 1px solid #d5ddf0; border-radius: 21px; background: #ffffff; color: #0f1b3d; font-size: 13px; font-weight: 600">Refuser</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 12px; right: 12px; bottom: 14px; height: 68px; box-sizing: border-box; padding: 0 8px; border-radius: 34px; background: #0f1b3d; display: flex; align-items: center; justify-content: space-around">
+    <button aria-label="Tableau de bord" style="height: 48px; padding: 0 16px; border: none; border-radius: 24px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil
+    </button>
+    <button aria-label="Agenda" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+    </button>
+    <button aria-label="Portefeuille" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5"/><path d="M16 13h2"/></svg>
+    </button>
+    <button aria-label="Profil" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+    </button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

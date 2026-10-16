@@ -1,0 +1,306 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-16T14:15:00Z"
+  },
+  "title": "Sopi — maquettes mobile",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Connexion.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Connexion"
+    },
+    "Main.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Accueil"
+    },
+    "Prestataires.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Prestataires"
+    },
+    "Fiche.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Fiche prestataire"
+    },
+    "Paiement.dc.html": {
+      "x": 0,
+      "y": 964,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Paiement de l'acompte"
+    },
+    "Reservations.dc.html": {
+      "x": 470,
+      "y": 964,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Mes réservations"
+    },
+    "Tableau.dc.html": {
+      "x": 940,
+      "y": 964,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Tableau de bord"
+    },
+    "Portefeuille.dc.html": {
+      "x": 1410,
+      "y": 964,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Portefeuille"
+    },
+    "Inscription.dc.html": {
+      "x": 0,
+      "y": 1928,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Inscription"
+    },
+    "MotDePasse.dc.html": {
+      "x": 470,
+      "y": 1928,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Mot de passe oublié"
+    },
+    "Creneau.dc.html": {
+      "x": 940,
+      "y": 1928,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Choix du créneau"
+    },
+    "PaiementOk.dc.html": {
+      "x": 1410,
+      "y": 1928,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Paiement réussi"
+    },
+    "PaiementEchec.dc.html": {
+      "x": 0,
+      "y": 2892,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Paiement échoué"
+    },
+    "DetailReservation.dc.html": {
+      "x": 470,
+      "y": 2892,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Détail réservation"
+    },
+    "Annulation.dc.html": {
+      "x": 940,
+      "y": 2892,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Annulation"
+    },
+    "Avis.dc.html": {
+      "x": 1410,
+      "y": 2892,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Laisser un avis"
+    },
+    "Litige.dc.html": {
+      "x": 0,
+      "y": 3856,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Signaler un problème"
+    },
+    "Notifications.dc.html": {
+      "x": 470,
+      "y": 3856,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Notifications"
+    },
+    "Profil.dc.html": {
+      "x": 940,
+      "y": 3856,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Profil"
+    },
+    "PrestaInscription1.dc.html": {
+      "x": 1410,
+      "y": 3856,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Inscription 1/3"
+    },
+    "PrestaInscription2.dc.html": {
+      "x": 0,
+      "y": 4820,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Inscription 2/3"
+    },
+    "SuiviDossier.dc.html": {
+      "x": 470,
+      "y": 4820,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Dossier en examen"
+    },
+    "DossierRefuse.dc.html": {
+      "x": 940,
+      "y": 4820,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Dossier refusé"
+    },
+    "Agenda.dc.html": {
+      "x": 1410,
+      "y": 4820,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Agenda"
+    },
+    "Prestation.dc.html": {
+      "x": 0,
+      "y": 5784,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Démarrer / terminer"
+    },
+    "Services.dc.html": {
+      "x": 470,
+      "y": 5784,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Services et tarifs"
+    },
+    "Disponibilites.dc.html": {
+      "x": 940,
+      "y": 5784,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Disponibilités"
+    },
+    "Retrait.dc.html": {
+      "x": 1410,
+      "y": 5784,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Retrait"
+    },
+    "Suspendu.dc.html": {
+      "x": 0,
+      "y": 6748,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Compte suspendu"
+    },
+    "RefusMotif.dc.html": {
+      "x": 470,
+      "y": 6748,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Motif de refus"
+    },
+    "ConnexionBloquee.dc.html": {
+      "x": 940,
+      "y": 6748,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Connexion bloquée"
+    },
+    "CodeFaux.dc.html": {
+      "x": 1410,
+      "y": 6748,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Code incorrect"
+    },
+    "RetraitEchec.dc.html": {
+      "x": 0,
+      "y": 7712,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Retrait échoué"
+    },
+    "CodeVerification.dc.html": {
+      "x": 470,
+      "y": 7712,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Vérification du code"
+    },
+    "CodeValide.dc.html": {
+      "x": 940,
+      "y": 7712,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Code validé"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Connexion.dc.html",
+    "ConnexionBloquee.dc.html",
+    "Inscription.dc.html",
+    "MotDePasse.dc.html",
+    "Prestataires.dc.html",
+    "Fiche.dc.html",
+    "Creneau.dc.html",
+    "Paiement.dc.html",
+    "PaiementOk.dc.html",
+    "PaiementEchec.dc.html",
+    "Reservations.dc.html",
+    "DetailReservation.dc.html",
+    "Annulation.dc.html",
+    "Avis.dc.html",
+    "Litige.dc.html",
+    "Notifications.dc.html",
+    "Profil.dc.html",
+    "PrestaInscription1.dc.html",
+    "PrestaInscription2.dc.html",
+    "SuiviDossier.dc.html",
+    "DossierRefuse.dc.html",
+    "Tableau.dc.html",
+    "RefusMotif.dc.html",
+    "Agenda.dc.html",
+    "Prestation.dc.html",
+    "CodeVerification.dc.html",
+    "CodeValide.dc.html",
+    "CodeFaux.dc.html",
+    "Services.dc.html",
+    "Disponibilites.dc.html",
+    "Portefeuille.dc.html",
+    "Retrait.dc.html",
+    "RetraitEchec.dc.html",
+    "Suspendu.dc.html"
+  ],
+  "notes": {
+    "titre": {
+      "x": 0,
+      "y": -300,
+      "text": "Sopi · Application mobile — 35 écrans, client et prestataire",
+      "kind": "title1",
+      "maxW": 1800
+    }
+  },
+  "designSystems": []
+}

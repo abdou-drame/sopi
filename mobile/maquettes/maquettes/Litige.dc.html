@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Ouvrir un litige</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 230px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 30%, #c7d2fe 0%, rgba(199,210,254,0) 60%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px">
+    <button aria-label="Retour" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Signaler un<br><span style="font-weight: 800">problème</span></div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 214px; box-sizing: border-box; padding: 20px; border: 1px solid #e3e9f6; border-radius: 30px; background: #ffffff; display: flex; flex-direction: column; gap: 14px">
+    <div style="font-size: 13px; color: #64708f">Réservation : Salon Fatou · Coupe femme · 24 oct.</div>
+
+    <div>
+      <div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 8px">Que s'est-il passé ?</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <span style="height: 38px; padding: 0 14px; border-radius: 19px; background: #0f1b3d; color: #ffffff; font-size: 13px; font-weight: 600; display: flex; align-items: center">Prestataire absent</span>
+        <span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">Service non conforme</span>
+        <span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">Problème de prix</span>
+        <span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">Autre</span>
+      </div>
+    </div>
+
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Décrivez la situation
+      <textarea style="height: 120px; box-sizing: border-box; padding: 14px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 14px; color: #0f1b3d; resize: none">Le prestataire ne s'est pas présenté au rendez-vous.</textarea>
+    </label>
+
+    <div>
+      <div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 8px">Preuves (photos)</div>
+      <div style="display: flex; gap: 10px">
+        <button aria-label="Ajouter une photo" style="width: 64px; height: 64px; border: 2px dashed #b8c4e6; border-radius: 18px; background: #f7f9ff; display: flex; align-items: center; justify-content: center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px">
+    <button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Envoyer le signalement</button>
+    <div style="text-align: center; font-size: 12px; color: #64708f">Un administrateur examinera votre dossier.</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

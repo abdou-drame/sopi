@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Suivi du dossier</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 380px; border-radius: 0 0 44px 44px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 40%, #c7d2fe 0%, rgba(199,210,254,0) 60%), radial-gradient(70% 60% at 55% 100%, #dbeafe 0%, rgba(219,234,254,0) 70%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px">
+    <div style="width: 104px; height: 104px; border-radius: 52px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    </div>
+    <div style="text-align: center; font-size: 28px; line-height: 34px; font-weight: 400">Dossier<br><span style="font-weight: 800">en cours d'examen</span></div>
+    <div style="font-size: 14px; color: #4a5678; text-align: center; padding: 0 36px; line-height: 20px">Nous vérifions vos justificatifs. Vous serez prévenu par e-mail dès qu'une décision est prise.</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 408px; box-sizing: border-box; padding: 18px; border: 1px solid #e3e9f6; border-radius: 26px; background: #ffffff; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Entreprise</span><span style="font-weight: 700">Salon Fatou</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Métier</span><span style="font-weight: 700">Coiffure</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Déposé le</span><span style="font-weight: 700">16 oct. 2026</span></div>
+    <div style="height: 1px; background: #e3e9f6"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Carte d'identité</span><span style="height: 26px; padding: 0 12px; border-radius: 13px; background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 700; display: flex; align-items: center">En attente</span></div>
+    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Diplôme ou attestation</span><span style="height: 26px; padding: 0 12px; border-radius: 13px; background: #f1f5f9; color: #475569; font-size: 12px; font-weight: 700; display: flex; align-items: center">En attente</span></div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px">
+    <button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Actualiser</button>
+    <button style="height: 50px; border: 1px solid #d5ddf0; border-radius: 25px; background: #ffffff; color: #0f1b3d; font-size: 14px; font-weight: 600">Retour à la connexion</button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
