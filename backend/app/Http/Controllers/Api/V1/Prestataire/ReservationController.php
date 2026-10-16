@@ -32,7 +32,7 @@ class ReservationController extends Controller
     /**
      * Mes demandes de réservation
      *
-     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`.
+     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre).
      *
      * @authenticated
      *
@@ -43,7 +43,7 @@ class ReservationController extends Controller
      */
     public function index(ListerReservationsRequest $request)
     {
-        return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut()));
+        return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut(), $request->groupe()));
     }
 
     /**
@@ -150,23 +150,34 @@ class ReservationController extends Controller
     /**
      * Terminer la prestation
      *
-     * La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps.
+     * La réservation `en_cours` passe à `terminee`. Le créneau reste réservé. Aucun corps. La réponse ajoute le détail du crédit
+     * du portefeuille : `montantTotal` (prix de la prestation), `commission` (retenue de la plateforme), `montantCredite`
+     * (acompte − commission, ajouté au solde) et `soldeApres` (solde du portefeuille après le crédit). Les trois derniers
+     * valent `null` si aucun crédit n'a eu lieu.
      *
      * @authenticated
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"},"montantTotal":15000,"commission":1500,"montantCredite":3000,"soldeApres":3000}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
      * @response 409 {"message":"Cette réservation ne peut pas être terminée."}
      * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
      */
-    public function terminer(Request $request, DeroulementReservationService $deroulement, string $id): JsonResponse|DemandeReservationResource
+    public function terminer(Request $request, DeroulementReservationService $deroulement, string $id): JsonResponse
     {
         try {
-            return new DemandeReservationResource($deroulement->terminer($this->prestataire($request), $id));
+            [$reservation, $credit] = $deroulement->terminerAvecCredit($this->prestataire($request), $id);
+
+            // Montants lus au moment du crédit (même transaction) : ce qui est affiché est exactement ce qui a été crédité.
+            return response()->json(array_merge((new DemandeReservationResource($reservation))->resolve(), [
+                'montantTotal' => (float) $reservation->prix_applique,
+                'commission' => $credit === null ? null : (float) $credit->commission,
+                'montantCredite' => $credit === null ? null : (float) $credit->montantCredite,
+                'soldeApres' => $credit === null ? null : (float) $credit->soldeApres,
+            ]));
         } catch (ReservationImpossibleException $e) {
             return response()->json(['message' => $e->getMessage()], $e->statut);
         }

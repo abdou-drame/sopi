@@ -31,7 +31,8 @@ class RecherchePrestatairesRequest extends FormRequest
             'q' => ['nullable', 'string', 'max:100'],
             'prix_min' => ['nullable', 'numeric', 'min:0', 'max:'.self::PRIX_MAX, 'decimal:0,2'],
             'prix_max' => ['nullable', 'numeric', 'min:0', 'max:'.self::PRIX_MAX, 'decimal:0,2', Rule::when($this->filled('prix_min'), ['gte:prix_min'])],
-            'tri' => ['nullable', Rule::in(['nom', 'prix_asc', 'prix_desc'])],
+            'note_min' => ['nullable', 'numeric', 'min:0', 'max:5'],
+            'tri' => ['nullable', Rule::in(['nom', 'prix_asc', 'prix_desc', 'note'])],
             'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
@@ -54,7 +55,10 @@ class RecherchePrestatairesRequest extends FormRequest
             'prix_max.max' => 'Le prix maximum est trop élevé.',
             'prix_max.decimal' => 'Le prix maximum ne doit pas avoir plus de 2 décimales.',
             'prix_max.gte' => 'Le prix maximum doit être supérieur ou égal au prix minimum.',
-            'tri.in' => 'Le tri doit être nom, prix_asc ou prix_desc.',
+            'note_min.numeric' => 'La note minimale doit être un nombre.',
+            'note_min.min' => 'La note minimale ne peut pas être négative.',
+            'note_min.max' => 'La note minimale ne peut pas dépasser 5.',
+            'tri.in' => 'Le tri doit être nom, prix_asc, prix_desc ou note.',
             'page.integer' => 'La page doit être un nombre entier.',
             'page.min' => 'La page doit être au moins 1.',
         ];
@@ -68,7 +72,8 @@ class RecherchePrestatairesRequest extends FormRequest
             'q' => ['description' => 'Texte contenu dans le nom de l\'entreprise ou dans le nom d\'une prestation active (sans tenir compte de la casse ; les accents comptent).', 'example' => 'vidange', 'required' => false],
             'prix_min' => ['description' => 'Le prestataire a une prestation active à ce prix ou plus (FCFA).', 'example' => 5000, 'required' => false],
             'prix_max' => ['description' => 'Le prestataire a une prestation active à ce prix ou moins (FCFA), et ≥ prix_min.', 'example' => 20000, 'required' => false],
-            'tri' => ['description' => 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives).', 'example' => 'prix_asc', 'required' => false],
+            'note_min' => ['description' => 'Note moyenne minimale (0 à 5) ; exclut les prestataires sans avis.', 'example' => 4, 'required' => false],
+            'tri' => ['description' => 'nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives), ou note (note moyenne décroissante, prestataires sans avis en dernier).', 'example' => 'note', 'required' => false],
             'page' => ['description' => 'Numéro de page (20 résultats par page).', 'example' => 1, 'required' => false],
         ];
     }
@@ -76,6 +81,6 @@ class RecherchePrestatairesRequest extends FormRequest
     /** Filtres validés, prêts pour le service. */
     public function filtres(): array
     {
-        return $this->safe()->only(['metier', 'quartier', 'q', 'prix_min', 'prix_max', 'tri']);
+        return $this->safe()->only(['metier', 'quartier', 'q', 'prix_min', 'prix_max', 'note_min', 'tri']);
     }
 }

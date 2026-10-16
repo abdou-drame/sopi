@@ -260,7 +260,10 @@
                     <a href="#authentification">Authentification</a>
                 </li>
                                     <ul id="tocify-subheader-authentification" class="tocify-subheader">
-                                                    <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-mot-de-passe-oublie">
+                                                    <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-connexion">
+                                <a href="#authentification-POSTapi-v1-auth-connexion">Connexion</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-mot-de-passe-oublie">
                                 <a href="#authentification-POSTapi-v1-auth-mot-de-passe-oublie">Mot de passe oublié</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-reinitialiser-mot-de-passe">
@@ -392,9 +395,6 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-v1-auth-inscription">
                                 <a href="#endpoints-POSTapi-v1-auth-inscription">POST api/v1/auth/inscription</a>
-                            </li>
-                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-v1-auth-connexion">
-                                <a href="#endpoints-POSTapi-v1-auth-connexion">POST api/v1/auth/connexion</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-v1-auth-deconnexion">
                                 <a href="#endpoints-POSTapi-v1-auth-deconnexion">POST api/v1/auth/deconnexion</a>
@@ -558,6 +558,9 @@
                                                     <li class="tocify-item level-2" data-unique="prestataire-solde-et-retraits-GETapi-v1-prestataire-solde">
                                 <a href="#prestataire-solde-et-retraits-GETapi-v1-prestataire-solde">Mon solde</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="prestataire-solde-et-retraits-GETapi-v1-prestataire-portefeuille-mouvements">
+                                <a href="#prestataire-solde-et-retraits-GETapi-v1-prestataire-portefeuille-mouvements">Historique du portefeuille</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="prestataire-solde-et-retraits-GETapi-v1-prestataire-retraits">
                                 <a href="#prestataire-solde-et-retraits-GETapi-v1-prestataire-retraits">Mes retraits</a>
                             </li>
@@ -588,6 +591,19 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="profil-DELETEapi-v1-me-jeton-push">
                                 <a href="#profil-DELETEapi-v1-me-jeton-push">Retirer mon jeton push</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
+                    <ul id="tocify-header-referentiels-publics" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="referentiels-publics">
+                    <a href="#referentiels-publics">Référentiels publics</a>
+                </li>
+                                    <ul id="tocify-subheader-referentiels-publics" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="referentiels-publics-GETapi-v1-metiers">
+                                <a href="#referentiels-publics-GETapi-v1-metiers">Lister les métiers</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="referentiels-publics-GETapi-v1-quartiers">
+                                <a href="#referentiels-publics-GETapi-v1-quartiers">Lister les quartiers</a>
                             </li>
                                                                         </ul>
                             </ul>
@@ -8530,7 +8546,199 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
     
 
-                                <h2 id="authentification-POSTapi-v1-auth-mot-de-passe-oublie">Mot de passe oublié</h2>
+                                <h2 id="authentification-POSTapi-v1-auth-connexion">Connexion</h2>
+
+<p>
+</p>
+
+<p>Authentifie un compte actif. Un compte non actif reçoit 403 avec <code>message</code> et, quand elles existent, des informations
+structurées : <code>motif</code> (sanction active, ou motif du refus d'inscription) et <code>finSuspension</code> (ISO 8601, suspension temporaire
+seulement). Ces champs sont absents sinon.</p>
+
+<span id="example-requests-POSTapi-v1-auth-connexion">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/auth/connexion" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"identifiant\": \"awa@example.com\",
+    \"password\": \"MotDePasse123\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/auth/connexion"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "identifiant": "awa@example.com",
+    "password": "MotDePasse123"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-auth-connexion">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;token&quot;: &quot;1|abcdef&quot;,
+    &quot;user&quot;: {
+        &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000001&quot;,
+        &quot;role&quot;: &quot;client&quot;,
+        &quot;statut&quot;: &quot;actif&quot;
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Identifiant ou mot de passe incorrect.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403, Compte suspendu):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Votre compte est suspendu jusqu&#039;au 10/03/2030 &agrave; 14:30. Motif : Retards r&eacute;p&eacute;t&eacute;s.&quot;,
+    &quot;motif&quot;: &quot;Retards r&eacute;p&eacute;t&eacute;s.&quot;,
+    &quot;finSuspension&quot;: &quot;2030-03-10T14:30:00+00:00&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403, Inscription refusée):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Votre demande d&#039;inscription a &eacute;t&eacute; refus&eacute;e.&quot;,
+    &quot;motif&quot;: &quot;Pi&egrave;ces illisibles.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-auth-connexion" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-auth-connexion"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-auth-connexion"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-auth-connexion" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-auth-connexion">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-auth-connexion" data-method="POST"
+      data-path="api/v1/auth/connexion"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-auth-connexion', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-auth-connexion"
+                    onclick="tryItOut('POSTapi-v1-auth-connexion');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-auth-connexion"
+                    onclick="cancelTryOut('POSTapi-v1-auth-connexion');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-auth-connexion"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/auth/connexion</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-auth-connexion"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-auth-connexion"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>identifiant</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="identifiant"                data-endpoint="POSTapi-v1-auth-connexion"
+               value="awa@example.com"
+               data-component="body">
+    <br>
+<p>Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères. Example: <code>awa@example.com</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="password"                data-endpoint="POSTapi-v1-auth-connexion"
+               value="MotDePasse123"
+               data-component="body">
+    <br>
+<p>Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères. Example: <code>MotDePasse123</code></p>
+        </div>
+        </form>
+
+                    <h2 id="authentification-POSTapi-v1-auth-mot-de-passe-oublie">Mot de passe oublié</h2>
 
 <p>
 </p>
@@ -10388,10 +10596,13 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </p>
 
 <p>Pour une réservation <code>acceptee</code> dont le délai de paiement (2 h après l'acceptation) n'est pas dépassé, crée le paiement de
-l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Aucun corps : le montant est toujours calculé par le
+l'acompte (30 % du prix) et renvoie l'adresse de la page de paiement. Le corps est facultatif : le montant est toujours calculé par le
 serveur à partir du prix convenu, figé dans la réservation à sa création. La réservation reste <code>acceptee</code> : elle ne sera confirmée (et son code
 généré) qu'à la confirmation du paiement par le prestataire de paiement. Idempotent : si un paiement est déjà en cours
 pour cette réservation, le même paiement et la même adresse sont renvoyés avec le code 200.</p>
+<p>Le champ facultatif <code>operateur</code> (<code>wave</code> ou <code>orange_money</code>) est validé et enregistré avec le paiement, mais n'a aucun effet
+pour l'instant : DexPay ne permet pas de présélectionner l'opérateur à la création de la session, le client le choisit
+sur la page de paiement. Sans <code>operateur</code>, rien ne change.</p>
 
 <span id="example-requests-POSTapi-v1-reservations--id--payer">
 <blockquote>Example request:</blockquote>
@@ -10402,7 +10613,11 @@ pour cette réservation, le même paiement et la même adresse sont renvoyés av
     "http://localhost:8000/api/v1/reservations/0198a1b2-0000-7000-8000-000000000060/payer" \
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
+    --header "Accept: application/json" \
+    --data "{
+    \"operateur\": \"wave\"
+}"
+</code></pre></div>
 
 
 <div class="javascript-example">
@@ -10416,10 +10631,14 @@ const headers = {
     "Accept": "application/json",
 };
 
+let body = {
+    "operateur": "wave"
+};
 
 fetch(url, {
     method: "POST",
     headers,
+    body: JSON.stringify(body),
 }).then(response =&gt; response.json());</code></pre></div>
 
 </span>
@@ -10616,7 +10835,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
     <br>
 <p>Identifiant de la réservation. Example: <code>0198a1b2-0000-7000-8000-000000000060</code></p>
             </div>
-                    </form>
+                            <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>operateur</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="operateur"                data-endpoint="POSTapi-v1-reservations--id--payer"
+               value="wave"
+               data-component="body">
+    <br>
+<p>Opérateur souhaité : <code>wave</code> ou <code>orange_money</code> (sans effet pour l'instant). Example: <code>wave</code></p>
+        </div>
+        </form>
 
                 <h1 id="client-profil-public-dun-prestataire">Client — profil public d'un prestataire</h1>
 
@@ -11024,7 +11256,7 @@ La recherche ignore la casse mais pas les accents. <code>prixMin</code> et <code
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/prestataires?metier=mecanique&amp;quartier=Malika&amp;q=vidange&amp;prix_min=5000&amp;prix_max=20000&amp;tri=prix_asc&amp;page=1" \
+    --get "http://localhost:8000/api/v1/prestataires?metier=mecanique&amp;quartier=Malika&amp;q=vidange&amp;prix_min=5000&amp;prix_max=20000&amp;note_min=4&amp;tri=note&amp;page=1" \
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11041,7 +11273,8 @@ const params = {
     "q": "vidange",
     "prix_min": "5000",
     "prix_max": "20000",
-    "tri": "prix_asc",
+    "note_min": "4",
+    "tri": "note",
     "page": "1",
 };
 Object.keys(params)
@@ -11273,18 +11506,30 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Le prestataire a une prestation active à ce prix ou moins (FCFA), et ≥ prix_min. Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 9999999999.99. Example: <code>20000</code></p>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>note_min</code></b>&nbsp;&nbsp;
+<small>number</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="number" style="display: none"
+               step="any"               name="note_min"                data-endpoint="GETapi-v1-prestataires"
+               value="4"
+               data-component="query">
+    <br>
+<p>Note moyenne minimale (0 à 5) ; exclut les prestataires sans avis. Le champ value doit être au moins égal à 0. Le champ value ne doit pas dépasser 5. Example: <code>4</code></p>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>tri</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
                               name="tri"                data-endpoint="GETapi-v1-prestataires"
-               value="prix_asc"
+               value="note"
                data-component="query">
     <br>
-<p>nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives). Example: <code>prix_asc</code></p>
+<p>nom (défaut), prix_asc ou prix_desc (selon le prix minimal des prestations actives), ou note (note moyenne décroissante, prestataires sans avis en dernier). Example: <code>note</code></p>
 Must be one of:
-<ul style="list-style-type: square;"><li><code>nom</code></li> <li><code>prix_asc</code></li> <li><code>prix_desc</code></li></ul>
+<ul style="list-style-type: square;"><li><code>nom</code></li> <li><code>prix_asc</code></li> <li><code>prix_desc</code></li> <li><code>note</code></li></ul>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>page</code></b>&nbsp;&nbsp;
@@ -11560,7 +11805,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel <code>statut</code>. Le <code>codeReservation</code> n'existe
+<p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : <code>statut</code> et <code>groupe</code> (onglets <code>a_venir</code>, <code>terminees</code>, <code>annulees</code>, qui imposent leur propre ordre). Le <code>codeReservation</code> n'existe
 qu'après le paiement (<code>null</code> avant) et n'est jamais visible que de son client. <code>peutAnnuler</code> applique les règles
 de l'annulation.</p>
 
@@ -11570,7 +11815,7 @@ de l'annulation.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/reservations?statut=en_attente" \
+    --get "http://localhost:8000/api/v1/reservations?statut=en_attente&amp;groupe=a_venir" \
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -11583,6 +11828,7 @@ de l'annulation.</p>
 
 const params = {
     "statut": "en_attente",
+    "groupe": "a_venir",
 };
 Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
@@ -11779,6 +12025,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous. Example: <code>en_attente</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>en_attente</code></li> <li><code>acceptee</code></li> <li><code>confirmee</code></li> <li><code>en_cours</code></li> <li><code>terminee</code></li> <li><code>refusee</code></li> <li><code>annulee</code></li></ul>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>groupe</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="groupe"                data-endpoint="GETapi-v1-reservations"
+               value="a_venir"
+               data-component="query">
+    <br>
+<p>Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut. Example: <code>a_venir</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>a_venir</code></li> <li><code>terminees</code></li> <li><code>annulees</code></li></ul>
             </div>
                 </form>
 
@@ -12636,7 +12896,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.0.0-dev&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-16T12:59:44+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-16T14:57:24+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -12898,152 +13158,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères. Example: <code>o,+]"OP&gt;@;4[*UyPJ"}6</code></p>
-        </div>
-        </form>
-
-                    <h2 id="endpoints-POSTapi-v1-auth-connexion">POST api/v1/auth/connexion</h2>
-
-<p>
-</p>
-
-
-
-<span id="example-requests-POSTapi-v1-auth-connexion">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://localhost:8000/api/v1/auth/connexion" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"identifiant\": \"awa@example.com\",
-    \"password\": \"MotDePasse123\"
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://localhost:8000/api/v1/auth/connexion"
-);
-
-const headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "identifiant": "awa@example.com",
-    "password": "MotDePasse123"
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTapi-v1-auth-connexion">
-</span>
-<span id="execution-results-POSTapi-v1-auth-connexion" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTapi-v1-auth-connexion"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-v1-auth-connexion"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTapi-v1-auth-connexion" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-v1-auth-connexion">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTapi-v1-auth-connexion" data-method="POST"
-      data-path="api/v1/auth/connexion"
-      data-authed="0"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-auth-connexion', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-v1-auth-connexion"
-                    onclick="tryItOut('POSTapi-v1-auth-connexion');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-v1-auth-connexion"
-                    onclick="cancelTryOut('POSTapi-v1-auth-connexion');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-v1-auth-connexion"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>api/v1/auth/connexion</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>identifiant</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="identifiant"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="awa@example.com"
-               data-component="body">
-    <br>
-<p>Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères. Example: <code>awa@example.com</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="password"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="MotDePasse123"
-               data-component="body">
-    <br>
-<p>Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères. Example: <code>MotDePasse123</code></p>
         </div>
         </form>
 
@@ -16134,7 +16248,7 @@ que par son prénom et l'initiale de son nom.</p>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel <code>statut</code>.</p>
+<p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : <code>statut</code> et <code>groupe</code> (onglets <code>a_venir</code>, <code>terminees</code>, <code>annulees</code>, qui imposent leur propre ordre).</p>
 
 <span id="example-requests-GETapi-v1-prestataire-reservations">
 <blockquote>Example request:</blockquote>
@@ -16142,7 +16256,7 @@ que par son prénom et l'initiale de son nom.</p>
 
 <div class="bash-example">
     <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost:8000/api/v1/prestataire/reservations?statut=en_attente" \
+    --get "http://localhost:8000/api/v1/prestataire/reservations?statut=en_attente&amp;groupe=a_venir" \
     --header "Authorization: Bearer {VOTRE_JETON}" \
     --header "Content-Type: application/json" \
     --header "Accept: application/json"</code></pre></div>
@@ -16155,6 +16269,7 @@ que par son prénom et l'initiale de son nom.</p>
 
 const params = {
     "statut": "en_attente",
+    "groupe": "a_venir",
 };
 Object.keys(params)
     .forEach(key =&gt; url.searchParams.append(key, params[key]));
@@ -16347,6 +16462,20 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Filtre par statut : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee. Par défaut : tous. Example: <code>en_attente</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>en_attente</code></li> <li><code>acceptee</code></li> <li><code>confirmee</code></li> <li><code>en_cours</code></li> <li><code>terminee</code></li> <li><code>refusee</code></li> <li><code>annulee</code></li></ul>
+            </div>
+                                    <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>groupe</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="groupe"                data-endpoint="GETapi-v1-prestataire-reservations"
+               value="a_venir"
+               data-component="query">
+    <br>
+<p>Onglet : a_venir (en attente, acceptée, confirmée ou en cours, créneau non terminé ; date de créneau croissante), terminees ou annulees (annulée ou refusée) ; les deux derniers du plus récent au plus ancien. Combinable avec statut. Example: <code>a_venir</code></p>
+Must be one of:
+<ul style="list-style-type: square;"><li><code>a_venir</code></li> <li><code>terminees</code></li> <li><code>annulees</code></li></ul>
             </div>
                 </form>
 
@@ -17504,7 +17633,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <small class="badge badge-darkred">requires authentication</small>
 </p>
 
-<p>La réservation <code>en_cours</code> passe à <code>terminee</code>. Le créneau reste réservé. Aucun corps.</p>
+<p>La réservation <code>en_cours</code> passe à <code>terminee</code>. Le créneau reste réservé. Aucun corps. La réponse ajoute le détail du crédit
+du portefeuille : <code>montantTotal</code> (prix de la prestation), <code>commission</code> (retenue de la plateforme), <code>montantCredite</code>
+(acompte − commission, ajouté au solde) et <code>soldeApres</code> (solde du portefeuille après le crédit). Les trois derniers
+valent <code>null</code> si aucun crédit n'a eu lieu.</p>
 
 <span id="example-requests-POSTapi-v1-prestataire-reservations--id--terminer">
 <blockquote>Example request:</blockquote>
@@ -17562,7 +17694,11 @@ fetch(url, {
     &quot;client&quot;: {
         &quot;prenom&quot;: &quot;Awa&quot;,
         &quot;initialeNom&quot;: &quot;D&quot;
-    }
+    },
+    &quot;montantTotal&quot;: 15000,
+    &quot;commission&quot;: 1500,
+    &quot;montantCredite&quot;: 3000,
+    &quot;soldeApres&quot;: 3000
 }</code>
  </pre>
             <blockquote>
@@ -19742,6 +19878,184 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
+                    <h2 id="prestataire-solde-et-retraits-GETapi-v1-prestataire-portefeuille-mouvements">Historique du portefeuille</h2>
+
+<p>
+<small class="badge badge-darkred">requires authentication</small>
+</p>
+
+<p>Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),
+du plus récent au plus ancien. <code>montant</code> est toujours positif : le sens se lit dans <code>type</code> (<code>credit</code> et <code>remboursement_retrait</code>
+augmentent le solde, <code>retrait</code> le diminue). <code>soldeApres</code> est le solde juste après le mouvement (FCFA).</p>
+
+<span id="example-requests-GETapi-v1-prestataire-portefeuille-mouvements">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/prestataire/portefeuille/mouvements" \
+    --header "Authorization: Bearer {VOTRE_JETON}" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/prestataire/portefeuille/mouvements"
+);
+
+const headers = {
+    "Authorization": "Bearer {VOTRE_JETON}",
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-prestataire-portefeuille-mouvements">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000080&quot;,
+            &quot;type&quot;: &quot;credit&quot;,
+            &quot;montant&quot;: 3000,
+            &quot;libelle&quot;: &quot;Prestation termin&eacute;e (acompte moins commission)&quot;,
+            &quot;soldeApres&quot;: 8000,
+            &quot;reservationId&quot;: &quot;0198a1b2-0000-7000-8000-000000000020&quot;,
+            &quot;retraitId&quot;: null,
+            &quot;date&quot;: &quot;2030-01-15T08:50:00+00:00&quot;
+        }
+    ],
+    &quot;links&quot;: {
+        &quot;first&quot;: &quot;https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1&quot;,
+        &quot;last&quot;: &quot;https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1&quot;,
+        &quot;prev&quot;: null,
+        &quot;next&quot;: null
+    },
+    &quot;meta&quot;: {
+        &quot;current_page&quot;: 1,
+        &quot;last_page&quot;: 1,
+        &quot;per_page&quot;: 20,
+        &quot;total&quot;: 1
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Authentification requise.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Vous n&#039;avez pas le droit d&#039;effectuer cette action.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-prestataire-portefeuille-mouvements" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-prestataire-portefeuille-mouvements"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-prestataire-portefeuille-mouvements"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-prestataire-portefeuille-mouvements" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-prestataire-portefeuille-mouvements">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-prestataire-portefeuille-mouvements" data-method="GET"
+      data-path="api/v1/prestataire/portefeuille/mouvements"
+      data-authed="1"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-prestataire-portefeuille-mouvements', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-prestataire-portefeuille-mouvements"
+                    onclick="tryItOut('GETapi-v1-prestataire-portefeuille-mouvements');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-prestataire-portefeuille-mouvements"
+                    onclick="cancelTryOut('GETapi-v1-prestataire-portefeuille-mouvements');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-prestataire-portefeuille-mouvements"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/prestataire/portefeuille/mouvements</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Authorization</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Authorization" class="auth-value"               data-endpoint="GETapi-v1-prestataire-portefeuille-mouvements"
+               value="Bearer {VOTRE_JETON}"
+               data-component="header">
+    <br>
+<p>Example: <code>Bearer {VOTRE_JETON}</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-prestataire-portefeuille-mouvements"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-prestataire-portefeuille-mouvements"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
                     <h2 id="prestataire-solde-et-retraits-GETapi-v1-prestataire-retraits">Mes retraits</h2>
 
 <p>
@@ -21235,6 +21549,268 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="Accept"                data-endpoint="DELETEapi-v1-me-jeton-push"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                <h1 id="referentiels-publics">Référentiels publics</h1>
+
+    <p>Listes utilisées par l'application avant la connexion (accueil, filtres, inscription d'un prestataire).</p>
+
+                                <h2 id="referentiels-publics-GETapi-v1-metiers">Lister les métiers</h2>
+
+<p>
+</p>
+
+<p>Métiers actifs uniquement, triés par nom. Sans authentification. Le <code>code</code> est la valeur à passer aux filtres
+(<code>GET /prestataires?metier=</code>) et à l'inscription d'un prestataire. Aucune icône n'est stockée : l'application en associe une au code.</p>
+
+<span id="example-requests-GETapi-v1-metiers">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/metiers" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/metiers"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-metiers">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000010&quot;,
+            &quot;code&quot;: &quot;coiffure&quot;,
+            &quot;nom&quot;: &quot;Coiffure&quot;
+        },
+        {
+            &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000011&quot;,
+            &quot;code&quot;: &quot;mecanique&quot;,
+            &quot;nom&quot;: &quot;M&eacute;canique&quot;
+        }
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-metiers" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-metiers"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-metiers"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-metiers" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-metiers">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-metiers" data-method="GET"
+      data-path="api/v1/metiers"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-metiers', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-metiers"
+                    onclick="tryItOut('GETapi-v1-metiers');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-metiers"
+                    onclick="cancelTryOut('GETapi-v1-metiers');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-metiers"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/metiers</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-metiers"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-metiers"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="referentiels-publics-GETapi-v1-quartiers">Lister les quartiers</h2>
+
+<p>
+</p>
+
+<p>Quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces superflus ignorés), triés
+par ordre alphabétique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.
+Passez la valeur telle quelle au filtre <code>GET /prestataires?quartier=</code>.</p>
+
+<span id="example-requests-GETapi-v1-quartiers">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost:8000/api/v1/quartiers" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/quartiers"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-v1-quartiers">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;data&quot;: [
+        &quot;Jaxaay&quot;,
+        &quot;Keur Massar Nord&quot;,
+        &quot;Malika&quot;
+    ]
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-v1-quartiers" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-v1-quartiers"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-v1-quartiers"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-v1-quartiers" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-v1-quartiers">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-v1-quartiers" data-method="GET"
+      data-path="api/v1/quartiers"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-quartiers', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-v1-quartiers"
+                    onclick="tryItOut('GETapi-v1-quartiers');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-v1-quartiers"
+                    onclick="cancelTryOut('GETapi-v1-quartiers');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-v1-quartiers"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/v1/quartiers</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-v1-quartiers"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-v1-quartiers"
                value="application/json"
                data-component="header">
     <br>

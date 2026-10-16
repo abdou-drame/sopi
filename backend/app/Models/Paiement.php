@@ -44,9 +44,10 @@ class Paiement extends Model
     }
 
     /** Crée le paiement EN_ATTENTE d'une réservation avec des montants calculés par le serveur (jamais en masse). */
-    public static function ouvrir(string $reservationId, MontantsPaiement $montants): self
+    public static function ouvrir(string $reservationId, MontantsPaiement $montants, ?string $operateurSouhaite = null): self
     {
         $paiement = new self;
+        $paiement->operateur_souhaite = $operateurSouhaite;
         $paiement->reservation_id = $reservationId;
         $paiement->montant_acompte = $montants->montantAcompte;
         $paiement->commission = $montants->commission;

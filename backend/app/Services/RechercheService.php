@@ -21,7 +21,7 @@ class RechercheService
     private const ECHAPPEMENT = '!';
 
     /**
-     * @param  array{metier?: ?string, quartier?: ?string, q?: ?string, prix_min?: int|float|string|null, prix_max?: int|float|string|null, tri?: ?string}  $filtres
+     * @param  array{metier?: ?string, quartier?: ?string, q?: ?string, prix_min?: int|float|string|null, prix_max?: int|float|string|null, note_min?: int|float|string|null, tri?: ?string}  $filtres
      */
     public function rechercher(array $filtres): LengthAwarePaginator
     {
@@ -62,6 +62,11 @@ class RechercheService
             });
         }
 
+        if (filled($filtres['note_min'] ?? null)) {
+            // Même agrégat que note_moyenne (avis non masqués) ; sans avis, la moyenne est NULL donc exclue.
+            $requete->whereRaw('(select avg(avis.note) from avis where avis.prestataire_id = prestataires.id and avis.masque_le is null) >= cast(? as decimal(3, 2))', [(string) $filtres['note_min']]);
+        }
+
         $prixMin = $filtres['prix_min'] ?? null;
         $prixMax = $filtres['prix_max'] ?? null;
         if (filled($prixMin) || filled($prixMax)) {
@@ -78,6 +83,7 @@ class RechercheService
         match ($tri) {
             'prix_asc' => $requete->orderBy('prix_min'),
             'prix_desc' => $requete->orderByDesc('prix_min'),
+            'note' => $requete->orderByRaw('note_moyenne desc nulls last')->orderByDesc('nombre_avis'),
             default => null,
         };
 

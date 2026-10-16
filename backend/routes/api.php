@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\Client\ReservationController;
 use App\Http\Controllers\Api\V1\Client\VerrouCreneauController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\InscriptionPrestataireController;
+use App\Http\Controllers\Api\V1\MetierController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Prestataire\AgendaController;
 use App\Http\Controllers\Api\V1\Prestataire\AvisController;
@@ -38,6 +39,7 @@ use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
 use App\Http\Controllers\Api\V1\Prestataire\RetraitController;
 use App\Http\Controllers\Api\V1\ProfilController;
+use App\Http\Controllers\Api\V1\QuartierController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
 use App\Http\Controllers\Api\V1\WebhookPaiementController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +47,10 @@ use Illuminate\Support\Facades\Route;
 // Toutes les routes de ce fichier sont préfixées par /api (voir bootstrap/app.php).
 Route::prefix('v1')->group(function () {
     Route::get('/health', HealthController::class);
+
+    // Référentiels publics (sans authentification).
+    Route::get('/metiers', [MetierController::class, 'index'])->middleware('throttle:60,1');
+    Route::get('/quartiers', [QuartierController::class, 'index'])->middleware('throttle:60,1');
 
     Route::post('/prestataires/inscription', InscriptionPrestataireController::class)->middleware('throttle:inscription-prestataire');
     Route::get('/suivi/{jeton}', SuiviDossierController::class)->middleware('throttle:suivi-dossier');
@@ -162,6 +168,7 @@ Route::prefix('v1')->group(function () {
 
         // Solde et retraits (M7). Pas de whereUuid : un identifiant invalide répond comme un retrait inconnu.
         Route::get('/solde', [RetraitController::class, 'solde']);
+        Route::get('/portefeuille/mouvements', [RetraitController::class, 'mouvements']);
         Route::get('/retraits', [RetraitController::class, 'index']);
         Route::get('/retraits/{id}', [RetraitController::class, 'show']);
         Route::post('/retraits', [RetraitController::class, 'store'])->middleware('throttle:retrait');

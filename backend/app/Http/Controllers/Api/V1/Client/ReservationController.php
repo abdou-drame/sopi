@@ -54,7 +54,7 @@ class ReservationController extends Controller
     /**
      * Mes réservations
      *
-     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtre optionnel `statut`. Le `codeReservation` n'existe
+     * Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe
      * qu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles
      * de l'annulation.
      *
@@ -67,7 +67,7 @@ class ReservationController extends Controller
      */
     public function index(ListerMesReservationsRequest $requete)
     {
-        return ReservationClientResource::collection($this->suivi->lister($requete->user(), $requete->statut()));
+        return ReservationClientResource::collection($this->suivi->lister($requete->user(), $requete->statut(), $requete->groupe()));
     }
 
     /**

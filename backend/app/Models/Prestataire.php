@@ -85,6 +85,11 @@ class Prestataire extends Model
         return $this->hasMany(Retrait::class);
     }
 
+    public function mouvementsPortefeuille(): HasMany
+    {
+        return $this->hasMany(MouvementPortefeuille::class);
+    }
+
     public function creneaux(): HasMany
     {
         return $this->hasMany(Creneau::class);

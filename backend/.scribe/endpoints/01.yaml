@@ -1,204 +1,42 @@
-name: Prestataires
-description: ''
+name: 'Référentiels publics'
+description: |-
+
+  Listes utilisées par l'application avant la connexion (accueil, filtres, inscription d'un prestataire).
 endpoints:
   -
     custom: []
     httpMethods:
-      - POST
-    uri: api/v1/prestataires/inscription
+      - GET
+    uri: api/v1/metiers
     metadata:
       custom: []
-      groupName: Prestataires
-      groupDescription: ''
+      groupName: 'Référentiels publics'
+      groupDescription: |-
+
+        Listes utilisées par l'application avant la connexion (accueil, filtres, inscription d'un prestataire).
       subgroup: ''
       subgroupDescription: ''
-      title: "Inscription d'un prestataire"
+      title: 'Lister les métiers'
       description: |-
-        Envoi en `multipart/form-data`. Crée le compte (statut `en_attente`, il ne peut pas se connecter avant validation
-        par un administrateur), le profil et les justificatifs. Le dossier doit contenir au moins une CNI et un diplôme
-        ou une attestation (5 fichiers au maximum, PDF/JPG/PNG, 5 Mo chacun). Limité à 10 requêtes par heure et par adresse IP.
-
-        Le `jeton_suivi` n'est renvoyé qu'une seule fois : seul son hachage est conservé. Les chemins des fichiers ne sont jamais renvoyés.
+        Métiers actifs uniquement, triés par nom. Sans authentification. Le `code` est la valeur à passer aux filtres
+        (`GET /prestataires?metier=`) et à l'inscription d'un prestataire. Aucune icône n'est stockée : l'application en associe une au code.
       authenticated: false
       deprecated: false
     headers:
-      Content-Type: multipart/form-data
+      Content-Type: application/json
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      nom:
-        custom: []
-        name: nom
-        description: 'Nom. Le champ value ne doit pas dépasser 100 caractères.'
-        required: true
-        example: Diop
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      prenom:
-        custom: []
-        name: prenom
-        description: 'Prénom. Le champ value ne doit pas dépasser 100 caractères.'
-        required: true
-        example: Moussa
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      telephone:
-        custom: []
-        name: telephone
-        description: 'Mobile sénégalais (avec ou sans +221), unique. Must match the regex /^\+2217[05678]\d{7}$/.'
-        required: true
-        example: '77 123 45 67'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      email:
-        custom: []
-        name: email
-        description: 'Adresse e-mail, unique. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: moussa@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      mot_de_passe:
-        custom: []
-        name: mot_de_passe
-        description: '8 caractères minimum. Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: mot-de-passe-exemple
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      nom_entreprise:
-        custom: []
-        name: nom_entreprise
-        description: "Nom de l'entreprise ou de l'atelier. Le champ value ne doit pas dépasser 150 caractères."
-        required: true
-        example: 'Garage Moussa'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      metier:
-        custom: []
-        name: metier
-        description: "Code d'un métier proposé (ex. : mecanique, coiffure, pressing). Must match an existing stored value."
-        required: true
-        example: mecanique
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      quartier:
-        custom: []
-        name: quartier
-        description: 'Quartier de Keur Massar. Le champ value ne doit pas dépasser 100 caractères.'
-        required: true
-        example: Malika
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      adresse:
-        custom: []
-        name: adresse
-        description: 'Adresse. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: 'Rue 10, près du marché'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      justificatifs:
-        custom: []
-        name: justificatifs
-        description: 'De 2 à 5 pièces : au moins une CNI et un diplôme ou une attestation. Le champ value doit contenir au moins 2 éléments. Le champ value ne doit pas contenir plus de 5 éléments.'
-        required: true
-        example:
-          - []
-        type: 'object[]'
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'justificatifs[].type_document':
-        custom: []
-        name: 'justificatifs[].type_document'
-        description: 'cni, diplome ou attestation.'
-        required: true
-        example: cni
-        type: string
-        enumValues:
-          - cni
-          - diplome
-          - attestation
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      'justificatifs[].fichier':
-        custom: []
-        name: 'justificatifs[].fichier'
-        description: 'PDF, JPG ou PNG, 5 Mo maximum. Must be a file. Le fichier ne doit pas dépasser 5120 Ko.'
-        required: true
-        example: null
-        type: file
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      nom: Diop
-      prenom: Moussa
-      telephone: '77 123 45 67'
-      email: moussa@example.com
-      mot_de_passe: mot-de-passe-exemple
-      nom_entreprise: 'Garage Moussa'
-      metier: mecanique
-      quartier: Malika
-      adresse: 'Rue 10, près du marché'
-      justificatifs:
-        -
-          type_document: cni
-    fileParameters:
-      justificatifs:
-        -
-          fichier: null
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
     responses:
       -
         custom: []
-        status: 201
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","jeton_suivi":"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","lien_suivi":"https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","justificatifs":[{"type":"cni","statut":"en_attente"},{"type":"diplome","statut":"en_attente"}]}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 422
-        content: '{"message":"Le dossier doit contenir une copie de votre CNI.","errors":{"justificatifs":["Le dossier doit contenir une copie de votre CNI."]}}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        status: 200
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000010","code":"coiffure","nom":"Coiffure"},{"id":"0198a1b2-0000-7000-8000-000000000011","code":"mecanique","nom":"Mécanique"}]}'
         headers: []
         description: ''
     responseFields: []
@@ -210,37 +48,25 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/suivi/{jeton}'
+    uri: api/v1/quartiers
     metadata:
       custom: []
-      groupName: Prestataires
+      groupName: 'Référentiels publics'
       groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: "Suivi du dossier d'inscription"
+      title: 'Lister les quartiers'
       description: |-
-        Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription.
-        Ne renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.
-        Un jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP.
+        Quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces superflus ignorés), triés
+        par ordre alphabétique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.
+        Passez la valeur telle quelle au filtre `GET /prestataires?quartier=`.
       authenticated: false
       deprecated: false
     headers:
       Content-Type: application/json
       Accept: application/json
-    urlParameters:
-      jeton:
-        custom: []
-        name: jeton
-        description: "Jeton de suivi reçu à l'inscription."
-        required: true
-        example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      jeton: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -250,19 +76,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"typeDocument":"cni","statut":"en_attente"},{"typeDocument":"diplome","statut":"en_attente"}]}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Lien de suivi invalide ou expiré."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 429
-        content: '{"message":"Trop de tentatives. Réessayez dans quelques instants."}'
+        content: '{"data":["Jaxaay","Keur Massar Nord","Malika"]}'
         headers: []
         description: ''
     responseFields: []

@@ -1,28 +1,27 @@
-name: 'Administration — notifications en échec'
+name: 'Administration — retraits'
 description: |-
 
-  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
-  du destinataire ne sont jamais exposés.
+  Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/notifications-en-echec
+    uri: api/v1/admin/retraits
     metadata:
       custom: []
-      groupName: 'Administration — notifications en échec'
+      groupName: 'Administration — retraits'
       groupDescription: |-
 
-        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
-        du destinataire ne sont jamais exposés.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des notifications en échec'
+      title: 'Liste des retraits'
       description: |-
-        Notifications dont au moins un canal (e-mail ou push) a échoué définitivement : point d'arrivée de l'alerte
-        `notifications_en_echec`. Du plus récent au plus ancien (20 par page). Filtres combinables : `canal`, `type`, `ancienneteMinutes`.
-        Chaque ligne donne le type, le destinataire (id et rôle), les canaux en échec, le nombre d'essais, la classe de l'erreur et la date.
+        Retraits des prestataires, du plus récent au plus ancien (20 par page). Filtres combinables : `statut`, `prestataire`
+        (identifiant du profil prestataire) et `bloques` (retraits en_cours depuis plus longtemps que le délai de blocage : point
+        d'arrivée de l'alerte `retraits_bloques`). Le téléphone de versement est masqué dans la liste ; la référence DexPay n'apparaît
+        que dans le détail.
       authenticated: true
       deprecated: false
     headers:
@@ -32,56 +31,38 @@ endpoints:
     urlParameters: []
     cleanUrlParameters: []
     queryParameters:
-      canal:
+      statut:
         custom: []
-        name: canal
-        description: 'email ou push : ne garde que les notifications dont CE canal est en échec.'
+        name: statut
+        description: 'en_cours, reussi ou echoue.'
         required: false
-        example: email
+        example: en_cours
         type: string
         enumValues:
-          - email
-          - push
+          - en_cours
+          - reussi
+          - echoue
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      type:
+      prestataire:
         custom: []
-        name: type
-        description: 'Type de notification, par exemple reservation_confirmee.'
+        name: prestataire
+        description: 'Identifiant du profil prestataire. validation.uuid.'
         required: false
-        example: reservation_confirmee
+        example: 0198a1b2-0000-7000-8000-000000000012
         type: string
-        enumValues:
-          - dossier_depose
-          - demande_acceptee
-          - demande_refusee
-          - reservation_nouvelle_demande
-          - reservation_acceptee
-          - reservation_refusee
-          - reservation_expiree
-          - reservation_annulee
-          - reservation_confirmee
-          - reservation_demarree
-          - reservation_terminee
-          - avis_recu
-          - avis_modere
-          - litige_ouvert
-          - litige_cloture
-          - sanction_posee
-          - sanction_levee
-          - reinitialisation_mot_de_passe
-          - mot_de_passe_modifie
+        enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
-      ancienneteMinutes:
+      bloques:
         custom: []
-        name: ancienneteMinutes
-        description: 'Notifications créées depuis au moins N minutes (alias : anciennete_minutes). Le champ value doit être au moins égal à 1. Le champ value ne doit pas dépasser 525600.'
+        name: bloques
+        description: "true : retraits en_cours depuis plus longtemps que le délai de blocage (point d'arrivée de l'alerte `retraits_bloques`) ; false : tous les autres."
         required: false
-        example: 60
-        type: integer
+        example: true
+        type: boolean
         enumValues: []
         exampleWasSpecified: false
         nullable: true
@@ -98,9 +79,9 @@ endpoints:
         nullable: true
         deprecated: false
     cleanQueryParameters:
-      canal: email
-      type: reservation_confirmee
-      ancienneteMinutes: 60
+      statut: en_cours
+      prestataire: 0198a1b2-0000-7000-8000-000000000012
+      bloques: true
       page: 1
     bodyParameters: []
     cleanBodyParameters: []
@@ -109,7 +90,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","type":"reservation_confirmee","destinataire":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client"},"canauxEnEchec":["email"],"tentatives":5,"classeErreur":"TransportException","dateCreation":"2030-01-20T08:00:00+00:00"}],"links":{},"meta":{"current_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"en_cours","bloque":true,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":null,"recredite":false,"telephoneVersement":"+221*******67"}],"links":{"first":"https://api.exemple.test/api/v1/admin/retraits?page=1","last":"https://api.exemple.test/api/v1/admin/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -127,7 +108,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Le canal doit être email ou push.","errors":{"canal":["Le canal doit être email ou push."]}}'
+        content: '{"message":"Le statut doit être en_cours, reussi ou echoue.","errors":{"statut":["Le statut doit être en_cours, reussi ou echoue."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -142,20 +123,19 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/admin/notifications-en-echec/{id}'
+    uri: 'api/v1/admin/retraits/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — notifications en échec'
+      groupName: 'Administration — retraits'
       groupDescription: |-
 
-        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Le contenu du message et les coordonnées
-        du destinataire ne sont jamais exposés.
+        Routes de lecture réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). Montants en FCFA entiers.
       subgroup: ''
       subgroupDescription: ''
-      title: "Détail d'une notification en échec"
+      title: "Détail d'un retrait"
       description: |-
-        Même forme qu'une ligne de la liste. Permet d'ouvrir un identifiant renvoyé par l'alerte `notifications_en_echec`, quelle que
-        soit sa page dans la liste. Une notification qui n'est pas (ou plus) en échec répond 404.
+        Prestataire, montant, statut, dates de demande et de traitement, téléphone de versement complet, référence DexPay et
+        `recredite` / `recrediteLe` (le montant d'un retrait échoué a-t-il été remis au solde).
       authenticated: true
       deprecated: false
     headers:
@@ -166,16 +146,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant de la notification.'
+        description: 'Identifiant du retrait.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
+        example: 0198a1b2-0000-7000-8000-000000000080
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
+      id: 0198a1b2-0000-7000-8000-000000000080
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -185,13 +165,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","type":"reservation_confirmee","destinataire":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client"},"canauxEnEchec":["email"],"tentatives":5,"classeErreur":"TransportException","dateCreation":"2030-01-20T08:00:00+00:00"}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000080","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000012","userId":"0198a1b2-0000-7000-8000-000000000002","nomEntreprise":"Garage Exemple"},"montant":5000,"statut":"echoue","bloque":false,"dateDemande":"2030-01-20T08:00:00+00:00","traiteLe":"2030-01-20T08:05:00+00:00","recredite":true,"telephoneVersement":"+221771234567","referenceDexpay":"DXP-RET-EXEMPLE","recrediteLe":"2030-01-20T08:05:00+00:00"}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Notification introuvable."}'
+        content: '{"message":"Retrait introuvable."}'
         headers: []
         description: ''
     responseFields: []

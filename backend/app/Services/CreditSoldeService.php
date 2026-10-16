@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\StatutPaiement;
+use App\Enums\TypeMouvementPortefeuille;
 use App\Exceptions\CreditSoldeImpossibleException;
+use App\Models\MouvementPortefeuille;
 use App\Models\Paiement;
 use App\Models\Prestataire;
 use App\Models\Reservation;
@@ -29,6 +31,16 @@ class CreditSoldeService
      */
     public function crediter(Reservation $reservation): bool
     {
+        return $this->crediterAvecDetail($reservation) !== null;
+    }
+
+    /**
+     * Comme crediter(), mais renvoie ce qui a été crédité (montants et solde lus dans la transaction), ou null si rien ne l'a été.
+     *
+     * @throws CreditSoldeImpossibleException si la base échoue (la transaction englobante doit alors être annulée)
+     */
+    public function crediterAvecDetail(Reservation $reservation): ?CreditEffectue
+    {
         $paiement = Paiement::query()
             ->where('reservation_id', $reservation->id)
             ->where('statut', StatutPaiement::Reussi->value)
@@ -38,7 +50,7 @@ class CreditSoldeService
             // Cas théorique : une réservation n'est EN_COURS qu'après un paiement réussi. La fin de prestation n'échoue pas.
             Log::warning('Crédit du solde impossible : aucun paiement réussi pour la réservation.', ['reservation_id' => $reservation->id]);
 
-            return false;
+            return null;
         }
 
         try {
@@ -50,17 +62,19 @@ class CreditSoldeService
         }
     }
 
-    private function crediterPaiement(Paiement $paiement, string $prestataireId): bool
+    private function crediterPaiement(Paiement $paiement, string $prestataireId): ?CreditEffectue
     {
         // Garde : un seul appel gagne, même en concurrence. 0 ligne = déjà crédité (ou paiement plus « réussi »).
         if (! $paiement->crediterSiPossible()) {
-            return false;
+            return null;
         }
 
         // Calcul exact en centimes entiers (jamais de flottant) ; l'ajout est une opération SQL atomique.
         $part = CalculPaiement::soustraire($paiement->montant_acompte, $paiement->commission);
         Prestataire::query()->whereKey($prestataireId)->update(['solde' => DB::raw('solde + '.$part)]);
+        $solde = Prestataire::query()->whereKey($prestataireId)->value('solde');
+        MouvementPortefeuille::enregistrer($prestataireId, TypeMouvementPortefeuille::Credit, $part, 'Prestation terminée (acompte moins commission)', $solde, reservationId: $paiement->reservation_id);
 
-        return true;
+        return new CreditEffectue((string) $paiement->montant_acompte, (string) $paiement->commission, $part, (string) $solde);
     }
 }

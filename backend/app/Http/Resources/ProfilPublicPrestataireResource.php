@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Prestataire;
 use App\Services\ConsultationAvisService;
+use App\Services\Paiement\CalculPaiement;
 use App\Services\PhotoAtelierService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -21,6 +22,8 @@ class ProfilPublicPrestataireResource extends JsonResource
     public function toArray(Request $request): array
     {
         $photos = app(PhotoAtelierService::class);
+        $calcul = CalculPaiement::depuisConfiguration();
+        $pourcentage = round((float) config('sopi.paiement.acompte_taux') * 100, 2);
 
         return [
             'id' => $this->id,
@@ -29,12 +32,14 @@ class ProfilPublicPrestataireResource extends JsonResource
             'quartier' => $this->quartier,
             'adresse' => $this->adresse,
             ...ConsultationAvisService::formater($this->note_moyenne, $this->nombre_avis),
+            'acomptePourcentage' => $pourcentage == (int) $pourcentage ? (int) $pourcentage : $pourcentage,
             'prestations' => $this->prestations->map(fn ($prestation) => [
                 'id' => $prestation->id,
                 'nom' => $prestation->nom,
                 'domaine' => $prestation->domaine,
                 'dureeMinutes' => $prestation->duree_minutes,
                 'prix' => (float) $prestation->prix,
+                'montantAcompte' => (float) $calcul->calculer((string) $prestation->prix)->montantAcompte,
             ])->values()->all(),
             'photos' => collect($this->photos_atelier ?? [])->map(function (string $nom) use ($photos) {
                 $id = $photos->identifiant($nom);

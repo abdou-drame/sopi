@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Prestataire;
 use App\Enums\OperateurRetrait;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Prestataire\DemanderRetraitRequest;
+use App\Http\Resources\MouvementPortefeuilleResource;
 use App\Http\Resources\RetraitResource;
 use App\Models\Prestataire;
 use App\Services\RetraitService;
@@ -57,6 +58,24 @@ class RetraitController extends Controller
     public function index(Request $request)
     {
         return RetraitResource::collection($this->service->lister($this->prestataire($request)));
+    }
+
+    /**
+     * Historique du portefeuille
+     *
+     * Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),
+     * du plus récent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`
+     * augmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA).
+     *
+     * @authenticated
+     *
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","type":"credit","montant":3000.0,"libelle":"Prestation terminée (acompte moins commission)","soldeApres":8000.0,"reservationId":"0198a1b2-0000-7000-8000-000000000020","retraitId":null,"date":"2030-01-15T08:50:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","last":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 401 {"message":"Authentification requise."}
+     * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     */
+    public function mouvements(Request $request)
+    {
+        return MouvementPortefeuilleResource::collection($this->service->mouvements($this->prestataire($request)));
     }
 
     /**

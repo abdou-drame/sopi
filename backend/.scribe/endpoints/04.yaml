@@ -1,25 +1,23 @@
-name: 'Administration — litiges'
+name: "Administration — demandes d'inscription"
 description: |-
 
-  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
-  elle ne déclenche aucun mouvement d'argent automatique.
+  Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
 endpoints:
   -
     custom: []
     httpMethods:
       - GET
-    uri: api/v1/admin/litiges
+    uri: api/v1/admin/prestataires/demandes
     metadata:
       custom: []
-      groupName: 'Administration — litiges'
+      groupName: "Administration — demandes d'inscription"
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
-        elle ne déclenche aucun mouvement d'argent automatique.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
       subgroup: ''
       subgroupDescription: ''
-      title: 'Liste des litiges'
-      description: 'Paginée (20 par page). Par défaut les litiges `ouvert`, du plus ancien au plus récent.'
+      title: 'Liste des demandes des prestataires'
+      description: 'Paginée (20 par page). Par défaut les demandes `en_attente`, de la plus ancienne à la plus récente.'
       authenticated: true
       deprecated: false
     headers:
@@ -32,13 +30,14 @@ endpoints:
       statut:
         custom: []
         name: statut
-        description: 'ouvert (défaut), cloture ou tous.'
+        description: 'en_attente (défaut), actif, refuse ou tous.'
         required: false
-        example: ouvert
+        example: en_attente
         type: string
         enumValues:
-          - ouvert
-          - cloture
+          - en_attente
+          - actif
+          - refuse
           - tous
         exampleWasSpecified: false
         nullable: true
@@ -55,7 +54,7 @@ endpoints:
         nullable: true
         deprecated: false
     cleanQueryParameters:
-      statut: ouvert
+      statut: en_attente
       page: 1
     bodyParameters: []
     cleanBodyParameters: []
@@ -64,7 +63,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":1,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa","telephone":"+221770000001","email":null},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221770000002","email":null,"nomEntreprise":"Garage Exemple"},"prixApplique":15000,"paiements":[],"decidePar":null,"sanctionId":null}],"links":{"first":"https://api.exemple.test/api/v1/admin/litiges?page=1","last":"https://api.exemple.test/api/v1/admin/litiges?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
+        content: '{"data":[{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","statutCompte":"en_attente","dateSoumission":"2026-10-12T09:30:00+00:00","nombreJustificatifs":2}],"links":{"first":"https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1","last":"https://api.exemple.test/api/v1/admin/prestataires/demandes?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}'
         headers: []
         description: ''
       -
@@ -82,7 +81,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Le statut doit être ouvert, cloture ou tous.","errors":{"statut":["Le statut doit être ouvert, cloture ou tous."]}}'
+        content: '{"message":"Le statut doit être en_attente, actif, refuse ou tous.","errors":{"statut":["Le statut doit être en_attente, actif, refuse ou tous."]}}'
         headers: []
         description: ''
     responseFields: []
@@ -97,18 +96,17 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/admin/litiges/{id}'
+    uri: 'api/v1/admin/prestataires/{id}'
     metadata:
       custom: []
-      groupName: 'Administration — litiges'
+      groupName: "Administration — demandes d'inscription"
       groupDescription: |-
 
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
-        elle ne déclenche aucun mouvement d'argent automatique.
+        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`).
       subgroup: ''
       subgroupDescription: ''
-      title: "Détail d'un litige"
-      description: 'Réservation, parties (coordonnées complètes), paiements de la réservation, preuves, réponse du prestataire et décision.'
+      title: "Détail d'une demande"
+      description: 'Coordonnées du prestataire et liste de ses justificatifs (sans chemin de stockage).'
       authenticated: true
       deprecated: false
     headers:
@@ -119,16 +117,16 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du litige.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -138,87 +136,13 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"ouvert","motif":"Prestataire absent","description":"Le prestataire ne s''est pas présenté.","dateCreation":"2030-01-16T12:00:00+00:00","reservation":{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"confirmee","dateDebut":"2030-01-16T09:00:00+00:00","prestation":"Vidange"},"nombrePreuves":0,"reponsePrestataire":null,"reponseLe":null,"decision":null,"motifDecision":null,"clotureLe":null,"preuves":[],"client":{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diallo","prenom":"Awa","telephone":"+221770000001","email":null},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221770000002","email":null,"nomEntreprise":"Garage Exemple"},"prixApplique":15000,"paiements":[{"id":"0198a1b2-0000-7000-8000-000000000070","statut":"paye","montantAcompte":4500,"commission":1500,"payeLe":"2030-01-15T09:00:00+00:00","rembourseLe":null}],"decidePar":null,"sanctionId":null}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"en_attente","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"en_attente","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Litige introuvable."}'
-        headers: []
-        description: ''
-    responseFields: []
-    auth:
-      - headers
-      - Authorization
-      - 'Bearer JETON_FICTIF'
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - GET
-    uri: 'api/v1/admin/litiges/{id}/preuves/{preuve}'
-    metadata:
-      custom: []
-      groupName: 'Administration — litiges'
-      groupDescription: |-
-
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
-        elle ne déclenche aucun mouvement d'argent automatique.
-      subgroup: ''
-      subgroupDescription: ''
-      title: "Afficher une preuve d'un litige"
-      description: "Renvoie l'image en flux (Content-Type réel, `nosniff`, `Cache-Control: private`)."
-      authenticated: true
-      deprecated: false
-    headers:
-      Authorization: 'Bearer {VOTRE_JETON}'
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters:
-      id:
-        custom: []
-        name: id
-        description: 'Identifiant du litige.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-      preuve:
-        custom: []
-        name: preuve
-        description: 'Identifiant de la preuve.'
-        required: true
-        example: 0198a1b2-0000-7000-8000-000000000091
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        deprecated: false
-    cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
-      preuve: 0198a1b2-0000-7000-8000-000000000091
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        custom: []
-        status: 200
-        content: "[Contenu binaire de l'image]"
-        headers: []
-        description: image
-      -
-        custom: []
-        status: 404
-        content: '{"message":"Preuve introuvable."}'
+        content: '{"message":"Demande introuvable."}'
         headers: []
         description: ''
     responseFields: []
@@ -233,20 +157,17 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/admin/litiges/{id}/trancher'
+    uri: 'api/v1/admin/prestataires/{id}/accepter'
     metadata:
       custom: []
-      groupName: 'Administration — litiges'
-      groupDescription: |-
-
-        Routes réservées aux administrateurs (jeton Sanctum + rôle `administrateur`). La décision est motivée et définitive ;
-        elle ne déclenche aucun mouvement d'argent automatique.
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
       subgroup: ''
       subgroupDescription: ''
-      title: 'Trancher un litige'
+      title: 'Accepter une demande'
       description: |-
-        Clôture un litige ouvert par une décision motivée (`rejet`, `avertissement`, `suspension_temporaire` ou `bannissement_definitif`). Une décision de sanction pose la sanction sur le `prestataire` (défaut) ou le `client` dans la même transaction que la clôture (voir « Administration — sanctions » pour ses effets). Un litige déjà clôturé répond 409, y compris
-        si deux décisions arrivent en même temps : une seule est retenue.
+        Le compte passe à `actif` (le prestataire peut se connecter) et ses justificatifs à `valide`.
+        Seule une demande `en_attente` peut être décidée. Aucune notification n'est envoyée : le prestataire consulte son lien de suivi.
       authenticated: true
       deprecated: false
     headers:
@@ -257,110 +178,182 @@ endpoints:
       id:
         custom: []
         name: id
-        description: 'Identifiant du litige.'
+        description: 'Identifiant du prestataire.'
         required: true
-        example: 0198a1b2-0000-7000-8000-000000000090
+        example: 0198a1b2-0000-7000-8000-000000000002
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: 0198a1b2-0000-7000-8000-000000000090
+      id: 0198a1b2-0000-7000-8000-000000000002
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters:
-      decision:
-        custom: []
-        name: decision
-        description: 'Décision : rejet, avertissement, suspension_temporaire, bannissement_definitif.'
-        required: true
-        example: rejet
-        type: string
-        enumValues:
-          - rejet
-          - avertissement
-          - suspension_temporaire
-          - bannissement_definitif
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      motif:
-        custom: []
-        name: motif
-        description: 'Motif de la décision, de 10 à 1000 caractères. Il sert aussi de motif à la sanction éventuelle. Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 1000 caractères.'
-        required: true
-        example: 'Le prestataire a prouvé sa présence sur place.'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      cible:
-        custom: []
-        name: cible
-        description: 'Compte sanctionné par une décision de sanction : prestataire, client (défaut : prestataire).'
-        required: false
-        example: prestataire
-        type: string
-        enumValues:
-          - prestataire
-          - client
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      dateFin:
-        custom: []
-        name: dateFin
-        description: 'Obligatoire pour une suspension temporaire : fin de la suspension, dans le futur (ISO 8601). This field is required when <code>decision</code> is <code>suspension_temporaire</code>. validation.date validation.after.'
-        required: false
-        example: '2030-02-01T00:00:00+00:00'
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-    cleanBodyParameters:
-      decision: rejet
-      motif: 'Le prestataire a prouvé sa présence sur place.'
-      cible: prestataire
-      dateFin: '2030-02-01T00:00:00+00:00'
+    bodyParameters: []
+    cleanBodyParameters: []
     fileParameters: []
     responses:
       -
         custom: []
         status: 200
-        content: '{"id":"0198a1b2-0000-7000-8000-000000000090","statut":"cloture","decision":"rejet","motifDecision":"Signalement non fondé.","clotureLe":"2030-01-17T09:00:00+00:00"}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 401
-        content: '{"message":"Authentification requise."}'
-        headers: []
-        description: ''
-      -
-        custom: []
-        status: 403
-        content: '{"message":"Vous n''avez pas le droit d''effectuer cette action."}'
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"actif","motifRefus":null,"dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"valide","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
         headers: []
         description: ''
       -
         custom: []
         status: 404
-        content: '{"message":"Litige introuvable."}'
+        content: '{"message":"Demande introuvable."}'
         headers: []
         description: ''
       -
         custom: []
         status: 409
-        content: '{"message":"Ce litige est déjà clôturé."}'
+        content: '{"message":"Cette demande a déjà été traitée."}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: 'api/v1/admin/prestataires/{id}/refuser'
+    metadata:
+      custom: []
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Refuser une demande'
+      description: |-
+        Le compte passe à `refuse`, ses justificatifs à `rejete` et le motif est enregistré (visible sur le lien de suivi du prestataire).
+        Seule une demande `en_attente` peut être décidée.
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du prestataire.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000002
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000002
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      motif:
+        custom: []
+        name: motif
+        description: 'Raison du refus, communiquée au prestataire (10 à 500 caractères). Le champ value doit contenir au moins 10 caractères. Le champ value ne doit pas dépasser 500 caractères.'
+        required: true
+        example: 'La photocopie de la CNI est illisible.'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      motif: 'La photocopie de la CNI est illisible.'
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"refuse","motifRefus":"La photocopie de la CNI est illisible.","dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"rejete","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Demande introuvable."}'
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 409
+        content: '{"message":"Cette demande a déjà été traitée."}'
         headers: []
         description: ''
       -
         custom: []
         status: 422
-        content: '{"message":"Le motif de la décision est obligatoire.","errors":{"motif":["Le motif de la décision est obligatoire."]}}'
+        content: '{"message":"Le motif du refus doit contenir au moins 10 caractères.","errors":{"motif":["Le motif du refus doit contenir au moins 10 caractères."]}}'
+        headers: []
+        description: ''
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer JETON_FICTIF'
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/v1/admin/justificatifs/{id}/telecharger'
+    metadata:
+      custom: []
+      groupName: "Administration — demandes d'inscription"
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Télécharger un justificatif'
+      description: 'Renvoie le fichier en flux depuis le stockage privé (affichage direct pour les PDF et images).'
+      authenticated: true
+      deprecated: false
+    headers:
+      Authorization: 'Bearer {VOTRE_JETON}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'Identifiant du justificatif.'
+        required: true
+        example: 0198a1b2-0000-7000-8000-000000000010
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 0198a1b2-0000-7000-8000-000000000010
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: 'Contenu binaire du fichier (Content-Type: application/pdf, image/jpeg ou image/png)'
+        headers: []
+        description: Fichier
+      -
+        custom: []
+        status: 404
+        content: '{"message":"Justificatif introuvable."}'
         headers: []
         description: ''
     responseFields: []

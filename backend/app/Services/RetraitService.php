@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Enums\OperateurRetrait;
 use App\Enums\StatutRetrait;
+use App\Enums\TypeMouvementPortefeuille;
 use App\Exceptions\RetraitEchoueException;
+use App\Models\MouvementPortefeuille;
 use App\Models\Prestataire;
 use App\Models\Retrait;
 use App\Services\Paiement\ContexteVersement;
@@ -23,6 +25,15 @@ class RetraitService
     public const PAR_PAGE = 20;
 
     public function __construct(private readonly PaiementService $paiements) {}
+
+    /** Mouvements du solde du prestataire, du plus récent au plus ancien. */
+    public function mouvements(Prestataire $prestataire): LengthAwarePaginator
+    {
+        return $prestataire->mouvementsPortefeuille()
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->paginate(self::PAR_PAGE);
+    }
 
     /** Retraits du prestataire, du plus récent au plus ancien. */
     public function lister(Prestataire $prestataire): LengthAwarePaginator
@@ -69,7 +80,13 @@ class RetraitService
                 throw ValidationException::withMessages(['montant' => ['Solde insuffisant.']]);
             }
 
-            return Retrait::ouvrir($prestataire->getKey(), $montant, $telephone, $operateur);
+            $retrait = Retrait::ouvrir($prestataire->getKey(), $montant, $telephone, $operateur);
+            MouvementPortefeuille::enregistrer(
+                $prestataire->getKey(), TypeMouvementPortefeuille::Retrait, $montant, 'Demande de retrait',
+                Prestataire::query()->whereKey($prestataire->getKey())->value('solde'), retraitId: $retrait->id,
+            );
+
+            return $retrait;
         });
 
         $contexteEchec = [];
@@ -136,9 +153,7 @@ class RetraitService
         DB::transaction(function () use ($retrait, &$change) {
             $change = $retrait->echouerSiEnCours();
             if ($retrait->recrediterSiPossible()) {
-                Prestataire::query()
-                    ->whereKey($retrait->prestataire_id)
-                    ->update(['solde' => DB::raw('solde + '.(int) $retrait->montant)]);
+                $this->recrediter($retrait);
             }
         });
 
@@ -153,10 +168,21 @@ class RetraitService
                 return;
             }
 
-            Prestataire::query()
-                ->whereKey($retrait->prestataire_id)
-                ->update(['solde' => DB::raw('solde + '.(int) $retrait->montant)]);
+            $this->recrediter($retrait);
         });
+    }
+
+    /** Recrédit du montant d'un retrait échoué et ligne du journal, à appeler dans la transaction de l'échec (après la garde recredite_le). */
+    private function recrediter(Retrait $retrait): void
+    {
+        Prestataire::query()
+            ->whereKey($retrait->prestataire_id)
+            ->update(['solde' => DB::raw('solde + '.(int) $retrait->montant)]);
+
+        MouvementPortefeuille::enregistrer(
+            $retrait->prestataire_id, TypeMouvementPortefeuille::RemboursementRetrait, (int) $retrait->montant, 'Retrait échoué : montant recrédité',
+            Prestataire::query()->whereKey($retrait->prestataire_id)->value('solde'), retraitId: $retrait->id,
+        );
     }
 
     /** Résultat ambigu : pas de recrédit ; journal sans donnée sensible (ni numéro, ni montant) ; le retrait reste EN_COURS. */

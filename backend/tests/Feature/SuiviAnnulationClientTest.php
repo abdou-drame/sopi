@@ -111,6 +111,7 @@ describe('détail', function () {
                 'nomEntreprise' => $prestataire->nom_entreprise,
                 'quartier' => $prestataire->quartier,
                 'adresse' => $prestataire->adresse,
+                'telephone' => null,
             ])
             ->assertJsonStructure(['creneau' => ['id', 'dateDebut', 'dateFin'], 'prestation' => ['id', 'nom', 'dureeMinutes', 'prix']])
             ->getContent();

@@ -30,7 +30,7 @@ endpoints:
       -
         custom: []
         status: 503
-        content: '{"status":"ok","app":"Sopi","version":"0.0.0-dev","database":"erreur","time":"2026-10-16T12:59:44+00:00"}'
+        content: '{"status":"ok","app":"Sopi","version":"0.0.0-dev","database":"erreur","time":"2026-10-16T14:57:24+00:00"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -125,61 +125,6 @@ endpoints:
       telephone: '+221705627717'
       email: reichel.charity@example.net
       password: 'o,+]"OP>@;4[*UyPJ"}6'
-    fileParameters: []
-    responses: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-  -
-    custom: []
-    httpMethods:
-      - POST
-    uri: api/v1/auth/connexion
-    metadata:
-      custom: []
-      groupName: Endpoints
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: ''
-      description: ''
-      authenticated: false
-      deprecated: false
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
-    bodyParameters:
-      identifiant:
-        custom: []
-        name: identifiant
-        description: 'Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: awa@example.com
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      password:
-        custom: []
-        name: password
-        description: 'Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères.'
-        required: true
-        example: MotDePasse123
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-    cleanBodyParameters:
-      identifiant: awa@example.com
-      password: MotDePasse123
     fileParameters: []
     responses: []
     responseFields: []
