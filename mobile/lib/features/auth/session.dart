@@ -78,12 +78,23 @@ class SessionControleur extends Notifier<EtatSession> {
 
   /// Connexion. Lève une [ErreurApi] (identifiants faux, 422, 429, réseau…) sauf pour un 403,
   /// qui passe l'état à [Restreint].
-  Future<void> connecter(String identifiant, String motDePasse) async {
+  Future<void> connecter(String identifiant, String motDePasse) =>
+      _ouvrirSession(cheminConnexion, {
+        'identifiant': identifiant,
+        'password': motDePasse,
+      });
+
+  /// Inscription d'un client. Le serveur répond 201 avec `{token, user}` : la session s'ouvre aussitôt.
+  /// Lève une [ErreurApi] (422 par champ, 429, réseau…).
+  Future<void> inscrire(Map<String, Object?> champs) =>
+      _ouvrirSession(cheminInscription, champs);
+
+  Future<void> _ouvrirSession(
+    String chemin,
+    Map<String, Object?> donnees,
+  ) async {
     try {
-      final reponse = await _dio.post<Object?>(
-        cheminConnexion,
-        data: {'identifiant': identifiant, 'password': motDePasse},
-      );
+      final reponse = await _dio.post<Object?>(chemin, data: donnees);
       final corps = reponse.data is Map ? reponse.data as Map : const {};
       final jeton = corps['token'];
       final utilisateur = Utilisateur.depuisJson(corps['user']);

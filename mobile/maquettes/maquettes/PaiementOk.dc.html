@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Paiement réussi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 420px; border-radius: 0 0 44px 44px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 40%, #c7d2fe 0%, rgba(199,210,254,0) 60%), radial-gradient(70% 60% at 55% 100%, #dbeafe 0%, rgba(219,234,254,0) 70%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 0; right: 0; top: 130px; display: flex; flex-direction: column; align-items: center; gap: 22px">
+    <div style="width: 112px; height: 112px; border-radius: 56px; background: #1d4ed8; display: flex; align-items: center; justify-content: center">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>
+    </div>
+    <div style="text-align: center; font-size: 28px; line-height: 34px; font-weight: 400">Paiement<br><span style="font-weight: 800">réussi !</span></div>
+    <div style="font-size: 14px; color: #4a5678; text-align: center; padding: 0 40px; line-height: 20px">Votre réservation est confirmée. Le prestataire a été prévenu.</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 452px; box-sizing: border-box; padding: 18px; border: 1px solid #e3e9f6; border-radius: 26px; background: #ffffff; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Prestataire</span><span style="font-weight: 700">Salon Fatou</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Service</span><span style="font-weight: 700">Coupe femme</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Date</span><span style="font-weight: 700">Sam. 24 oct., 10h00</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 14px"><span style="color: #64708f">Acompte payé</span><span style="font-weight: 700; color: #1d4ed8">1 500 FCFA</span></div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px">
+    <button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Voir ma réservation</button>
+    <button style="height: 54px; border: 1px solid #d5ddf0; border-radius: 27px; background: #ffffff; color: #0f1b3d; font-size: 15px; font-weight: 600">Retour à l'accueil</button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

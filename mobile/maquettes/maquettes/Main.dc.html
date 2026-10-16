@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Accueil client</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 330px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 22%, #c7d2fe 0%, rgba(199,210,254,0) 60%), radial-gradient(70% 60% at 55% 100%, #dbeafe 0%, rgba(219,234,254,0) 70%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px; display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Menu" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+    </button>
+    <div style="display: flex; gap: 10px; align-items: center">
+      <button aria-label="Notifications" style="position: relative; width: 44px; height: 44px; border: none; border-radius: 22px; background: #ffffff; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f1b3d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span style="position: absolute; top: 10px; right: 11px; width: 9px; height: 9px; border-radius: 5px; background: #1d4ed8; border: 2px solid #ffffff"></span>
+      </button>
+      <div style="width: 44px; height: 44px; border-radius: 22px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px">A</div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; display: flex; align-items: flex-end; justify-content: space-between">
+    <div style="font-size: 30px; line-height: 36px; font-weight: 400; color: #0f1b3d">Bonjour<br><span style="font-weight: 800">Aminata !</span></div>
+    <button aria-label="Rechercher" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 190px; height: 124px; box-sizing: border-box; padding: 18px 20px; border-radius: 26px; background: #1d4ed8; color: #ffffff; display: flex; flex-direction: column; justify-content: space-between">
+    <div style="font-size: 12px; font-weight: 500; opacity: 0.85">Prochaine réservation</div>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <div>
+        <div style="font-size: 22px; font-weight: 700; line-height: 28px">Demain, 10h00</div>
+        <div style="font-size: 13px; opacity: 0.9">Coiffure · Salon Fatou</div>
+      </div>
+      <button style="height: 44px; padding: 0 18px; border: none; border-radius: 22px; background: #ffffff; color: #1d4ed8; font-size: 14px; font-weight: 700">Voir</button>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 350px; display: flex; gap: 10px">
+    <button style="flex: 1; height: 112px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; text-align: left; display: flex; flex-direction: column; justify-content: space-between">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span><span style="display: block; font-size: 11px; color: #64708f">Réserver</span><span style="display: block; font-size: 16px; font-weight: 700; color: #0f1b3d">Mécanique</span></span>
+    </button>
+    <button style="flex: 1; height: 112px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; text-align: left; display: flex; flex-direction: column; justify-content: space-between">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+      <span><span style="display: block; font-size: 11px; color: #64708f">Réserver</span><span style="display: block; font-size: 16px; font-weight: 700; color: #0f1b3d">Coiffure</span></span>
+    </button>
+    <button style="flex: 1; height: 112px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff; text-align: left; display: flex; flex-direction: column; justify-content: space-between">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+      <span><span style="display: block; font-size: 11px; color: #64708f">Réserver</span><span style="display: block; font-size: 16px; font-weight: 700; color: #0f1b3d">Pressing</span></span>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 482px; display: flex; align-items: center; justify-content: space-between">
+    <div style="font-size: 17px; font-weight: 700">Prestataires à découvrir</div>
+    <div style="font-size: 13px; font-weight: 600; color: #1d4ed8">Tout voir</div>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 520px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 12px; box-sizing: border-box; padding: 12px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff">
+      <div style="width: 52px; height: 52px; border-radius: 16px; background: #dbeafe; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div style="flex-grow: 1">
+        <div style="font-size: 15px; font-weight: 700">Garage Keur Massar</div>
+        <div style="font-size: 12px; color: #64708f">Mécanique · Malika</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>4,8
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; box-sizing: border-box; padding: 12px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff">
+      <div style="width: 52px; height: 52px; border-radius: 16px; background: #e0e7ff; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12"/></svg>
+      </div>
+      <div style="flex-grow: 1">
+        <div style="font-size: 15px; font-weight: 700">Salon Fatou</div>
+        <div style="font-size: 12px; color: #64708f">Coiffure · Keur Massar</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>4,9
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; box-sizing: border-box; padding: 12px; border: 1px solid #e3e9f6; border-radius: 22px; background: #ffffff">
+      <div style="width: 52px; height: 52px; border-radius: 16px; background: #cffafe; display: flex; align-items: center; justify-content: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>
+      </div>
+      <div style="flex-grow: 1">
+        <div style="font-size: 15px; font-weight: 700">Pressing Express</div>
+        <div style="font-size: 12px; color: #64708f">Pressing · Thiaroye</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>4,6
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 12px; right: 12px; bottom: 14px; height: 68px; box-sizing: border-box; padding: 0 8px; border-radius: 34px; background: #0f1b3d; display: flex; align-items: center; justify-content: space-around">
+    <button aria-label="Accueil" style="height: 48px; padding: 0 18px; border: none; border-radius: 24px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil
+    </button>
+    <button aria-label="Rechercher" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <button aria-label="Mes réservations" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+    </button>
+    <button aria-label="Profil" style="width: 48px; height: 48px; border: none; border-radius: 24px; background: transparent; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b8c4e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+    </button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

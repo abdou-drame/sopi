@@ -177,11 +177,14 @@ void main() {
       await lancer(tester, serveur);
       await tester.enterText(find.byType(TextField).first, 'awa@exemple.sn');
       await tester.enterText(find.byType(TextField).last, 'secret');
+      await tester.ensureVisible(find.text('Se connecter'));
+      await tester.pump();
       await tester.tap(find.text('Se connecter'));
       await tester.pumpAndSettle();
       expect(chemin(tester), Chemins.compteRestreint);
-      expect(find.text('Votre compte est suspendu.'), findsOneWidget);
-      expect(find.text('Motif : Retards répétés'), findsOneWidget);
+      expect(find.textContaining('suspendu'), findsOneWidget);
+      expect(find.text('Motif'), findsOneWidget);
+      expect(find.text('Retards répétés'), findsOneWidget);
     });
   });
 }

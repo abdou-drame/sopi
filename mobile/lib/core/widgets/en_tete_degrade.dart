@@ -34,9 +34,12 @@ class BoutonRetour extends StatelessWidget {
 
 /// Fond de l'en-tête : #eef4ff avec deux taches radiales (bleu clair et indigo clair).
 class FondDegrade extends StatelessWidget {
-  const FondDegrade({super.key, this.child});
+  const FondDegrade({super.key, this.child, this.tacheBasse = false});
 
   final Widget? child;
+
+  /// Troisième tache, bleu pastel en bas au centre (maquette Connexion).
+  final bool tacheBasse;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +70,86 @@ class FondDegrade extends StatelessWidget {
               ),
             ),
           ),
+          if (tacheBasse)
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(0.1, 1.0),
+                    radius: 0.7,
+                    colors: [CouleursSopi.bleuPastel, Color(0x00DBEAFE)],
+                  ),
+                ),
+              ),
+            ),
           ?child,
         ],
+      ),
+    );
+  }
+}
+
+/// Fait descendre son contenu depuis le haut de l'écran (450 ms). Ne joue qu'une fois ; sans animation
+/// (accessibilité), le contenu est affiché tout de suite.
+class DescenteDepuisLeHaut extends StatefulWidget {
+  const DescenteDepuisLeHaut({super.key, required this.child});
+
+  final Widget child;
+
+  static const duree = Duration(milliseconds: 450);
+
+  @override
+  State<DescenteDepuisLeHaut> createState() => _DescenteDepuisLeHautState();
+}
+
+class _DescenteDepuisLeHautState extends State<DescenteDepuisLeHaut>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controleur;
+  late final Animation<double> _descente;
+  bool _initialise = false;
+  bool _anime = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controleur = AnimationController(
+      vsync: this,
+      duration: DescenteDepuisLeHaut.duree,
+    );
+    _descente = CurvedAnimation(
+      parent: _controleur,
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialise) return;
+    _initialise = true;
+    _anime = animationsActives(context);
+    if (_anime) {
+      _controleur.forward();
+    } else {
+      _controleur.value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controleur.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_anime) return widget.child;
+    return AnimatedBuilder(
+      animation: _descente,
+      child: widget.child,
+      builder: (context, enfant) => FractionalTranslation(
+        translation: Offset(0, -(1 - _descente.value)),
+        child: enfant,
       ),
     );
   }

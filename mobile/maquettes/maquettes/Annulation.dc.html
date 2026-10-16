@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Annuler la réservation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #0f1b3d; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: radial-gradient(110% 60% at 92% 0%, rgba(29,78,216,0.55) 0%, rgba(29,78,216,0) 60%), #0f1b3d; opacity: 1"></div>
+
+  <div style="position: absolute; left: 12px; right: 12px; bottom: 12px; box-sizing: border-box; padding: 14px 20px 24px; border-radius: 36px; background: #ffffff">
+    <div style="width: 44px; height: 5px; border-radius: 3px; background: #d5ddf0; margin: 0 auto 18px"></div>
+    <div style="font-size: 22px; font-weight: 800; line-height: 28px">Annuler cette réservation ?</div>
+    <div style="margin-top: 4px; font-size: 14px; color: #64708f">Salon Fatou · Sam. 24 oct., 10h00</div>
+
+    <div style="margin-top: 18px; box-sizing: border-box; padding: 14px 16px; border-radius: 22px; background: #dbeafe; font-size: 13px; line-height: 19px; color: #1e3a8a">
+      Vous pouvez annuler jusqu'à 2 heures avant le rendez-vous. <b>L'acompte de 1 500 FCFA ne sera pas remboursé.</b> Il l'est seulement si c'est le prestataire qui annule.
+    </div>
+
+    <div style="margin-top: 16px; font-size: 13px; font-weight: 600; color: #4a5678">Motif (facultatif)</div>
+    <div style="margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="height: 36px; padding: 0 14px; border-radius: 18px; background: #0f1b3d; color: #ffffff; font-size: 13px; font-weight: 600; display: flex; align-items: center">Empêchement</span>
+      <span style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">Changement de date</span>
+      <span style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">Autre</span>
+    </div>
+
+    <div style="margin-top: 22px; display: flex; flex-direction: column; gap: 10px">
+      <button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Garder ma réservation</button>
+      <button style="height: 50px; border: 1px solid #d5ddf0; border-radius: 25px; background: #ffffff; color: #0f1b3d; font-size: 15px; font-weight: 600">Oui, annuler</button>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

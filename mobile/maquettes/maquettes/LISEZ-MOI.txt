@@ -1,0 +1,4 @@
+Maquettes mobiles Sopi (35 ecrans, 390 x 844).
+Chaque fichier .dc.html est un ecran. Les valeurs (position, taille, couleur, texte, rayon) sont dans le style de chaque element.
+Les donnees (noms, prix, notes) sont des exemples. Les logos Wave et Orange Money (images /_blob/...) ne sont pas inclus : les fichiers officiels sont a placer dans mobile/assets/.
+canvas.json donne le titre et l'ordre des ecrans.

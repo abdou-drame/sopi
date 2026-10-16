@@ -5,6 +5,8 @@ import 'erreurs.dart';
 import 'stockage_jeton.dart';
 
 const cheminConnexion = '/auth/connexion';
+const cheminInscription = '/auth/inscription';
+const cheminMotDePasseOublie = '/auth/mot-de-passe-oublie';
 
 /// Construit le client HTTP unique de l'application.
 ///

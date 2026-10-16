@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Connexion bloquée</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 360px; border-radius: 0 0 40px 40px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 30%, #c7d2fe 0%, rgba(199,210,254,0) 60%), radial-gradient(70% 60% at 55% 100%, #dbeafe 0%, rgba(219,234,254,0) 70%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 28px; top: 72px; display: flex; align-items: center; gap: 12px">
+    <div style="width: 52px; height: 52px; border-radius: 18px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800">S</div>
+    <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.5px">Sopi</div>
+  </div>
+
+  <div style="position: absolute; left: 28px; right: 28px; top: 176px; font-size: 32px; line-height: 38px; font-weight: 400">Heureux de<br><span style="font-weight: 800">vous revoir !</span></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 258px; box-sizing: border-box; padding: 12px 16px; border-radius: 20px; background: #fee2e2; color: #b91c1c; font-size: 13px; line-height: 18px; font-weight: 600">Trop de tentatives. Votre accès est bloqué 15 minutes. Réessayez dans 14:32.</div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 340px; box-sizing: border-box; padding: 22px 20px 24px; border-radius: 30px; background: #ffffff; border: 1px solid #e3e9f6; display: flex; flex-direction: column; gap: 14px">
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">
+      E-mail ou téléphone
+      <input type="text" value="aminata@exemple.sn" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">
+      Mot de passe
+      <input type="password" value="motdepasse" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #b91c1c; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label>
+    <div style="text-align: right; font-size: 13px; font-weight: 600; color: #1d4ed8">Mot de passe oublié ?</div>
+    <button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Se connecter</button>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; top: 636px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 14px; color: #4a5678">
+    Pas encore de compte ?<span style="font-weight: 700; color: #1d4ed8">Créer un compte</span>
+  </div>
+
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 28px; box-sizing: border-box; padding: 16px 18px; border-radius: 24px; background: #0f1b3d; color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+    <div>
+      <div style="font-size: 12px; opacity: 0.7">Vous êtes professionnel ?</div>
+      <div style="font-size: 15px; font-weight: 700">Devenir prestataire Sopi</div>
+    </div>
+    <button aria-label="Devenir prestataire" style="flex-shrink: 0; width: 44px; height: 44px; border: none; border-radius: 22px; background: #1d4ed8; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+    </button>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
