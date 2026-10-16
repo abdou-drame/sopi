@@ -171,3 +171,26 @@ describe('demande de réinitialisation', function () {
             ->postJson('/api/v1/auth/mot-de-passe-oublie', ['email' => 'cible@exemple.test'])->assertStatus(429);
     });
 });
+
+describe('confidentialité du jeton', function () {
+    it('n\'expose jamais le jeton dans l\'écran des notifications en échec ni dans l\'API', function () {
+        configurerSmtp(['mail.mailers.smtp.host' => null]);
+        User::factory()->create(['email' => 'awa@exemple.test']);
+        $admin = User::factory()->administrateur()->create();
+
+        demanderReinitialisation('awa@exemple.test')->assertOk();
+
+        $notification = Notification::sole();
+        $lien = $notification->secret();
+        $jeton = basename($lien);
+        expect($lien)->toContain('/reinitialiser-mot-de-passe/')->and($jeton)->toMatch('/^[a-f0-9]{64}$/')
+            ->and($notification->secret_chiffre)->not->toContain($jeton)
+            ->and($notification->corps.$notification->titre.$notification->dernier_echec_message)->not->toContain($jeton);
+
+        $this->actingAs($admin, 'sanctum');
+        $liste = $this->getJson('/api/v1/admin/notifications-en-echec')->assertOk();
+        $detail = $this->getJson('/api/v1/admin/notifications-en-echec/'.$notification->id);
+        expect($liste->getContent())->not->toContain($jeton)->not->toContain('reinitialiser-mot-de-passe')->not->toContain('secret')
+            ->and($detail->getContent())->not->toContain($jeton)->not->toContain('reinitialiser-mot-de-passe')->not->toContain('secret');
+    });
+});

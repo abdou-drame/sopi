@@ -44,6 +44,9 @@ tags:
     name: Appareils
     description: "\nAppareils recevant les notifications push (jeton FCM). Client et prestataire uniquement. Le jeton n'est jamais renvoyé."
   -
+    name: Authentification
+    description: ''
+  -
     name: "Client — agenda d'un prestataire"
     description: "\nRoutes réservées aux clients (jeton Sanctum + rôle `client`). Seuls les prestataires dont le compte est actif sont visibles."
   -
@@ -2706,6 +2709,8 @@ paths:
               - litige_cloture
               - sanction_posee
               - sanction_levee
+              - reinitialisation_mot_de_passe
+              - mot_de_passe_modifie
             nullable: true
         -
           in: query
@@ -6195,6 +6200,153 @@ paths:
         required: true
         schema:
           type: string
+  /api/v1/auth/mot-de-passe-oublie:
+    post:
+      summary: 'Mot de passe oublié'
+      operationId: motDePasseOubli
+      description: "Envoie un lien de réinitialisation (valable 60 minutes, usage unique) à l'adresse e-mail d'un compte actif. La réponse est\ntoujours la même, que l'adresse corresponde à un compte ou non (compte inconnu, sans e-mail, suspendu, banni, en attente,\nrefusé ou administrateur : aucun e-mail n'est envoyé). Limité par adresse IP et par adresse e-mail."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "Si un compte correspond à cette adresse, un lien de réinitialisation vient d'être envoyé."
+                properties:
+                  message:
+                    type: string
+                    example: "Si un compte correspond à cette adresse, un lien de réinitialisation vient d'être envoyé."
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: "L'adresse e-mail n'est pas valide."
+                  errors:
+                    email:
+                      - "L'adresse e-mail n'est pas valide."
+                properties:
+                  message:
+                    type: string
+                    example: "L'adresse e-mail n'est pas valide."
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        example:
+                          - "L'adresse e-mail n'est pas valide."
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: 'Adresse e-mail du compte. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: awa@example.com
+              required:
+                - email
+      security: []
+  /api/v1/auth/reinitialiser-mot-de-passe:
+    post:
+      summary: 'Réinitialiser le mot de passe'
+      operationId: rinitialiserLeMotDePasse
+      description: "Choisit un nouveau mot de passe avec le jeton du lien reçu par e-mail (valable 60 minutes, usage unique). Tous les appareils\ndu compte sont déconnectés et un e-mail de confirmation est envoyé."
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Votre mot de passe a été modifié. Vous pouvez vous reconnecter.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Votre mot de passe a été modifié. Vous pouvez vous reconnecter.'
+        422:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.'
+                  errors:
+                    jeton:
+                      - 'Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.'
+                  errors:
+                    type: object
+                    properties:
+                      jeton:
+                        type: array
+                        example:
+                          - 'Ce lien est invalide, expiré ou déjà utilisé. Faites une nouvelle demande de réinitialisation.'
+                        items:
+                          type: string
+        429:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Trop de tentatives. Réessayez dans quelques instants.'
+                properties:
+                  message:
+                    type: string
+                    example: 'Trop de tentatives. Réessayez dans quelques instants.'
+      tags:
+        - Authentification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                jeton:
+                  type: string
+                  description: 'Jeton contenu dans le lien reçu par e-mail. Le champ value ne doit pas dépasser 200 caractères.'
+                  example: jeton-recu-par-email
+                mot_de_passe:
+                  type: string
+                  description: 'Nouveau mot de passe (8 caractères minimum). Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: nouveau-mot-de-passe
+              required:
+                - jeton
+                - mot_de_passe
+      security: []
   '/api/v1/prestataires/{id}/agenda':
     get:
       summary: "Créneaux disponibles d'un prestataire"
@@ -8736,7 +8888,7 @@ paths:
                   app: Sopi
                   version: 0.0.0-dev
                   database: erreur
-                  time: '2026-10-15T19:52:38+00:00'
+                  time: '2026-10-16T12:59:44+00:00'
                 properties:
                   status:
                     type: string
@@ -8752,7 +8904,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-15T19:52:38+00:00'
+                    example: '2026-10-16T12:59:44+00:00'
       tags:
         - Endpoints
       security: []
@@ -8815,16 +8967,16 @@ paths:
             schema:
               type: object
               properties:
-                telephone:
+                identifiant:
                   type: string
-                  description: 'Le champ value ne doit pas dépasser 30 caractères.'
-                  example: vmqeopfuudtdsufvyvddq
+                  description: 'Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: awa@example.com
                 password:
                   type: string
-                  description: 'Le champ value ne doit pas dépasser 255 caractères.'
-                  example: OP>@;4
+                  description: 'Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères.'
+                  example: MotDePasse123
               required:
-                - telephone
+                - identifiant
                 - password
       security: []
   /api/v1/auth/deconnexion:

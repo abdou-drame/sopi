@@ -255,6 +255,19 @@
                             </li>
                                                                         </ul>
                             </ul>
+                    <ul id="tocify-header-authentification" class="tocify-header">
+                <li class="tocify-item level-1" data-unique="authentification">
+                    <a href="#authentification">Authentification</a>
+                </li>
+                                    <ul id="tocify-subheader-authentification" class="tocify-subheader">
+                                                    <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-mot-de-passe-oublie">
+                                <a href="#authentification-POSTapi-v1-auth-mot-de-passe-oublie">Mot de passe oublié</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="authentification-POSTapi-v1-auth-reinitialiser-mot-de-passe">
+                                <a href="#authentification-POSTapi-v1-auth-reinitialiser-mot-de-passe">Réinitialiser le mot de passe</a>
+                            </li>
+                                                                        </ul>
+                            </ul>
                     <ul id="tocify-header-client-agenda-dun-prestataire" class="tocify-header">
                 <li class="tocify-item level-1" data-unique="client-agenda-dun-prestataire">
                     <a href="#client-agenda-dun-prestataire">Client — agenda d'un prestataire</a>
@@ -587,7 +600,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: October 15, 2026</li>
+        <li>Last updated: October 16, 2026</li>
     </ul>
 </div>
 
@@ -4332,7 +4345,7 @@ Must be one of:
     <br>
 <p>Type de notification, par exemple reservation_confirmee. Example: <code>reservation_confirmee</code></p>
 Must be one of:
-<ul style="list-style-type: square;"><li><code>dossier_depose</code></li> <li><code>demande_acceptee</code></li> <li><code>demande_refusee</code></li> <li><code>reservation_nouvelle_demande</code></li> <li><code>reservation_acceptee</code></li> <li><code>reservation_refusee</code></li> <li><code>reservation_expiree</code></li> <li><code>reservation_annulee</code></li> <li><code>reservation_confirmee</code></li> <li><code>reservation_demarree</code></li> <li><code>reservation_terminee</code></li> <li><code>avis_recu</code></li> <li><code>avis_modere</code></li> <li><code>litige_ouvert</code></li> <li><code>litige_cloture</code></li> <li><code>sanction_posee</code></li> <li><code>sanction_levee</code></li></ul>
+<ul style="list-style-type: square;"><li><code>dossier_depose</code></li> <li><code>demande_acceptee</code></li> <li><code>demande_refusee</code></li> <li><code>reservation_nouvelle_demande</code></li> <li><code>reservation_acceptee</code></li> <li><code>reservation_refusee</code></li> <li><code>reservation_expiree</code></li> <li><code>reservation_annulee</code></li> <li><code>reservation_confirmee</code></li> <li><code>reservation_demarree</code></li> <li><code>reservation_terminee</code></li> <li><code>avis_recu</code></li> <li><code>avis_modere</code></li> <li><code>litige_ouvert</code></li> <li><code>litige_cloture</code></li> <li><code>sanction_posee</code></li> <li><code>sanction_levee</code></li> <li><code>reinitialisation_mot_de_passe</code></li> <li><code>mot_de_passe_modifie</code></li></ul>
             </div>
                                     <div style="padding-left: 28px; clear: unset;">
                 <b style="line-height: 2;"><code>ancienneteMinutes</code></b>&nbsp;&nbsp;
@@ -8513,6 +8526,355 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                     </form>
 
+                <h1 id="authentification">Authentification</h1>
+
+    
+
+                                <h2 id="authentification-POSTapi-v1-auth-mot-de-passe-oublie">Mot de passe oublié</h2>
+
+<p>
+</p>
+
+<p>Envoie un lien de réinitialisation (valable 60 minutes, usage unique) à l'adresse e-mail d'un compte actif. La réponse est
+toujours la même, que l'adresse corresponde à un compte ou non (compte inconnu, sans e-mail, suspendu, banni, en attente,
+refusé ou administrateur : aucun e-mail n'est envoyé). Limité par adresse IP et par adresse e-mail.</p>
+
+<span id="example-requests-POSTapi-v1-auth-mot-de-passe-oublie">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/auth/mot-de-passe-oublie" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"email\": \"awa@example.com\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/auth/mot-de-passe-oublie"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "email": "awa@example.com"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-auth-mot-de-passe-oublie">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Si un compte correspond &agrave; cette adresse, un lien de r&eacute;initialisation vient d&#039;&ecirc;tre envoy&eacute;.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;L&#039;adresse e-mail n&#039;est pas valide.&quot;,
+    &quot;errors&quot;: {
+        &quot;email&quot;: [
+            &quot;L&#039;adresse e-mail n&#039;est pas valide.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-auth-mot-de-passe-oublie" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-auth-mot-de-passe-oublie"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-auth-mot-de-passe-oublie"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-auth-mot-de-passe-oublie" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-auth-mot-de-passe-oublie">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-auth-mot-de-passe-oublie" data-method="POST"
+      data-path="api/v1/auth/mot-de-passe-oublie"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-auth-mot-de-passe-oublie', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-auth-mot-de-passe-oublie"
+                    onclick="tryItOut('POSTapi-v1-auth-mot-de-passe-oublie');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-auth-mot-de-passe-oublie"
+                    onclick="cancelTryOut('POSTapi-v1-auth-mot-de-passe-oublie');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-auth-mot-de-passe-oublie"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/auth/mot-de-passe-oublie</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-auth-mot-de-passe-oublie"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-auth-mot-de-passe-oublie"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>email</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="email"                data-endpoint="POSTapi-v1-auth-mot-de-passe-oublie"
+               value="awa@example.com"
+               data-component="body">
+    <br>
+<p>Adresse e-mail du compte. Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères. Example: <code>awa@example.com</code></p>
+        </div>
+        </form>
+
+                    <h2 id="authentification-POSTapi-v1-auth-reinitialiser-mot-de-passe">Réinitialiser le mot de passe</h2>
+
+<p>
+</p>
+
+<p>Choisit un nouveau mot de passe avec le jeton du lien reçu par e-mail (valable 60 minutes, usage unique). Tous les appareils
+du compte sont déconnectés et un e-mail de confirmation est envoyé.</p>
+
+<span id="example-requests-POSTapi-v1-auth-reinitialiser-mot-de-passe">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost:8000/api/v1/auth/reinitialiser-mot-de-passe" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"jeton\": \"jeton-recu-par-email\",
+    \"mot_de_passe\": \"nouveau-mot-de-passe\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost:8000/api/v1/auth/reinitialiser-mot-de-passe"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "jeton": "jeton-recu-par-email",
+    "mot_de_passe": "nouveau-mot-de-passe"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-v1-auth-reinitialiser-mot-de-passe">
+            <blockquote>
+            <p>Example response (200):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Votre mot de passe a &eacute;t&eacute; modifi&eacute;. Vous pouvez vous reconnecter.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Ce lien est invalide, expir&eacute; ou d&eacute;j&agrave; utilis&eacute;. Faites une nouvelle demande de r&eacute;initialisation.&quot;,
+    &quot;errors&quot;: {
+        &quot;jeton&quot;: [
+            &quot;Ce lien est invalide, expir&eacute; ou d&eacute;j&agrave; utilis&eacute;. Faites une nouvelle demande de r&eacute;initialisation.&quot;
+        ]
+    }
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (429):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Trop de tentatives. R&eacute;essayez dans quelques instants.&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-POSTapi-v1-auth-reinitialiser-mot-de-passe" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-v1-auth-reinitialiser-mot-de-passe"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-v1-auth-reinitialiser-mot-de-passe"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-v1-auth-reinitialiser-mot-de-passe" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-v1-auth-reinitialiser-mot-de-passe">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-v1-auth-reinitialiser-mot-de-passe" data-method="POST"
+      data-path="api/v1/auth/reinitialiser-mot-de-passe"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-auth-reinitialiser-mot-de-passe', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-v1-auth-reinitialiser-mot-de-passe"
+                    onclick="tryItOut('POSTapi-v1-auth-reinitialiser-mot-de-passe');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-v1-auth-reinitialiser-mot-de-passe"
+                    onclick="cancelTryOut('POSTapi-v1-auth-reinitialiser-mot-de-passe');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-v1-auth-reinitialiser-mot-de-passe"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/v1/auth/reinitialiser-mot-de-passe</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-v1-auth-reinitialiser-mot-de-passe"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-v1-auth-reinitialiser-mot-de-passe"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>jeton</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="jeton"                data-endpoint="POSTapi-v1-auth-reinitialiser-mot-de-passe"
+               value="jeton-recu-par-email"
+               data-component="body">
+    <br>
+<p>Jeton contenu dans le lien reçu par e-mail. Le champ value ne doit pas dépasser 200 caractères. Example: <code>jeton-recu-par-email</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>mot_de_passe</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="mot_de_passe"                data-endpoint="POSTapi-v1-auth-reinitialiser-mot-de-passe"
+               value="nouveau-mot-de-passe"
+               data-component="body">
+    <br>
+<p>Nouveau mot de passe (8 caractères minimum). Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères. Example: <code>nouveau-mot-de-passe</code></p>
+        </div>
+        </form>
+
                 <h1 id="client-agenda-dun-prestataire">Client — agenda d'un prestataire</h1>
 
     <p>Routes réservées aux clients (jeton Sanctum + rôle <code>client</code>). Seuls les prestataires dont le compte est actif sont visibles.</p>
@@ -12274,7 +12636,7 @@ access-control-allow-origin: http://localhost:5173
     &quot;app&quot;: &quot;Sopi&quot;,
     &quot;version&quot;: &quot;0.0.0-dev&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-15T19:52:38+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-16T12:59:44+00:00&quot;
 }</code>
  </pre>
     </span>
@@ -12556,8 +12918,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Content-Type: application/json" \
     --header "Accept: application/json" \
     --data "{
-    \"telephone\": \"vmqeopfuudtdsufvyvddq\",
-    \"password\": \"OP&gt;@;4\"
+    \"identifiant\": \"awa@example.com\",
+    \"password\": \"MotDePasse123\"
 }"
 </code></pre></div>
 
@@ -12573,8 +12935,8 @@ const headers = {
 };
 
 let body = {
-    "telephone": "vmqeopfuudtdsufvyvddq",
-    "password": "OP&gt;@;4"
+    "identifiant": "awa@example.com",
+    "password": "MotDePasse123"
 };
 
 fetch(url, {
@@ -12660,16 +13022,16 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                                 <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
         <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>telephone</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>identifiant</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="telephone"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="vmqeopfuudtdsufvyvddq"
+                              name="identifiant"                data-endpoint="POSTapi-v1-auth-connexion"
+               value="awa@example.com"
                data-component="body">
     <br>
-<p>Le champ value ne doit pas dépasser 30 caractères. Example: <code>vmqeopfuudtdsufvyvddq</code></p>
+<p>Adresse e-mail ou numéro de téléphone mobile sénégalais. Le champ « telephone » reste accepté à la place. Le champ value ne doit pas dépasser 255 caractères. Example: <code>awa@example.com</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>password</code></b>&nbsp;&nbsp;
@@ -12678,10 +13040,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="password"                data-endpoint="POSTapi-v1-auth-connexion"
-               value="OP>@;4"
+               value="MotDePasse123"
                data-component="body">
     <br>
-<p>Le champ value ne doit pas dépasser 255 caractères. Example: <code>OP&gt;@;4</code></p>
+<p>Mot de passe du compte. Le champ value ne doit pas dépasser 255 caractères. Example: <code>MotDePasse123</code></p>
         </div>
         </form>
 
