@@ -28,13 +28,6 @@ import 'reservations_controleur.dart';
 /// Délai entre deux relectures automatiques tant que la réservation attend une réponse ou un paiement.
 const intervalleActualisationDetail = Duration(seconds: 30);
 
-/// Une réservation du client, relue à la demande (tirer pour actualiser, retour d'un écran…).
-final detailReservationProvider = FutureProvider.autoDispose
-    .family<ReservationClient, String>(
-      retry: sansRelance,
-      (ref, id) => ref.watch(depotReservationProvider).reservation(id),
-    );
-
 /// Détail d'une réservation (maquettes DetailReservation, DetailEnAttente, DetailAPayer) :
 /// la présentation dépend du statut renvoyé par l'API.
 class DetailReservationPage extends ConsumerStatefulWidget {

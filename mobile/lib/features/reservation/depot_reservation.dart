@@ -270,3 +270,10 @@ final acomptePrestationProvider =
           .watch(depotReservationProvider)
           .acomptePrestation(cle.prestataireId, cle.prestationId),
     );
+
+/// Une réservation du client, relue à la demande (tirer pour actualiser, retour d'un écran…).
+final detailReservationProvider = FutureProvider.autoDispose
+    .family<ReservationClient, String>(
+      retry: sansRelance,
+      (ref, id) => ref.watch(depotReservationProvider).reservation(id),
+    );
