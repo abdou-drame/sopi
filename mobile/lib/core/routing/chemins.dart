@@ -35,6 +35,9 @@ abstract final class Chemins {
   static String annulation(String id) => '/reservations/$id/annulation';
   static String avis(String id) => '/reservations/$id/avis';
   static String litige(String id) => '/reservations/$id/litige';
+  static const signalements = '/profil/signalements';
+  static String signalement(String id) => '/signalements/$id';
+  static const aide = '/profil/aide';
   static const profilModifier = '/profil/modifier';
   static const motDePasseChanger = '/profil/mot-de-passe';
 

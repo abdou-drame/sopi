@@ -8,6 +8,8 @@ import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
+import '../../features/compte/litige_page.dart';
+import '../../features/compte/signalements_pages.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
@@ -212,10 +214,19 @@ GoRouter creerRouteur({
         builder: (context, state) =>
             AvisPage(reservationId: state.pathParameters['id']!),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id/litige',
-        'Litige',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id/litige',
+        builder: (context, state) =>
+            LitigePage(reservationId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Chemins.signalements,
+        builder: (context, state) => const MesSignalementsPage(),
+      ),
+      GoRoute(
+        path: '/signalements/:id',
+        builder: (context, state) =>
+            DetailSignalementPage(litigeId: state.pathParameters['id']!),
       ),
       _provisoire(Chemins.retourPaiement, 'Retour de paiement'),
       _provisoire(Chemins.profilModifier, 'Modifier le profil'),
