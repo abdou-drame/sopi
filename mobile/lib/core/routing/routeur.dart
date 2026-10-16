@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/accueil/accueil_page.dart';
 import '../../features/auth/connexion_page.dart';
+import '../../features/auth/inscription_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
@@ -113,7 +114,10 @@ GoRouter creerRouteur({
         path: Chemins.connexion,
         builder: (_, _) => const ConnexionPage(),
       ),
-      _provisoire(Chemins.inscription, 'Inscription'),
+      GoRoute(
+        path: Chemins.inscription,
+        builder: (_, _) => const InscriptionPage(),
+      ),
       _provisoire(Chemins.motDePasseOublie, 'Mot de passe oublié'),
       _provisoire(Chemins.reinitialisation, 'Réinitialisation du mot de passe'),
       _provisoire(Chemins.inscriptionPrestataire, 'Inscription prestataire'),
