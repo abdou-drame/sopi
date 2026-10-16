@@ -8266,7 +8266,8 @@ fetch(url, {
                 <pre>
 
 <code class="language-json" style="max-height: 300px;">{
-    &quot;message&quot;: &quot;Votre compte n&#039;est pas actif : les notifications ne peuvent pas &ecirc;tre activ&eacute;es.&quot;
+    &quot;message&quot;: &quot;Votre compte n&#039;est pas actif : les notifications ne peuvent pas &ecirc;tre activ&eacute;es.&quot;,
+    &quot;statutCompte&quot;: &quot;suspendu&quot;
 }</code>
  </pre>
             <blockquote>
@@ -8553,7 +8554,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 
 <p>Authentifie un compte actif. Un compte non actif reçoit 403 avec <code>message</code> et, quand elles existent, des informations
 structurées : <code>motif</code> (sanction active, ou motif du refus d'inscription) et <code>finSuspension</code> (ISO 8601, suspension temporaire
-seulement). Ces champs sont absents sinon.</p>
+seulement). Le champ <code>statutCompte</code> (<code>en_attente</code>, <code>refuse</code>, <code>suspendu</code> ou <code>banni</code>) accompagne toujours ce 403. Les autres champs sont absents sinon.</p>
 
 <span id="example-requests-POSTapi-v1-auth-connexion">
 <blockquote>Example request:</blockquote>
@@ -8625,6 +8626,7 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Votre compte est suspendu jusqu&#039;au 10/03/2030 &agrave; 14:30. Motif : Retards r&eacute;p&eacute;t&eacute;s.&quot;,
+    &quot;statutCompte&quot;: &quot;suspendu&quot;,
     &quot;motif&quot;: &quot;Retards r&eacute;p&eacute;t&eacute;s.&quot;,
     &quot;finSuspension&quot;: &quot;2030-03-10T14:30:00+00:00&quot;
 }</code>
@@ -8636,7 +8638,18 @@ fetch(url, {
 
 <code class="language-json" style="max-height: 300px;">{
     &quot;message&quot;: &quot;Votre demande d&#039;inscription a &eacute;t&eacute; refus&eacute;e.&quot;,
+    &quot;statutCompte&quot;: &quot;refuse&quot;,
     &quot;motif&quot;: &quot;Pi&egrave;ces illisibles.&quot;
+}</code>
+ </pre>
+            <blockquote>
+            <p>Example response (403, En attente de validation):</p>
+        </blockquote>
+                <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;message&quot;: &quot;Votre compte est en attente de validation.&quot;,
+    &quot;statutCompte&quot;: &quot;en_attente&quot;
 }</code>
  </pre>
     </span>
@@ -11806,7 +11819,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </p>
 
 <p>Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : <code>statut</code> et <code>groupe</code> (onglets <code>a_venir</code>, <code>terminees</code>, <code>annulees</code>, qui imposent leur propre ordre). Le <code>codeReservation</code> n'existe
-qu'après le paiement (<code>null</code> avant) et n'est jamais visible que de son client. <code>peutAnnuler</code> applique les règles
+qu'après le paiement (<code>null</code> avant) et n'est jamais visible que de son client. <code>peutAnnuler</code> applique les règles <code>paiementAvant</code> (ISO 8601) est la date limite pour payer l'acompte (acceptation + délai de paiement), non nulle seulement pour une réservation acceptée non payée ; <code>reponseAvant</code> est la date limite de réponse du prestataire (création + délai de réponse), non nulle seulement pour une réservation en attente.
 de l'annulation.</p>
 
 <span id="example-requests-GETapi-v1-reservations">
@@ -11862,6 +11875,8 @@ fetch(url, {
             &quot;motifRefus&quot;: null,
             &quot;codeReservation&quot;: null,
             &quot;peutAnnuler&quot;: true,
+            &quot;paiementAvant&quot;: null,
+            &quot;reponseAvant&quot;: &quot;2030-01-16T02:50:00+00:00&quot;,
             &quot;creneau&quot;: {
                 &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
                 &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
@@ -12094,6 +12109,8 @@ fetch(url, {
     &quot;motifRefus&quot;: null,
     &quot;codeReservation&quot;: null,
     &quot;peutAnnuler&quot;: true,
+    &quot;paiementAvant&quot;: null,
+    &quot;reponseAvant&quot;: &quot;2030-01-16T02:50:00+00:00&quot;,
     &quot;creneau&quot;: {
         &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
         &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
@@ -12292,6 +12309,8 @@ fetch(url, {
     &quot;motifRefus&quot;: null,
     &quot;codeReservation&quot;: null,
     &quot;peutAnnuler&quot;: false,
+    &quot;paiementAvant&quot;: null,
+    &quot;reponseAvant&quot;: null,
     &quot;creneau&quot;: {
         &quot;id&quot;: &quot;0198a1b2-0000-7000-8000-000000000040&quot;,
         &quot;dateDebut&quot;: &quot;2030-01-16T09:00:00+00:00&quot;,
@@ -12894,9 +12913,9 @@ access-control-allow-origin: http://localhost:5173
 <code class="language-json" style="max-height: 300px;">{
     &quot;status&quot;: &quot;ok&quot;,
     &quot;app&quot;: &quot;Sopi&quot;,
-    &quot;version&quot;: &quot;0.0.0-dev&quot;,
+    &quot;version&quot;: &quot;0.1.0&quot;,
     &quot;database&quot;: &quot;erreur&quot;,
-    &quot;time&quot;: &quot;2026-10-16T14:57:24+00:00&quot;
+    &quot;time&quot;: &quot;2026-10-16T21:20:25+00:00&quot;
 }</code>
  </pre>
     </span>
