@@ -9,6 +9,7 @@ import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/reservation/accueil_client_page.dart';
+import '../../features/reservation/avis_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
 import '../../features/reservation/choix_creneau_page.dart';
 import '../../features/reservation/demande_envoyee_page.dart';
@@ -206,10 +207,10 @@ GoRouter creerRouteur({
         'Annulation',
         parametres: ['id'],
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id/avis',
-        'Avis',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.reservations}/:id/avis',
+        builder: (context, state) =>
+            AvisPage(reservationId: state.pathParameters['id']!),
       ),
       _provisoire(
         '${Chemins.reservations}/:id/litige',

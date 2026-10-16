@@ -206,6 +206,18 @@ class DepotReservation {
     return ReservationClient.depuisJson(j);
   }
 
+  /// Publie l'avis du client sur une réservation terminée (POST /reservations/{id}/avis).
+  Future<void> publierAvis(
+    String id, {
+    required int note,
+    String? commentaire,
+  }) async {
+    await _dio.post<Object?>(
+      '/reservations/$id/avis',
+      data: {'note': note, 'commentaire': ?commentaire},
+    );
+  }
+
   /// POST /reservations/{id}/annuler (sans corps).
   Future<void> annuler(String id) async {
     await _dio.post<Object?>('/reservations/$id/annuler');
