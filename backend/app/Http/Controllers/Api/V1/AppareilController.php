@@ -29,14 +29,14 @@ class AppareilController extends Controller
      * @bodyParam plateforme string required android ou ios. Example: android
      *
      * @response 200 {"message":"Appareil enregistré."}
-     * @response 403 {"message":"Votre compte n'est pas actif : les notifications ne peuvent pas être activées."}
+     * @response 403 {"message":"Votre compte n'est pas actif : les notifications ne peuvent pas être activées.","statutCompte":"suspendu"}
      * @response 422 {"message":"La plateforme doit être android ou ios.","errors":{"plateforme":["La plateforme doit être android ou ios."]}}
      */
     public function enregistrer(EnregistrerAppareilRequest $request, AppareilService $appareils): JsonResponse
     {
         $utilisateur = $request->user();
         if ($utilisateur->statut !== StatutCompte::Actif) {
-            return response()->json(['message' => 'Votre compte n\'est pas actif : les notifications ne peuvent pas être activées.'], 403);
+            return response()->json(['message' => 'Votre compte n\'est pas actif : les notifications ne peuvent pas être activées.', 'statutCompte' => $utilisateur->statut->value], 403);
         }
 
         $appareils->enregistrer($utilisateur, $request->validated('jeton'), PlateformeAppareil::from($request->validated('plateforme')));

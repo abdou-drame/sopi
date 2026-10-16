@@ -103,6 +103,16 @@ class ReponseReservationService
             ?? throw new ReservationImpossibleException('Réservation introuvable.', Response::HTTP_NOT_FOUND);
     }
 
+    /** Date limite (UTC) de réponse du prestataire : création + délai de réponse. Null si la réservation n'est plus EN_ATTENTE. */
+    public static function echeanceReponse(Reservation $reservation): ?CarbonInterface
+    {
+        if ($reservation->statut !== StatutReservation::EnAttente) {
+            return null;
+        }
+
+        return $reservation->created_at->copy()->utc()->addHours((int) config('sopi.reservations.delai_reponse_heures'));
+    }
+
     /** Une demande créée avant cet instant a dépassé le délai de réponse. */
     private function limiteReponse(): CarbonInterface
     {

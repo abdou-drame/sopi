@@ -67,7 +67,7 @@ endpoints:
       -
         custom: []
         status: 403
-        content: '{"message":"Votre compte n''est pas actif : les notifications ne peuvent pas être activées."}'
+        content: '{"message":"Votre compte n''est pas actif : les notifications ne peuvent pas être activées.","statutCompte":"suspendu"}'
         headers: []
         description: ''
       -

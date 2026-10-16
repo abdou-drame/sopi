@@ -6125,10 +6125,14 @@ paths:
                 type: object
                 example:
                   message: "Votre compte n'est pas actif : les notifications ne peuvent pas être activées."
+                  statutCompte: suspendu
                 properties:
                   message:
                     type: string
                     example: "Votre compte n'est pas actif : les notifications ne peuvent pas être activées."
+                  statutCompte:
+                    type: string
+                    example: suspendu
         422:
           description: ''
           content:
@@ -6207,7 +6211,7 @@ paths:
     post:
       summary: Connexion
       operationId: connexion
-      description: "Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations\nstructurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire\nseulement). Ces champs sont absents sinon."
+      description: "Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations\nstructurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire\nseulement). Le champ `statutCompte` (`en_attente`, `refuse`, `suspendu` ou `banni`) accompagne toujours ce 403. Les autres champs sont absents sinon."
       parameters: []
       responses:
         200:
@@ -6261,12 +6265,16 @@ paths:
                     type: object
                     example:
                       message: "Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés."
+                      statutCompte: suspendu
                       motif: 'Retards répétés.'
                       finSuspension: '2030-03-10T14:30:00+00:00'
                     properties:
                       message:
                         type: string
                         example: "Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés."
+                      statutCompte:
+                        type: string
+                        example: suspendu
                       motif:
                         type: string
                         example: 'Retards répétés.'
@@ -6278,14 +6286,31 @@ paths:
                     type: object
                     example:
                       message: "Votre demande d'inscription a été refusée."
+                      statutCompte: refuse
                       motif: 'Pièces illisibles.'
                     properties:
                       message:
                         type: string
                         example: "Votre demande d'inscription a été refusée."
+                      statutCompte:
+                        type: string
+                        example: refuse
                       motif:
                         type: string
                         example: 'Pièces illisibles.'
+                  -
+                    description: 'En attente de validation'
+                    type: object
+                    example:
+                      message: 'Votre compte est en attente de validation.'
+                      statutCompte: en_attente
+                    properties:
+                      message:
+                        type: string
+                        example: 'Votre compte est en attente de validation.'
+                      statutCompte:
+                        type: string
+                        example: en_attente
       tags:
         - Authentification
       requestBody:
@@ -8298,7 +8323,7 @@ paths:
     get:
       summary: 'Mes réservations'
       operationId: mesRservations
-      description: "Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe\nqu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles\nde l'annulation."
+      description: "Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe\nqu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles `paiementAvant` (ISO 8601) est la date limite pour payer l'acompte (acceptation + délai de paiement), non nulle seulement pour une réservation acceptée non payée ; `reponseAvant` est la date limite de réponse du prestataire (création + délai de réponse), non nulle seulement pour une réservation en attente.\nde l'annulation."
       parameters:
         -
           in: query
@@ -8350,6 +8375,8 @@ paths:
                       motifRefus: null
                       codeReservation: null
                       peutAnnuler: true
+                      paiementAvant: null
+                      reponseAvant: '2030-01-16T02:50:00+00:00'
                       creneau:
                         id: 0198a1b2-0000-7000-8000-000000000040
                         dateDebut: '2030-01-16T09:00:00+00:00'
@@ -8385,6 +8412,8 @@ paths:
                         motifRefus: null
                         codeReservation: null
                         peutAnnuler: true
+                        paiementAvant: null
+                        reponseAvant: '2030-01-16T02:50:00+00:00'
                         creneau:
                           id: 0198a1b2-0000-7000-8000-000000000040
                           dateDebut: '2030-01-16T09:00:00+00:00'
@@ -8422,6 +8451,13 @@ paths:
                         peutAnnuler:
                           type: boolean
                           example: true
+                        paiementAvant:
+                          type: string
+                          example: null
+                          nullable: true
+                        reponseAvant:
+                          type: string
+                          example: '2030-01-16T02:50:00+00:00'
                         creneau:
                           type: object
                           properties:
@@ -8566,6 +8602,8 @@ paths:
                   motifRefus: null
                   codeReservation: null
                   peutAnnuler: true
+                  paiementAvant: null
+                  reponseAvant: '2030-01-16T02:50:00+00:00'
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -8601,6 +8639,13 @@ paths:
                   peutAnnuler:
                     type: boolean
                     example: true
+                  paiementAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  reponseAvant:
+                    type: string
+                    example: '2030-01-16T02:50:00+00:00'
                   creneau:
                     type: object
                     properties:
@@ -8710,6 +8755,8 @@ paths:
                   motifRefus: null
                   codeReservation: null
                   peutAnnuler: false
+                  paiementAvant: null
+                  reponseAvant: null
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -8745,6 +8792,14 @@ paths:
                   peutAnnuler:
                     type: boolean
                     example: false
+                  paiementAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
                   creneau:
                     type: object
                     properties:
@@ -9032,9 +9087,9 @@ paths:
                 example:
                   status: ok
                   app: Sopi
-                  version: 0.0.0-dev
+                  version: 0.1.0
                   database: erreur
-                  time: '2026-10-16T14:57:24+00:00'
+                  time: '2026-10-16T21:20:25+00:00'
                 properties:
                   status:
                     type: string
@@ -9044,13 +9099,13 @@ paths:
                     example: Sopi
                   version:
                     type: string
-                    example: 0.0.0-dev
+                    example: 0.1.0
                   database:
                     type: string
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-16T14:57:24+00:00'
+                    example: '2026-10-16T21:20:25+00:00'
       tags:
         - Endpoints
       security: []

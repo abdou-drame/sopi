@@ -45,11 +45,38 @@ describe('POST /auth/connexion : refus structuré', function () {
             ->assertJsonMissingPath('finSuspension');
     });
 
-    it('n\'ajoute aucun champ pour un compte en attente de validation', function () {
+    it('n\'ajoute aucun motif pour un compte en attente de validation (seulement statutCompte)', function () {
         User::factory()->prestataire()->statut(StatutCompte::EnAttenteValidation)->create(['telephone' => '+221771234567', 'password' => 'motdepasse1']);
 
         $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'motdepasse1'])
             ->assertForbidden()
-            ->assertExactJson(['message' => 'Votre compte est en attente de validation.']);
+            ->assertExactJson(['message' => 'Votre compte est en attente de validation.', 'statutCompte' => 'en_attente']);
+    });
+
+    it('ajoute statutCompte (valeur de l\'énumération) pour chaque statut non actif', function (StatutCompte $statut) {
+        User::factory()->prestataire()->statut($statut)->create(['telephone' => '+221771234567', 'password' => 'motdepasse1']);
+
+        $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'motdepasse1'])
+            ->assertForbidden()
+            ->assertJsonPath('statutCompte', $statut->value);
+    })->with([StatutCompte::EnAttenteValidation, StatutCompte::Refuse, StatutCompte::Suspendu, StatutCompte::Banni]);
+
+    it('garde message, motif et finSuspension inchangés à côté de statutCompte', function () {
+        $fin = Carbon::parse('2030-03-10 14:30:00', 'UTC');
+        $user = User::factory()->prestataire()->statut(StatutCompte::Suspendu)->create(['telephone' => '+221771234567', 'password' => 'motdepasse1']);
+        Sanction::factory()->suspension($fin)->create(['user_id' => $user->id, 'motif' => 'Retards répétés.']);
+
+        $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'motdepasse1'])
+            ->assertForbidden()
+            ->assertJsonPath('statutCompte', 'suspendu')
+            ->assertJsonPath('motif', 'Retards répétés.')
+            ->assertJsonStructure(['message', 'statutCompte', 'motif', 'finSuspension']);
+    });
+
+    it('ne met pas statutCompte dans une connexion réussie', function () {
+        User::factory()->create(['telephone' => '+221771234567', 'password' => 'motdepasse1']);
+
+        $this->postJson('/api/v1/auth/connexion', ['telephone' => '771234567', 'password' => 'motdepasse1'])
+            ->assertOk()->assertJsonMissingPath('statutCompte');
     });
 });

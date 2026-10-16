@@ -16,7 +16,7 @@ endpoints:
       description: |-
         Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations
         structurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire
-        seulement). Ces champs sont absents sinon.
+        seulement). Le champ `statutCompte` (`en_attente`, `refuse`, `suspendu` ou `banni`) accompagne toujours ce 403. Les autres champs sont absents sinon.
       authenticated: false
       deprecated: false
     headers:
@@ -69,15 +69,21 @@ endpoints:
       -
         custom: []
         status: 403
-        content: '{"message":"Votre compte est suspendu jusqu''au 10/03/2030 à 14:30. Motif : Retards répétés.","motif":"Retards répétés.","finSuspension":"2030-03-10T14:30:00+00:00"}'
+        content: '{"message":"Votre compte est suspendu jusqu''au 10/03/2030 à 14:30. Motif : Retards répétés.","statutCompte":"suspendu","motif":"Retards répétés.","finSuspension":"2030-03-10T14:30:00+00:00"}'
         headers: []
         description: 'Compte suspendu'
       -
         custom: []
         status: 403
-        content: '{"message":"Votre demande d''inscription a été refusée.","motif":"Pièces illisibles."}'
+        content: '{"message":"Votre demande d''inscription a été refusée.","statutCompte":"refuse","motif":"Pièces illisibles."}'
         headers: []
         description: 'Inscription refusée'
+      -
+        custom: []
+        status: 403
+        content: '{"message":"Votre compte est en attente de validation.","statutCompte":"en_attente"}'
+        headers: []
+        description: 'En attente de validation'
     responseFields: []
     auth: []
     controller: null

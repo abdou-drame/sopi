@@ -6,6 +6,7 @@ use App\Enums\StatutReservation;
 use App\Models\Prestataire;
 use App\Models\Reservation;
 use App\Services\PaiementReservationService;
+use App\Services\ReponseReservationService;
 use App\Services\SuiviReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -53,6 +54,8 @@ class ReservationClientResource extends JsonResource
             'codeReservation' => $this->code_reservation,
             'peutAnnuler' => SuiviReservationService::peutAnnuler($this->resource),
             'peutPayer' => PaiementReservationService::peutPayer($this->resource),
+            'paiementAvant' => PaiementReservationService::echeancePaiement($this->resource)?->toIso8601String(),
+            'reponseAvant' => ReponseReservationService::echeanceReponse($this->resource)?->toIso8601String(),
             'paiement' => $this->paiementVisible(),
             'peutNoter' => $this->statut === StatutReservation::Terminee && $this->avis === null,
             'avis' => $this->avis === null ? null : new AvisClientResource($this->avis),

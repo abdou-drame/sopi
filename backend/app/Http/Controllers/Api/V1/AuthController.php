@@ -40,7 +40,7 @@ class AuthController extends Controller
      *
      * Authentifie un compte actif. Un compte non actif reçoit 403 avec `message` et, quand elles existent, des informations
      * structurées : `motif` (sanction active, ou motif du refus d'inscription) et `finSuspension` (ISO 8601, suspension temporaire
-     * seulement). Ces champs sont absents sinon.
+     * seulement). Le champ `statutCompte` (`en_attente`, `refuse`, `suspendu` ou `banni`) accompagne toujours ce 403. Les autres champs sont absents sinon.
      *
      * @group Authentification
      *
@@ -48,8 +48,9 @@ class AuthController extends Controller
      *
      * @response 200 {"token":"1|abcdef","user":{"id":"0198a1b2-0000-7000-8000-000000000001","role":"client","statut":"actif"}}
      * @response 401 {"message":"Identifiant ou mot de passe incorrect."}
-     * @response 403 scenario="Compte suspendu" {"message":"Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés.","motif":"Retards répétés.","finSuspension":"2030-03-10T14:30:00+00:00"}
-     * @response 403 scenario="Inscription refusée" {"message":"Votre demande d'inscription a été refusée.","motif":"Pièces illisibles."}
+     * @response 403 scenario="Compte suspendu" {"message":"Votre compte est suspendu jusqu'au 10/03/2030 à 14:30. Motif : Retards répétés.","statutCompte":"suspendu","motif":"Retards répétés.","finSuspension":"2030-03-10T14:30:00+00:00"}
+     * @response 403 scenario="Inscription refusée" {"message":"Votre demande d'inscription a été refusée.","statutCompte":"refuse","motif":"Pièces illisibles."}
+     * @response 403 scenario="En attente de validation" {"message":"Votre compte est en attente de validation.","statutCompte":"en_attente"}
      */
     public function connexion(ConnexionRequest $request, BlocageConnexionService $blocage, SanctionService $sanctions): JsonResponse
     {
@@ -79,7 +80,7 @@ class AuthController extends Controller
 
         // Seul un compte actif s'authentifie ; le statut n'est révélé qu'avec le bon mot de passe.
         if (! $user->estActif()) {
-            return response()->json(['message' => $sanctions->messageRefusConnexion($user)] + $sanctions->detailRefusConnexion($user), 403);
+            return response()->json(['message' => $sanctions->messageRefusConnexion($user), 'statutCompte' => $user->statut->value] + $sanctions->detailRefusConnexion($user), 403);
         }
 
         return response()->json([

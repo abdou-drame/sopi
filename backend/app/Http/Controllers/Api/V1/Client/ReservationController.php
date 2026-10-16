@@ -55,12 +55,12 @@ class ReservationController extends Controller
      * Mes réservations
      *
      * Paginée (20 par page), de la plus récente à la plus ancienne. Filtres optionnels : `statut` et `groupe` (onglets `a_venir`, `terminees`, `annulees`, qui imposent leur propre ordre). Le `codeReservation` n'existe
-     * qu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles
+     * qu'après le paiement (`null` avant) et n'est jamais visible que de son client. `peutAnnuler` applique les règles `paiementAvant` (ISO 8601) est la date limite pour payer l'acompte (acceptation + délai de paiement), non nulle seulement pour une réservation acceptée non payée ; `reponseAvant` est la date limite de réponse du prestataire (création + délai de réponse), non nulle seulement pour une réservation en attente.
      * de l'annulation.
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}],"links":{"first":"https://api.exemple.test/api/v1/reservations?page=1","last":"https://api.exemple.test/api/v1/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"paiementAvant":null,"reponseAvant":"2030-01-16T02:50:00+00:00","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}],"links":{"first":"https://api.exemple.test/api/v1/reservations?page=1","last":"https://api.exemple.test/api/v1/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 422 {"message":"Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.","errors":{"statut":["Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."]}}
@@ -77,7 +77,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":true,"paiementAvant":null,"reponseAvant":"2030-01-16T02:50:00+00:00","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
@@ -101,7 +101,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":false,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"codeReservation":null,"peutAnnuler":false,"paiementAvant":null,"reponseAvant":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"prestataire":{"id":"0198a1b2-0000-7000-8000-000000000030","nomEntreprise":"Garage Exemple","quartier":"Keur Massar Nord","adresse":"Rue 10, Keur Massar"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}

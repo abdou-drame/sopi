@@ -286,7 +286,7 @@ describe('routes /appareils', function () {
     it('refuse un compte non actif', function (StatutCompte $statut) use ($jeton) {
         $user = User::factory()->create(['statut' => $statut]);
 
-        $this->actingAs($user, 'sanctum')->postJson('/api/v1/appareils', ['jeton' => $jeton, 'plateforme' => 'android'])->assertForbidden();
+        $this->actingAs($user, 'sanctum')->postJson('/api/v1/appareils', ['jeton' => $jeton, 'plateforme' => 'android'])->assertForbidden()->assertJsonPath('statutCompte', $statut->value);
         expect(Appareil::query()->count())->toBe(0);
     })->with([StatutCompte::Banni, StatutCompte::Suspendu]);
 
