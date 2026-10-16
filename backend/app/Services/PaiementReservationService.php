@@ -89,17 +89,36 @@ class PaiementReservationService
             return false;
         }
 
-        $reussi = array_key_exists('a_paiement_reussi', $reservation->getAttributes())
+        return ! self::aPaiementReussi($reservation);
+    }
+
+    /** Date limite (UTC) pour payer l'acompte : acceptation + délai de paiement. Null si la réservation n'est pas ACCEPTEE ou déjà payée. */
+    public static function echeancePaiement(Reservation $reservation): ?CarbonInterface
+    {
+        if ($reservation->statut !== StatutReservation::Acceptee || $reservation->acceptee_le === null
+            || self::aPaiementReussi($reservation)) {
+            return null;
+        }
+
+        return $reservation->acceptee_le->copy()->utc()->addHours(self::delaiPaiementHeures());
+    }
+
+    private static function aPaiementReussi(Reservation $reservation): bool
+    {
+        return array_key_exists('a_paiement_reussi', $reservation->getAttributes())
             ? (bool) $reservation->getAttribute('a_paiement_reussi')
             : $reservation->paiements()->where('statut', StatutPaiement::Reussi->value)->exists();
+    }
 
-        return ! $reussi;
+    private static function delaiPaiementHeures(): int
+    {
+        return (int) config('sopi.reservations.delai_paiement_heures');
     }
 
     /** Une réservation acceptée avant cet instant (UTC) n'est plus payable. */
     private static function limitePaiement(): CarbonInterface
     {
-        return now()->utc()->subHours((int) config('sopi.reservations.delai_paiement_heures'));
+        return now()->utc()->subHours(self::delaiPaiementHeures());
     }
 
     /** @return array{0: Paiement, 1: bool} */
