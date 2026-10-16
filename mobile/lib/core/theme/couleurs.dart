@@ -29,6 +29,12 @@ abstract final class CouleursSopi {
   // Pastilles d'icône des métiers (bleu, indigo, cyan clairs)
   static const indigoPastel = Color(0xFFE0E7FF);
   static const cyanPastel = Color(0xFFCFFAFE);
+  static const indigoTexte = Color(0xFF3730A3);
+  static const ardoisePastel = Color(0xFFF1F5F9);
+  static const ardoiseTexte = Color(0xFF475569);
+
+  // Texte discret sur fond marine (onglets inactifs)
+  static const texteSurMarine = Color(0xFFB8C4E6);
 
   // Squelettes de chargement
   static const squelette = Color(0xFFE3E9F6);

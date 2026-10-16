@@ -185,6 +185,54 @@ class DepotReservation {
     );
     return ReservationCreee.depuisJson(reponse.data);
   }
+
+  /// Une page de « Mes réservations » ([groupe] : `a_venir`, `terminees` ou `annulees`).
+  Future<PageReservations> reservations(String groupe, {int page = 1}) async {
+    final corps = await _lire(
+      '/reservations',
+      requete: {'groupe': groupe, 'page': page},
+    );
+    return PageReservations.depuisJson(corps);
+  }
+
+  Future<ReservationClient> reservation(String id) async {
+    final reponse = await _dio.get<Object?>('/reservations/$id');
+    final corps = reponse.data is Map
+        ? Map<String, dynamic>.from(reponse.data as Map)
+        : <String, dynamic>{};
+    final j = corps['data'] is Map
+        ? Map<String, dynamic>.from(corps['data'] as Map)
+        : corps;
+    return ReservationClient.depuisJson(j);
+  }
+
+  /// POST /reservations/{id}/annuler (sans corps).
+  Future<void> annuler(String id) async {
+    await _dio.post<Object?>('/reservations/$id/annuler');
+  }
+
+  /// POST /reservations/{id}/payer (sans corps) : crée la session de paiement chez le prestataire de paiement.
+  Future<SessionPaiement> payer(String id) async {
+    final reponse = await _dio.post<Object?>('/reservations/$id/payer');
+    return SessionPaiement.depuisJson(reponse.data);
+  }
+
+  /// Acompte d'une prestation, tel que l'API le donne dans le profil public (jamais recalculé ici).
+  Future<AcomptePrestation?> acomptePrestation(
+    String prestataireId,
+    String prestationId,
+  ) async {
+    final profil = await this.profil(prestataireId);
+    for (final p in profil.prestations) {
+      if (p.id == prestationId) {
+        return AcomptePrestation(
+          montant: p.montantAcompte,
+          pourcentage: profil.acomptePourcentage,
+        );
+      }
+    }
+    return null;
+  }
 }
 
 final depotReservationProvider = Provider<DepotReservation>(
@@ -210,3 +258,15 @@ final notificationsNonLuesProvider = FutureProvider<int>(
   retry: sansRelance,
   (ref) => ref.watch(depotReservationProvider).notificationsNonLues(),
 );
+
+/// Prestataire + prestation dont on veut l'acompte (clé de [acomptePrestationProvider]).
+typedef ClePrestation = ({String prestataireId, String prestationId});
+
+/// Acompte d'une prestation (donné par l'API), pour une réservation acceptée sans paiement encore créé.
+final acomptePrestationProvider =
+    FutureProvider.family<AcomptePrestation?, ClePrestation>(
+      retry: sansRelance,
+      (ref, cle) => ref
+          .watch(depotReservationProvider)
+          .acomptePrestation(cle.prestataireId, cle.prestationId),
+    );

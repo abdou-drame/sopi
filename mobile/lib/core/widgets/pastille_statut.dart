@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/couleurs.dart';
 
-enum TonStatut { info, succes, erreur, neutre }
+enum TonStatut { info, succes, erreur, neutre, indigo, ardoise }
 
 /// Petite pastille arrondie portant un statut (« Confirmée », « En attente »…).
 class PastilleStatut extends StatelessWidget {
@@ -22,6 +22,11 @@ class PastilleStatut extends StatelessWidget {
       TonStatut.succes => (CouleursSopi.succesFond, CouleursSopi.succesTexte),
       TonStatut.erreur => (CouleursSopi.erreurFond, CouleursSopi.erreurTexte),
       TonStatut.neutre => (CouleursSopi.bordure, CouleursSopi.texteSecondaire),
+      TonStatut.indigo => (CouleursSopi.indigoPastel, CouleursSopi.indigoTexte),
+      TonStatut.ardoise => (
+        CouleursSopi.ardoisePastel,
+        CouleursSopi.ardoiseTexte,
+      ),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

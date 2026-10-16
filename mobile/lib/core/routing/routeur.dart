@@ -15,6 +15,7 @@ import '../../features/reservation/demande_envoyee_page.dart';
 import '../../features/reservation/fiche_prestataire_page.dart';
 import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
+import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -148,10 +149,7 @@ GoRouter creerRouteur({
             Chemins.rechercher,
             () => const ListePrestatairesPage(avecRetour: false),
           ),
-          _onglet(
-            Chemins.reservations,
-            () => const EcranProvisoire(nom: 'Réservations'),
-          ),
+          _onglet(Chemins.reservations, () => const MesReservationsPage()),
           _onglet(Chemins.profil, () => const ProfilProvisoire()),
         ],
       ),

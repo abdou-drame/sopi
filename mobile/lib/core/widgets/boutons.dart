@@ -188,10 +188,10 @@ class BoutonMarine extends StatelessWidget {
   );
 }
 
-enum TonBoutonCompact { primaire, clair }
+enum TonBoutonCompact { primaire, clair, contour }
 
 /// Bouton pilule de petite taille (cartes de liste, barres d'action) : « Réserver », « Voir », « Continuer ».
-/// [clair] : fond blanc, texte bleu, pour une pose sur fond bleu.
+/// [clair] : fond blanc, texte bleu, pour une pose sur fond bleu. [contour] : fond blanc, bordure grise, texte marine (action secondaire d'une carte).
 class BoutonCompact extends StatelessWidget {
   const BoutonCompact({
     super.key,
@@ -214,13 +214,17 @@ class BoutonCompact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final clair = ton == TonBoutonCompact.clair;
+    final clair = ton != TonBoutonCompact.primaire;
+    final contour = ton == TonBoutonCompact.contour;
     return _BoutonPilule(
       libelle: libelle,
       onPressed: onPressed,
       chargement: chargement,
       fond: clair ? CouleursSopi.blanc : CouleursSopi.bleu,
-      texte: clair ? CouleursSopi.bleu : CouleursSopi.blanc,
+      texte: contour
+          ? CouleursSopi.marine
+          : (clair ? CouleursSopi.bleu : CouleursSopi.blanc),
+      bordure: contour ? CouleursSopi.bordureForte : null,
       pleineLargeur: false,
       hauteur: hauteur,
       taille: taille,

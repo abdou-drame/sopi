@@ -153,6 +153,7 @@ class ProfilPrestataire {
     this.adresse,
     this.noteMoyenne,
     this.nombreAvis = 0,
+    this.acomptePourcentage,
   });
 
   final String id;
@@ -165,6 +166,9 @@ class ProfilPrestataire {
   final List<Prestation> prestations;
   final List<PhotoPrestataire> photos;
 
+  /// Part de l'acompte en pourcentage, donnée par l'API.
+  final num? acomptePourcentage;
+
   factory ProfilPrestataire.depuisJson(Object? corps) {
     final brut = _objet(corps);
     final j = brut['data'] is Map ? _objet(brut['data']) : brut;
@@ -176,6 +180,7 @@ class ProfilPrestataire {
       adresse: j['adresse'] as String?,
       noteMoyenne: _nombre(j['noteMoyenne'])?.toDouble(),
       nombreAvis: _nombre(j['nombreAvis'])?.toInt() ?? 0,
+      acomptePourcentage: _nombre(j['acomptePourcentage']),
       prestations: [
         for (final e in _liste(j['prestations'])) Prestation.depuisJson(e),
       ],
@@ -336,4 +341,190 @@ class ReservationAVenir {
       prestataireNom: (prestataire['nomEntreprise'] ?? '').toString(),
     );
   }
+}
+
+/// Statut d'une réservation, tel que l'API l'écrit (`en_attente`, `acceptee`…).
+enum StatutReservation {
+  enAttente('en_attente', 'En attente'),
+  acceptee('acceptee', 'Acceptée'),
+  confirmee('confirmee', 'Confirmée'),
+  enCours('en_cours', 'En cours'),
+  terminee('terminee', 'Terminée'),
+  annulee('annulee', 'Annulée'),
+  refusee('refusee', 'Refusée');
+
+  const StatutReservation(this.code, this.libelle);
+
+  final String code;
+  final String libelle;
+
+  /// Un statut inconnu de l'application est traité comme « en attente » (le plus prudent : aucune action proposée).
+  static StatutReservation depuisCode(Object? code) => values.firstWhere(
+    (s) => s.code == code,
+    orElse: () => StatutReservation.enAttente,
+  );
+
+  /// Annulée ou refusée : plus rien à faire sur la réservation.
+  bool get ferme => this == annulee || this == refusee;
+}
+
+/// Paiement le plus récent d'une réservation (`paiement` de la réservation).
+class PaiementResume {
+  const PaiementResume({required this.statut, required this.montantAcompte});
+
+  /// `en_attente`, `reussi`, `echoue` ou `rembourse`.
+  final String statut;
+  final num montantAcompte;
+
+  bool get echoue => statut == 'echoue';
+  bool get reussi => statut == 'reussi';
+
+  static PaiementResume? depuisJson(Object? brut) {
+    if (brut is! Map) return null;
+    final j = Map<String, dynamic>.from(brut);
+    return PaiementResume(
+      statut: (j['statut'] ?? '').toString(),
+      montantAcompte: _nombre(j['montantAcompte']) ?? 0,
+    );
+  }
+}
+
+/// Avis que le client a donné sur une réservation terminée.
+class AvisDonne {
+  const AvisDonne({required this.note, this.commentaire});
+
+  final int note;
+  final String? commentaire;
+}
+
+/// Réservation vue par son client (GET /reservations et GET /reservations/{id}).
+class ReservationClient {
+  const ReservationClient({
+    required this.id,
+    required this.statut,
+    required this.debut,
+    required this.fin,
+    required this.prestationId,
+    required this.prestationNom,
+    required this.prix,
+    required this.prestataireId,
+    required this.prestataireNom,
+    this.motifRefus,
+    this.codeReservation,
+    this.peutAnnuler = false,
+    this.peutPayer = false,
+    this.peutNoter = false,
+    this.paiement,
+    this.avis,
+    this.quartier,
+    this.adresse,
+    this.telephone,
+  });
+
+  final String id;
+  final StatutReservation statut;
+  final DateTime debut;
+  final DateTime fin;
+  final String prestationId;
+  final String prestationNom;
+  final num prix;
+  final String prestataireId;
+  final String prestataireNom;
+  final String? motifRefus;
+  final String? codeReservation;
+  final bool peutAnnuler;
+  final bool peutPayer;
+  final bool peutNoter;
+  final PaiementResume? paiement;
+  final AvisDonne? avis;
+  final String? quartier;
+  final String? adresse;
+
+  /// Téléphone du prestataire : renvoyé seulement une fois la réservation confirmée.
+  final String? telephone;
+
+  factory ReservationClient.depuisJson(Map<String, dynamic> j) {
+    final creneau = _objet(j['creneau']);
+    final prestation = _objet(j['prestation']);
+    final prestataire = _objet(j['prestataire']);
+    final avis = j['avis'];
+    final motif = (j['motifRefus'] ?? '').toString().trim();
+    final code = (j['codeReservation'] ?? '').toString().trim();
+    final telephone = (prestataire['telephone'] ?? '').toString().trim();
+    return ReservationClient(
+      id: j['id'].toString(),
+      statut: StatutReservation.depuisCode(j['statut']),
+      debut: _date(creneau['dateDebut']),
+      fin: _date(creneau['dateFin'] ?? creneau['dateDebut']),
+      prestationId: prestation['id'].toString(),
+      prestationNom: (prestation['nom'] ?? '').toString(),
+      prix: _nombre(prestation['prix']) ?? 0,
+      prestataireId: prestataire['id'].toString(),
+      prestataireNom: (prestataire['nomEntreprise'] ?? '').toString(),
+      motifRefus: motif.isEmpty ? null : motif,
+      codeReservation: code.isEmpty ? null : code,
+      peutAnnuler: j['peutAnnuler'] == true,
+      peutPayer: j['peutPayer'] == true,
+      peutNoter: j['peutNoter'] == true,
+      paiement: PaiementResume.depuisJson(j['paiement']),
+      avis: avis is Map
+          ? AvisDonne(
+              note: _nombre(avis['note'])?.toInt() ?? 0,
+              commentaire: avis['commentaire'] as String?,
+            )
+          : null,
+      quartier: prestataire['quartier'] as String?,
+      adresse: prestataire['adresse'] as String?,
+      telephone: telephone.isEmpty ? null : telephone,
+    );
+  }
+}
+
+/// Une page de « Mes réservations » avec sa pagination.
+class PageReservations {
+  const PageReservations({required this.elements, required this.pagination});
+
+  final List<ReservationClient> elements;
+  final Pagination pagination;
+
+  factory PageReservations.depuisJson(Object? corps) => PageReservations(
+    elements: [
+      for (final e in _liste(_objet(corps)['data']))
+        ReservationClient.depuisJson(e),
+    ],
+    pagination: Pagination.depuisJson(corps),
+  );
+}
+
+/// Réponse de POST /reservations/{id}/payer : de quoi ouvrir la page de paiement.
+class SessionPaiement {
+  const SessionPaiement({
+    required this.urlPaiement,
+    required this.montantAcompte,
+    required this.montantRestantSurPlace,
+  });
+
+  final String urlPaiement;
+  final num montantAcompte;
+  final num montantRestantSurPlace;
+
+  factory SessionPaiement.depuisJson(Object? corps) {
+    final j = _objet(corps);
+    final paiement = _objet(j['paiement']);
+    return SessionPaiement(
+      urlPaiement: (j['urlPaiement'] ?? '').toString(),
+      montantAcompte: _nombre(paiement['montantAcompte']) ?? 0,
+      montantRestantSurPlace: _nombre(j['montantRestantSurPlace']) ?? 0,
+    );
+  }
+}
+
+/// Acompte d'une prestation tel que l'API le calcule (profil public du prestataire).
+class AcomptePrestation {
+  const AcomptePrestation({required this.montant, this.pourcentage});
+
+  final num montant;
+
+  /// Part de l'acompte en pourcentage (30), ou null si l'API ne la donne pas.
+  final num? pourcentage;
 }
