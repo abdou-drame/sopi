@@ -5,9 +5,10 @@ import '../reservation/modeles.dart' show StatutReservation;
 import 'depot_prestataire.dart';
 import 'detail_demande_page.dart';
 import 'prestation_page.dart';
+import 'terminer_prestation_page.dart';
 
 /// Écran d'une réservation du prestataire, choisi selon son statut relu à l'API :
-/// confirmée → Prestation (saisie du code). Les autres statuts gardent le détail de la demande.
+/// confirmée → Prestation (saisie du code), en cours → Terminer la prestation. Les autres statuts gardent le détail de la demande.
 class AiguillageReservationPrestataire extends ConsumerWidget {
   const AiguillageReservationPrestataire({super.key, required this.id});
 
@@ -18,6 +19,7 @@ class AiguillageReservationPrestataire extends ConsumerWidget {
     final statut = ref.watch(detailDemandeProvider(id)).value?.statut;
     return switch (statut) {
       StatutReservation.confirmee => PrestationPage(id: id),
+      StatutReservation.enCours => TerminerPrestationPage(id: id),
       _ => DetailDemandePage(id: id),
     };
   }

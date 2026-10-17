@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/erreurs.dart';
+import '../../core/format/formateurs.dart';
 import 'demandes_controleur.dart';
 import 'depot_prestataire.dart';
 
@@ -68,6 +69,36 @@ Future<bool> annulerReservation(
     messager.showSnackBar(
       const SnackBar(
         content: Text('Réservation annulée. Le client est remboursé.'),
+      ),
+    );
+    return true;
+  } catch (e) {
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(SnackBar(content: Text(ErreurApi.depuis(e).message)));
+    return false;
+  }
+}
+
+/// Termine la prestation. Le serveur crédite le portefeuille ; le message montre le montant réellement crédité
+/// (celui de la réponse, jamais recalculé). Renvoie vrai si la prestation est terminée.
+Future<bool> terminerPrestation(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+) async {
+  final messager = ScaffoldMessenger.of(context);
+  try {
+    final credit = await ref.read(depotPrestataireProvider).terminer(id);
+    rafraichirDemandes(ref, id);
+    ref.invalidate(soldeProvider);
+    final montant = credit.montantCredite;
+    messager.showSnackBar(
+      SnackBar(
+        content: Text(
+          montant == null
+              ? 'Prestation terminée.'
+              : 'Prestation terminée. ${formaterArgent(montant)} ajoutés à votre portefeuille.',
+        ),
       ),
     );
     return true;
