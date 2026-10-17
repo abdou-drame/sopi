@@ -86,8 +86,17 @@ String dateRelative(DateTime date, DateTime maintenant) {
 /// - réservation (`reservationId`) : détail de la réservation ; « prestation terminée » : écran d'avis ;
 /// - litige (`litigeId`) : détail du signalement ;
 /// - tout autre type, connu ou non : rien à ouvrir.
-String? destinationNotification(NotificationClient n) {
+String? destinationNotification(
+  NotificationClient n, {
+  bool prestataire = false,
+}) {
   final reservation = n.donnees['reservationId'];
+  if (prestataire) {
+    // Côté prestataire, seules les notifications de réservation ont un écran (le détail de la demande).
+    return n.type.startsWith('reservation_') && reservation != null
+        ? Chemins.reservationPrestataire(reservation)
+        : null;
+  }
   final litige = n.donnees['litigeId'];
   if (n.type == 'reservation_terminee' && reservation != null) {
     return Chemins.avis(reservation);

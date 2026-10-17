@@ -55,7 +55,9 @@ abstract final class Chemins {
   static const disponibilites = '/prestataire/disponibilites';
   static const retrait = '/prestataire/retrait';
   static const historiqueRetraits = '/prestataire/retraits';
-  static String demandeReservation(String id) => '/prestataire/demandes/$id';
+  static const reservationsPrestataire = '/prestataire/reservations';
+  static String refusReservation(String id) =>
+      '/prestataire/reservations/$id/refus';
   static String reservationPrestataire(String id) =>
       '/prestataire/reservations/$id';
   static String demarrerPrestation(String id) =>

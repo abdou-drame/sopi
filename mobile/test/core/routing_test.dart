@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sopi/core/api/stockage_jeton.dart';
+import 'package:sopi/core/format/formateurs.dart';
 import 'package:sopi/core/routing/chemins.dart';
 import 'package:sopi/core/routing/routeur.dart';
 import 'package:sopi/core/theme/theme_sopi.dart';
@@ -15,6 +16,8 @@ const _client = Utilisateur(id: '1', role: RoleSopi.client);
 const _prestataire = Utilisateur(id: '2', role: RoleSopi.prestataire);
 
 void main() {
+  setUpAll(initialiserFormats);
+
   group('redirectionSopi', () {
     test('session inconnue : écran de démarrage', () {
       expect(
@@ -133,7 +136,7 @@ void main() {
     });
 
     testWidgets(
-      'prestataire : coque Tableau / Agenda / Portefeuille / Profil',
+      'prestataire : coque Accueil / Agenda / Portefeuille / Profil',
       (tester) async {
         final serveur = AdaptateurSimule({
           'GET /me': const Simulee(200, {'id': '2', 'role': 'prestataire'}),

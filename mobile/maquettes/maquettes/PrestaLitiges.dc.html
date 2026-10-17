@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Signalements reçus</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 230px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 30%, #c7d2fe 0%, rgba(199,210,254,0) 60%), #eef4ff"></div>
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px; display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Retour" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+  </div>
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Signalements<br><span style="font-weight: 800">reçus</span></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 184px; height: 48px; box-sizing: border-box; padding: 4px; border-radius: 24px; background: #0f1b3d; display: flex; gap: 4px"><button style="flex: 1; border: none; border-radius: 20px; background: #1d4ed8; color: #ffffff; font-size: 12px; font-weight: 700">À traiter</button><button style="flex: 1; border: none; border-radius: 20px; background: transparent; color: #b8c4e6; font-size: 12px; font-weight: 600">En examen</button><button style="flex: 1; border: none; border-radius: 20px; background: transparent; color: #b8c4e6; font-size: 12px; font-weight: 600">Clos</button></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 248px; display: flex; flex-direction: column; gap: 12px">
+    <div style="box-sizing: border-box; padding: 16px; border: 1px solid #e3e9f6; border-radius: 26px; background: #ffffff">
+      <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 16px; font-weight: 700">Aminata D.</div><span style="height: 26px; padding: 0 12px; border-radius: 13px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center">À traiter</span></div>
+      <div style="margin-top: 4px; font-size: 13px; color: #64708f">Prestataire absent · Sam. 24 oct.</div><div style="display: flex; justify-content: flex-end; margin-top: 12px"><button style="height: 38px; padding: 0 18px; border: none; border-radius: 19px; background: #1d4ed8; color: #ffffff; font-size: 13px; font-weight: 700">Répondre</button></div>
+    </div>    <div style="box-sizing: border-box; padding: 16px; border: 1px solid #e3e9f6; border-radius: 26px; background: #ffffff">
+      <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 16px; font-weight: 700">Khadija S.</div><span style="height: 26px; padding: 0 12px; border-radius: 13px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center">À traiter</span></div>
+      <div style="margin-top: 4px; font-size: 13px; color: #64708f">Service non conforme · Mer. 21 oct.</div><div style="display: flex; justify-content: flex-end; margin-top: 12px"><button style="height: 38px; padding: 0 18px; border: none; border-radius: 19px; background: #1d4ed8; color: #ffffff; font-size: 13px; font-weight: 700">Répondre</button></div>
+    </div>    <div style="box-sizing: border-box; padding: 14px 16px; border: 1px dashed #b8c4e6; border-radius: 22px; font-size: 12px; line-height: 17px; color: #64708f">Répondez rapidement : votre version est transmise à l'administrateur avec celle du client.</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
