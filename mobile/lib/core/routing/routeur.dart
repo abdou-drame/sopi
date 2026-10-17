@@ -34,6 +34,8 @@ import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
 import '../../features/prestataire/agenda_page.dart';
 import '../../features/prestataire/aiguillage_reservation.dart';
+import '../../features/prestataire/service_form_page.dart';
+import '../../features/prestataire/services_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
 import '../../features/prestataire/reservations_prestataire_page.dart';
 import '../../features/prestataire/tableau_page.dart';
@@ -307,7 +309,15 @@ GoRouter creerRouteur({
       ),
 
       // — Espace prestataire : écrans plein écran
-      _provisoire(Chemins.services, 'Mes services'),
+      GoRoute(path: Chemins.services, builder: (_, _) => const ServicesPage()),
+      GoRoute(
+        path: Chemins.serviceNouveau,
+        builder: (_, _) => const ServiceFormPage(),
+      ),
+      GoRoute(
+        path: Chemins.serviceModifier(':id'),
+        builder: (_, state) => ServiceFormPage(id: state.pathParameters['id']),
+      ),
       _provisoire(Chemins.disponibilites, 'Disponibilités'),
       _provisoire(Chemins.retrait, 'Retrait'),
       _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),

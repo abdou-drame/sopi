@@ -147,3 +147,36 @@ class CreditPrestation {
     );
   }
 }
+
+/// Prestation proposée par le prestataire (`GET /prestataire/prestations`). L'acompte n'y figure pas : il est calculé par le serveur.
+class PrestationService {
+  const PrestationService({
+    required this.id,
+    required this.nom,
+    required this.dureeMinutes,
+    required this.prix,
+    required this.actif,
+    this.domaine,
+  });
+
+  final String id;
+  final String nom;
+  final String? domaine;
+  final int dureeMinutes;
+  final num prix;
+  final bool actif;
+
+  /// Accepte l'objet seul ou enveloppé dans `data` (réponses de création et de modification).
+  factory PrestationService.depuisJson(Object? brut) {
+    var j = _objet(brut);
+    if (j['data'] is Map) j = _objet(j['data']);
+    return PrestationService(
+      id: '${j['id']}',
+      nom: '${j['nom'] ?? ''}',
+      domaine: j['domaine'] is String ? j['domaine'] as String : null,
+      dureeMinutes: _nombre(j['dureeMinutes'])?.toInt() ?? 0,
+      prix: _nombre(j['prix']) ?? 0,
+      actif: j['actif'] != false,
+    );
+  }
+}

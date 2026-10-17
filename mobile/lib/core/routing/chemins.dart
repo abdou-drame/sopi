@@ -52,6 +52,9 @@ abstract final class Chemins {
   static const portefeuille = '/prestataire/portefeuille';
   static const profilPrestataire = '/prestataire/profil';
   static const services = '/prestataire/services';
+  static const serviceNouveau = '/prestataire/services/nouveau';
+  static String serviceModifier(String id) =>
+      '/prestataire/services/$id/modifier';
   static const disponibilites = '/prestataire/disponibilites';
   static const retrait = '/prestataire/retrait';
   static const historiqueRetraits = '/prestataire/retraits';

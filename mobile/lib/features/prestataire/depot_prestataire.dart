@@ -85,6 +85,47 @@ class DepotPrestataire {
     );
     return DemandeReservation.depuisJson(reponse.data);
   }
+
+  /// Toutes les prestations du prestataire, actives et désactivées (`GET /prestataire/prestations`, sans pagination).
+  Future<List<PrestationService>> prestations() async {
+    final corps = await _lire('/prestataire/prestations');
+    final liste = corps['data'];
+    return liste is List
+        ? [for (final e in liste) PrestationService.depuisJson(e)]
+        : const [];
+  }
+
+  Future<PrestationService> creerPrestation({
+    required String nom,
+    required int dureeMinutes,
+    required num prix,
+  }) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/prestations',
+      data: {'nom': nom, 'duree_minutes': dureeMinutes, 'prix': prix},
+    );
+    return PrestationService.depuisJson(reponse.data);
+  }
+
+  /// Modification partielle : seuls les champs fournis sont envoyés. Il n'existe pas de suppression : on désactive (`actif`).
+  Future<PrestationService> modifierPrestation(
+    String id, {
+    String? nom,
+    int? dureeMinutes,
+    num? prix,
+    bool? actif,
+  }) async {
+    final reponse = await _dio.patch<Object?>(
+      '/prestataire/prestations/$id',
+      data: {
+        'nom': ?nom,
+        'duree_minutes': ?dureeMinutes,
+        'prix': ?prix,
+        'actif': ?actif,
+      },
+    );
+    return PrestationService.depuisJson(reponse.data);
+  }
 }
 
 final depotPrestataireProvider = Provider<DepotPrestataire>(
@@ -110,3 +151,9 @@ final detailDemandeProvider = FutureProvider.autoDispose
       retry: sansRelance,
       (ref, id) => ref.watch(depotPrestataireProvider).demande(id),
     );
+
+/// Services et tarifs du prestataire, relus à l'ouverture de l'écran.
+final prestationsProvider = FutureProvider.autoDispose<List<PrestationService>>(
+  retry: sansRelance,
+  (ref) => ref.watch(depotPrestataireProvider).prestations(),
+);
