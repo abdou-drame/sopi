@@ -11,6 +11,7 @@ import 'package:sopi/core/api/stockage_jeton.dart';
 import 'package:sopi/core/config/support.dart';
 import 'package:sopi/core/routing/routeur.dart';
 import 'package:sopi/core/theme/theme_sopi.dart';
+import 'package:sopi/features/inscription_prestataire/stockage_jeton_suivi.dart';
 
 import '../../aide_api.dart';
 
@@ -43,11 +44,15 @@ Future<ProviderContainer> lancerAcces(
   String supportEmail = '',
   List<Uri>? urlsOuvertes,
   bool sansAnimation = true,
+  StockageJetonSuiviMemoire? stockageSuivi,
   List<Override> surcharges = const [],
 }) async {
   final conteneur = ProviderContainer(
     overrides: <Override>[
       ...surchargesApi(serveur, StockageJetonMemoire(jeton)),
+      stockageJetonSuiviProvider.overrideWithValue(
+        stockageSuivi ?? StockageJetonSuiviMemoire(),
+      ),
       supportEmailProvider.overrideWithValue(supportEmail),
       lanceurUrlProvider.overrideWithValue((uri) async {
         urlsOuvertes?.add(uri);

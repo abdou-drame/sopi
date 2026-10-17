@@ -15,6 +15,8 @@ import '../../features/compte/modifier_profil_page.dart';
 import '../../features/compte/notifications_page.dart';
 import '../../features/compte/profil_client_page.dart';
 import '../../features/compte/signalements_pages.dart';
+import '../../features/inscription_prestataire/etape_activite_page.dart';
+import '../../features/inscription_prestataire/etape_informations_page.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
@@ -143,7 +145,15 @@ GoRouter creerRouteur({
         builder: (_, _) => const MotDePasseOubliePage(),
       ),
       _provisoire(Chemins.reinitialisation, 'Réinitialisation du mot de passe'),
-      _provisoire(Chemins.inscriptionPrestataire, 'Inscription prestataire'),
+      GoRoute(
+        path: Chemins.inscriptionPrestataire,
+        builder: (_, _) => const EtapeActivitePage(),
+      ),
+      GoRoute(
+        path: Chemins.inscriptionInformations,
+        builder: (_, _) => const EtapeInformationsPage(),
+      ),
+      _provisoire(Chemins.inscriptionJustificatifs, 'Justificatifs'),
       _provisoire(Chemins.suiviDossier, 'Suivi du dossier'),
       GoRoute(
         path: Chemins.compteRestreint,
