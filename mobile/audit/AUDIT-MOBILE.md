@@ -3,8 +3,53 @@
 Branche `feature/p4c-audit`, créée depuis `main` (`e74fe38`, qui contient 4b-6b et le backend 4.3).
 Aucun code, aucune configuration modifiés. Aucun secret lu ni écrit. Chaque affirmation cite fichier et ligne ; ce qui n'a pas pu être vérifié est écrit « non vérifié ».
 
-> La synthèse (partie 4) sera placée en tête de ce document à la fin de l'audit.
-> Parties livrées pour l'instant : **1, 2, 3**. À venir : 4 (synthèse).
+> Audit en lecture seule : aucun code ni aucune configuration modifiés, rien fusionné. Toutes les parties (1 à 4) sont livrées.
+
+# Synthèse (partie 4)
+
+## Tableau récapitulatif
+
+| Indicateur | Valeur | Détail |
+|---|---|---|
+| Routes non-admin de l'API auditées | **69** | comptage manuel dans `backend/routes/api.php` (`route:list` non lancé) |
+| … avec un appelant mobile | 59 | partie 1.1 |
+| … **sans écran / sans appel mobile** | **10** | 3 normales (webhook, `/auth/reinitialiser-mot-de-passe`, `/auth/moi`) ; 7 manques : push (4), signaler un avis (1), historique des retraits (2) — partie 1.2 |
+| Appels mobile **sans route** backend | **0** | partie 1.3 (aucune divergence de méthode, chemin ni champ trouvée) |
+| Maquettes auditées | 54 | 54/54 ont un écran (partie 2.1) |
+| Écarts **BLOQUANT** (maquettes) | **0** | partie 2.3 |
+| Écarts **VISIBLE** (maquettes) | **4** | titre 28 au lieu de 30 pt (S1), titre « Connexion » 32 pt à confirmer (S3), police chargée à l'exécution (S4), avis « modéré » remplacé |
+| Écarts **MINEUR** (maquettes) | **14** | S2, S5, S6 et 11 textes / rayons |
+| Qualité : VISIBLE / MINEUR | 2 / 6 | cibles tactiles de 26 px, gris `#94A3B8` à 2,56:1 ; dépendance et fichiers morts, doublon de champ, textes en 11 pt… |
+| Points **non vérifiés** à lever | 6 | voir lot 6 |
+| Routes **provisoires** restantes | **4** | `/` (point d'entrée), `/reinitialisation`, `/reservations/:id/annulation`, `/paiement/retour` : 3 jamais ciblées par l'interface (partie 1.4, 3.4) |
+| `flutter analyze` | **0 problème** | partie 3.1 |
+| Tests | **531 / 531 au vert** (4 min 23 s) | partie 3.1 |
+| Secret dans le dépôt | **aucun trouvé** | arbre courant seulement, historique non vérifié (partie 3.7) |
+
+Points qui ne sont pas des écarts de maquette mais qui pèsent le plus :
+1. **Aucune notification push** dans le mobile (pas de `firebase_messaging`, aucun enregistrement d'appareil) alors que le cahier des charges demande e-mail + push — partie 1.2 (b), gravité probable élevée.
+2. **`GET /quartiers` ne renvoie que les quartiers des prestataires actifs** et sert aussi de liste à l'inscription d'un prestataire : possible **blocage de l'inscription** dans un quartier sans prestataire actif — partie 1.2 (c), à confirmer.
+
+## Corrections proposées, par priorité (aucune n'est faite)
+
+Les durées sont mes **estimations**, non mesurées. « Lot » = environ une heure.
+
+| Lot | Contenu | Gravité | Fichiers principaux |
+|---|---|---|---|
+| **1 — Confirmer et lever le blocage possible des quartiers** (~1 h) | Vérifier avec un compte neuf qu'un quartier sans prestataire actif est introuvable à l'inscription prestataire ; si oui, faire servir la liste complète des quartiers (décision d'architecte : backend ou mobile) | BLOQUANT possible | `B:QuartierController.php`, `M:inscription_prestataire/etape_activite_page.dart:109,176-235` |
+| **2 — Titres et boutons conformes** (~1 h) | Titre d'en-tête à 30 pt / interligne 36 dans `EnTeteDegrade` (un seul fichier pour ~40 écrans), graisse 700 des boutons, titre « Connexion » 32 pt si absent ; mettre à jour les tests concernés | VISIBLE / MINEUR | `core/widgets/en_tete_degrade.dart:236-249`, `core/widgets/boutons.dart:66-69`, `auth/connexion_page.dart` |
+| **3 — Push, partie mobile** (2 à 3 lots) | Ajouter `firebase_messaging`, enregistrer l'appareil (`/appareils` ou `/me/jeton-push`) à la connexion, le retirer à la déconnexion, afficher la notification reçue. Touche `android/` et les secrets de build (GitHub Secrets) : **à valider avant** | Élevée | `pubspec.yaml`, `core/` (nouveau service), `.github` (hors périmètre de l'audit) |
+| **4 — Accessibilité** (~1 h) | Agrandir à 44 px la zone tactile des croix de créneau et de photo (sans changer le visuel), vérifier à quoi sert `#94A3B8` et le foncer si c'est du texte, rendre « Réessayer » du portefeuille plus visible | VISIBLE | `disponibilites_page.dart:264-273`, `photos_page.dart:249-257`, `profil_prestataire_page.dart:324`, `portefeuille_page.dart:109-119` |
+| **5 — Décisions de contenu + textes** (~1 h) | Trancher « avis modéré » (garder la phrase actuelle ou la maquette) ; rétablir les textes manquants : e-mail d'inscription et de dossier, « 3 caractères minimum », « Le code est bon… », « Un instant, nous confirmons le code… », recherche « un salon, un service… » | VISIBLE / MINEUR | `reservation/avis_page.dart:33-34`, `auth/inscription_page.dart:175`, `refus_motif_page.dart`, `prestation_page.dart`, `liste_prestataires_page.dart:336` |
+| **6 — Lever les « non vérifié »** (~1 h) | Captures d'écran réelles contre maquettes (rayons 5, 7, 19, 23, 48, 56 ; espacements) ; état d'erreur de `retrait_page.dart` ; garde de double envoi de tous les formulaires (paiement, litige, avis, annulation, service, disponibilités) ; états vides des listes ; police hors ligne ; `/` jamais visible ; secrets dans l'historique Git | à qualifier | voir parties 2.0, 3.4, 3.5, 3.6 |
+| **7 — Nettoyage** (~1 h) | Retirer `cupertino_icons`, `core/animation/chiffres.dart`, `core/widgets/carte_sopi.dart` (et son test) si confirmés inutiles ; fusionner `ChampTexte` dans `ChampFormulaire` ; passer les couleurs en dur (`#94A3B8`, `#EEF2FA`) et les `fontSize` répétés dans le thème ; embarquer Plus Jakarta Sans dans `assets/` (S4) | MINEUR | `pubspec.yaml`, `core/`, parties 3.2-3.3 |
+| **8 — Fonctions absentes, à décider** (par fonction) | « Signaler » un avis (`POST /prestataire/avis/{id}/signaler`), historique et détail des retraits, lien profond de réinitialisation du mot de passe (`/reinitialisation`), `/application/version` (route inexistante côté backend), routes provisoires `/reservations/:id/annulation` et `/paiement/retour` (les supprimer ou les raccorder) | Moyenne | partie 1.2 (b), (c) et 1.4 |
+
+Ordre conseillé : 1 (lève un blocage possible) → 3 (plus gros manque fonctionnel) → 2 → 5 → 4 → 6 → 7 → 8. Le lot 3 est le seul qui touche des fichiers interdits à l'audit (`android/`, secrets de build) ; il faut une instruction explicite pour le démarrer.
+
+Écarts connus et acceptés (non comptés ci-dessus) : voir 2.4.
+
+
 
 Notation des chemins : `B:` = `backend/`, `M:` = `mobile/lib/`.
 
