@@ -32,6 +32,7 @@ import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
+import '../../features/prestataire/agenda_page.dart';
 import '../../features/prestataire/detail_demande_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
 import '../../features/prestataire/reservations_prestataire_page.dart';
@@ -296,7 +297,7 @@ GoRouter creerRouteur({
         builder: (_, _, shell) => _coque(_ongletsPrestataire, shell),
         branches: [
           _onglet(Chemins.tableau, () => const TableauPage()),
-          _onglet(Chemins.agenda, () => const EcranProvisoire(nom: 'Agenda')),
+          _onglet(Chemins.agenda, () => const AgendaPage()),
           _onglet(
             Chemins.portefeuille,
             () => const EcranProvisoire(nom: 'Portefeuille'),
