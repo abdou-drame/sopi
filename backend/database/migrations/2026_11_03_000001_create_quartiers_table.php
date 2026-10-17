@@ -12,11 +12,13 @@ return new class extends Migration
     {
         // Référentiel des quartiers proposés à l'inscription d'un prestataire. Il n'est pas une contrainte :
         // prestataires.quartier reste un texte libre.
-        Schema::create('quartiers', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('nom', 100)->unique();
-            $table->timestamps();
-        });
+        if (! Schema::hasTable('quartiers')) {
+            Schema::create('quartiers', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->string('nom', 100)->unique();
+                $table->timestamps();
+            });
+        }
 
         // Quartiers de départ insérés ici : le déploiement ne lance que `migrate --force`, pas les seeders.
         // Insertion idempotente, comparaison sans tenir compte de la casse.
