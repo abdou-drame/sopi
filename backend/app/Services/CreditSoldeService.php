@@ -70,7 +70,7 @@ class CreditSoldeService
         }
 
         // Calcul exact en centimes entiers (jamais de flottant) ; l'ajout est une opération SQL atomique.
-        $part = CalculPaiement::soustraire($paiement->montant_acompte, $paiement->commission);
+        $part = CalculPaiement::montantCredite($paiement->montant_acompte, $paiement->commission);
         Prestataire::query()->whereKey($prestataireId)->update(['solde' => DB::raw('solde + '.$part)]);
         $solde = Prestataire::query()->whereKey($prestataireId)->value('solde');
         MouvementPortefeuille::enregistrer($prestataireId, TypeMouvementPortefeuille::Credit, $part, 'Prestation terminée (acompte moins commission)', $solde, reservationId: $paiement->reservation_id);

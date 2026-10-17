@@ -36,13 +36,15 @@ class ReservationController extends Controller
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","last":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"reponseAvant":"2030-01-16T08:50:00+00:00","acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","last":"https://api.exemple.test/api/v1/prestataire/reservations?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 422 {"message":"Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee.","errors":{"statut":["Le statut doit être l'un de : en_attente, acceptee, confirmee, en_cours, terminee, refusee, annulee."]}}
      */
     public function index(ListerReservationsRequest $request)
     {
+        request()->attributes->set(DemandeReservationResource::AVEC_MONTANTS, true);
+
         return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut(), $request->groupe()));
     }
 
@@ -53,13 +55,14 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_attente","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"reponseAvant":"2030-01-16T08:50:00+00:00","acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
      */
     public function show(Request $request, string $id): JsonResponse|DemandeReservationResource
     {
+        request()->attributes->set(DemandeReservationResource::AVEC_MONTANTS, true);
         $reservation = $this->service->trouver($this->prestataire($request), $id);
 
         return $reservation === null
@@ -77,7 +80,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"acceptee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"reponseAvant":null,"acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
@@ -102,7 +105,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"refusee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Je ne suis pas disponible à cette heure.","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"refusee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Je ne suis pas disponible à cette heure.","reponseAvant":null,"acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
@@ -130,7 +133,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_cours","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"en_cours","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"reponseAvant":null,"acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
@@ -159,7 +162,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"},"montantTotal":15000,"commission":1500,"montantCredite":3000,"soldeApres":3000}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"terminee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":null,"reponseAvant":null,"acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"},"montantTotal":15000,"commission":1500,"montantCredite":3000,"soldeApres":3000}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}
@@ -195,7 +198,7 @@ class ReservationController extends Controller
      *
      * @urlParam id string required Identifiant de la réservation. Example: 0198a1b2-0000-7000-8000-000000000060
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Un imprévu m'empêche d'assurer la prestation.","creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000060","statut":"annulee","dateCreation":"2030-01-15T08:50:00+00:00","motifRefus":"Un imprévu m'empêche d'assurer la prestation.","reponseAvant":null,"acompte":4500.0,"commission":1500.0,"montantCredite":3000.0,"creneau":{"id":"0198a1b2-0000-7000-8000-000000000040","dateDebut":"2030-01-16T09:00:00+00:00","dateFin":"2030-01-16T10:00:00+00:00"},"prestation":{"id":"0198a1b2-0000-7000-8000-000000000050","nom":"Vidange","dureeMinutes":60,"prix":15000},"client":{"prenom":"Awa","initialeNom":"D"}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Réservation introuvable."}

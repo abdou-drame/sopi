@@ -25,7 +25,7 @@ class ReponseReservationService
     public function lister(Prestataire $prestataire, ?StatutReservation $statut = null, ?GroupeReservation $groupe = null): LengthAwarePaginator
     {
         $requete = $this->demandes($prestataire)
-            ->with(['creneau', 'prestation', 'client'])
+            ->with(['creneau', 'prestation', 'client', 'paiements'])
             ->when($statut, fn (Builder $q) => $q->where('statut', $statut->value));
 
         if ($groupe !== null) {
@@ -44,7 +44,7 @@ class ReponseReservationService
             return null;
         }
 
-        return $this->demandes($prestataire)->with(['creneau', 'prestation', 'client'])->find($id);
+        return $this->demandes($prestataire)->with(['creneau', 'prestation', 'client', 'paiements'])->find($id);
     }
 
     /**
