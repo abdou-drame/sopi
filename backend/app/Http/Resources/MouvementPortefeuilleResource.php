@@ -25,6 +25,11 @@ class MouvementPortefeuilleResource extends JsonResource
             'soldeApres' => (float) $this->solde_apres,
             'reservationId' => $this->reservation_id,
             'retraitId' => $this->retrait_id,
+            // Nom du service de la réservation liée (crédit de fin de prestation), sinon null.
+            'prestation' => $this->reservation?->prestation?->nom,
+            // Pour un retrait : opérateur (`wave` ou `orange_money`, null si inconnu) et statut du retrait ; sinon null.
+            'operateur' => $this->retrait?->operateur?->value,
+            'statutRetrait' => $this->retrait?->statut->value,
             'date' => $this->created_at->toIso8601String(),
         ];
     }

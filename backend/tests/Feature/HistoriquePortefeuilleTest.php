@@ -102,7 +102,7 @@ describe('GET /prestataire/portefeuille/mouvements', function () {
             ->assertJsonCount(20, 'data')
             ->assertJsonPath('meta.total', 22)
             ->assertJsonPath('data.0.libelle', 'M22');
-        expect(array_keys($page1->json('data.0')))->toBe(['id', 'type', 'montant', 'libelle', 'soldeApres', 'reservationId', 'retraitId', 'date']);
+        expect(array_keys($page1->json('data.0')))->toBe(['id', 'type', 'montant', 'libelle', 'soldeApres', 'reservationId', 'retraitId', 'prestation', 'operateur', 'statutRetrait', 'date']);
 
         $this->getJson('/api/v1/prestataire/portefeuille/mouvements?page=2')->assertOk()->assertJsonCount(2, 'data');
     });
