@@ -51,7 +51,7 @@ class RetraitController extends Controller
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","last":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","operateur":"wave","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","last":"https://api.exemple.test/api/v1/prestataire/retraits?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      */
@@ -65,11 +65,11 @@ class RetraitController extends Controller
      *
      * Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),
      * du plus récent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`
-     * augmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA).
+     * augmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA). `prestation` est le nom du service de la réservation liée (crédit), sinon `null` ; `operateur` (`wave` ou `orange_money`, `null` si inconnu) et `statutRetrait` (`en_cours`, `reussi` ou `echoue`) ne sont renseignés que pour un retrait.
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","type":"credit","montant":3000.0,"libelle":"Prestation terminée (acompte moins commission)","soldeApres":8000.0,"reservationId":"0198a1b2-0000-7000-8000-000000000020","retraitId":null,"date":"2030-01-15T08:50:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","last":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","type":"credit","montant":3000.0,"libelle":"Prestation terminée (acompte moins commission)","soldeApres":8000.0,"reservationId":"0198a1b2-0000-7000-8000-000000000020","retraitId":null,"prestation":"Vidange","operateur":null,"statutRetrait":null,"date":"2030-01-15T08:50:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","last":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      */
@@ -85,7 +85,7 @@ class RetraitController extends Controller
      *
      * @urlParam id string required Identifiant du retrait. Example: 0198a1b2-0000-7000-8000-000000000070
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","operateur":"wave","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 404 {"message":"Retrait introuvable."}
@@ -111,7 +111,7 @@ class RetraitController extends Controller
      *
      * @authenticated
      *
-     * @response 201 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
+     * @response 201 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","operateur":"wave","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      * @response 422 {"message":"Solde insuffisant.","errors":{"montant":["Solde insuffisant."]}}

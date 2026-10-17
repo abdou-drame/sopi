@@ -112,6 +112,7 @@ describe('détail et confidentialité', function () {
             'id' => $retrait->id,
             'montant' => 7500.0,
             'statut' => 'reussi',
+            'operateur' => 'wave',
             'telephoneVersement' => '+221******567',
             'dateDemande' => $retrait->fresh()->created_at->toIso8601String(),
             'dateTraitement' => $retrait->fresh()->traite_le->toIso8601String(),

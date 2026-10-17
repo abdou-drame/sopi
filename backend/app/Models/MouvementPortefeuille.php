@@ -7,6 +7,7 @@ use Database\Factories\MouvementPortefeuilleFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /** Ligne du journal du solde d'un prestataire. Écrite par les services du portefeuille, jamais en masse. */
 class MouvementPortefeuille extends Model
@@ -27,7 +28,17 @@ class MouvementPortefeuille extends Model
         ];
     }
 
-    /** Enregistre un mouvement ; à appeler dans la transaction qui modifie le solde, juste après la modification. */
+    public function reservation(): BelongsTo
+    {
+        return $this->belongsTo(Reservation::class);
+    }
+
+    public function retrait(): BelongsTo
+    {
+        return $this->belongsTo(Retrait::class);
+    }
+
+    /** Enregistre un mouvement ;à appeler dans la transaction qui modifie le solde, juste après la modification. */
     public static function enregistrer(
         string $prestataireId,
         TypeMouvementPortefeuille $type,

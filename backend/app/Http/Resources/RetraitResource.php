@@ -24,6 +24,7 @@ class RetraitResource extends JsonResource
             'id' => $this->id,
             'montant' => (float) $this->montant,
             'statut' => $this->statut->value,
+            'operateur' => $this->operateur?->value,
             'telephoneVersement' => self::masquer($this->telephone_versement),
             'dateDemande' => $this->created_at->toIso8601String(),
             'dateTraitement' => $this->traite_le?->toIso8601String(),

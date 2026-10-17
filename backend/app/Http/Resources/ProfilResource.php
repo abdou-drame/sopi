@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,6 +23,11 @@ class ProfilResource extends JsonResource
             'role' => $this->role->value,
             'statutCompte' => $this->statut->value,
             'dateCreation' => $this->created_at?->toIso8601String(),
+            // Bloc réservé au prestataire : absent pour un client et un administrateur.
+            'prestataire' => $this->when(
+                $this->role === Role::Prestataire && $this->prestataire !== null,
+                fn () => ProfilPublicPrestataireResource::identite($this->prestataire),
+            ),
         ];
     }
 }

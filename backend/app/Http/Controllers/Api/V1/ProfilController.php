@@ -24,7 +24,10 @@ class ProfilController extends Controller
     /**
      * Voir mon profil
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}
+     * Pour un prestataire, un bloc `prestataire` (`id`, `nomEntreprise`, `metier`, `quartier`) s'ajoute ; il est absent pour un client et un administrateur.
+     *
+     * @response 200 scenario="client" {"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}
+     * @response 200 scenario="prestataire" {"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Ndiaye","prenom":"Fatou","email":"fatou@example.com","telephone":"+221781234567","role":"prestataire","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Salon Fatou","metier":"Coiffure","quartier":"Keur Massar Nord"}}
      * @response 401 {"message":"Authentification requise."}
      */
     public function afficher(Request $request): ProfilResource
