@@ -29,7 +29,7 @@ class DepotInscriptionPrestataire {
     champ('mot_de_passe_confirmation', d.confirmation);
     champ('nom_entreprise', d.nomEntreprise.trim());
     champ('metier', d.metierCode ?? '');
-    champ('quartier', d.quartier ?? '');
+    champ('quartier', d.quartierNettoye);
     champ('adresse', d.adresse.trim());
 
     var i = 0;
