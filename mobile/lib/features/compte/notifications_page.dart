@@ -6,6 +6,8 @@ import '../../core/api/erreurs.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/liste_infinie.dart';
+import '../auth/session.dart';
+import '../auth/utilisateur.dart';
 import '../reservation/depot_reservation.dart';
 import 'depot_compte.dart';
 import 'modeles_notification.dart';
@@ -45,7 +47,13 @@ class _EtatNotifications extends ConsumerState<NotificationsPage> {
   }
 
   Future<void> _ouvrir(NotificationClient n) async {
-    final destination = destinationNotification(n);
+    final session = ref.read(sessionProvider);
+    final destination = destinationNotification(
+      n,
+      prestataire:
+          session is Connecte &&
+          session.utilisateur.role == RoleSopi.prestataire,
+    );
     if (!n.lue) {
       _controleur.modifier((x) => x.id == n.id, (x) => x.copieLue());
       try {

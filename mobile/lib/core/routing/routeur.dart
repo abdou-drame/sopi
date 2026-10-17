@@ -32,6 +32,7 @@ import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
+import '../../features/prestataire/tableau_page.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
 import 'ecrans_provisoires.dart';
@@ -65,7 +66,10 @@ String? redirectionSopi(
       if (chemin == '/' || Chemins.authentification.contains(chemin)) {
         return accueil;
       }
-      if (chemin == Chemins.etatApi) return null;
+      if (chemin == Chemins.etatApi || chemin == Chemins.notifications) {
+        // Les notifications sont communes aux deux espaces.
+        return null;
+      }
       final espacePrestataire =
           chemin == Chemins.racinePrestataire ||
           chemin.startsWith('${Chemins.racinePrestataire}/');
@@ -288,7 +292,7 @@ GoRouter creerRouteur({
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => _coque(_ongletsPrestataire, shell),
         branches: [
-          _onglet(Chemins.tableau, () => const EcranProvisoire(nom: 'Tableau')),
+          _onglet(Chemins.tableau, () => const TableauPage()),
           _onglet(Chemins.agenda, () => const EcranProvisoire(nom: 'Agenda')),
           _onglet(
             Chemins.portefeuille,

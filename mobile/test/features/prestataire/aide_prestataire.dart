@@ -53,3 +53,15 @@ Map<String, Object?> pageDemandesApi(
     'total': total ?? elements.length,
   },
 };
+
+Map<String, Object?> utilisateurPrestataire({String prenom = 'Fatou'}) => {
+  'data': {
+    'id': 'u-2',
+    'nom': 'Ndiaye',
+    'prenom': prenom,
+    'telephone': '+221771234568',
+    'email': 'fatou@exemple.sn',
+    'role': 'prestataire',
+    'statut': 'actif',
+  },
+};
