@@ -240,7 +240,7 @@ class _PuceCreneau extends StatelessWidget {
       ),
       StatutCreneau.indisponible => (
         CouleursSopi.ardoisePastel,
-        const Color(0xFF94A3B8),
+        CouleursSopi.texteDiscret,
         FontWeight.w600,
         heure,
       ),

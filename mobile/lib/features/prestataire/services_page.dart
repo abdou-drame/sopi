@@ -130,7 +130,7 @@ class _CarteService extends StatelessWidget {
                     fontSize: 12,
                     color: actif
                         ? CouleursSopi.texteDiscret
-                        : const Color(0xFF94A3B8),
+                        : CouleursSopi.texteDiscret,
                   ),
                 ),
               ],
@@ -142,7 +142,7 @@ class _CarteService extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: actif ? CouleursSopi.marine : const Color(0xFF94A3B8),
+              color: actif ? CouleursSopi.marine : CouleursSopi.texteDiscret,
             ),
           ),
           const SizedBox(width: 12),

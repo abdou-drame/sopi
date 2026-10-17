@@ -42,6 +42,10 @@ abstract final class CouleursSopi {
   static const texteSurMarine = Color(0xFFB8C4E6);
 
   // Squelettes de chargement
+  // Éléments désactivés ou décoratifs (jamais pour du texte : contraste insuffisant)
+  static const desactive = Color(0xFF94A3B8);
+  static const separateurLigne = Color(0xFFEEF2FA);
+
   static const squelette = Color(0xFFE3E9F6);
   static const squeletteClair = Color(0xFFEEF2FB);
 }

@@ -7,6 +7,7 @@ import '../../core/animation/apparition.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
+import '../../core/theme/dimensions.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_degrade.dart';
@@ -162,16 +163,20 @@ class _EnTeteAgenda extends StatelessWidget {
                     Text(
                       'Mon',
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 30,
-                        height: 36 / 30,
+                        fontSize: DimensionsSopi.tailleTitreEcran,
+                        height:
+                            DimensionsSopi.interligneTitreEcran /
+                            DimensionsSopi.tailleTitreEcran,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
                     Text(
                       'agenda',
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 30,
-                        height: 36 / 30,
+                        fontSize: DimensionsSopi.tailleTitreEcran,
+                        height:
+                            DimensionsSopi.interligneTitreEcran /
+                            DimensionsSopi.tailleTitreEcran,
                         fontWeight: FontWeight.w800,
                       ),
                     ),

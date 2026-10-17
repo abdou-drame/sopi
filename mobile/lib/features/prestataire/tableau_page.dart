@@ -176,8 +176,10 @@ class _EnteteTableau extends ConsumerWidget {
                         ],
                       ),
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 30,
-                        height: 36 / 30,
+                        fontSize: DimensionsSopi.tailleTitreEcran,
+                        height:
+                            DimensionsSopi.interligneTitreEcran /
+                            DimensionsSopi.tailleTitreEcran,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -219,8 +221,10 @@ class _CarteSolde extends ConsumerWidget {
         ),
         style: theme.textTheme.headlineMedium?.copyWith(
           color: CouleursSopi.blanc,
-          fontSize: 30,
-          height: 36 / 30,
+          fontSize: DimensionsSopi.tailleTitreEcran,
+          height:
+              DimensionsSopi.interligneTitreEcran /
+              DimensionsSopi.tailleTitreEcran,
           fontWeight: FontWeight.w800,
         ),
       );

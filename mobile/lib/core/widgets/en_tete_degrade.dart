@@ -234,18 +234,22 @@ class _EnTeteDegradeState extends State<EnTeteDegrade>
         Text(
           widget.titreLigne1,
           style: theme.textTheme.headlineMedium?.copyWith(
-            fontSize: 30,
+            fontSize: DimensionsSopi.tailleTitreEcran,
             fontWeight: FontWeight.w400,
-            height: 36 / 30,
+            height:
+                DimensionsSopi.interligneTitreEcran /
+                DimensionsSopi.tailleTitreEcran,
           ),
         ),
         if (widget.titreLigne2 != null)
           Text(
             widget.titreLigne2!,
             style: theme.textTheme.headlineMedium?.copyWith(
-              fontSize: 30,
+              fontSize: DimensionsSopi.tailleTitreEcran,
               fontWeight: FontWeight.w800,
-              height: 36 / 30,
+              height:
+                  DimensionsSopi.interligneTitreEcran /
+                  DimensionsSopi.tailleTitreEcran,
             ),
           ),
       ],

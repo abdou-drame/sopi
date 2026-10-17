@@ -82,8 +82,10 @@ class MiseEnPageFormulaire extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: 30,
-                            height: 36 / 30,
+                            fontSize: DimensionsSopi.tailleTitreEcran,
+                            height:
+                                DimensionsSopi.interligneTitreEcran /
+                                DimensionsSopi.tailleTitreEcran,
                             fontWeight: FontWeight.w400,
                           ),
                           children: [
