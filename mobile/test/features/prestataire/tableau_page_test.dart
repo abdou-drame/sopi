@@ -182,6 +182,15 @@ void main() {
       expect(find.bySemanticsLabel('À traiter'), findsOneWidget);
     });
 
+    testWidgets('Refuser ouvre l\'écran du motif', (tester) async {
+      _vue390(tester);
+      await lancerAcces(tester, AdaptateurSimule(_routes()), jeton: 'jeton');
+      await passerTransition(tester);
+      await tester.tap(find.text('Refuser'));
+      await passerTransition(tester);
+      expect(cheminCourant(tester), Chemins.refusReservation('r-1'));
+    });
+
     testWidgets('Accepter appelle l\'API puis relit le tableau', (
       tester,
     ) async {

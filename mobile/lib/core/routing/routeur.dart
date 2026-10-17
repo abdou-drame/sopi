@@ -32,6 +32,8 @@ import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
+import '../../features/prestataire/detail_demande_page.dart';
+import '../../features/prestataire/refus_motif_page.dart';
 import '../../features/prestataire/reservations_prestataire_page.dart';
 import '../../features/prestataire/tableau_page.dart';
 import 'barre_onglets.dart';
@@ -312,10 +314,14 @@ GoRouter creerRouteur({
         path: Chemins.reservationsPrestataire,
         builder: (_, _) => const ReservationsPrestatairePage(),
       ),
-      _provisoire(
-        '${Chemins.racinePrestataire}/reservations/:id',
-        'Réservation',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.racinePrestataire}/reservations/:id',
+        builder: (_, state) =>
+            DetailDemandePage(id: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '${Chemins.racinePrestataire}/reservations/:id/refus',
+        builder: (_, state) => RefusMotifPage(id: state.pathParameters['id']!),
       ),
       _provisoire(
         '${Chemins.racinePrestataire}/reservations/:id/demarrer',

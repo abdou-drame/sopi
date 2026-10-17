@@ -32,3 +32,23 @@ Future<bool> accepterDemande(
     return false;
   }
 }
+
+/// Refuse une demande avec son motif (3 à 500 caractères, déjà vérifiés par l'écran). Renvoie vrai si le serveur l'a refusée.
+Future<bool> refuserDemande(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+  String motif,
+) async {
+  final messager = ScaffoldMessenger.of(context);
+  try {
+    await ref.read(depotPrestataireProvider).refuser(id, motif);
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(const SnackBar(content: Text('Demande refusée.')));
+    return true;
+  } catch (e) {
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(SnackBar(content: Text(ErreurApi.depuis(e).message)));
+    return false;
+  }
+}

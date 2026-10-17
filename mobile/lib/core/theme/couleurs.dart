@@ -35,6 +35,8 @@ abstract final class CouleursSopi {
 
   // Délai de réponse qui court (« Il reste 11 h 20 »)
   static const ambre = Color(0xFFB45309);
+  static const ambrePastel = Color(0xFFFEF3C7);
+  static const ambreProfond = Color(0xFF92400E);
 
   // Texte discret sur fond marine (onglets inactifs)
   static const texteSurMarine = Color(0xFFB8C4E6);

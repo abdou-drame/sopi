@@ -9,3 +9,14 @@ String formaterReste(Duration restant) {
   final m = minutes % 60;
   return 'Il reste $h h ${m.toString().padLeft(2, '0')}';
 }
+
+/// « Il vous reste 11 h 20 pour répondre. » (détail d'une demande), ou le constat du délai dépassé.
+String formaterResteVous(Duration restant) {
+  if (restant <= Duration.zero) {
+    return 'Le délai de réponse est dépassé. La demande va être annulée.';
+  }
+  final reste = formaterReste(
+    restant,
+  ).replaceFirst('Il reste', 'Il vous reste');
+  return '$reste pour répondre. Passé ce délai, la demande est annulée.';
+}
