@@ -236,8 +236,12 @@ GoRouter creerRouteur({
         routes: [
           GoRoute(
             path: 'avis',
-            builder: (context, state) =>
-                AvisPrestatairePage(prestataireId: state.pathParameters['id']!),
+            builder: (context, state) => AvisPrestatairePage(
+              prestataireId: state.pathParameters['id']!,
+              nomEntreprise: state.extra is String
+                  ? state.extra as String
+                  : null,
+            ),
           ),
         ],
       ),

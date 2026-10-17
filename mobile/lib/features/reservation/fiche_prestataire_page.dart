@@ -557,7 +557,10 @@ class _CorpsFiche extends ConsumerWidget {
               lien: avis.asData?.value.elements.isNotEmpty == true
                   ? 'Tout voir'
                   : null,
-              onLien: () => context.push(Chemins.avisPrestataire(profil.id)),
+              onLien: () => context.push(
+                Chemins.avisPrestataire(profil.id),
+                extra: profil.nomEntreprise,
+              ),
             ),
           ),
           const SizedBox(height: 12),
