@@ -146,11 +146,19 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
     } else if (solde.hasError) {
       ligneSolde = InkWell(
         onTap: () => ref.invalidate(soldeProvider),
-        child: Text(
-          'Solde indisponible. Toucher pour réessayer.',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontSize: 13,
-            color: CouleursSopi.erreurTexte,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Solde indisponible. Toucher pour réessayer.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                decoration: TextDecoration.underline,
+                color: CouleursSopi.erreurTexte,
+              ),
+            ),
           ),
         ),
       );

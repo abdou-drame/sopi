@@ -150,7 +150,7 @@ class _EtatFeuille extends ConsumerState<_FeuilleAnnulation> {
                             children: [
                               const TextSpan(
                                 text:
-                                    'Vous pouvez annuler jusqu\'à 2 heures avant le rendez-vous. ',
+                                    'Vous pouvez annuler tant que le délai d\'annulation n\'est pas dépassé. ',
                               ),
                               TextSpan(
                                 text:

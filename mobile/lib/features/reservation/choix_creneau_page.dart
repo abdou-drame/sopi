@@ -450,7 +450,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
           ],
           const SizedBox(height: 16),
           Text(
-            'Seuls les créneaux libres sont affichés. Une fois choisi, le créneau est retenu 5 minutes. Passé ce délai, il faudra le choisir de nouveau.',
+            'Seuls les créneaux libres sont affichés. Une fois choisi, le créneau vous est réservé le temps du compte à rebours. Passé ce délai, il faudra le choisir de nouveau.',
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 12,
               height: 17 / 12,

@@ -18,8 +18,6 @@ import '../../core/widgets/en_tete_degrade.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/ligne_montant.dart';
 import 'annulation_reservation.dart';
-import 'demande_envoyee_page.dart'
-    show delaiPaiementHeures, delaiReponsePrestataireHeures;
 import 'depot_reservation.dart';
 import 'modeles.dart';
 import 'presentation_reservation.dart';
@@ -214,7 +212,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
   String _messageAttente(ReservationClient r) {
     final limite = r.reponseAvant;
     final delai = limite == null
-        ? 'Il a jusqu\'à $delaiReponsePrestataireHeures h pour répondre.'
+        ? 'Il a un délai limité pour répondre.'
         : 'Le prestataire a jusqu\'au ${_enMinuscule(formaterDate(limite))} pour répondre.';
     return 'En attente de la réponse du prestataire. $delai Vous êtes prévenu dès qu\'il répond.';
   }
@@ -238,8 +236,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
         _BlocAcceptee(
           message: 'Payez l\'acompte pour confirmer votre réservation.',
           paiementAvant: r.paiementAvant,
-          delai:
-              'Vous avez $delaiPaiementHeures h après l\'acceptation pour payer.',
+          delai: 'Vous avez un délai limité après l\'acceptation pour payer.',
           maintenant: ref.read(horlogeProvider),
           onExpire: _relire,
         ),

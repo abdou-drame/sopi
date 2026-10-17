@@ -189,7 +189,10 @@ void main() {
       tester,
     ) async {
       await _lancer(tester, chemin: Chemins.inscriptionInformations);
-      expect(find.text('E-mail'), findsOneWidget);
+      expect(
+        find.text('E-mail (pour le suivi de votre dossier)'),
+        findsOneWidget,
+      );
       expect(find.textContaining('facultatif'), findsNothing);
     });
 

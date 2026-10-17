@@ -124,7 +124,10 @@ void main() {
       final envois = _envois(serveur, '/demarrer');
       expect(envois, hasLength(1));
       expect(envois.single.data, {'code': 'K7MQ2P'});
-      expect(find.text('Code validé'), findsOneWidget);
+      expect(
+        find.text('Le code est bon. Vous pouvez démarrer la prestation.'),
+        findsOneWidget,
+      );
       expect(
         _lectures(serveur),
         greaterThan(avant),
@@ -151,7 +154,10 @@ void main() {
       await avancer(tester, 2500);
 
       expect(find.text('Code de réservation incorrect.'), findsOneWidget);
-      expect(find.text('Code validé'), findsNothing);
+      expect(
+        find.text('Le code est bon. Vous pouvez démarrer la prestation.'),
+        findsNothing,
+      );
       expect(
         tester.widget<TextField>(_champCode).enabled,
         isTrue,

@@ -149,7 +149,7 @@ void main() {
 
       expect(
         find.text(
-          'Trop de tentatives. Votre accès est bloqué 15 minutes. Réessayez dans 00:03.',
+          'Trop de tentatives. Votre accès est temporairement bloqué. Réessayez dans 00:03.',
         ),
         findsOneWidget,
       );

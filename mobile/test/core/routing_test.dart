@@ -47,6 +47,26 @@ void main() {
       },
     );
 
+    test(
+      'la racine « / » ne reste jamais affichée, quelle que soit la session',
+      () {
+        expect(
+          redirectionSopi(const SessionInconnue(), '/'),
+          Chemins.demarrage,
+        );
+        expect(redirectionSopi(const NonConnecte(), '/'), Chemins.connexion);
+        expect(redirectionSopi(const Connecte(_client), '/'), Chemins.accueil);
+        expect(
+          redirectionSopi(const Connecte(_prestataire), '/'),
+          Chemins.tableau,
+        );
+        expect(
+          redirectionSopi(const Restreint(message: 'Compte suspendu.'), '/'),
+          Chemins.compteRestreint,
+        );
+      },
+    );
+
     test('client : espace client, jamais l\'espace prestataire', () {
       const s = Connecte(_client);
       expect(redirectionSopi(s, Chemins.connexion), Chemins.accueil);

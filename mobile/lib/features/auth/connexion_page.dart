@@ -105,7 +105,7 @@ class _ConnexionPageState extends ConsumerState<ConnexionPage> {
                   onFin: () => setState(() => _blocage = null),
                   builder: (_, restant) => BandeauErreur.alerte(
                     message:
-                        'Trop de tentatives. Votre accès est bloqué 15 minutes. '
+                        'Trop de tentatives. Votre accès est temporairement bloqué. '
                         'Réessayez dans ${formaterDecompte(restant)}.',
                   ),
                 )

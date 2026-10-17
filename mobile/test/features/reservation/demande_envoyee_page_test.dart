@@ -44,7 +44,7 @@ void main() {
       expect(find.text('envoyée'), findsOneWidget);
       expect(
         find.text(
-          'Salon Fatou a 12 h pour répondre. Aucun paiement maintenant.',
+          'Salon Fatou va répondre à votre demande. Aucun paiement maintenant.',
         ),
         findsOneWidget,
       );
@@ -52,7 +52,10 @@ void main() {
       expect(find.text('Coupe femme'), findsOneWidget);
       expect(find.text(formaterDate(_reservation.debut)), findsOneWidget);
       expect(find.text(formaterArgent(5000)), findsOneWidget);
-      expect(find.textContaining('vous avez 2 h pour payer'), findsOneWidget);
+      expect(
+        find.textContaining('vous disposez d\'un délai limité pour payer'),
+        findsOneWidget,
+      );
       expect(find.text('Voir ma réservation'), findsOneWidget);
       expect(find.text("Retour à l'accueil"), findsOneWidget);
     });

@@ -86,7 +86,7 @@ void main() {
         find.text('Coupe femme · ${formaterDate(_debut)}'),
         findsOneWidget,
       );
-      expect(find.textContaining('jusqu\'à 12 h'), findsOneWidget);
+      expect(find.textContaining('délai limité pour répondre'), findsOneWidget);
       expect(find.text('Annuler la demande'), findsOneWidget);
       expect(find.textContaining('Payer'), findsNothing);
       expect(find.text('Code de démarrage'), findsNothing);
@@ -106,7 +106,10 @@ void main() {
         expect(find.text('Le prestataire a accepté'), findsOneWidget);
         // L'API ne donne pas l'échéance : pas de compte à rebours, seulement le rappel du délai.
         expect(find.textContaining('Il reste'), findsNothing);
-        expect(find.textContaining('Vous avez 2 h'), findsOneWidget);
+        expect(
+          find.textContaining('Vous avez un délai limité'),
+          findsOneWidget,
+        );
         expect(
           find.text('Payer l\'acompte · ${formaterArgent(1500)}'),
           findsOneWidget,

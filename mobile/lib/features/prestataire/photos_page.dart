@@ -244,25 +244,34 @@ class _Vignette extends ConsumerWidget {
           ),
         ),
         Positioned(
-          top: 6,
-          right: 6,
+          top: 0,
+          right: 0,
           child: Semantics(
             button: true,
             label: 'Supprimer la photo',
             child: GestureDetector(
               key: ValueKey('supprimer-$id'),
               onTap: onSupprimer,
-              child: Container(
-                width: 26,
-                height: 26,
-                decoration: const BoxDecoration(
-                  color: CouleursSopi.marine,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.close_rounded,
-                  size: 14,
-                  color: CouleursSopi.blanc,
+              // Zone tactile de 44 × 44 ; le rond visible reste de 26, à 6 du coin.
+              child: SizedBox(
+                width: 44,
+                height: 44,
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    margin: const EdgeInsets.all(6),
+                    width: 26,
+                    height: 26,
+                    decoration: const BoxDecoration(
+                      color: CouleursSopi.marine,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.close_rounded,
+                      size: 14,
+                      color: CouleursSopi.blanc,
+                    ),
+                  ),
                 ),
               ),
             ),

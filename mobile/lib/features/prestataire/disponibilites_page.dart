@@ -240,7 +240,7 @@ class _PuceCreneau extends StatelessWidget {
       ),
       StatutCreneau.indisponible => (
         CouleursSopi.ardoisePastel,
-        const Color(0xFF94A3B8),
+        CouleursSopi.texteDiscret,
         FontWeight.w600,
         heure,
       ),
@@ -248,7 +248,7 @@ class _PuceCreneau extends StatelessWidget {
     final libre = creneau.statut == StatutCreneau.libre;
     return Container(
       height: 34,
-      padding: EdgeInsets.only(left: 12, right: libre ? 4 : 12),
+      padding: EdgeInsets.only(left: 12, right: libre ? 0 : 12),
       decoration: BoxDecoration(
         color: fond,
         borderRadius: BorderRadius.circular(17),
@@ -268,9 +268,10 @@ class _PuceCreneau extends StatelessWidget {
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: onRetirer,
+                // Zone tactile de toute la hauteur de la pastille (34), le visuel de la croix ne change pas.
                 child: const SizedBox(
-                  width: 26,
-                  height: 26,
+                  width: 34,
+                  height: 34,
                   child: Icon(
                     Icons.close_rounded,
                     size: 13,

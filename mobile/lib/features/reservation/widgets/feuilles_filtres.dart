@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/api/erreurs.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/widgets/boutons.dart';
-import '../../../core/widgets/champ_texte.dart';
+import '../../../core/widgets/champ_formulaire.dart';
 import '../../../core/widgets/etats.dart';
 import '../depot_reservation.dart';
 import '../formats.dart';
@@ -272,7 +272,7 @@ class _FeuillePrixState extends State<FeuillePrix> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ChampTexte(
+        ChampFormulaire(
           libelle: 'Prix minimum (FCFA)',
           controleur: _min,
           clavier: TextInputType.number,
@@ -281,7 +281,7 @@ class _FeuillePrixState extends State<FeuillePrix> {
           onChanged: (_) => setState(() => _erreur = null),
         ),
         const SizedBox(height: 14),
-        ChampTexte(
+        ChampFormulaire(
           libelle: 'Prix maximum (FCFA)',
           controleur: _max,
           clavier: TextInputType.number,

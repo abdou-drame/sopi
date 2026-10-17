@@ -101,7 +101,10 @@ void main() {
       expect(find.text('Heures disponibles'), findsOneWidget);
       expect(find.text('10h00'), findsOneWidget);
       expect(find.text('11h00'), findsOneWidget);
-      expect(find.textContaining('retenu 5 minutes'), findsOneWidget);
+      expect(
+        find.textContaining('réservé le temps du compte à rebours'),
+        findsOneWidget,
+      );
       expect(find.text('Choisissez une heure'), findsOneWidget);
       final agenda = serveur.requetes.firstWhere(
         (r) => r.path == '/prestataires/p-1/agenda',

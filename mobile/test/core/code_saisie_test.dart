@@ -96,14 +96,20 @@ void main() {
       );
       await tester.enterText(find.byType(TextField), 'ABCDEF');
       await tester.pump();
-      expect(find.text('Vérification du code'), findsOneWidget);
+      expect(
+        find.text('Un instant, nous confirmons le code du client.'),
+        findsOneWidget,
+      );
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(succes, 0);
 
       reponse.complete();
       await tester.pump();
       await tester.pump();
-      expect(find.text('Code validé'), findsOneWidget);
+      expect(
+        find.text('Le code est bon. Vous pouvez démarrer la prestation.'),
+        findsOneWidget,
+      );
       expect(succes, 1);
     });
 
@@ -256,8 +262,14 @@ void main() {
         );
         await tester.enterText(find.byType(TextField), 'ABCDEF');
         await tester.pump();
-        expect(find.text('Vérification du code'), findsOneWidget);
-        expect(find.text('Code validé'), findsNothing);
+        expect(
+          find.text('Un instant, nous confirmons le code du client.'),
+          findsOneWidget,
+        );
+        expect(
+          find.text('Le code est bon. Vous pouvez démarrer la prestation.'),
+          findsNothing,
+        );
 
         await _avancer(tester, 900); // éventail 350 ms + fusion 300 ms
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -265,7 +277,10 @@ void main() {
 
         reponse.complete();
         await _avancer(tester, 1000); // coche et rebond
-        expect(find.text('Code validé'), findsOneWidget);
+        expect(
+          find.text('Le code est bon. Vous pouvez démarrer la prestation.'),
+          findsOneWidget,
+        );
         expect(succes, 1);
         await tester.pumpWidget(const SizedBox());
       },

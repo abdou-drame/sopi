@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/theme/couleurs.dart';
 import 'package:sopi/core/widgets/bandeaux.dart';
 import 'package:sopi/core/widgets/boutons.dart';
-import 'package:sopi/core/widgets/carte_sopi.dart';
-import 'package:sopi/core/widgets/champ_texte.dart';
+import 'package:sopi/core/widgets/champ_formulaire.dart';
 import 'package:sopi/core/widgets/decompte.dart';
 import 'package:sopi/core/widgets/en_tete_degrade.dart';
 import 'package:sopi/core/widgets/etats.dart';
@@ -68,13 +67,13 @@ void main() {
     });
   });
 
-  group('ChampTexte', () {
+  group('ChampFormulaire', () {
     testWidgets('affiche le libellé au-dessus et saisit du texte', (
       tester,
     ) async {
       final c = TextEditingController();
       await tester.pumpWidget(
-        enrober(ChampTexte(libelle: 'Téléphone', controleur: c)),
+        enrober(ChampFormulaire(libelle: 'Téléphone', controleur: c)),
       );
       expect(find.text('Téléphone'), findsOneWidget);
       await tester.enterText(find.byType(TextField), '771234567');
@@ -88,7 +87,7 @@ void main() {
     testWidgets("affiche l'erreur en rouge dessous", (tester) async {
       await tester.pumpWidget(
         enrober(
-          const ChampTexte(libelle: 'E-mail', erreur: 'Adresse invalide.'),
+          const ChampFormulaire(libelle: 'E-mail', erreur: 'Adresse invalide.'),
         ),
       );
       final erreur = find.text('Adresse invalide.');
@@ -105,7 +104,9 @@ void main() {
 
     testWidgets("l'œil montre et cache le mot de passe", (tester) async {
       await tester.pumpWidget(
-        enrober(const ChampTexte(libelle: 'Mot de passe', motDePasse: true)),
+        enrober(
+          const ChampFormulaire(libelle: 'Mot de passe', motDePasse: true),
+        ),
       );
       expect(
         tester.widget<TextField>(find.byType(TextField)).obscureText,
@@ -123,38 +124,6 @@ void main() {
         tester.widget<TextField>(find.byType(TextField)).obscureText,
         isTrue,
       );
-    });
-  });
-
-  group('CarteSopi', () {
-    testWidgets(
-      'affiche son contenu avec une bordure fine et réagit au toucher',
-      (tester) async {
-        var touche = false;
-        await tester.pumpWidget(
-          enrober(
-            CarteSopi(onTap: () => touche = true, child: const Text('Contenu')),
-          ),
-        );
-        await tester.pumpAndSettle();
-        expect(find.text('Contenu'), findsOneWidget);
-        await tester.tap(find.text('Contenu'));
-        expect(touche, isTrue);
-      },
-    );
-
-    testWidgets('apparaît en fondu par défaut, pas avec animer: false', (
-      tester,
-    ) async {
-      await tester.pumpWidget(enrober(const CarteSopi(child: Text('A'))));
-      expect(opacite(tester, find.text('A')), 0);
-      await tester.pumpAndSettle();
-      expect(opacite(tester, find.text('A')), 1);
-
-      await tester.pumpWidget(
-        enrober(const CarteSopi(animer: false, child: Text('B'))),
-      );
-      expect(opacite(tester, find.text('B')), 1);
     });
   });
 

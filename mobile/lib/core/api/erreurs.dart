@@ -111,7 +111,7 @@ class ErreurSession extends ErreurApi {
   const ErreurSession(super.message);
 }
 
-/// 422 : messages par champ (`errors`). [premierMessage] sert aux champs affichés sous un `ChampTexte`.
+/// 422 : messages par champ (`errors`). [premierMessage] sert aux champs affichés sous un `ChampFormulaire`.
 class ErreurValidation extends ErreurApi {
   const ErreurValidation(super.message, [this.champs = const {}]);
 

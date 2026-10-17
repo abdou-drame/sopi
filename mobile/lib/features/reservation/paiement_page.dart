@@ -534,7 +534,7 @@ class _Contenu extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  'Annulation gratuite jusqu\'à 2 h avant, mais l\'acompte n\'est pas remboursé. Il l\'est si le prestataire annule.',
+                  'Annulation possible avant le rendez-vous, mais l\'acompte n\'est pas remboursé. Il l\'est si le prestataire annule.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: CouleursSopi.texteDiscret,
                     height: 17 / 12,
@@ -903,7 +903,7 @@ class _Echec extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
       ),
       child: Text(
-        'Votre créneau est conservé pendant 2 heures. Passé ce délai sans paiement, la réservation est annulée automatiquement.',
+        'Votre créneau est conservé pendant un délai limité. Passé ce délai sans paiement, la réservation est annulée automatiquement.',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
           fontSize: 13,
           height: 19 / 13,

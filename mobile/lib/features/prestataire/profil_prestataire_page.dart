@@ -285,7 +285,9 @@ class _Ligne extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         decoration: BoxDecoration(
           border: separateur
-              ? const Border(bottom: BorderSide(color: Color(0xFFEEF2FA)))
+              ? const Border(
+                  bottom: BorderSide(color: CouleursSopi.separateurLigne),
+                )
               : null,
         ),
         child: Row(
@@ -321,7 +323,7 @@ class _Ligne extends StatelessWidget {
               const Icon(
                 Icons.chevron_right_rounded,
                 size: 18,
-                color: Color(0xFF94A3B8),
+                color: CouleursSopi.desactive,
               ),
           ],
         ),

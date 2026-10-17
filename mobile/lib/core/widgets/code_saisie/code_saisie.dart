@@ -346,7 +346,7 @@ class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
     }
     if (_phase == _Phase.verification) {
       return Text(
-        'Vérification du code',
+        'Un instant, nous confirmons le code du client.',
         style: theme.textTheme.bodyMedium?.copyWith(
           fontWeight: FontWeight.w700,
         ),
@@ -354,7 +354,7 @@ class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
     }
     if (_phase == _Phase.succes) {
       return Text(
-        'Code validé',
+        'Le code est bon. Vous pouvez démarrer la prestation.',
         style: theme.textTheme.bodyMedium?.copyWith(
           color: CouleursSopi.succesTexte,
           fontWeight: FontWeight.w700,
@@ -486,7 +486,8 @@ class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
                     child: CircularProgressIndicator(
                       strokeWidth: 4,
                       color: CouleursSopi.blanc,
-                      semanticsLabel: 'Vérification du code',
+                      semanticsLabel:
+                          'Un instant, nous confirmons le code du client.',
                     ),
                   ),
                 ),

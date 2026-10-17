@@ -333,7 +333,7 @@ class _Entete extends StatelessWidget {
                             fontSize: 14,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Rechercher un prestataire…',
+                            hintText: 'Rechercher un salon, un service…',
                             hintStyle: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 14,
                               color: CouleursSopi.texteDiscret,
