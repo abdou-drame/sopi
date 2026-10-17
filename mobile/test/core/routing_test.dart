@@ -133,7 +133,7 @@ void main() {
     });
 
     testWidgets(
-      'prestataire : coque Tableau / Agenda / Portefeuille / Profil',
+      'prestataire : coque Accueil / Agenda / Portefeuille / Profil',
       (tester) async {
         final serveur = AdaptateurSimule({
           'GET /me': const Simulee(200, {'id': '2', 'role': 'prestataire'}),

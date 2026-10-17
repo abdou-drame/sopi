@@ -81,7 +81,7 @@ const _ongletsClient = [
 ];
 
 const _ongletsPrestataire = [
-  OngletSopi(libelle: 'Tableau', icone: Icons.dashboard_rounded),
+  OngletSopi(libelle: 'Accueil', icone: Icons.home_rounded),
   OngletSopi(libelle: 'Agenda', icone: Icons.calendar_month_rounded),
   OngletSopi(
     libelle: 'Portefeuille',
@@ -303,11 +303,6 @@ GoRouter creerRouteur({
       _provisoire(Chemins.disponibilites, 'Disponibilités'),
       _provisoire(Chemins.retrait, 'Retrait'),
       _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),
-      _provisoire(
-        '${Chemins.racinePrestataire}/demandes/:id',
-        'Demande de réservation',
-        parametres: ['id'],
-      ),
       _provisoire(
         '${Chemins.racinePrestataire}/reservations/:id',
         'Réservation',
