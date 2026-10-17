@@ -13,6 +13,7 @@ import '../../core/widgets/champ_formulaire.dart';
 import '../../core/widgets/compte_a_rebours.dart';
 import '../../core/widgets/decompte.dart';
 import '../../core/widgets/en_tete_degrade.dart';
+import '../inscription_prestataire/stockage_jeton_suivi.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
 
@@ -188,6 +189,11 @@ class _ConnexionPageState extends ConsumerState<ConnexionPage> {
                   texte: 'Créer un compte',
                   onTap: () => context.push(Chemins.inscription),
                 ),
+                if (ref.watch(jetonSuiviProvider) != null)
+                  LienTexte(
+                    texte: 'Suivre mon dossier',
+                    onTap: () => context.push(Chemins.suiviDossier),
+                  ),
               ],
             ),
           ),

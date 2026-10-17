@@ -28,6 +28,10 @@ String formaterDate(DateTime date) {
   return '${jour[0].toUpperCase()}${jour.substring(1)}, $heure';
 }
 
+/// « 16 oct. 2026 » (date seule, heure UTC comme [formaterDate]). Nécessite [initialiserFormats].
+String formaterDateCourte(DateTime date) =>
+    DateFormat('d MMM y', 'fr_FR').format(date.toUtc());
+
 /// « +221 77 123 45 67 » à partir de +221771234567, 221771234567 ou 771234567. Autre valeur : renvoyée telle quelle
 /// (par exemple un numéro masqué comme +221******567).
 String formaterTelephone(String numero) {
