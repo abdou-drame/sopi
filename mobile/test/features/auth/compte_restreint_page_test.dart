@@ -132,6 +132,29 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    for (final cas in [
+      (
+        'suspendu',
+        'Votre accès est temporairement limité suite à une sanction.',
+      ),
+      ('refuse', "Votre demande d'inscription n'a pas été acceptée."),
+      ('banni', 'Votre accès à Sopi a été retiré.'),
+      (
+        'en_attente',
+        "Votre compte est en attente de validation par l'équipe Sopi.",
+      ),
+    ])
+      testWidgets('statutCompte ${cas.$1} : phrase propre au statut', (
+        tester,
+      ) async {
+        // Le message est neutre : seul `statutCompte` peut déterminer le type affiché.
+        await _arriver(tester, {
+          'message': 'Accès refusé.',
+          'statutCompte': cas.$1,
+        });
+        expect(find.text(cas.$2), findsOneWidget);
+      });
+
     test('TypeRestriction se déduit du message du serveur', () {
       expect(
         TypeRestriction.depuisMessage('Votre compte est suspendu.'),
