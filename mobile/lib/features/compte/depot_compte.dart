@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_client.dart';
 import '../../core/widgets/liste_infinie.dart';
 import 'modeles_litige.dart';
+import 'modeles_notification.dart';
 
 /// Requêtes du module Compte client (litiges, notifications, profil).
 class DepotCompte {
@@ -51,6 +52,22 @@ class DepotCompte {
     final corps = reponse.data as Map;
     final j = corps['data'] is Map ? corps['data'] as Map : corps;
     return LitigeClient.depuisJson(Map<String, dynamic>.from(j));
+  }
+
+  Future<PageListe<NotificationClient>> notifications(int page) async {
+    final reponse = await _dio.get<Object?>(
+      '/notifications',
+      queryParameters: {'page': page},
+    );
+    return NotificationClient.pageDepuisJson(reponse.data);
+  }
+
+  Future<void> marquerLue(String id) async {
+    await _dio.post<Object?>('/notifications/$id/lire');
+  }
+
+  Future<void> toutMarquerLu() async {
+    await _dio.post<Object?>('/notifications/lire-tout');
   }
 
   /// Octets d'une preuve ; le jeton est ajouté par le client HTTP commun.

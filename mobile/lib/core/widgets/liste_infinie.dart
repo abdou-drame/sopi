@@ -42,7 +42,7 @@ class ListeInfinie<T> extends StatefulWidget {
   const ListeInfinie({
     super.key,
     required this.titreLigne1,
-    required this.titreLigne2,
+    this.titreLigne2,
     required this.charger,
     required this.construire,
     required this.messageVide,
@@ -53,7 +53,7 @@ class ListeInfinie<T> extends StatefulWidget {
   });
 
   final String titreLigne1;
-  final String titreLigne2;
+  final String? titreLigne2;
   final Future<PageListe<T>> Function(int page) charger;
   final Widget Function(BuildContext, T) construire;
   final String messageVide;

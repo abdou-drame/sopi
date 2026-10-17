@@ -9,6 +9,7 @@ import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/compte/litige_page.dart';
+import '../../features/compte/notifications_page.dart';
 import '../../features/compte/signalements_pages.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
@@ -160,7 +161,10 @@ GoRouter creerRouteur({
       ),
 
       // — Espace client : parcours plein écran
-      _provisoire(Chemins.notifications, 'Notifications'),
+      GoRoute(
+        path: Chemins.notifications,
+        builder: (context, state) => const NotificationsPage(),
+      ),
       GoRoute(
         path: Chemins.prestataires,
         builder: (context, state) => ListePrestatairesPage(
