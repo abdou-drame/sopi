@@ -59,9 +59,14 @@ endpoints:
       subgroupDescription: ''
       title: 'Lister les quartiers'
       description: |-
-        Quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces superflus ignorés), triés
-        par ordre alphabétique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.
-        Passez la valeur telle quelle au filtre `GET /prestataires?quartier=`.
+        Sans paramètre : quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces
+        superflus ignorés), triés par ordre alphabétique. C'est la liste de la recherche des clients.
+
+        Avec `tous=1` : liste complète pour l'inscription d'un prestataire, c'est-à-dire le référentiel des quartiers (table
+        `quartiers`) réuni aux quartiers des prestataires actifs, sans doublon (casse, accents et espaces en trop ignorés), triée
+        sans tenir compte des accents. Le référentiel n'est qu'une liste de suggestions : le quartier d'un prestataire reste un texte libre.
+
+        Sans authentification. Passez la valeur telle quelle au filtre `GET /prestataires?quartier=`.
       authenticated: false
       deprecated: false
     headers:
@@ -69,8 +74,20 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      tous:
+        custom: []
+        name: tous
+        description: 'Mettre `1` (ou `true`) pour obtenir le référentiel complet. Toute autre valeur est ignorée.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanQueryParameters:
+      tous: true
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []

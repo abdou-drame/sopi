@@ -278,3 +278,24 @@ describe('POST /prestataires/inscription', function () {
             ->assertJsonPath('message', 'Trop de tentatives. Réessayez dans quelques instants.');
     });
 });
+
+describe('POST /prestataires/inscription : quartier', function () {
+    it('accepte un quartier du référentiel, même sans prestataire actif', function () {
+        expect(Prestataire::count())->toBe(0);
+
+        $this->getJson('/api/v1/quartiers?tous=1')->assertJsonFragment(['Keur Massar Sud']);
+        $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire(['quartier' => 'Keur Massar Sud']))->assertCreated();
+
+        expect(Prestataire::firstOrFail()->quartier)->toBe('Keur Massar Sud');
+    });
+
+    it('accepte un quartier libre, puis le propose dans la liste complète une fois le compte actif', function () {
+        $reponse = $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire(['quartier' => 'Quartier Libre']))->assertCreated();
+
+        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Keur Massar Nord', 'Keur Massar Sud']]);
+
+        Prestataire::findOrFail($reponse->json('id'))->user->forceFill(['statut' => StatutCompte::Actif])->save();
+
+        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Keur Massar Nord', 'Keur Massar Sud', 'Quartier Libre']]);
+    });
+});
