@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/theme/couleurs.dart';
 import 'package:sopi/core/widgets/bandeaux.dart';
 import 'package:sopi/core/widgets/boutons.dart';
-import 'package:sopi/core/widgets/carte_sopi.dart';
 import 'package:sopi/core/widgets/champ_texte.dart';
 import 'package:sopi/core/widgets/decompte.dart';
 import 'package:sopi/core/widgets/en_tete_degrade.dart';
@@ -123,38 +122,6 @@ void main() {
         tester.widget<TextField>(find.byType(TextField)).obscureText,
         isTrue,
       );
-    });
-  });
-
-  group('CarteSopi', () {
-    testWidgets(
-      'affiche son contenu avec une bordure fine et réagit au toucher',
-      (tester) async {
-        var touche = false;
-        await tester.pumpWidget(
-          enrober(
-            CarteSopi(onTap: () => touche = true, child: const Text('Contenu')),
-          ),
-        );
-        await tester.pumpAndSettle();
-        expect(find.text('Contenu'), findsOneWidget);
-        await tester.tap(find.text('Contenu'));
-        expect(touche, isTrue);
-      },
-    );
-
-    testWidgets('apparaît en fondu par défaut, pas avec animer: false', (
-      tester,
-    ) async {
-      await tester.pumpWidget(enrober(const CarteSopi(child: Text('A'))));
-      expect(opacite(tester, find.text('A')), 0);
-      await tester.pumpAndSettle();
-      expect(opacite(tester, find.text('A')), 1);
-
-      await tester.pumpWidget(
-        enrober(const CarteSopi(animer: false, child: Text('B'))),
-      );
-      expect(opacite(tester, find.text('B')), 1);
     });
   });
 

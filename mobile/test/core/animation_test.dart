@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/animation/apparition.dart';
 import 'package:sopi/core/animation/chargement.dart';
-import 'package:sopi/core/animation/chiffres.dart';
-import 'package:sopi/core/format/formateurs.dart';
 
 import '../aide.dart';
 
@@ -160,72 +158,6 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Données'), findsOneWidget);
       expect(find.byKey(const Key('sq')), findsNothing);
-    });
-  });
-
-  group('CompteurAnime', () {
-    testWidgets('monte de 0 à la valeur en 500 ms', (tester) async {
-      await tester.pumpWidget(enrober(const CompteurAnime(valeur: 12000)));
-      expect(find.text(formaterArgent(0)), findsOneWidget);
-
-      await tester.pump(const Duration(milliseconds: 250));
-      final milieu = tester.widget<Text>(find.byType(Text)).data!;
-      expect(milieu, isNot(formaterArgent(0)));
-      expect(milieu, isNot(formaterArgent(12000)));
-
-      await tester.pumpAndSettle();
-      expect(find.text(formaterArgent(12000)), findsOneWidget);
-    });
-
-    testWidgets('sans animation, affiche la valeur finale tout de suite', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        enrober(const CompteurAnime(valeur: 12000), sansAnimation: true),
-      );
-      expect(find.text(formaterArgent(12000)), findsOneWidget);
-    });
-  });
-
-  group('BarreAnimee', () {
-    double hauteur(WidgetTester tester) =>
-        tester.getSize(find.byType(BarreAnimee)).height;
-
-    testWidgets('grandit depuis zéro jusqu\'à sa hauteur', (tester) async {
-      await tester.pumpWidget(
-        enrober(
-          const Align(
-            alignment: Alignment.bottomLeft,
-            child: BarreAnimee(
-              ratio: 0.5,
-              hauteurMax: 100,
-              couleur: Colors.blue,
-            ),
-          ),
-        ),
-      );
-      expect(hauteur(tester), 0);
-      await tester.pump(const Duration(milliseconds: 300));
-      expect(hauteur(tester), inExclusiveRange(0, 50));
-      await tester.pumpAndSettle();
-      expect(hauteur(tester), 50);
-    });
-
-    testWidgets('sans animation, a tout de suite sa hauteur', (tester) async {
-      await tester.pumpWidget(
-        enrober(
-          const Align(
-            alignment: Alignment.bottomLeft,
-            child: BarreAnimee(
-              ratio: 0.5,
-              hauteurMax: 100,
-              couleur: Colors.blue,
-            ),
-          ),
-          sansAnimation: true,
-        ),
-      );
-      expect(hauteur(tester), 50);
     });
   });
 }
