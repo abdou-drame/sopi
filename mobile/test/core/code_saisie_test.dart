@@ -213,6 +213,31 @@ void main() {
         );
       },
     );
+    testWidgets(
+      '429 sans Retry-After : message du serveur tel quel, sans durée inventée, champ libre',
+      (tester) async {
+        await tester.pumpWidget(
+          enrober(
+            CodeSaisie(
+              onSubmit: (_) async =>
+                  throw const ErreurTropDeRequetes('Patientez un instant.'),
+            ),
+            sansAnimation: true,
+          ),
+        );
+        await tester.enterText(find.byType(TextField), 'ABCDEF');
+        await tester.pump();
+        await tester.pump();
+        await tester.pump();
+
+        expect(find.text('Patientez un instant.'), findsOneWidget);
+        expect(find.textContaining('Réessayez dans'), findsNothing);
+        expect(
+          tester.widget<TextField>(find.byType(TextField)).enabled,
+          isTrue,
+        );
+      },
+    );
   });
 
   group('animations', () {

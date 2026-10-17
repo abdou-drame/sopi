@@ -197,7 +197,7 @@
       "y": 5784,
       "w": 390,
       "h": 844,
-      "title": "Prestataire · Disponibilités"
+      "title": "Prestataire · Disponibilités (créneaux)"
     },
     "Retrait.dc.html": {
       "x": 1410,
@@ -379,14 +379,14 @@
       "y": 12532,
       "w": 390,
       "h": 844,
-      "title": "Prestataire · Congé ou indisponibilité"
+      "title": "Prestataire · Déclarer une indisponibilité"
     },
     "PlageHoraire.dc.html": {
       "x": 470,
       "y": 12532,
       "w": 390,
       "h": 844,
-      "title": "Prestataire · Horaires d'un jour"
+      "title": "Prestataire · Ajouter des créneaux"
     }
   },
   "order": [

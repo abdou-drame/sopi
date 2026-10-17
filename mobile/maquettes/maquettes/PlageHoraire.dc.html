@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Horaires d'un jour</title>
+<title>Ajouter des créneaux</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -21,16 +21,18 @@ button,input,textarea{font-family:inherit}
   <div style="position: absolute; left: 20px; right: 20px; top: 24px; display: flex; align-items: center; justify-content: space-between">
     <button aria-label="Retour" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
   </div>
-  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Horaires du<br><span style="font-weight: 800">lundi</span></div>
-  <div style="position: absolute; left: 16px; right: 16px; top: 214px; box-sizing: border-box; padding: 20px; border: 1px solid #e3e9f6; border-radius: 30px; background: #ffffff; display: flex; flex-direction: column; gap: 16px">
-    <div style="display: flex; align-items: center; justify-content: space-between"><div><div style="font-size: 15px; font-weight: 700">Jour travaillé</div><div style="font-size: 12px; color: #64708f">Désactivez pour fermer ce jour</div></div><span style="width: 48px; height: 28px; border-radius: 14px; background: #1d4ed8; position: relative"><span style="position: absolute; right: 3px; top: 3px; width: 22px; height: 22px; border-radius: 11px; background: #ffffff"></span></span></div>    <div style="display: flex; gap: 10px"><div style="flex: 1; min-width: 0"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Ouverture
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Ajouter des<br><span style="font-weight: 800">créneaux</span></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 214px; box-sizing: border-box; padding: 20px; border: 1px solid #e3e9f6; border-radius: 30px; background: #ffffff; display: flex; flex-direction: column; gap: 14px">
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Jour
+      <input type="text" value="Lun. 26 oct. 2026" placeholder="" style="width: 100%; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label>    <div style="display: flex; gap: 10px"><div style="flex: 1; min-width: 0"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">De
       <input type="text" value="08:00" placeholder="" style="width: 100%; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
-    </label></div><div style="flex: 1; min-width: 0"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Fermeture
+    </label></div><div style="flex: 1; min-width: 0"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">À
       <input type="text" value="18:00" placeholder="" style="width: 100%; min-width: 0; height: 50px; box-sizing: border-box; padding: 0 14px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
-    </label></div></div>
+    </label></div></div>    <div><div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 8px">Durée d'un créneau</div><div style="display: flex; flex-wrap: wrap; gap: 8px"><span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">30 min</span><span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">45 min</span><span style="height: 38px; padding: 0 14px; border-radius: 19px; background: #0f1b3d; color: #ffffff; font-size: 13px; font-weight: 700; display: flex; align-items: center">1 h</span><span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">1 h 30</span><span style="height: 38px; padding: 0 14px; border-radius: 19px; border: 1px solid #d5ddf0; font-size: 13px; font-weight: 600; display: flex; align-items: center">2 h</span></div></div>    <div style="display: flex; align-items: center; justify-content: space-between"><div><div style="font-size: 15px; font-weight: 700">Répéter chaque semaine</div><div style="font-size: 12px; color: #64708f">Pendant 4 semaines (8 au maximum)</div></div><span style="width: 48px; height: 28px; border-radius: 14px; background: #1d4ed8; position: relative"><span style="position: absolute; right: 3px; top: 3px; width: 22px; height: 22px; border-radius: 11px; background: #ffffff"></span></span></div>
   </div>
-  <div style="position: absolute; left: 20px; right: 20px; top: 430px; font-size: 12px; line-height: 17px; color: #64708f">Les créneaux proposés aux clients suivent ces horaires. Les réservations déjà confirmées ne sont pas modifiées.</div>
-  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px"><button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Enregistrer</button></div>
+  <div style="position: absolute; left: 20px; right: 20px; top: 604px; font-size: 12px; line-height: 17px; color: #64708f">Les clients pourront réserver ces créneaux. Les réservations déjà prises ne sont pas modifiées.</div>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px"><button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Créer les créneaux</button></div>
 
 </div>
 </x-dc>

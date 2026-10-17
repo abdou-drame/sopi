@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/erreurs.dart';
+import '../../core/format/formateurs.dart';
 import 'demandes_controleur.dart';
 import 'depot_prestataire.dart';
 
@@ -45,6 +46,61 @@ Future<bool> refuserDemande(
     await ref.read(depotPrestataireProvider).refuser(id, motif);
     rafraichirDemandes(ref, id);
     messager.showSnackBar(const SnackBar(content: Text('Demande refusée.')));
+    return true;
+  } catch (e) {
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(SnackBar(content: Text(ErreurApi.depuis(e).message)));
+    return false;
+  }
+}
+
+/// Annule une réservation acceptée ou confirmée avec son motif (3 à 500 caractères, déjà vérifiés par l'écran).
+/// Le client est remboursé par le serveur. Renvoie vrai si le serveur l'a annulée.
+Future<bool> annulerReservation(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+  String motif,
+) async {
+  final messager = ScaffoldMessenger.of(context);
+  try {
+    await ref.read(depotPrestataireProvider).annuler(id, motif);
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(
+      const SnackBar(
+        content: Text('Réservation annulée. Le client est remboursé.'),
+      ),
+    );
+    return true;
+  } catch (e) {
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(SnackBar(content: Text(ErreurApi.depuis(e).message)));
+    return false;
+  }
+}
+
+/// Termine la prestation. Le serveur crédite le portefeuille ; le message montre le montant réellement crédité
+/// (celui de la réponse, jamais recalculé). Renvoie vrai si la prestation est terminée.
+Future<bool> terminerPrestation(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+) async {
+  final messager = ScaffoldMessenger.of(context);
+  try {
+    final credit = await ref.read(depotPrestataireProvider).terminer(id);
+    rafraichirDemandes(ref, id);
+    ref.invalidate(soldeProvider);
+    final montant = credit.montantCredite;
+    messager.showSnackBar(
+      SnackBar(
+        content: Text(
+          montant == null
+              ? 'Prestation terminée.'
+              : 'Prestation terminée. ${formaterArgent(montant)} ajoutés à votre portefeuille.',
+        ),
+      ),
+    );
     return true;
   } catch (e) {
     rafraichirDemandes(ref, id);

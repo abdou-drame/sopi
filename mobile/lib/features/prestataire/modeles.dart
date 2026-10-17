@@ -118,3 +118,148 @@ enum OngletDemandes {
   final String? statut;
   final String? groupe;
 }
+
+/// Détail du crédit du portefeuille donné par `POST /prestataire/reservations/{id}/terminer`.
+/// Tous les montants viennent du serveur ; ils valent null si aucun crédit n'a eu lieu.
+class CreditPrestation {
+  const CreditPrestation({
+    required this.reservation,
+    this.montantTotal,
+    this.commission,
+    this.montantCredite,
+    this.soldeApres,
+  });
+
+  final DemandeReservation reservation;
+  final num? montantTotal;
+  final num? commission;
+  final num? montantCredite;
+  final num? soldeApres;
+
+  factory CreditPrestation.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return CreditPrestation(
+      reservation: DemandeReservation.depuisJson(j),
+      montantTotal: _nombre(j['montantTotal']),
+      commission: _nombre(j['commission']),
+      montantCredite: _nombre(j['montantCredite']),
+      soldeApres: _nombre(j['soldeApres']),
+    );
+  }
+}
+
+/// Prestation proposée par le prestataire (`GET /prestataire/prestations`). L'acompte n'y figure pas : il est calculé par le serveur.
+class PrestationService {
+  const PrestationService({
+    required this.id,
+    required this.nom,
+    required this.dureeMinutes,
+    required this.prix,
+    required this.actif,
+    this.domaine,
+  });
+
+  final String id;
+  final String nom;
+  final String? domaine;
+  final int dureeMinutes;
+  final num prix;
+  final bool actif;
+
+  /// Accepte l'objet seul ou enveloppé dans `data` (réponses de création et de modification).
+  factory PrestationService.depuisJson(Object? brut) {
+    var j = _objet(brut);
+    if (j['data'] is Map) j = _objet(j['data']);
+    return PrestationService(
+      id: '${j['id']}',
+      nom: '${j['nom'] ?? ''}',
+      domaine: j['domaine'] is String ? j['domaine'] as String : null,
+      dureeMinutes: _nombre(j['dureeMinutes'])?.toInt() ?? 0,
+      prix: _nombre(j['prix']) ?? 0,
+      actif: j['actif'] != false,
+    );
+  }
+}
+
+enum StatutCreneau {
+  libre,
+  verrouille,
+  reserve,
+  indisponible;
+
+  static StatutCreneau depuis(Object? brut) => switch (brut) {
+    'libre' => StatutCreneau.libre,
+    'verrouille' => StatutCreneau.verrouille,
+    'reserve' => StatutCreneau.reserve,
+    _ => StatutCreneau.indisponible,
+  };
+}
+
+/// Créneau de l'agenda du prestataire (`GET /prestataire/agenda`). Seul un créneau libre peut être retiré.
+class CreneauAgenda {
+  const CreneauAgenda({
+    required this.id,
+    required this.debut,
+    required this.fin,
+    required this.statut,
+  });
+
+  final String id;
+  final DateTime debut;
+  final DateTime fin;
+  final StatutCreneau statut;
+
+  factory CreneauAgenda.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return CreneauAgenda(
+      id: '${j['id']}',
+      debut: DateTime.parse('${j['dateDebut']}').toUtc(),
+      fin: DateTime.parse('${j['dateFin']}').toUtc(),
+      statut: StatutCreneau.depuis(j['statut']),
+    );
+  }
+}
+
+/// Plage à créer (`POST /prestataire/agenda/plages`). Les heures sont déjà au format « HH:MM ».
+class PlageHoraire {
+  const PlageHoraire({
+    required this.jour,
+    required this.heureDebut,
+    required this.heureFin,
+    required this.dureeCreneauMinutes,
+    this.repeterSemaines,
+  });
+
+  final String jour;
+  final String heureDebut;
+  final String heureFin;
+  final int dureeCreneauMinutes;
+  final int? repeterSemaines;
+
+  Map<String, Object?> versJson() => {
+    'date': jour,
+    'heure_debut': heureDebut,
+    'heure_fin': heureFin,
+    'duree_creneau_minutes': dureeCreneauMinutes,
+    'repeter_semaines': ?repeterSemaines,
+  };
+}
+
+/// Bilan d'une indisponibilité déclarée, tel que renvoyé par le serveur.
+class BilanIndisponibilite {
+  const BilanIndisponibilite({
+    required this.creneauxBloques,
+    required this.reservationsAnnulees,
+  });
+
+  final int creneauxBloques;
+  final int reservationsAnnulees;
+
+  factory BilanIndisponibilite.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return BilanIndisponibilite(
+      creneauxBloques: _nombre(j['creneauxBloques'])?.toInt() ?? 0,
+      reservationsAnnulees: _nombre(j['reservationsAnnulees'])?.toInt() ?? 0,
+    );
+  }
+}

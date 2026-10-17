@@ -61,7 +61,7 @@ void main() {
       const s = Connecte(_prestataire);
       expect(redirectionSopi(s, Chemins.connexion), Chemins.tableau);
       expect(redirectionSopi(s, Chemins.agenda), isNull);
-      expect(redirectionSopi(s, Chemins.demarrerPrestation('r1')), isNull);
+      expect(redirectionSopi(s, Chemins.annulationPrestataire('r1')), isNull);
       expect(redirectionSopi(s, Chemins.accueil), Chemins.tableau);
       expect(redirectionSopi(s, Chemins.reservations), Chemins.tableau);
     });

@@ -33,7 +33,12 @@ import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
 import '../../features/prestataire/agenda_page.dart';
-import '../../features/prestataire/detail_demande_page.dart';
+import '../../features/prestataire/aiguillage_reservation.dart';
+import '../../features/prestataire/disponibilites_page.dart';
+import '../../features/prestataire/indisponibilite_page.dart';
+import '../../features/prestataire/plage_horaire_page.dart';
+import '../../features/prestataire/service_form_page.dart';
+import '../../features/prestataire/services_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
 import '../../features/prestataire/reservations_prestataire_page.dart';
 import '../../features/prestataire/tableau_page.dart';
@@ -307,8 +312,27 @@ GoRouter creerRouteur({
       ),
 
       // — Espace prestataire : écrans plein écran
-      _provisoire(Chemins.services, 'Mes services'),
-      _provisoire(Chemins.disponibilites, 'Disponibilités'),
+      GoRoute(path: Chemins.services, builder: (_, _) => const ServicesPage()),
+      GoRoute(
+        path: Chemins.serviceNouveau,
+        builder: (_, _) => const ServiceFormPage(),
+      ),
+      GoRoute(
+        path: Chemins.serviceModifier(':id'),
+        builder: (_, state) => ServiceFormPage(id: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: Chemins.disponibilites,
+        builder: (_, _) => const DisponibilitesPage(),
+      ),
+      GoRoute(
+        path: Chemins.plageHoraire,
+        builder: (_, _) => const PlageHorairePage(),
+      ),
+      GoRoute(
+        path: Chemins.indisponibilite,
+        builder: (_, _) => const IndisponibilitePage(),
+      ),
       _provisoire(Chemins.retrait, 'Retrait'),
       _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),
       GoRoute(
@@ -318,16 +342,16 @@ GoRouter creerRouteur({
       GoRoute(
         path: '${Chemins.racinePrestataire}/reservations/:id',
         builder: (_, state) =>
-            DetailDemandePage(id: state.pathParameters['id']!),
+            AiguillageReservationPrestataire(id: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '${Chemins.racinePrestataire}/reservations/:id/refus',
         builder: (_, state) => RefusMotifPage(id: state.pathParameters['id']!),
       ),
-      _provisoire(
-        '${Chemins.racinePrestataire}/reservations/:id/demarrer',
-        'Démarrer la prestation',
-        parametres: ['id'],
+      GoRoute(
+        path: '${Chemins.racinePrestataire}/reservations/:id/annulation',
+        builder: (_, state) =>
+            RefusMotifPage(id: state.pathParameters['id']!, annulation: true),
       ),
     ],
   );

@@ -52,7 +52,12 @@ abstract final class Chemins {
   static const portefeuille = '/prestataire/portefeuille';
   static const profilPrestataire = '/prestataire/profil';
   static const services = '/prestataire/services';
+  static const serviceNouveau = '/prestataire/services/nouveau';
+  static String serviceModifier(String id) =>
+      '/prestataire/services/$id/modifier';
   static const disponibilites = '/prestataire/disponibilites';
+  static const plageHoraire = '/prestataire/disponibilites/plage';
+  static const indisponibilite = '/prestataire/disponibilites/indisponibilite';
   static const retrait = '/prestataire/retrait';
   static const historiqueRetraits = '/prestataire/retraits';
   static const reservationsPrestataire = '/prestataire/reservations';
@@ -60,8 +65,8 @@ abstract final class Chemins {
       '/prestataire/reservations/$id/refus';
   static String reservationPrestataire(String id) =>
       '/prestataire/reservations/$id';
-  static String demarrerPrestation(String id) =>
-      '/prestataire/reservations/$id/demarrer';
+  static String annulationPrestataire(String id) =>
+      '/prestataire/reservations/$id/annulation';
 
   /// Routes accessibles sans être connecté.
   static const publiques = <String>{
