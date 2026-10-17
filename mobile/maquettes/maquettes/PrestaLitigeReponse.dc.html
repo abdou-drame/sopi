@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Répondre à un signalement</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,textarea{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 230px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 30%, #c7d2fe 0%, rgba(199,210,254,0) 60%), #eef4ff"></div>
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px; display: flex; align-items: center; justify-content: space-between">
+    <button aria-label="Retour" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+  </div>
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Répondre au<br><span style="font-weight: 800">signalement</span></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 214px; box-sizing: border-box; padding: 20px; border: 1px solid #e3e9f6; border-radius: 30px; background: #ffffff; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 16px; font-weight: 700">Aminata D.</div><span style="height: 26px; padding: 0 12px; border-radius: 13px; background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center">À traiter</span></div>
+    <div style="font-size: 13px; color: #64708f">Coupe femme · Sam. 24 oct., 10h00</div>
+    <div><div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 6px">Motif</div><span style="height: 34px; padding: 0 14px; border-radius: 17px; background: #0f1b3d; color: #ffffff; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center">Prestataire absent</span></div>
+    <div><div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 6px">Ce que dit le client</div><div style="font-size: 14px; line-height: 20px; color: #0f1b3d">Le prestataire ne s'est pas présenté au rendez-vous.</div></div>
+    <div><div style="font-size: 12px; font-weight: 600; color: #4a5678; margin-bottom: 8px">Preuves du client</div><div style="display: flex; gap: 10px"><div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg,#c7d2fe,#bfdbfe)"></div><div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg,#c7d2fe,#bfdbfe)"></div></div></div>
+  </div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 562px; box-sizing: border-box; padding: 14px; border: 1px solid #e3e9f6; border-radius: 30px; background: #ffffff; display: flex; flex-direction: column; gap: 14px">
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Votre réponse
+      <textarea style="height: 88px; box-sizing: border-box; padding: 14px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 14px; color: #0f1b3d; resize: none">J'étais présent à l'heure convenue, le client n'est pas venu.</textarea>
+    </label>
+  </div>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px; display: flex; flex-direction: column; gap: 10px"><button style="height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Envoyer ma réponse</button><div style="text-align: center; font-size: 12px; color: #64708f">Un administrateur examinera les deux versions.</div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -148,14 +148,14 @@
       "y": 3856,
       "w": 390,
       "h": 844,
-      "title": "Prestataire · Inscription 1/3"
+      "title": "Prestataire · Inscription 1/3 (activité)"
     },
     "PrestaInscription2.dc.html": {
       "x": 0,
       "y": 4820,
       "w": 390,
       "h": 844,
-      "title": "Prestataire · Inscription 2/3"
+      "title": "Prestataire · Inscription 3/3 (justificatifs)"
     },
     "SuiviDossier.dc.html": {
       "x": 470,
@@ -296,6 +296,97 @@
       "w": 390,
       "h": 844,
       "title": "Commun · Aide et support"
+    },
+    "PrestaCompte.dc.html": {
+      "x": 470,
+      "y": 9640,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Inscription 2/3 (informations)"
+    },
+    "PrestaAvis.dc.html": {
+      "x": 940,
+      "y": 9640,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Avis reçus"
+    },
+    "AvisPrestataire.dc.html": {
+      "x": 1410,
+      "y": 9640,
+      "w": 390,
+      "h": 844,
+      "title": "Client · Tous les avis d'un prestataire"
+    },
+    "PrestaLitiges.dc.html": {
+      "x": 0,
+      "y": 10604,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Signalements reçus"
+    },
+    "PrestaLitigeReponse.dc.html": {
+      "x": 470,
+      "y": 10604,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Répondre à un signalement"
+    },
+    "PrestaProfil.dc.html": {
+      "x": 940,
+      "y": 10604,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Profil"
+    },
+    "PrestaReservations.dc.html": {
+      "x": 1410,
+      "y": 10604,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Demandes et réservations"
+    },
+    "PrestaDetailDemande.dc.html": {
+      "x": 0,
+      "y": 11568,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Détail d'une demande"
+    },
+    "PrestaTerminer.dc.html": {
+      "x": 470,
+      "y": 11568,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Terminer la prestation"
+    },
+    "PrestaPhotos.dc.html": {
+      "x": 940,
+      "y": 11568,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Photos de l'entreprise"
+    },
+    "ServiceForm.dc.html": {
+      "x": 1410,
+      "y": 11568,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Ajouter / modifier un service"
+    },
+    "Conge.dc.html": {
+      "x": 0,
+      "y": 12532,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Congé ou indisponibilité"
+    },
+    "PlageHoraire.dc.html": {
+      "x": 470,
+      "y": 12532,
+      "w": 390,
+      "h": 844,
+      "title": "Prestataire · Horaires d'un jour"
     }
   },
   "order": [
@@ -324,6 +415,7 @@
     "ChangerMotDePasse.dc.html",
     "Aide.dc.html",
     "PrestaInscription1.dc.html",
+    "PrestaCompte.dc.html",
     "PrestaInscription2.dc.html",
     "SuiviDossier.dc.html",
     "DossierRefuse.dc.html",
@@ -339,13 +431,25 @@
     "Portefeuille.dc.html",
     "Retrait.dc.html",
     "RetraitEchec.dc.html",
-    "Suspendu.dc.html"
+    "Suspendu.dc.html",
+    "PrestaAvis.dc.html",
+    "AvisPrestataire.dc.html",
+    "PrestaLitiges.dc.html",
+    "PrestaLitigeReponse.dc.html",
+    "PrestaProfil.dc.html",
+    "PrestaReservations.dc.html",
+    "PrestaDetailDemande.dc.html",
+    "PrestaTerminer.dc.html",
+    "PrestaPhotos.dc.html",
+    "ServiceForm.dc.html",
+    "Conge.dc.html",
+    "PlageHoraire.dc.html"
   ],
   "notes": {
     "titre": {
       "x": 0,
       "y": -300,
-      "text": "Sopi · Application mobile — 41 écrans, client et prestataire",
+      "text": "Sopi · Application mobile — 54 écrans, client et prestataire",
       "kind": "title1",
       "maxW": 1800
     }
