@@ -118,3 +118,32 @@ enum OngletDemandes {
   final String? statut;
   final String? groupe;
 }
+
+/// Détail du crédit du portefeuille donné par `POST /prestataire/reservations/{id}/terminer`.
+/// Tous les montants viennent du serveur ; ils valent null si aucun crédit n'a eu lieu.
+class CreditPrestation {
+  const CreditPrestation({
+    required this.reservation,
+    this.montantTotal,
+    this.commission,
+    this.montantCredite,
+    this.soldeApres,
+  });
+
+  final DemandeReservation reservation;
+  final num? montantTotal;
+  final num? commission;
+  final num? montantCredite;
+  final num? soldeApres;
+
+  factory CreditPrestation.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return CreditPrestation(
+      reservation: DemandeReservation.depuisJson(j),
+      montantTotal: _nombre(j['montantTotal']),
+      commission: _nombre(j['commission']),
+      montantCredite: _nombre(j['montantCredite']),
+      soldeApres: _nombre(j['soldeApres']),
+    );
+  }
+}

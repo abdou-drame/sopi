@@ -59,6 +59,32 @@ class DepotPrestataire {
     );
     return DemandeReservation.depuisJson(reponse.data);
   }
+
+  /// Démarre la prestation avec le code du client. 422 si le code est faux, 429 après 5 essais par minute.
+  Future<DemandeReservation> demarrer(String id, String code) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/reservations/$id/demarrer',
+      data: {'code': code},
+    );
+    return DemandeReservation.depuisJson(reponse.data);
+  }
+
+  /// Termine la prestation : le serveur crédite le portefeuille et renvoie les montants du crédit.
+  Future<CreditPrestation> terminer(String id) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/reservations/$id/terminer',
+    );
+    return CreditPrestation.depuisJson(reponse.data);
+  }
+
+  /// Annule une réservation acceptée ou confirmée (le client est remboursé par le serveur).
+  Future<DemandeReservation> annuler(String id, String motif) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/reservations/$id/annuler',
+      data: {'motif': motif},
+    );
+    return DemandeReservation.depuisJson(reponse.data);
+  }
 }
 
 final depotPrestataireProvider = Provider<DepotPrestataire>(

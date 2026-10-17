@@ -57,10 +57,10 @@ class CodeSaisie extends StatefulWidget {
   final VoidCallback? onSucces;
 
   @override
-  State<CodeSaisie> createState() => _CodeSaisieState();
+  State<CodeSaisie> createState() => CodeSaisieState();
 }
 
-class _CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
+class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
   static const _hauteurCase = 46.0;
   static const _ecart = 8.0;
   static const _tailleCarre = 96.0;
@@ -153,6 +153,16 @@ class _CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
     }
   }
 
+  /// Envoie le code saisi (bouton « Démarrer la prestation ») s'il est complet et qu'aucun envoi n'est en cours.
+  void soumettreSiComplet() {
+    if (_saisieActive && _code.length == longueurCode) {
+      unawaited(_soumettre(_code));
+    }
+  }
+
+  /// Vrai quand les 6 caractères sont saisis et qu'un envoi est possible.
+  bool get peutSoumettre => _saisieActive && _code.length == longueurCode;
+
   Future<void> _soumettre(String code) async {
     setState(() {
       _phase = _Phase.verification;
@@ -212,7 +222,8 @@ class _CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
       _ => erreur.message,
     };
 
-    if (erreur is ErreurTropDeRequetes) {
+    // Sans Retry-After, aucune durée n'est inventée : le message du serveur est affiché tel quel.
+    if (erreur is ErreurTropDeRequetes && erreur.delai != null) {
       _bloquer(erreur);
       return;
     }
@@ -227,7 +238,7 @@ class _CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
 
   void _bloquer(ErreurTropDeRequetes erreur) {
     _minuteurBlocage?.cancel();
-    _blocageRestant = erreur.delai ?? const Duration(seconds: 60);
+    _blocageRestant = erreur.delai!;
     setState(() {
       _phase = _Phase.bloque;
       _erreur = null;

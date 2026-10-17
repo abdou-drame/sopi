@@ -16,9 +16,12 @@ const motifMax = 500;
 
 /// Motif du refus (maquette RefusMotif) : 3 à 500 caractères, montré au client.
 class RefusMotifPage extends ConsumerStatefulWidget {
-  const RefusMotifPage({super.key, required this.id});
+  const RefusMotifPage({super.key, required this.id, this.annulation = false});
 
   final String id;
+
+  /// Vrai pour annuler une réservation acceptée ou confirmée (le client est remboursé) au lieu de refuser une demande.
+  final bool annulation;
 
   @override
   ConsumerState<RefusMotifPage> createState() => _RefusMotifPageState();
@@ -42,13 +45,24 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
 
   Future<void> _confirmer() async {
     setState(() => _enCours = true);
-    final ok = await refuserDemande(context, ref, widget.id, _motif);
+    final bool ok;
+    if (widget.annulation) {
+      ok = await annulerReservation(context, ref, widget.id, _motif);
+    } else {
+      ok = await refuserDemande(context, ref, widget.id, _motif);
+    }
     if (!mounted) return;
     setState(() => _enCours = false);
     // Refusée : on revient. Sinon (409…), le message est affiché et la demande relue.
     if (ok) {
-      // Retour à l'écran d'où l'on venait (détail ou liste) ; le détail se relit.
-      _retour();
+      if (widget.annulation) {
+        // Annulée : retour à la liste des réservations, relue.
+        context.go(Chemins.tableau);
+        context.push(Chemins.reservationsPrestataire);
+      } else {
+        // Retour à l'écran d'où l'on venait (détail ou liste) ; le détail se relit.
+        _retour();
+      }
     }
   }
 
@@ -66,8 +80,10 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
               padding: EdgeInsets.zero,
               children: [
                 EnTeteDegrade(
-                  titreLigne1: 'Refuser',
-                  titreLigne2: 'la demande',
+                  titreLigne1: widget.annulation ? 'Annuler' : 'Refuser',
+                  titreLigne2: widget.annulation
+                      ? 'la prestation'
+                      : 'la demande',
                   onRetour: _retour,
                 ),
                 if (demande != null)
@@ -131,7 +147,9 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Motif du refus (obligatoire)',
+                          widget.annulation
+                              ? "Motif de l'annulation (obligatoire)"
+                              : 'Motif du refus (obligatoire)',
                           style: theme.textTheme.labelLarge?.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -217,11 +235,12 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 16, 16, 24),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   child: BandeauInfo(
-                    message:
-                        'Le client verra ce motif et pourra choisir un autre créneau.',
+                    message: widget.annulation
+                        ? 'Le client sera remboursé intégralement et verra ce motif.'
+                        : 'Le client verra ce motif et pourra choisir un autre créneau.',
                   ),
                 ),
               ],
@@ -238,7 +257,9 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 BoutonMarine(
-                  libelle: 'Confirmer le refus',
+                  libelle: widget.annulation
+                      ? "Confirmer l'annulation"
+                      : 'Confirmer le refus',
                   chargement: _enCours,
                   onPressed: _valide && !_enCours ? _confirmer : null,
                 ),

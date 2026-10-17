@@ -60,8 +60,8 @@ abstract final class Chemins {
       '/prestataire/reservations/$id/refus';
   static String reservationPrestataire(String id) =>
       '/prestataire/reservations/$id';
-  static String demarrerPrestation(String id) =>
-      '/prestataire/reservations/$id/demarrer';
+  static String annulationPrestataire(String id) =>
+      '/prestataire/reservations/$id/annulation';
 
   /// Routes accessibles sans être connecté.
   static const publiques = <String>{

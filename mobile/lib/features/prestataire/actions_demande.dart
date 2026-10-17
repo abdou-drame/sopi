@@ -52,3 +52,28 @@ Future<bool> refuserDemande(
     return false;
   }
 }
+
+/// Annule une réservation acceptée ou confirmée avec son motif (3 à 500 caractères, déjà vérifiés par l'écran).
+/// Le client est remboursé par le serveur. Renvoie vrai si le serveur l'a annulée.
+Future<bool> annulerReservation(
+  BuildContext context,
+  WidgetRef ref,
+  String id,
+  String motif,
+) async {
+  final messager = ScaffoldMessenger.of(context);
+  try {
+    await ref.read(depotPrestataireProvider).annuler(id, motif);
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(
+      const SnackBar(
+        content: Text('Réservation annulée. Le client est remboursé.'),
+      ),
+    );
+    return true;
+  } catch (e) {
+    rafraichirDemandes(ref, id);
+    messager.showSnackBar(SnackBar(content: Text(ErreurApi.depuis(e).message)));
+    return false;
+  }
+}
