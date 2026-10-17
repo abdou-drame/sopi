@@ -30,6 +30,21 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
     final d = ref.read(formulaireInscriptionProvider);
     _entreprise = TextEditingController(text: d.nomEntreprise);
     _adresse = TextEditingController(text: d.adresse);
+    // Erreurs du serveur (422) renvoyées depuis l'étape 3 : affichées sous les bons champs.
+    const cles = {'nom_entreprise', 'metier', 'quartier', 'adresse'};
+    final serveur = ref.read(erreursServeurInscriptionProvider);
+    _erreurs = {
+      for (final e in serveur.entries)
+        if (cles.contains(e.key)) e.key: e.value,
+    };
+    _tentative = _erreurs.isNotEmpty;
+    if (_tentative) {
+      Future.microtask(() {
+        if (mounted) {
+          ref.read(erreursServeurInscriptionProvider.notifier).prendre(cles);
+        }
+      });
+    }
   }
 
   @override

@@ -17,6 +17,7 @@ import '../../features/compte/profil_client_page.dart';
 import '../../features/compte/signalements_pages.dart';
 import '../../features/inscription_prestataire/etape_activite_page.dart';
 import '../../features/inscription_prestataire/etape_informations_page.dart';
+import '../../features/inscription_prestataire/etape_justificatifs_page.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
@@ -153,7 +154,10 @@ GoRouter creerRouteur({
         path: Chemins.inscriptionInformations,
         builder: (_, _) => const EtapeInformationsPage(),
       ),
-      _provisoire(Chemins.inscriptionJustificatifs, 'Justificatifs'),
+      GoRoute(
+        path: Chemins.inscriptionJustificatifs,
+        builder: (_, _) => const EtapeJustificatifsPage(),
+      ),
       _provisoire(Chemins.suiviDossier, 'Suivi du dossier'),
       GoRoute(
         path: Chemins.compteRestreint,

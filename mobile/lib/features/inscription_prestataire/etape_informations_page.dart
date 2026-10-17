@@ -38,6 +38,28 @@ class _EtapeInformationsPageState extends ConsumerState<EtapeInformationsPage> {
     _email = TextEditingController(text: d.email);
     _motDePasse = TextEditingController(text: d.motDePasse);
     _confirmation = TextEditingController(text: d.confirmation);
+    // Erreurs du serveur (422) renvoyées depuis l'étape 3 : affichées sous les bons champs.
+    const cles = {
+      'prenom',
+      'nom',
+      'telephone',
+      'email',
+      'mot_de_passe',
+      'mot_de_passe_confirmation',
+    };
+    final serveur = ref.read(erreursServeurInscriptionProvider);
+    _erreurs = {
+      for (final e in serveur.entries)
+        if (cles.contains(e.key)) e.key: e.value,
+    };
+    _tentative = _erreurs.isNotEmpty;
+    if (_tentative) {
+      Future.microtask(() {
+        if (mounted) {
+          ref.read(erreursServeurInscriptionProvider.notifier).prendre(cles);
+        }
+      });
+    }
   }
 
   @override
