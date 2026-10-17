@@ -51,7 +51,6 @@ import '../../features/prestataire/reservations_prestataire_page.dart';
 import '../../features/prestataire/tableau_page.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
-import 'ecrans_provisoires.dart';
 
 /// Redirection selon la session. Renvoie null si l'utilisateur peut rester sur [chemin].
 /// [jetonSuivi] : jeton d'un dossier prestataire déposé sur ce téléphone ; il permet d'envoyer un compte
@@ -129,19 +128,6 @@ StatefulShellBranch _onglet(String chemin, Widget Function() ecran) =>
       routes: [GoRoute(path: chemin, builder: (_, _) => ecran())],
     );
 
-/// Route d'un écran futur, branchée sur un écran provisoire.
-GoRoute _provisoire(
-  String chemin,
-  String nom, {
-  List<String> parametres = const [],
-}) => GoRoute(
-  path: chemin,
-  builder: (_, etat) => EcranProvisoire(
-    nom: nom,
-    parametres: {for (final p in parametres) p: etat.pathParameters[p] ?? ''},
-  ),
-);
-
 GoRouter creerRouteur({
   required EtatSession Function() session,
   String? Function()? jetonSuivi,
@@ -157,11 +143,8 @@ GoRouter creerRouteur({
       jetonSuivi: jetonSuivi?.call(),
     ),
     routes: [
-      GoRoute(
-        path: '/',
-        redirect: (_, _) => null,
-        builder: (_, _) => const EcranProvisoire(nom: 'Sopi'),
-      ),
+      // La racine ne s'affiche jamais : elle renvoie au démarrage, puis la redirection globale choisit la destination.
+      GoRoute(path: '/', redirect: (_, _) => Chemins.demarrage),
       GoRoute(
         path: Chemins.demarrage,
         builder: (_, _) =>
@@ -182,7 +165,6 @@ GoRouter creerRouteur({
         path: Chemins.motDePasseOublie,
         builder: (_, _) => const MotDePasseOubliePage(),
       ),
-      _provisoire(Chemins.reinitialisation, 'Réinitialisation du mot de passe'),
       GoRoute(
         path: Chemins.inscriptionPrestataire,
         builder: (_, _) => const EtapeActivitePage(),
@@ -270,11 +252,6 @@ GoRouter creerRouteur({
         builder: (context, state) =>
             PaiementPage(reservationId: state.pathParameters['id']!),
       ),
-      _provisoire(
-        '${Chemins.reservations}/:id/annulation',
-        'Annulation',
-        parametres: ['id'],
-      ),
       GoRoute(
         path: '${Chemins.reservations}/:id/avis',
         builder: (context, state) =>
@@ -294,7 +271,6 @@ GoRouter creerRouteur({
         builder: (context, state) =>
             DetailSignalementPage(litigeId: state.pathParameters['id']!),
       ),
-      _provisoire(Chemins.retourPaiement, 'Retour de paiement'),
       GoRoute(
         path: Chemins.profilModifier,
         builder: (context, state) => const ModifierProfilPage(),

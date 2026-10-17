@@ -1,5 +1,4 @@
 /// Toutes les routes de l'application, déclarées en un seul endroit.
-/// Les écrans « futurs » sont branchés sur un écran provisoire (voir `routeur.dart`) jusqu'à leur développement.
 abstract final class Chemins {
   // — Technique
   static const demarrage = '/demarrage';
@@ -9,7 +8,6 @@ abstract final class Chemins {
   static const connexion = '/connexion';
   static const inscription = '/inscription';
   static const motDePasseOublie = '/mot-de-passe-oublie';
-  static const reinitialisation = '/reinitialisation';
   static const inscriptionPrestataire = '/inscription-prestataire';
   static const inscriptionInformations =
       '/inscription-prestataire/informations';
@@ -33,10 +31,8 @@ abstract final class Chemins {
       '/prestataires/$prestataireId/creneau';
   static String paiement(String reservationId) =>
       '/reservations/$reservationId/paiement';
-  static const retourPaiement = '/paiement/retour';
   static String demandeEnvoyee(String id) => '/reservations/$id/envoyee';
   static String detailReservation(String id) => '/reservations/$id';
-  static String annulation(String id) => '/reservations/$id/annulation';
   static String avis(String id) => '/reservations/$id/avis';
   static String litige(String id) => '/reservations/$id/litige';
   static const signalements = '/profil/signalements';
@@ -86,7 +82,6 @@ abstract final class Chemins {
     connexion,
     inscription,
     motDePasseOublie,
-    reinitialisation,
     inscriptionPrestataire,
     inscriptionInformations,
     inscriptionJustificatifs,
@@ -99,7 +94,6 @@ abstract final class Chemins {
     connexion,
     inscription,
     motDePasseOublie,
-    reinitialisation,
     inscriptionPrestataire,
     inscriptionInformations,
     inscriptionJustificatifs,
