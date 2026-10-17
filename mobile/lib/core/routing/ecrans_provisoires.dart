@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../features/auth/session.dart';
+import 'chemins.dart';
 import '../theme/dimensions.dart';
 import '../widgets/boutons.dart';
 
@@ -70,6 +72,16 @@ class ProfilProvisoire extends ConsumerWidget {
                 ),
                 if (nom.isNotEmpty) Text(nom),
                 const SizedBox(height: 24),
+                BoutonSecondaire(
+                  libelle: 'Mes services',
+                  onPressed: () => context.push(Chemins.services),
+                ),
+                const SizedBox(height: 12),
+                BoutonSecondaire(
+                  libelle: 'Mes disponibilités',
+                  onPressed: () => context.push(Chemins.disponibilites),
+                ),
+                const SizedBox(height: 12),
                 BoutonSecondaire(
                   libelle: 'Se déconnecter',
                   onPressed: () =>
