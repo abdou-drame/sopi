@@ -56,7 +56,9 @@ void main() {
       expect(find.text('Coupe femme · 24 oct.'), findsOneWidget);
       expect(find.text('Publier mon avis'), findsOneWidget);
       expect(
-        find.text('Votre avis sera visible sur la fiche du prestataire.'),
+        find.text(
+          'Votre avis est visible immédiatement sur la fiche du prestataire.',
+        ),
         findsOneWidget,
       );
       expect(find.textContaining('modéré'), findsNothing);

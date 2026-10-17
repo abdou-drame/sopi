@@ -144,7 +144,7 @@ class _EtapeInformationsPageState extends ConsumerState<EtapeInformationsPage> {
               onChanged: (v) => _modifier((d) => d.copie(telephone: v)),
             ),
             ChampFormulaire(
-              libelle: 'E-mail',
+              libelle: 'E-mail (pour le suivi de votre dossier)',
               controleur: _email,
               erreur: _erreurs['email'],
               clavier: TextInputType.emailAddress,

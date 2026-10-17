@@ -30,8 +30,7 @@ const libellesNotes = <int, String>{
 const longueurMinCommentaire = 3;
 const longueurMaxCommentaire = 1000;
 
-/// « Comment s'est passée la prestation ? » (maquette Avis). L'avis est publié tout de suite : la phrase du bas
-/// remplace celle de la maquette (« modéré avant d'être affiché »).
+/// « Comment s'est passée la prestation ? » (maquette Avis). L'avis est publié tout de suite.
 class AvisPage extends ConsumerStatefulWidget {
   const AvisPage({super.key, required this.reservationId});
 
@@ -264,7 +263,7 @@ class _EtatAvis extends ConsumerState<AvisPage> {
                     if (bas == 0) ...[
                       const SizedBox(height: 10),
                       Text(
-                        'Votre avis sera visible sur la fiche du prestataire.',
+                        'Votre avis est visible immédiatement sur la fiche du prestataire.',
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,

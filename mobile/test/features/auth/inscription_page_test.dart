@@ -51,7 +51,7 @@ void main() {
         'Prénom',
         'Nom',
         'Téléphone',
-        'E-mail (facultatif)',
+        'E-mail (facultatif, utile pour récupérer votre compte)',
         'Mot de passe',
         'Confirmer le mot de passe',
       ]) {

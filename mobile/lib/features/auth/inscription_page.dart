@@ -172,7 +172,8 @@ class _InscriptionPageState extends ConsumerState<InscriptionPage> {
                   onChanged: (_) => _effacer('telephone'),
                 ),
                 ChampFormulaire(
-                  libelle: 'E-mail (facultatif)',
+                  libelle:
+                      'E-mail (facultatif, utile pour récupérer votre compte)',
                   controleur: _email,
                   hauteur: 50,
                   margeInterne: 14,
