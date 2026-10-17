@@ -4,7 +4,7 @@ Branche `feature/p4c-audit`, créée depuis `main` (`e74fe38`, qui contient 4b-6
 Aucun code, aucune configuration modifiés. Aucun secret lu ni écrit. Chaque affirmation cite fichier et ligne ; ce qui n'a pas pu être vérifié est écrit « non vérifié ».
 
 > La synthèse (partie 4) sera placée en tête de ce document à la fin de l'audit.
-> Parties livrées pour l'instant : **1, 2**. À venir : 3 (qualité), 4 (synthèse).
+> Parties livrées pour l'instant : **1, 2, 3**. À venir : 4 (synthèse).
 
 Notation des chemins : `B:` = `backend/`, `M:` = `mobile/lib/`.
 
@@ -280,4 +280,83 @@ ConnexionBloquee, CodeVerification, CodeValide, CodeFaux, PaiementOk, PaiementEc
 7. Pas de pourcentages (30 %, 10 %) ni de « 2 h », et libellés « Il reste … » dérivés de `reponseAvant` (maquettes `Detail*:36,40,43`, `Paiement:43`, `PrestaDetailDemande:30,32,33`, `PrestaTerminer:30`, `Prestation:41`, `CodeFaux:41`).
 
 Le dépistage confirme seulement le nº 7 (les textes « (30 %) » et « (10 %) » sont absents du Dart). Les autres sont déclarés par l'architecte et n'ont pas été réexaminés.
+
+
+---
+
+# Partie 3 — Qualité
+
+## 3.1 Analyse statique et tests (exécutés dans le worktree d'audit, `mobile/`)
+
+| Commande | Résultat |
+|---|---|
+| `flutter analyze` | **Aucun problème** (« No issues found! », 24,6 s). |
+| `flutter test` (suite complète) | **531 tests, tous au vert** (« All tests passed! », 4 min 23 s). |
+
+Aucun code n'a été modifié pour obtenir ces résultats. Remarque : `flutter pub get` signale 45 paquets avec une version plus récente incompatible avec les contraintes (information, pas une erreur).
+
+## 3.2 Dépendances (`mobile/pubspec.yaml`)
+
+Utilisation comptée par fichiers de `lib/` important `package:<nom>/` :
+
+| Dépendance | Fichiers | Constat |
+|---|---|---|
+| `flutter_riverpod` | 68 | utilisée |
+| `go_router` | 41 | utilisée |
+| `dio` | 10 | utilisée |
+| `intl` | 7 | utilisée |
+| `flutter_secure_storage`, `google_fonts`, `url_launcher`, `image_picker`, `package_info_plus`, `file_picker` | 1-2 chacune | utilisées |
+| `flutter_localizations` | 1 (`main.dart:29`) | utilisée |
+| `cupertino_icons` | **0** (aucun `CupertinoIcons` dans `lib/`) | **inutilisée** : MINEUR. Les `GlobalCupertinoLocalizations` de `main.dart:29` viennent de `flutter_localizations`, pas de ce paquet |
+| `firebase_messaging` | absent | attendu par le CLAUDE.md pour le push ; voir 1.2 (b) |
+
+Doublons : aucune dépendance en double dans `pubspec.yaml`.
+
+## 3.3 Code mort
+
+- `lib/core/animation/chiffres.dart` (`CompteurAnime`, `BarreAnimee`) : **aucun import** dans `lib/` (recherche du nom du fichier dans tous les `import`). Non vérifié si des tests l'utilisent. MINEUR.
+- `lib/core/widgets/carte_sopi.dart` (`CarteSopi`) : jamais importé par `lib/`, seulement testé (`test/core/widgets_test.dart:129-149`). Code mort en production. MINEUR.
+- `main.dart` : point d'entrée, non importé (normal).
+- **Doublon de widget** : `core/widgets/champ_texte.dart` (`ChampTexte`) et `core/widgets/champ_formulaire.dart` (`ChampFormulaire`) font la même chose (champ avec bascule afficher / masquer le mot de passe : `champ_formulaire.dart:122-135`, `champ_texte.dart:85-95`). `ChampFormulaire` est utilisé par 11 fichiers, `ChampTexte` par un seul. MINEUR (dette).
+- Méthode de recherche : rapprochement du nom de fichier, pas une analyse de classes inutilisées à l'intérieur d'un fichier importé ; il peut rester du code mort non détecté.
+
+## 3.4 Boutons inactifs, TODO, écran provisoire
+
+| Recherche (`onPressed: null`, `onTap: () {}`, `onPressed: () {}`, `TODO`, `FIXME`) | Résultat |
+|---|---|
+| `TODO` / `FIXME` / `onTap: () {}` / `onPressed: () {}` | **Aucun** dans `lib/`. |
+| `onPressed: null` | 1 seul : `features/auth/mot_de_passe_oublie_page.dart:142` — **voulu** : bouton « Renvoyer dans N s » désactivé pendant le délai de renvoi ; ce n'est pas un bouton mort. |
+| `EcranProvisoire` | défini `core/routing/ecrans_provisoires.dart:6`, utilisé par `_provisoire` (`routeur.dart:133-143`) et en direct à `routeur.dart:163` (route `/`). |
+
+**`EcranProvisoire` est-il jamais affiché ?** Sur les 4 routes provisoires de 1.4 : `/reinitialisation`, `/reservations/:id/annulation` et `/paiement/retour` ne sont jamais ciblées par une navigation (aucun appel à `Chemins.reinitialisation`, `annulation`, `retourPaiement` en dehors de `chemins.dart`) : **inaccessibles par l'interface**. La route `/` (`routeur.dart:160-164`) est le point d'entrée : son affichage dépend de la redirection au démarrage ; **non vérifié** qu'elle redirige toujours avant le rendu (aucun test d'intégration ne le prouve). Un lien profond externe (`/reinitialisation?...`) afficherait en revanche l'écran provisoire : **non testé**.
+
+## 3.5 Gestion des erreurs, états vides, double envoi
+
+Méthode : recherche des pages qui lisent un `AsyncValue` (`.when`, `hasError`, `hasValue`) et comptage des mentions « Réessayer » / composants d'erreur, puis lecture des cas à 0 ou 1.
+
+| Constat | Détail | Gravité |
+|---|---|---|
+| `portefeuille_page.dart` : l'erreur de solde n'a pas de bouton « Réessayer », mais un texte cliquable | `:109-119` : « Solde indisponible. Toucher pour réessayer. » dans un `InkWell` (cible = une ligne de texte de 13 pt, blanc sur fond dégradé). La relance existe ; la découvrabilité et la taille de cible sont faibles. L'historique du portefeuille n'a pas été vérifié séparément (**non vérifié**) | MINEUR |
+| `retrait_page.dart` : aucune mention « Réessayer » | l'état d'erreur de chargement du solde (`solde.hasValue` testé à `:127`) n'a pas été lu au-delà de `:134` ; **non vérifié** ce qui s'affiche quand le chargement échoue (le bouton est-il bloqué ? le message vient-il du serveur ?) | à vérifier |
+| Double envoi | Les envois de formulaire lus portent une garde : `connexion_page.dart:34,65` (`_envoi`), `retrait_page.dart:36,56` (`_enCours`), bouton en mode `chargement` (`:314`). Seul `onPressed: () async` hors formulaire : `suivi_dossier_page.dart:176` (« Contacter le support », ouvre la messagerie, sans effet de bord métier) : sans garde mais sans risque. Les autres écrans (paiement, litige, avis, annulation, service, disponibilités) n'ont **pas** été relus un par un pour cette garde : **non vérifié**, couvert en partie par les tests de la suite | non vérifié |
+| États vide | Présents là où des tests les couvrent (ex. « Aucun avis pour le moment. » `test/features/reservation/fiche_prestataire_page_test.dart:121-125,199-206`). Les autres écrans de liste n'ont pas été systématiquement relus | non vérifié |
+
+Je n'ai donc **pas** pu établir la liste complète des écrans sans état vide ou sans « Réessayer » ; seuls `portefeuille_page.dart` et `retrait_page.dart` sont remontés par le dépistage et ont été lus partiellement.
+
+## 3.6 Accessibilité (contrôle de code, pas de lecteur d'écran ni de capture)
+
+| Point | Constat | Gravité |
+|---|---|---|
+| Boutons-icônes sans libellé | Les deux `IconButton` du code (bascule du mot de passe, `champ_formulaire.dart:122`, `champ_texte.dart:85`) ont un `tooltip`. 44 occurrences de `tooltip:`/`Semantics(` pour 60 `IconButton`/`GestureDetector`/`InkWell`. Les cibles « croix » des créneaux (`disponibilites_page.dart:264-273`) et des photos (`photos_page.dart:249-257`) ont un `Semantics`. Les autres `GestureDetector`/`InkWell` n'ont pas été tous relus : **non vérifié** | non vérifié |
+| Cibles tactiles trop petites | Croix de suppression de créneau : **26 × 26 px** (`disponibilites_page.dart:272-273`) ; bouton de suppression de photo : hauteur **26 px** (`photos_page.dart:257`) ; cases / pastilles 22 × 22 (`etape_activite_page.dart:143-144,185-186`) ; lien « Solde indisponible… » : une ligne de 13 pt. Le seuil usuel est 44-48 px | VISIBLE (croix créneau et photo) / MINEUR |
+| Petits textes | 12 usages de `fontSize: 11` (`notifications_page.dart:178`, `agenda_page.dart:243,431,503`, `tableau_page.dart:333`, `choix_creneau_page.dart:502`, `fiche_prestataire_page.dart:109,395,682`, `widgets/composants.dart:253`, `widgets/liste_avis.dart:218`, `accueil_client_page.dart:616`) | MINEUR |
+| Contraste (calculé sur les couleurs de `core/theme/couleurs.dart`) | `texteSecondaire` `#4A5678` sur blanc : 7,26 ✔ ; `texteDiscret` `#64708F` sur blanc : 4,93 ✔, sur `#F7F9FF` : 4,69 ✔ ; `erreurTexte` `#B91C1C` : 6,47 ✔ ; `succesTexte` `#15803D` sur `#DCFCE7` : 4,57 ✔ (seuil 4,5) ; **`#94A3B8` sur blanc : 2,56 ✘** (en dur : `disponibilites_page.dart:243`, `profil_prestataire_page.dart:324`) | VISIBLE si ce gris porte du texte lisible (icône ou texte : **non vérifié** ce que colorie `0xFF94A3B8`) |
+| Texte clair sur fond clair | Non recensé de façon exhaustive ; blanc sur dégradé bleu des en-têtes non calculé | non vérifié |
+
+## 3.7 Secrets (dépôt public)
+
+- Fichiers suivis par Git (`git ls-files`) correspondant à `.env`, `*.jks`, `*.keystore`, `key.properties`, `google-services`, `firebase*.json`, `service-account` : **aucun**.
+- `.gitignore` (racine) exclut `.env`, `.env.*` (sauf `.env.example`), `*.jks`, `*.keystore`, `key.properties`, `google-services.json` (`.gitignore:2-9`).
+- Recherche de motifs de clés (`AKIA…`, clé privée PEM, `sk_live_`, `AIza…`, `password|secret|api_key|token = <16+ caractères>`) sur tout le dépôt suivi, hors verrous, `resources/views` et PDF : 4 occurrences, **toutes factices ou de code** (`admin-web/src/auth/connexion.test.tsx:45` valeur de test « mot-de-passe-factice » ; `backend/tests/.../PayerReservationTest.php:304` et `WebhookPaiementTest.php:73` : constantes de test ; `mobile/lib/features/auth/inscription_page.dart:62` : nom de champ). **Aucun secret trouvé.**
+- Limites : la recherche couvre l'arbre courant, **pas l'historique** Git (non vérifié) ; aucune valeur de secret n'est reproduite dans ce rapport.
 
