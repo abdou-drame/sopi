@@ -83,7 +83,7 @@ class DossierInscription {
 
   /// Quartier tel qu'il est envoyé et validé : espaces de début, de fin et répétés retirés.
   String get quartierNettoye =>
-      (quartier ?? '').trim().replaceAll(RegExp(r's+'), ' ');
+      (quartier ?? '').trim().replaceAll(RegExp(r'\s+'), ' ');
 
   DossierInscription copie({
     String? nomEntreprise,
