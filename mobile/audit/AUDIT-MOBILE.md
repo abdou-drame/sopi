@@ -4,7 +4,7 @@ Branche `feature/p4c-audit`, créée depuis `main` (`e74fe38`, qui contient 4b-6
 Aucun code, aucune configuration modifiés. Aucun secret lu ni écrit. Chaque affirmation cite fichier et ligne ; ce qui n'a pas pu être vérifié est écrit « non vérifié ».
 
 > La synthèse (partie 4) sera placée en tête de ce document à la fin de l'audit.
-> Parties livrées pour l'instant : **1**. À venir : 2 (maquettes), 3 (qualité), 4 (synthèse).
+> Parties livrées pour l'instant : **1, 2**. À venir : 3 (qualité), 4 (synthèse).
 
 Notation des chemins : `B:` = `backend/`, `M:` = `mobile/lib/`.
 
@@ -186,3 +186,98 @@ Note : les écarts « pas de pourcentage (30 %, 10 %) ni de « 2 h » » figuren
 ### Points à vérifier en partie 3
 - `EcranProvisoire` jamais affiché en navigation réelle (aucun test d'intégration ne le prouve).
 - Aucun secret : le dépôt ne contient que l'URL publique de l'API et aucune clé (recherche rapide `key|secret|token` sur `environnement.dart` : aucune valeur sensible lue). Contrôle complet en partie 3.
+
+---
+
+# Partie 2 — Maquettes contre code
+
+## 2.0 Méthode et limites (à lire avant les résultats)
+
+- **54 fichiers** `.dc.html` dans `mobile/maquettes/maquettes/` (le `LISEZ-MOI.txt` annonce « 35 écrans » : il est périmé). Chacun a été rapproché d'un fichier Dart (tableau 2.1). **Aucune maquette sans écran** : 54/54 ont un écran. Plusieurs maquettes sont des **états** d'un même écran (Code*/Prestation, Detail*/DetailReservation, Paiement*/Paiement, Retrait*/Retrait, Dossier*/SuiviDossier, ConnexionBloquee/Connexion).
+- **Dépistage automatique** (scripts dans le scratchpad, non versionnés) : pour chaque maquette, extraction des textes, des couleurs hexadécimales, des `font-size`, `font-weight`, `border-radius` et des hauteurs 36-64 px, puis recherche dans le Dart de l'écran et des widgets partagés (`core/`). Limites : (1) un texte n'est « absent » que s'il n'est pas retrouvé tel quel, et les **données d'exemple** des maquettes (Salon Fatou, 3 500 FCFA, dates) sont dynamiques dans l'app : ignorées, elles ne sont pas des écarts ; (2) les rayons des boutons valent `hauteur / 2` (`core/widgets/boutons.dart:62`), donc le dépistage signale à tort des rayons 23, 25, 27, 28 : **faux positifs** ; (3) les positions `top/left` des maquettes sont absolues alors que le Dart utilise des `Column`/`Padding` : comparaison **non vérifiée** pixel par pixel.
+- **Lecture manuelle** du code pour : connexion, inscription, photos, profil prestataire, en-têtes et boutons partagés. Les autres écrans ont été passés au dépistage seulement ; ce qui n'a pas pu être confirmé est écrit « non vérifié ».
+- Rien n'a été lancé sur appareil ni en capture d'écran : **le rendu réel n'a pas été comparé visuellement**. Les écarts ci-dessous sont des écarts de code contre maquette, pas de capture contre capture.
+
+Légende : **BLOQUANT** = change le sens ou empêche d'utiliser ; **VISIBLE** = un utilisateur le remarque en comparant ; **MINEUR** = détail.
+
+## 2.1 Correspondance maquette → écran
+
+| Maquette | Écran Dart (`M:lib/features/`) |
+|---|---|
+| Connexion, ConnexionBloquee | `auth/connexion_page.dart` |
+| Inscription | `auth/inscription_page.dart` |
+| MotDePasse | `auth/mot_de_passe_oublie_page.dart` |
+| Suspendu | `auth/compte_restreint_page.dart` |
+| PrestaInscription1 / 2, PrestaCompte | `inscription_prestataire/etape_activite_page.dart` / `etape_justificatifs_page.dart` / `etape_informations_page.dart` |
+| SuiviDossier, DossierRefuse | `inscription_prestataire/suivi_dossier_page.dart` |
+| Main | `reservation/accueil_client_page.dart` |
+| Prestataires | `reservation/liste_prestataires_page.dart` |
+| Fiche, AvisPrestataire | `reservation/fiche_prestataire_page.dart`, `avis_prestataire_page.dart` |
+| Creneau, DemandeEnvoyee | `reservation/choix_creneau_page.dart`, `demande_envoyee_page.dart` |
+| Reservations | `reservation/mes_reservations_page.dart` |
+| DetailEnAttente / DetailAPayer / DetailReservation | `reservation/detail_reservation_page.dart` |
+| Paiement, PaiementOk, PaiementEchec | `reservation/paiement_page.dart` |
+| Annulation, Avis | `reservation/annulation_reservation.dart`, `avis_page.dart` |
+| Profil, ModifierProfil, ChangerMotDePasse | `compte/profil_client_page.dart`, `modifier_profil_page.dart`, `changer_mot_de_passe_page.dart` |
+| Notifications, Aide, Litige | `compte/notifications_page.dart`, `aide_page.dart`, `litige_page.dart` |
+| Tableau, Agenda | `prestataire/tableau_page.dart`, `agenda_page.dart` |
+| PrestaReservations, PrestaDetailDemande, RefusMotif | `prestataire/reservations_prestataire_page.dart`, `detail_demande_page.dart`, `refus_motif_page.dart` |
+| Prestation, CodeVerification, CodeValide, CodeFaux | `prestataire/prestation_page.dart` (+ `core/widgets/code_saisie/code_saisie.dart`) |
+| PrestaTerminer | `prestataire/terminer_prestation_page.dart` |
+| Services, ServiceForm | `prestataire/services_page.dart`, `service_form_page.dart` |
+| Disponibilites, PlageHoraire, Conge | `prestataire/disponibilites_page.dart`, `plage_horaire_page.dart`, `indisponibilite_page.dart` |
+| Portefeuille, Retrait, RetraitEchec | `prestataire/portefeuille_page.dart`, `retrait_page.dart` |
+| PrestaAvis, PrestaLitiges, PrestaLitigeReponse | `prestataire/avis_recus_page.dart`, `litiges_recus_page.dart`, `litige_reponse_page.dart` |
+| PrestaPhotos, PrestaProfil | `prestataire/photos_page.dart`, `profil_prestataire_page.dart` |
+
+## 2.2 Écarts systématiques (touchent presque tous les écrans)
+
+| # | Écart | Maquette | Dart | Gravité |
+|---|---|---|---|---|
+| S1 | **Titre d'en-tête : 28 pt au lieu de 30 pt**, interligne 1,15 (≈ 32 pt) au lieu de 36 pt. Le titre à deux lignes (« Créer votre / compte client ») utilise `headlineMedium` du thème Material, dont la taille par défaut est 28 | 30 px, lh 36 (ex. `Inscription.dc.html:29`, `Aide:28`, `Notifications:29`, `Reservations:22`, `Portefeuille:22`, `ModifierProfil:28`…) | `core/widgets/en_tete_degrade.dart:236-249` (`headlineMedium` + `height: 1.15`, aucune taille imposée) ; `core/theme/theme_sopi.dart:90` (poids seul) | VISIBLE (tous les écrans à en-tête dégradé) |
+| S2 | **Texte des boutons : graisse 800 au lieu de 700** (taille 16 correcte) | `Inscription:55` (fw 700) | `core/widgets/boutons.dart:66-69` (`FontWeight.w800`) | MINEUR |
+| S3 | **Titre « Connexion » à 32 pt** dans la maquette | `Connexion:27`, `ConnexionBloquee:27` | non confirmé dans `auth/connexion_page.dart` (le dépistage ne retrouve pas `fontSize: 32` dans cet écran ; il existe à `prestataire/profil_prestataire_page.dart:98`) : **non vérifié** | VISIBLE (à confirmer) |
+| S4 | **Police chargée à l'exécution** par `google_fonts` (Plus Jakarta Sans), non embarquée dans `assets/` : au premier lancement hors ligne, repli sur la police système | `LISEZ-MOI` : Plus Jakarta Sans | `core/theme/theme_sopi.dart:31` ; seul fichier à importer `google_fonts` (`:2`) | VISIBLE (hors ligne, 1er lancement) ; non vérifié sur appareil |
+| S5 | **Couleurs en dur hors du thème central** | `#94a3b8`, `#eef2fa` | `prestataire/disponibilites_page.dart:243` (`0xFF94A3B8`) ; `prestataire/profil_prestataire_page.dart:288` (`0xFFEEF2FA`), `:324` (`0xFF94A3B8`). Recensement limité aux 54 écrans | MINEUR |
+| S6 | **Centralisation** : couleurs et dimensions dans `core/theme/couleurs.dart`, `dimensions.dart`, `theme_sopi.dart` ; widgets partagés dans `core/widgets/`. Les couleurs des écrans viennent du thème **sauf S5**. En revanche, les tailles de texte sont souvent écrites en dur : `fontSize: 30` dans `compte/litige_page.dart:220`, `compte/mise_en_page_formulaire.dart:85`, `prestataire/agenda_page.dart:165,173`, `prestataire/tableau_page.dart:179,222`, `reservation/accueil_client_page.dart:278`, `reservation/avis_page.dart:185` | — | — | MINEUR (dette de maintenance) |
+
+Remarque sur S1 : les écrans qui posent `fontSize: 30` à la main (S6) respectent la maquette ; ceux qui passent par `EnTeteDegrade` non. Le titre n'est donc **pas homogène** d'un écran à l'autre.
+
+## 2.3 Écarts par écran (hors S1-S6)
+
+Seuls les écarts **confirmés par lecture ou par recherche textuelle** figurent ici. Pour les maquettes non listées, le dépistage n'a trouvé que S1/S2 et des données d'exemple ; leur conformité sur le reste (ordre, icônes, espacements) est **non vérifiée**.
+
+| Maquette (ligne) | Écran (ligne) | Écart | Gravité |
+|---|---|---|---|
+| `Inscription:43` « E-mail (facultatif, utile pour récupérer votre compte) » | `auth/inscription_page.dart:175` « E-mail (facultatif) » | texte raccourci | MINEUR |
+| `PrestaCompte:46` « E-mail (pour le suivi de votre dossier) » | `inscription_prestataire/etape_informations_page.dart` : libellé non retrouvé | texte absent | MINEUR |
+| `CodeFaux:47` « …Après 5 essais, … » | `prestataire/prestation_page.dart:33` : l'erreur vient de l'API ; la mention des 5 essais n'est qu'un commentaire (`depot_prestataire.dart:164`) | dépend du message serveur (429) : non vérifié côté API | MINEUR |
+| `CodeValide:37` « Le code est bon. Vous pouvez démarrer la prestation. » | `prestation_page.dart:46` : animation « Code validé » puis relecture ; phrase non retrouvée | texte absent | MINEUR |
+| `CodeVerification:38` « Un instant, nous confirmons le code du client. » | texte non retrouvé dans `prestation_page.dart` (la phrase analogue pour le paiement est à `paiement_page.dart:654`) | texte absent | MINEUR |
+| `RefusMotif:38` « 3 caractères minimum » | `prestataire/refus_motif_page.dart` : mention absente ; la contrainte n'est pas annoncée | texte absent | MINEUR |
+| `Avis:49` « Votre avis est modéré avant d'être affiché. » | `reservation/avis_page.dart:33-34` : phrase remplacée volontairement (l'avis est publié tout de suite, d'après le commentaire du code) | change une promesse faite à l'utilisateur ; écart documenté dans le code mais **absent de la liste des écarts acceptés** : à confirmer par l'architecte | VISIBLE |
+| `Prestataires:34` « Rechercher un salon, un service… » | `reservation/liste_prestataires_page.dart:336` « Rechercher un prestataire… » | texte différent | MINEUR |
+| `Disponibilites:27` texte d'introduction | `prestataire/disponibilites_page.dart:79` « Vos créneaux des prochaines semaines. Touchez la croix… » | texte différent | MINEUR |
+| `Portefeuille:28` « Retrait de 1 000 à 500 000 FCFA » | `prestataire/portefeuille_page.dart:85` : construit à partir des limites du serveur | conforme (dynamique) ; format du premier nombre non vérifié | MINEUR |
+| `PlageHoraire:32` « pendant 4 semaines (8 au maximum) » | `prestataire/plage_horaire_page.dart:42,255` | conforme ; la borne 8 est en dur (`:26`) | MINEUR |
+| Rayons non retrouvés : `Main:29` 5, `Notifications:42` 5, `DetailAPayer:50` 7, `Litige:36` 19, `Creneau:67` 23, `Fiche:111` 23, `Profil:23` 48, `PaiementOk:23` 56 | — | boutons : faux positifs (rayon = hauteur / 2). Pour les autres valeurs : non confirmées dans le Dart, **non vérifié**, à contrôler sur capture | MINEUR |
+| `Connexion`, `PrestaPhotos:25`, `Profil:53` | `auth/connexion_page.dart`, `auth/widgets/mise_en_page_acces.dart`, `prestataire/photos_page.dart:198`, `compte/profil_client_page.dart:200` | lus : textes présents (blocage 15 min à `connexion_page.dart:108`, version lue par `package_info_plus`), structure à deux panneaux pleine page conforme | — |
+
+**Bloquants trouvés en partie 2 : 0.** Aucun écart ne change le sens d'un écran ni n'empêche d'utiliser l'app.
+
+### États particuliers dessinés dans les maquettes
+
+ConnexionBloquee, CodeVerification, CodeValide, CodeFaux, PaiementOk, PaiementEchec, RetraitEchec, DossierRefuse, Suspendu, DetailEnAttente ont chacun une branche ou un écran correspondant (tableau 2.1). Le contenu de l'état `RetraitEchec` n'a pas été lu en détail : **non vérifié**. Les états vide / chargement / erreur non dessinés dans les maquettes sont audités en partie 3.
+
+## 2.4 Écarts connus et acceptés (listés, non comptés comme anomalies)
+
+1. Quartier choisi par une feuille de sélection.
+2. Tuile « ajouter une photo » avec bordure pleine.
+3. Titres de notifications en gras selon lu / non lu.
+4. Confirmation avant la déconnexion.
+5. Écran « retrait en cours » sans maquette.
+6. Compteur de demandes du tableau de bord : 3 au lieu de 2.
+7. Pas de pourcentages (30 %, 10 %) ni de « 2 h », et libellés « Il reste … » dérivés de `reponseAvant` (maquettes `Detail*:36,40,43`, `Paiement:43`, `PrestaDetailDemande:30,32,33`, `PrestaTerminer:30`, `Prestation:41`, `CodeFaux:41`).
+
+Le dépistage confirme seulement le nº 7 (les textes « (30 %) » et « (10 %) » sont absents du Dart). Les autres sont déclarés par l'architecte et n'ont pas été réexaminés.
+
