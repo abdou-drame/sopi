@@ -32,6 +32,7 @@ import '../../features/reservation/modeles.dart';
 import '../../features/reservation/liste_prestataires_page.dart';
 import '../../features/reservation/mes_reservations_page.dart';
 import '../../features/auth/utilisateur.dart';
+import '../../features/prestataire/reservations_prestataire_page.dart';
 import '../../features/prestataire/tableau_page.dart';
 import 'barre_onglets.dart';
 import 'chemins.dart';
@@ -307,6 +308,10 @@ GoRouter creerRouteur({
       _provisoire(Chemins.disponibilites, 'Disponibilités'),
       _provisoire(Chemins.retrait, 'Retrait'),
       _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),
+      GoRoute(
+        path: Chemins.reservationsPrestataire,
+        builder: (_, _) => const ReservationsPrestatairePage(),
+      ),
       _provisoire(
         '${Chemins.racinePrestataire}/reservations/:id',
         'Réservation',

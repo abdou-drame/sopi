@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api/erreurs.dart';
+import 'demandes_controleur.dart';
 import 'depot_prestataire.dart';
 
 /// Relit tout ce qu'une réponse du prestataire change : compteur et cartes du tableau, listes, détail.
 /// Les réponses d'action ne contiennent pas les montants : on relit toujours depuis l'API.
 void rafraichirDemandes(WidgetRef ref, [String? id]) {
   ref.invalidate(demandesATraiterProvider);
+  ref.invalidate(listeDemandesProvider);
   if (id != null) ref.invalidate(detailDemandeProvider(id));
 }
 

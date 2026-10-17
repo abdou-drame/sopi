@@ -172,6 +172,16 @@ void main() {
       expect(find.textContaining('Fatou !'), findsOneWidget);
     });
 
+    testWidgets('Tout voir ouvre la liste des réservations', (tester) async {
+      _vue390(tester);
+      await lancerAcces(tester, AdaptateurSimule(_routes()), jeton: 'jeton');
+      await passerTransition(tester);
+      await tester.tap(find.text('Tout voir'));
+      await passerTransition(tester);
+      expect(cheminCourant(tester), Chemins.reservationsPrestataire);
+      expect(find.bySemanticsLabel('À traiter'), findsOneWidget);
+    });
+
     testWidgets('Accepter appelle l\'API puis relit le tableau', (
       tester,
     ) async {

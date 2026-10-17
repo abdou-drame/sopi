@@ -33,6 +33,9 @@ abstract final class CouleursSopi {
   static const ardoisePastel = Color(0xFFF1F5F9);
   static const ardoiseTexte = Color(0xFF475569);
 
+  // Délai de réponse qui court (« Il reste 11 h 20 »)
+  static const ambre = Color(0xFFB45309);
+
   // Texte discret sur fond marine (onglets inactifs)
   static const texteSurMarine = Color(0xFFB8C4E6);
 
