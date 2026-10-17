@@ -10,6 +10,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/en_tete_degrade.dart';
 import '../../core/widgets/etats.dart';
+import '../compte/modeles_notification.dart' show dateRelative;
 import 'depot_reservation.dart';
 import 'formats.dart';
 import 'modeles.dart';
@@ -61,9 +62,12 @@ class Etoiles extends StatelessWidget {
 
 /// Une ligne d'avis (carte blanche : auteur, étoiles, commentaire).
 class CarteAvis extends StatelessWidget {
-  const CarteAvis({super.key, required this.avis});
+  const CarteAvis({super.key, required this.avis, this.maintenant});
 
   final Avis avis;
+
+  /// Heure actuelle : quand elle est fournie, la date de l’avis s’affiche sous l’auteur (« Il y a 2 h »).
+  final DateTime? maintenant;
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +101,16 @@ class CarteAvis extends StatelessWidget {
               Etoiles(note: avis.note),
             ],
           ),
+          if (maintenant != null && avis.dateCreation != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              dateRelative(avis.dateCreation!, maintenant!),
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontSize: 11,
+                color: CouleursSopi.texteDiscret,
+              ),
+            ),
+          ],
           if (avis.commentaire != null && avis.commentaire!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(

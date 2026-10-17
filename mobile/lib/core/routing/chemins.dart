@@ -59,6 +59,9 @@ abstract final class Chemins {
   static const plageHoraire = '/prestataire/disponibilites/plage';
   static const indisponibilite = '/prestataire/disponibilites/indisponibilite';
   static const retrait = '/prestataire/retrait';
+  static const avisRecus = '/prestataire/avis';
+  static const litigesRecus = '/prestataire/litiges';
+  static String litigeRecu(String id) => '/prestataire/litiges/$id';
   static const reservationsPrestataire = '/prestataire/reservations';
   static String refusReservation(String id) =>
       '/prestataire/reservations/$id/refus';

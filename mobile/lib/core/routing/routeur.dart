@@ -39,6 +39,9 @@ import '../../features/prestataire/indisponibilite_page.dart';
 import '../../features/prestataire/plage_horaire_page.dart';
 import '../../features/prestataire/portefeuille_page.dart';
 import '../../features/prestataire/retrait_page.dart';
+import '../../features/prestataire/avis_recus_page.dart';
+import '../../features/prestataire/litige_reponse_page.dart';
+import '../../features/prestataire/litiges_recus_page.dart';
 import '../../features/prestataire/service_form_page.dart';
 import '../../features/prestataire/services_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
@@ -333,6 +336,18 @@ GoRouter creerRouteur({
         builder: (_, _) => const IndisponibilitePage(),
       ),
       GoRoute(path: Chemins.retrait, builder: (_, _) => const RetraitPage()),
+      GoRoute(
+        path: Chemins.avisRecus,
+        builder: (_, _) => const AvisRecusPage(),
+      ),
+      GoRoute(
+        path: Chemins.litigesRecus,
+        builder: (_, _) => const LitigesRecusPage(),
+      ),
+      GoRoute(
+        path: Chemins.litigeRecu(':id'),
+        builder: (_, etat) => LitigeReponsePage(id: etat.pathParameters['id']!),
+      ),
       GoRoute(
         path: Chemins.reservationsPrestataire,
         builder: (_, _) => const ReservationsPrestatairePage(),

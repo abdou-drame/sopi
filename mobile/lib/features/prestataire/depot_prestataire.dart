@@ -1,11 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_client.dart';
+import '../../core/widgets/liste_infinie.dart' show PageListe;
 import '../reservation/depot_reservation.dart'
     show horlogeProvider, sansRelance;
 import '../reservation/formats.dart' show formaterJourApi;
 import 'modeles.dart';
+import '../reservation/modeles.dart' show PageAvis;
+import 'modeles_litiges.dart';
 import 'modeles_portefeuille.dart';
 
 /// Requêtes de l'espace prestataire (`/api/v1/prestataire/...`). Aucune règle métier ici : le serveur décide.
@@ -51,6 +56,37 @@ class DepotPrestataire {
       },
     );
     return RetraitCree.depuisJson(reponse.data);
+  }
+
+  /// Mes avis reçus : page, note moyenne et nombre d'avis (`GET /prestataire/avis`).
+  Future<PageAvis> avisRecus({int page = 1}) async => PageAvis.depuisJson(
+    await _lire('/prestataire/avis', requete: {'page': page}),
+  );
+
+  /// Une page des signalements (litiges) qui me visent, du plus récent au plus ancien.
+  Future<PageListe<LitigeRecu>> litiges({int page = 1}) async =>
+      LitigeRecu.pageDepuisJson(
+        await _lire('/prestataire/litiges', requete: {'page': page}),
+      );
+
+  Future<LitigeRecu> litige(String id) async =>
+      LitigeRecu.depuisJson(await _lire('/prestataire/litiges/$id'));
+
+  /// Envoie ma version des faits (une seule réponse par litige : 409 ensuite).
+  Future<void> repondreLitige(String id, String reponse) async {
+    await _dio.post<Object?>(
+      '/prestataire/litiges/$id/reponse',
+      data: {'reponse': reponse},
+    );
+  }
+
+  /// Octets d'une preuve du client ; le jeton est ajouté par le client HTTP commun.
+  Future<Uint8List> preuveLitige(String litigeId, String preuveId) async {
+    final reponse = await _dio.get<List<int>>(
+      '/prestataire/litiges/$litigeId/preuves/$preuveId',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(reponse.data ?? const []);
   }
 
   /// Une page de demandes pour un onglet de la liste (statut ou groupe selon l'onglet).
@@ -261,3 +297,36 @@ final creneauxProvider = FutureProvider.autoDispose<List<CreneauAgenda>>(
         );
   },
 );
+
+/// Tous les signalements qui me visent. L'API ne filtre pas par statut et ils sont peu nombreux : toutes les pages sont lues
+/// (jusqu'à 25) pour que chaque onglet affiche la totalité de ses éléments.
+final litigesRecusProvider = FutureProvider.autoDispose<List<LitigeRecu>>(
+  retry: sansRelance,
+  (ref) async {
+    final depot = ref.watch(depotPrestataireProvider);
+    final tous = <LitigeRecu>[];
+    var page = 1;
+    while (true) {
+      final reponse = await depot.litiges(page: page);
+      tous.addAll(reponse.elements);
+      if (reponse.page >= reponse.derniere || page >= 25) break;
+      page++;
+    }
+    return tous;
+  },
+);
+
+/// Détail d'un signalement (avec les identifiants des preuves du client).
+final litigeRecuProvider = FutureProvider.autoDispose
+    .family<LitigeRecu, String>(
+      retry: sansRelance,
+      (ref, id) => ref.watch(depotPrestataireProvider).litige(id),
+    );
+
+final preuveLitigeProvider = FutureProvider.autoDispose
+    .family<Uint8List, ({String litigeId, String preuveId})>(
+      retry: sansRelance,
+      (ref, c) => ref
+          .watch(depotPrestataireProvider)
+          .preuveLitige(c.litigeId, c.preuveId),
+    );
