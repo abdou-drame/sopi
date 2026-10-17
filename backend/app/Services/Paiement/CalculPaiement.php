@@ -69,6 +69,12 @@ class CalculPaiement
         return intdiv($centimes, 100).'.'.str_pad((string) ($centimes % 100), 2, '0', STR_PAD_LEFT);
     }
 
+    /** Montant crédité au solde du prestataire à la fin de la prestation : acompte moins commission (le solde de 70 % se règle sur place). */
+    public static function montantCredite(string $acompte, string $commission): string
+    {
+        return self::soustraire($acompte, $commission);
+    }
+
     private static function enCentimes(string $montant): int
     {
         if (preg_match('/^(\d{1,10})(?:\.(\d{1,2}))?$/', $montant, $m) !== 1) {
