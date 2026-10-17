@@ -98,8 +98,13 @@ class DepotReservation {
     ];
   }
 
-  Future<List<String>> quartiers() async {
-    final corps = await _lire('/quartiers');
+  /// Quartiers où un prestataire actif est installé (recherche côté client). Avec [tous] : liste complète du
+  /// référentiel, proposée à l'inscription d'un prestataire (GET /quartiers?tous=1).
+  Future<List<String>> quartiers({bool tous = false}) async {
+    final corps = await _lire(
+      '/quartiers',
+      requete: tous ? {'tous': '1'} : null,
+    );
     return [for (final e in (corps['data'] as List? ?? const [])) e.toString()];
   }
 
@@ -263,6 +268,12 @@ final metiersProvider = FutureProvider<List<Metier>>(
 final quartiersProvider = FutureProvider<List<String>>(
   retry: sansRelance,
   (ref) => ref.watch(depotReservationProvider).quartiers(),
+);
+
+/// Liste complète des quartiers pour l'inscription d'un prestataire (la recherche garde [quartiersProvider]).
+final quartiersInscriptionProvider = FutureProvider<List<String>>(
+  retry: sansRelance,
+  (ref) => ref.watch(depotReservationProvider).quartiers(tous: true),
 );
 
 /// Nombre de notifications non lues, pour la pastille de la cloche.
