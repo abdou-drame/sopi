@@ -64,7 +64,7 @@ class _BoutonPilule extends StatelessWidget {
       ),
       textStyle: WidgetStatePropertyAll(
         Theme.of(context).textTheme.labelLarge?.copyWith(
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w700,
           fontSize: taille,
         ),
       ),
