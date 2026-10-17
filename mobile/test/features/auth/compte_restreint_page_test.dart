@@ -143,7 +143,7 @@ void main() {
         'en_attente',
         "Votre compte est en attente de validation par l'équipe Sopi.",
       ),
-    ])
+    ]) {
       testWidgets('statutCompte ${cas.$1} : phrase propre au statut', (
         tester,
       ) async {
@@ -154,6 +154,7 @@ void main() {
         });
         expect(find.text(cas.$2), findsOneWidget);
       });
+    }
 
     test('TypeRestriction se déduit du message du serveur', () {
       expect(
