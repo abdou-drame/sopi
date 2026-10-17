@@ -53,6 +53,7 @@ class DossierInscription {
     this.nomEntreprise = '',
     this.metierCode,
     this.quartier,
+    this.quartierAutre = false,
     this.adresse = '',
     this.prenom = '',
     this.nom = '',
@@ -68,6 +69,9 @@ class DossierInscription {
   /// Code du métier (champ `metier` de l'API), choisi parmi `GET /metiers`.
   final String? metierCode;
   final String? quartier;
+
+  /// Vrai quand le prestataire a choisi « Autre quartier » : [quartier] est alors le texte qu'il a saisi.
+  final bool quartierAutre;
   final String adresse;
   final String prenom;
   final String nom;
@@ -77,10 +81,15 @@ class DossierInscription {
   final String confirmation;
   final Map<TypeJustificatif, FichierJustificatif> fichiers;
 
+  /// Quartier tel qu'il est envoyé et validé : espaces de début, de fin et répétés retirés.
+  String get quartierNettoye =>
+      (quartier ?? '').trim().replaceAll(RegExp(r'\s+'), ' ');
+
   DossierInscription copie({
     String? nomEntreprise,
     Object? metierCode = _inchange,
     Object? quartier = _inchange,
+    bool? quartierAutre,
     String? adresse,
     String? prenom,
     String? nom,
@@ -97,6 +106,7 @@ class DossierInscription {
     quartier: identical(quartier, _inchange)
         ? this.quartier
         : quartier as String?,
+    quartierAutre: quartierAutre ?? this.quartierAutre,
     adresse: adresse ?? this.adresse,
     prenom: prenom ?? this.prenom,
     nom: nom ?? this.nom,

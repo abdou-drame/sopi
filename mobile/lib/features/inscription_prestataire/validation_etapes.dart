@@ -3,7 +3,11 @@ import 'modeles.dart';
 
 /// Validation locale des étapes 1 et 2 (le serveur revalide tout). Une clé absente = champ valide.
 abstract final class ValidationEtapes {
-  static Map<String, String> etape1(DossierInscription d) {
+  /// [saisieLibre] : la liste des quartiers est indisponible, le quartier est donc forcément saisi à la main.
+  static Map<String, String> etape1(
+    DossierInscription d, {
+    bool saisieLibre = false,
+  }) {
     final erreurs = <String, String>{};
     final entreprise = d.nomEntreprise.trim();
     if (entreprise.isEmpty) {
@@ -15,7 +19,18 @@ abstract final class ValidationEtapes {
     if (d.metierCode == null) {
       erreurs['metier'] = 'Choisissez votre métier.';
     }
-    if (d.quartier == null || d.quartier!.trim().isEmpty) {
+    final quartier = d.quartierNettoye;
+    if (d.quartierAutre || saisieLibre) {
+      if (quartier.isEmpty) {
+        erreurs['quartier'] = 'Indiquez votre quartier.';
+      } else if (quartier.length < 2) {
+        erreurs['quartier'] =
+            'Le quartier doit contenir au moins 2 caractères.';
+      } else if (quartier.length > 100) {
+        erreurs['quartier'] =
+            'Le quartier ne doit pas dépasser 100 caractères.';
+      }
+    } else if (quartier.isEmpty) {
       erreurs['quartier'] = 'Choisissez votre quartier.';
     }
     final adresse = d.adresse.trim();

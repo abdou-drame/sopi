@@ -21,6 +21,7 @@ class EtapeActivitePage extends ConsumerStatefulWidget {
 class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
   late final TextEditingController _entreprise;
   late final TextEditingController _adresse;
+  late final TextEditingController _autreQuartier;
   Map<String, String> _erreurs = {};
   bool _tentative = false;
 
@@ -30,6 +31,9 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
     final d = ref.read(formulaireInscriptionProvider);
     _entreprise = TextEditingController(text: d.nomEntreprise);
     _adresse = TextEditingController(text: d.adresse);
+    _autreQuartier = TextEditingController(
+      text: d.quartierAutre ? (d.quartier ?? '') : '',
+    );
     // Erreurs du serveur (422) renvoyées depuis l'étape 3 : affichées sous les bons champs.
     const cles = {'nom_entreprise', 'metier', 'quartier', 'adresse'};
     final serveur = ref.read(erreursServeurInscriptionProvider);
@@ -51,23 +55,28 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
   void dispose() {
     _entreprise.dispose();
     _adresse.dispose();
+    _autreQuartier.dispose();
     super.dispose();
   }
+
+  /// Liste vide ou en erreur : le prestataire saisit son quartier, il n'est jamais bloqué.
+  static bool _listeIndisponible(AsyncValue<List<String>> quartiers) =>
+      quartiers.hasError ||
+      (quartiers.hasValue && quartiers.requireValue.isEmpty);
+
+  Map<String, String> _validerEtape() => ValidationEtapes.etape1(
+    ref.read(formulaireInscriptionProvider),
+    saisieLibre: _listeIndisponible(ref.read(quartiersInscriptionProvider)),
+  );
 
   /// Revalide en direct une fois que l'utilisateur a essayé de continuer.
   void _apresModification() {
     if (!_tentative) return;
-    setState(
-      () => _erreurs = ValidationEtapes.etape1(
-        ref.read(formulaireInscriptionProvider),
-      ),
-    );
+    setState(() => _erreurs = _validerEtape());
   }
 
   void _continuer() {
-    final erreurs = ValidationEtapes.etape1(
-      ref.read(formulaireInscriptionProvider),
-    );
+    final erreurs = _validerEtape();
     setState(() {
       _tentative = true;
       _erreurs = erreurs;
@@ -84,19 +93,27 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
   }
 
   Future<void> _choisirQuartier(List<String> quartiers) async {
-    final actuel = ref.read(formulaireInscriptionProvider).quartier;
-    final choix = await showModalBottomSheet<String>(
+    final d = ref.read(formulaireInscriptionProvider);
+    final choix = await showModalBottomSheet<_ChoixQuartier>(
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: CouleursSopi.marine.withValues(alpha: .6),
-      builder: (_) => _FeuilleQuartiers(quartiers: quartiers, actuel: actuel),
+      builder: (_) => _FeuilleQuartiers(
+        quartiers: quartiers,
+        actuel: d.quartierAutre ? null : d.quartier,
+        autreChoisi: d.quartierAutre,
+      ),
     );
     if (choix == null || !mounted) return;
     ref
         .read(formulaireInscriptionProvider.notifier)
-        .mettreAJour((d) => d.copie(quartier: choix));
+        .mettreAJour(
+          (x) => choix.autre
+              ? x.copie(quartier: _autreQuartier.text, quartierAutre: true)
+              : x.copie(quartier: choix.nom, quartierAutre: false),
+        );
     _apresModification();
   }
 
@@ -106,7 +123,7 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
     final d = ref.watch(formulaireInscriptionProvider);
     final notifier = ref.read(formulaireInscriptionProvider.notifier);
     final metiers = ref.watch(metiersProvider);
-    final quartiers = ref.watch(quartiersProvider);
+    final quartiers = ref.watch(quartiersInscriptionProvider);
 
     Widget libelle(String texte) => Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -174,12 +191,18 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
       ],
     );
 
-    final blocQuartier = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        libelle('Quartier'),
-        quartiers.when(
-          loading: () => const Padding(
+    void saisirQuartier(String v) {
+      notifier.mettreAJour((x) => x.copie(quartier: v, quartierAutre: true));
+      _apresModification();
+    }
+
+    final Widget blocQuartier;
+    if (quartiers.isLoading) {
+      blocQuartier = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          libelle('Quartier'),
+          const Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: SizedBox(
               width: 22,
@@ -187,21 +210,43 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
               child: CircularProgressIndicator(strokeWidth: 2.5),
             ),
           ),
-          error: (_, _) => Row(
-            children: [
-              const Expanded(
-                child: Text('Impossible de charger les quartiers.'),
-              ),
-              TextButton(
-                onPressed: () => ref.invalidate(quartiersProvider),
-                child: const Text('Réessayer'),
-              ),
-            ],
+        ],
+      );
+    } else if (_listeIndisponible(quartiers)) {
+      // Liste vide ou appel en échec : saisie directe, sans bloquer l'inscription.
+      blocQuartier = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ChampFormulaire(
+            key: const ValueKey('champ-autre-quartier'),
+            libelle: 'Quartier',
+            controleur: _autreQuartier,
+            erreur: _erreurs['quartier'],
+            actionClavier: TextInputAction.next,
+            hauteur: 50,
+            onChanged: saisirQuartier,
           ),
-          data: (liste) => InkWell(
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(
+              'La liste des quartiers est indisponible. Saisissez le vôtre.',
+              key: const ValueKey('liste-quartiers-indisponible'),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: CouleursSopi.texteDiscret,
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      blocQuartier = Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          libelle('Quartier'),
+          InkWell(
             key: const ValueKey('champ-quartier'),
             borderRadius: BorderRadius.circular(16),
-            onTap: () => _choisirQuartier(liste),
+            onTap: () => _choisirQuartier(quartiers.requireValue),
             child: Container(
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -209,7 +254,7 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
                 color: CouleursSopi.champ,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: _erreurs['quartier'] != null
+                  color: _erreurs['quartier'] != null && !d.quartierAutre
                       ? CouleursSopi.erreurTexte
                       : CouleursSopi.bordureForte,
                 ),
@@ -218,10 +263,12 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
                 children: [
                   Expanded(
                     child: Text(
-                      d.quartier ?? 'Choisir un quartier',
+                      d.quartierAutre
+                          ? _libelleAutreQuartier
+                          : d.quartier ?? 'Choisir un quartier',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontSize: 15,
-                        color: d.quartier == null
+                        color: !d.quartierAutre && d.quartier == null
                             ? CouleursSopi.texteDiscret
                             : CouleursSopi.marine,
                       ),
@@ -235,10 +282,22 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
               ),
             ),
           ),
-        ),
-        erreur(_erreurs['quartier']),
-      ],
-    );
+          if (d.quartierAutre) ...[
+            const SizedBox(height: 12),
+            ChampFormulaire(
+              key: const ValueKey('champ-autre-quartier'),
+              libelle: 'Votre quartier',
+              controleur: _autreQuartier,
+              erreur: _erreurs['quartier'],
+              actionClavier: TextInputAction.next,
+              hauteur: 50,
+              onChanged: saisirQuartier,
+            ),
+          ] else
+            erreur(_erreurs['quartier']),
+        ],
+      );
+    }
 
     return MiseEnPageEtape(
       etape: 1,
@@ -326,15 +385,45 @@ class _PuceMetier extends StatelessWidget {
   }
 }
 
+/// Dernier choix de la liste : le prestataire saisit lui-même son quartier.
+const _libelleAutreQuartier = 'Autre quartier';
+
+/// Choix fait dans la feuille : un quartier de la liste, ou « Autre quartier ».
+class _ChoixQuartier {
+  const _ChoixQuartier.quartier(String this.nom) : autre = false;
+  const _ChoixQuartier.autre() : nom = null, autre = true;
+
+  final String? nom;
+  final bool autre;
+}
+
 class _FeuilleQuartiers extends StatelessWidget {
-  const _FeuilleQuartiers({required this.quartiers, required this.actuel});
+  const _FeuilleQuartiers({
+    required this.quartiers,
+    required this.actuel,
+    required this.autreChoisi,
+  });
 
   final List<String> quartiers;
   final String? actuel;
+  final bool autreChoisi;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    Widget ligne(String texte, bool choisi, _ChoixQuartier choix) => ListTile(
+      title: Text(
+        texte,
+        style: theme.textTheme.titleSmall?.copyWith(
+          fontWeight: choisi ? FontWeight.w800 : FontWeight.w600,
+        ),
+      ),
+      trailing: choisi
+          ? const Icon(Icons.check_rounded, color: CouleursSopi.bleu)
+          : null,
+      onTap: () => Navigator.of(context).pop(choix),
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
       child: Container(
@@ -365,23 +454,12 @@ class _FeuilleQuartiers extends StatelessWidget {
                 shrinkWrap: true,
                 children: [
                   for (final q in quartiers)
-                    ListTile(
-                      title: Text(
-                        q,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: q == actuel
-                              ? FontWeight.w800
-                              : FontWeight.w600,
-                        ),
-                      ),
-                      trailing: q == actuel
-                          ? const Icon(
-                              Icons.check_rounded,
-                              color: CouleursSopi.bleu,
-                            )
-                          : null,
-                      onTap: () => Navigator.of(context).pop(q),
-                    ),
+                    ligne(q, q == actuel, _ChoixQuartier.quartier(q)),
+                  ligne(
+                    _libelleAutreQuartier,
+                    autreChoisi,
+                    const _ChoixQuartier.autre(),
+                  ),
                 ],
               ),
             ),
