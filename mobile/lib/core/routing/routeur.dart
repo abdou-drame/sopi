@@ -15,6 +15,11 @@ import '../../features/compte/modifier_profil_page.dart';
 import '../../features/compte/notifications_page.dart';
 import '../../features/compte/profil_client_page.dart';
 import '../../features/compte/signalements_pages.dart';
+import '../../features/inscription_prestataire/etape_activite_page.dart';
+import '../../features/inscription_prestataire/etape_informations_page.dart';
+import '../../features/inscription_prestataire/etape_justificatifs_page.dart';
+import '../../features/inscription_prestataire/stockage_jeton_suivi.dart';
+import '../../features/inscription_prestataire/suivi_dossier_page.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
 import '../../features/reservation/avis_prestataire_page.dart';
@@ -32,12 +37,22 @@ import 'chemins.dart';
 import 'ecrans_provisoires.dart';
 
 /// Redirection selon la session. Renvoie null si l'utilisateur peut rester sur [chemin].
-String? redirectionSopi(EtatSession session, String chemin) {
+/// [jetonSuivi] : jeton d'un dossier prestataire déposé sur ce téléphone ; il permet d'envoyer un compte
+/// `en_attente` ou `refuse` vers le suivi du dossier plutôt que vers la page de compte restreint.
+String? redirectionSopi(
+  EtatSession session,
+  String chemin, {
+  String? jetonSuivi,
+}) {
   switch (session) {
     case SessionInconnue():
       return chemin == Chemins.demarrage ? null : Chemins.demarrage;
-    case Restreint():
-      return chemin == Chemins.compteRestreint ? null : Chemins.compteRestreint;
+    case Restreint(:final statutCompte):
+      final versSuivi =
+          jetonSuivi != null &&
+          (statutCompte == 'en_attente' || statutCompte == 'refuse');
+      final cible = versSuivi ? Chemins.suiviDossier : Chemins.compteRestreint;
+      return chemin == cible ? null : cible;
     case NonConnecte():
       if (Chemins.publiques.contains(chemin)) {
         // Le démarrage n'est qu'un passage : une fois la session connue, on va à la connexion.
@@ -109,13 +124,18 @@ GoRoute _provisoire(
 
 GoRouter creerRouteur({
   required EtatSession Function() session,
+  String? Function()? jetonSuivi,
   required Listenable rafraichir,
   String? cheminInitial,
 }) {
   return GoRouter(
     initialLocation: cheminInitial ?? Chemins.demarrage,
     refreshListenable: rafraichir,
-    redirect: (_, etat) => redirectionSopi(session(), etat.uri.path),
+    redirect: (_, etat) => redirectionSopi(
+      session(),
+      etat.uri.path,
+      jetonSuivi: jetonSuivi?.call(),
+    ),
     routes: [
       GoRoute(
         path: '/',
@@ -143,8 +163,22 @@ GoRouter creerRouteur({
         builder: (_, _) => const MotDePasseOubliePage(),
       ),
       _provisoire(Chemins.reinitialisation, 'Réinitialisation du mot de passe'),
-      _provisoire(Chemins.inscriptionPrestataire, 'Inscription prestataire'),
-      _provisoire(Chemins.suiviDossier, 'Suivi du dossier'),
+      GoRoute(
+        path: Chemins.inscriptionPrestataire,
+        builder: (_, _) => const EtapeActivitePage(),
+      ),
+      GoRoute(
+        path: Chemins.inscriptionInformations,
+        builder: (_, _) => const EtapeInformationsPage(),
+      ),
+      GoRoute(
+        path: Chemins.inscriptionJustificatifs,
+        builder: (_, _) => const EtapeJustificatifsPage(),
+      ),
+      GoRoute(
+        path: Chemins.suiviDossier,
+        builder: (_, _) => const SuiviDossierPage(),
+      ),
       GoRoute(
         path: Chemins.compteRestreint,
         builder: (_, _) => const CompteRestreintPage(),
@@ -292,8 +326,10 @@ GoRouter creerRouteur({
 final routeurProvider = Provider<GoRouter>((ref) {
   final changement = ValueNotifier<int>(0);
   ref.listen(sessionProvider, (_, _) => changement.value++);
+  ref.listen(jetonSuiviProvider, (_, _) => changement.value++);
   final routeur = creerRouteur(
     session: () => ref.read(sessionProvider),
+    jetonSuivi: () => ref.read(jetonSuiviProvider),
     rafraichir: changement,
   );
   ref.onDispose(() {

@@ -11,6 +11,10 @@ abstract final class Chemins {
   static const motDePasseOublie = '/mot-de-passe-oublie';
   static const reinitialisation = '/reinitialisation';
   static const inscriptionPrestataire = '/inscription-prestataire';
+  static const inscriptionInformations =
+      '/inscription-prestataire/informations';
+  static const inscriptionJustificatifs =
+      '/inscription-prestataire/justificatifs';
   static const suiviDossier = '/suivi-dossier';
   static const compteRestreint = '/compte-restreint';
 
@@ -66,6 +70,8 @@ abstract final class Chemins {
     motDePasseOublie,
     reinitialisation,
     inscriptionPrestataire,
+    inscriptionInformations,
+    inscriptionJustificatifs,
     suiviDossier,
   };
 
@@ -77,6 +83,8 @@ abstract final class Chemins {
     motDePasseOublie,
     reinitialisation,
     inscriptionPrestataire,
+    inscriptionInformations,
+    inscriptionJustificatifs,
     suiviDossier,
     compteRestreint,
   };
