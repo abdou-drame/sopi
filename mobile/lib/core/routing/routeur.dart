@@ -8,8 +8,12 @@ import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
 import '../../features/auth/session.dart';
+import '../../features/compte/aide_page.dart';
+import '../../features/compte/changer_mot_de_passe_page.dart';
 import '../../features/compte/litige_page.dart';
+import '../../features/compte/modifier_profil_page.dart';
 import '../../features/compte/notifications_page.dart';
+import '../../features/compte/profil_client_page.dart';
 import '../../features/compte/signalements_pages.dart';
 import '../../features/reservation/accueil_client_page.dart';
 import '../../features/reservation/avis_page.dart';
@@ -156,7 +160,7 @@ GoRouter creerRouteur({
             () => const ListePrestatairesPage(avecRetour: false),
           ),
           _onglet(Chemins.reservations, () => const MesReservationsPage()),
-          _onglet(Chemins.profil, () => const ProfilProvisoire()),
+          _onglet(Chemins.profil, () => const ProfilClientPage()),
         ],
       ),
 
@@ -233,8 +237,18 @@ GoRouter creerRouteur({
             DetailSignalementPage(litigeId: state.pathParameters['id']!),
       ),
       _provisoire(Chemins.retourPaiement, 'Retour de paiement'),
-      _provisoire(Chemins.profilModifier, 'Modifier le profil'),
-      _provisoire(Chemins.motDePasseChanger, 'Changer le mot de passe'),
+      GoRoute(
+        path: Chemins.profilModifier,
+        builder: (context, state) => const ModifierProfilPage(),
+      ),
+      GoRoute(
+        path: Chemins.motDePasseChanger,
+        builder: (context, state) => const ChangerMotDePassePage(),
+      ),
+      GoRoute(
+        path: Chemins.aide,
+        builder: (context, state) => const AidePage(),
+      ),
 
       // — Espace prestataire : coque à 4 onglets
       StatefulShellRoute.indexedStack(

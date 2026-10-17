@@ -142,6 +142,11 @@ class SessionControleur extends Notifier<EtatSession> {
     _oublier();
   }
 
+  /// Remplace l'utilisateur connecté (profil modifié) : le nom change partout sans nouvelle connexion.
+  void mettreAJourUtilisateur(Utilisateur utilisateur) {
+    if (state is Connecte) _definir(Connecte(utilisateur));
+  }
+
   /// Sort de l'état « compte restreint » (retour à l'écran de connexion).
   void quitterRestriction() {
     if (state is Restreint) state = const NonConnecte();

@@ -3,8 +3,10 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/api/erreurs.dart';
 import '../../core/api_client.dart';
 import '../../core/widgets/liste_infinie.dart';
+import '../auth/utilisateur.dart';
 import 'modeles_litige.dart';
 import 'modeles_notification.dart';
 
@@ -68,6 +70,39 @@ class DepotCompte {
 
   Future<void> toutMarquerLu() async {
     await _dio.post<Object?>('/notifications/lire-tout');
+  }
+
+  /// PUT /me : renvoie le profil à jour.
+  Future<Utilisateur> modifierProfil({
+    required String prenom,
+    required String nom,
+    required String telephone,
+  }) async {
+    final reponse = await _dio.put<Object?>(
+      '/me',
+      data: {'nom': nom, 'prenom': prenom, 'telephone': telephone},
+    );
+    final corps = reponse.data is Map ? reponse.data as Map : const {};
+    final brut = corps['data'] is Map ? corps['data'] : corps;
+    final utilisateur = Utilisateur.depuisJson(brut);
+    if (utilisateur == null) throw const ErreurInconnue();
+    return utilisateur;
+  }
+
+  /// PUT /me/mot-de-passe. Le jeton courant reste valide (le serveur révoque seulement les autres).
+  Future<void> changerMotDePasse({
+    required String actuel,
+    required String nouveau,
+    required String confirmation,
+  }) async {
+    await _dio.put<Object?>(
+      '/me/mot-de-passe',
+      data: {
+        'mot_de_passe_actuel': actuel,
+        'nouveau_mot_de_passe': nouveau,
+        'confirmation': confirmation,
+      },
+    );
   }
 
   /// Octets d'une preuve ; le jeton est ajouté par le client HTTP commun.
