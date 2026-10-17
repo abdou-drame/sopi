@@ -180,3 +180,86 @@ class PrestationService {
     );
   }
 }
+
+enum StatutCreneau {
+  libre,
+  verrouille,
+  reserve,
+  indisponible;
+
+  static StatutCreneau depuis(Object? brut) => switch (brut) {
+    'libre' => StatutCreneau.libre,
+    'verrouille' => StatutCreneau.verrouille,
+    'reserve' => StatutCreneau.reserve,
+    _ => StatutCreneau.indisponible,
+  };
+}
+
+/// Créneau de l'agenda du prestataire (`GET /prestataire/agenda`). Seul un créneau libre peut être retiré.
+class CreneauAgenda {
+  const CreneauAgenda({
+    required this.id,
+    required this.debut,
+    required this.fin,
+    required this.statut,
+  });
+
+  final String id;
+  final DateTime debut;
+  final DateTime fin;
+  final StatutCreneau statut;
+
+  factory CreneauAgenda.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return CreneauAgenda(
+      id: '${j['id']}',
+      debut: DateTime.parse('${j['dateDebut']}').toUtc(),
+      fin: DateTime.parse('${j['dateFin']}').toUtc(),
+      statut: StatutCreneau.depuis(j['statut']),
+    );
+  }
+}
+
+/// Plage à créer (`POST /prestataire/agenda/plages`). Les heures sont déjà au format « HH:MM ».
+class PlageHoraire {
+  const PlageHoraire({
+    required this.jour,
+    required this.heureDebut,
+    required this.heureFin,
+    required this.dureeCreneauMinutes,
+    this.repeterSemaines,
+  });
+
+  final String jour;
+  final String heureDebut;
+  final String heureFin;
+  final int dureeCreneauMinutes;
+  final int? repeterSemaines;
+
+  Map<String, Object?> versJson() => {
+    'date': jour,
+    'heure_debut': heureDebut,
+    'heure_fin': heureFin,
+    'duree_creneau_minutes': dureeCreneauMinutes,
+    'repeter_semaines': ?repeterSemaines,
+  };
+}
+
+/// Bilan d'une indisponibilité déclarée, tel que renvoyé par le serveur.
+class BilanIndisponibilite {
+  const BilanIndisponibilite({
+    required this.creneauxBloques,
+    required this.reservationsAnnulees,
+  });
+
+  final int creneauxBloques;
+  final int reservationsAnnulees;
+
+  factory BilanIndisponibilite.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return BilanIndisponibilite(
+      creneauxBloques: _nombre(j['creneauxBloques'])?.toInt() ?? 0,
+      reservationsAnnulees: _nombre(j['reservationsAnnulees'])?.toInt() ?? 0,
+    );
+  }
+}

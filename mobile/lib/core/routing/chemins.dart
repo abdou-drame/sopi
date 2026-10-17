@@ -56,6 +56,8 @@ abstract final class Chemins {
   static String serviceModifier(String id) =>
       '/prestataire/services/$id/modifier';
   static const disponibilites = '/prestataire/disponibilites';
+  static const plageHoraire = '/prestataire/disponibilites/plage';
+  static const indisponibilite = '/prestataire/disponibilites/indisponibilite';
   static const retrait = '/prestataire/retrait';
   static const historiqueRetraits = '/prestataire/retraits';
   static const reservationsPrestataire = '/prestataire/reservations';
