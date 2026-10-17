@@ -19,6 +19,17 @@ class ProfilPublicPrestataireResource extends JsonResource
 {
     public static $wrap = null;
 
+    /** Identité d'un prestataire, commune au profil public et au profil du prestataire connecté (GET /me). */
+    public static function identite(Prestataire $prestataire): array
+    {
+        return [
+            'id' => $prestataire->id,
+            'nomEntreprise' => $prestataire->nom_entreprise,
+            'metier' => $prestataire->metier,
+            'quartier' => $prestataire->quartier,
+        ];
+    }
+
     public function toArray(Request $request): array
     {
         $photos = app(PhotoAtelierService::class);
@@ -26,10 +37,7 @@ class ProfilPublicPrestataireResource extends JsonResource
         $pourcentage = round((float) config('sopi.paiement.acompte_taux') * 100, 2);
 
         return [
-            'id' => $this->id,
-            'nomEntreprise' => $this->nom_entreprise,
-            'metier' => $this->metier,
-            'quartier' => $this->quartier,
+            ...self::identite($this->resource),
             'adresse' => $this->adresse,
             ...ConsultationAvisService::formater($this->note_moyenne, $this->nombre_avis),
             'acomptePourcentage' => $pourcentage == (int) $pourcentage ? (int) $pourcentage : $pourcentage,
