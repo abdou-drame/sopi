@@ -12,15 +12,15 @@ const messageMessagerieIndisponible = "Impossible d'ouvrir votre messagerie.";
 const _questions = [
   (
     'Comment fonctionne la réservation ?',
-    "Vous choisissez un service et un créneau, puis vous envoyez la demande. Le prestataire a 12 h pour répondre. S'il accepte, vous avez 2 h pour payer l'acompte et confirmer.",
+    "Vous choisissez un service et un créneau, puis vous envoyez la demande. Le prestataire dispose d'un délai limité pour répondre. S'il accepte, vous avez un délai limité pour payer l'acompte et confirmer.",
   ),
   (
     "Combien coûte l'acompte ?",
-    "L'acompte représente 30 % du tarif du service. Le reste se règle sur place, auprès du prestataire.",
+    "L'acompte représente une part du tarif du service, indiquée avant le paiement. Le reste se règle sur place, auprès du prestataire.",
   ),
   (
     'Puis-je annuler ?',
-    "Oui, jusqu'à 2 heures avant le rendez-vous. L'acompte n'est pas remboursé si vous annulez. Il l'est si c'est le prestataire qui annule.",
+    "Oui, jusqu'à un court délai avant le rendez-vous (indiqué au moment d'annuler). L'acompte n'est pas remboursé si vous annulez. Il l'est si c'est le prestataire qui annule.",
   ),
   (
     'À quoi sert le code de démarrage ?',

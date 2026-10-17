@@ -308,7 +308,10 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.textContaining('conservé pendant 2 heures'), findsOneWidget);
+      expect(
+        find.textContaining('conservé pendant un délai limité'),
+        findsOneWidget,
+      );
       expect(find.text('Mes réservations'), findsOneWidget);
 
       _serveReservation(serveur, _res());

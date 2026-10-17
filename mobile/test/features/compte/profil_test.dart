@@ -281,7 +281,7 @@ void main() {
     ) async {
       await _ouvrir(tester, Chemins.aide);
       expect(find.text('Comment fonctionne la réservation ?'), findsOneWidget);
-      expect(find.textContaining('30 %'), findsOneWidget);
+      expect(find.textContaining('indiquée avant le paiement'), findsOneWidget);
       expect(find.text('Contacter le support'), findsNothing);
     });
 

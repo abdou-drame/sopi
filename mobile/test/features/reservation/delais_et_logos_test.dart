@@ -69,20 +69,24 @@ void main() {
       );
       expect(find.text('Il reste'), findsOneWidget);
       expect(find.text(_unHeure52), findsOneWidget);
-      expect(find.textContaining('Vous avez 2 h'), findsNothing);
+      expect(find.textContaining('Vous avez un délai limité'), findsNothing);
     });
 
-    testWidgets('absent : pas de pastille, rappel du délai fixe de 2 h', (
-      tester,
-    ) async {
-      await _ouvrir(
-        tester,
-        _reservation(),
-        chemin: Chemins.detailReservation('r-1'),
-      );
-      expect(find.textContaining('Il reste'), findsNothing);
-      expect(find.textContaining('Vous avez 2 h'), findsOneWidget);
-    });
+    testWidgets(
+      'absent : pas de pastille, rappel du délai limité sans chiffre',
+      (tester) async {
+        await _ouvrir(
+          tester,
+          _reservation(),
+          chemin: Chemins.detailReservation('r-1'),
+        );
+        expect(find.textContaining('Il reste'), findsNothing);
+        expect(
+          find.textContaining('Vous avez un délai limité'),
+          findsOneWidget,
+        );
+      },
+    );
 
     testWidgets('à zéro : « Délai dépassé »', (tester) async {
       await _ouvrir(
@@ -132,16 +136,16 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.textContaining('jusqu\'à 12 h'), findsNothing);
+      expect(find.textContaining('délai limité pour répondre'), findsNothing);
     });
 
-    testWidgets('absent : texte fixe de 12 h', (tester) async {
+    testWidgets('absent : texte sans chiffre', (tester) async {
       await _ouvrir(
         tester,
         _reservation(statut: 'en_attente'),
         chemin: Chemins.detailReservation('r-1'),
       );
-      expect(find.textContaining("jusqu'à 12 h pour répondre"), findsOneWidget);
+      expect(find.textContaining('délai limité pour répondre'), findsOneWidget);
       expect(find.textContaining("Le prestataire a jusqu'au"), findsNothing);
     });
   });

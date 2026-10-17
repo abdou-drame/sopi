@@ -10,12 +10,6 @@ import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_degrade.dart';
 import 'modeles.dart';
 
-/// Délai laissé au prestataire pour répondre (règle serveur ; l'API ne le renvoie pas dans la création).
-const delaiReponsePrestataireHeures = 12;
-
-/// Délai laissé au client pour payer l'acompte une fois la demande acceptée.
-const delaiPaiementHeures = 2;
-
 /// Écran « Demande envoyée » (maquette DemandeEnvoyee) : récapitulatif de la demande qui vient d'être créée.
 /// Aucun paiement à ce stade : le client paie seulement après l'acceptation du prestataire.
 class DemandeEnvoyeePage extends StatelessWidget {
@@ -101,7 +95,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                                   horizontal: 20,
                                 ),
                                 child: Text(
-                                  '${r.prestataireNom} a $delaiReponsePrestataireHeures h pour répondre. Aucun paiement maintenant.',
+                                  '${r.prestataireNom} va répondre à votre demande. Aucun paiement maintenant.',
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontSize: 14,
@@ -152,7 +146,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(22),
                             ),
                             child: Text(
-                              "Dès que le prestataire accepte, vous êtes prévenu et vous avez $delaiPaiementHeures h pour payer l'acompte. La réservation est confirmée une fois l'acompte payé.",
+                              "Dès que le prestataire accepte, vous êtes prévenu et vous disposez d'un délai limité pour payer l'acompte. La réservation est confirmée une fois l'acompte payé.",
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 fontSize: 13,
                                 height: 19 / 13,
