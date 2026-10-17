@@ -19,7 +19,7 @@ endpoints:
       subgroup: ''
       subgroupDescription: ''
       title: 'Voir mon profil'
-      description: ''
+      description: "Pour un prestataire, un bloc `prestataire` (`id`, `nomEntreprise`, `metier`, `quartier`) s'ajoute ; il est absent pour un client et un administrateur."
       authenticated: true
       deprecated: false
     headers:
@@ -39,7 +39,13 @@ endpoints:
         status: 200
         content: '{"id":"0198a1b2-0000-7000-8000-000000000001","nom":"Diop","prenom":"Awa","email":"awa@example.com","telephone":"+221771234567","role":"client","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00"}'
         headers: []
-        description: ''
+        description: client
+      -
+        custom: []
+        status: 200
+        content: '{"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Ndiaye","prenom":"Fatou","email":"fatou@example.com","telephone":"+221781234567","role":"prestataire","statutCompte":"actif","dateCreation":"2026-10-11T09:30:00+00:00","prestataire":{"id":"0198a1b2-0000-7000-8000-000000000003","nomEntreprise":"Salon Fatou","metier":"Coiffure","quartier":"Keur Massar Nord"}}'
+        headers: []
+        description: prestataire
       -
         custom: []
         status: 401

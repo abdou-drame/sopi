@@ -9089,7 +9089,7 @@ paths:
                   app: Sopi
                   version: 0.1.0
                   database: erreur
-                  time: '2026-10-16T21:20:25+00:00'
+                  time: '2026-10-17T21:50:33+00:00'
                 properties:
                   status:
                     type: string
@@ -9105,7 +9105,7 @@ paths:
                     example: erreur
                   time:
                     type: string
-                    example: '2026-10-16T21:20:25+00:00'
+                    example: '2026-10-17T21:50:33+00:00'
       tags:
         - Endpoints
       security: []
@@ -10721,6 +10721,10 @@ paths:
                       statut: en_attente
                       dateCreation: '2030-01-15T08:50:00+00:00'
                       motifRefus: null
+                      reponseAvant: '2030-01-16T08:50:00+00:00'
+                      acompte: 4500.0
+                      commission: 1500.0
+                      montantCredite: 3000.0
                       creneau:
                         id: 0198a1b2-0000-7000-8000-000000000040
                         dateDebut: '2030-01-16T09:00:00+00:00'
@@ -10752,6 +10756,10 @@ paths:
                         statut: en_attente
                         dateCreation: '2030-01-15T08:50:00+00:00'
                         motifRefus: null
+                        reponseAvant: '2030-01-16T08:50:00+00:00'
+                        acompte: 4500
+                        commission: 1500
+                        montantCredite: 3000
                         creneau:
                           id: 0198a1b2-0000-7000-8000-000000000040
                           dateDebut: '2030-01-16T09:00:00+00:00'
@@ -10780,6 +10788,18 @@ paths:
                           type: string
                           example: null
                           nullable: true
+                        reponseAvant:
+                          type: string
+                          example: '2030-01-16T08:50:00+00:00'
+                        acompte:
+                          type: number
+                          example: 4500.0
+                        commission:
+                          type: number
+                          example: 1500.0
+                        montantCredite:
+                          type: number
+                          example: 3000.0
                         creneau:
                           type: object
                           properties:
@@ -10916,6 +10936,10 @@ paths:
                   statut: en_attente
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: null
+                  reponseAvant: '2030-01-16T08:50:00+00:00'
+                  acompte: 4500.0
+                  commission: 1500.0
+                  montantCredite: 3000.0
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -10942,6 +10966,18 @@ paths:
                     type: string
                     example: null
                     nullable: true
+                  reponseAvant:
+                    type: string
+                    example: '2030-01-16T08:50:00+00:00'
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: number
+                    example: 1500.0
+                  montantCredite:
+                    type: number
+                    example: 3000.0
                   creneau:
                     type: object
                     properties:
@@ -11043,6 +11079,10 @@ paths:
                   statut: acceptee
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: null
+                  reponseAvant: null
+                  acompte: 4500.0
+                  commission: 1500.0
+                  montantCredite: 3000.0
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -11069,6 +11109,19 @@ paths:
                     type: string
                     example: null
                     nullable: true
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: number
+                    example: 1500.0
+                  montantCredite:
+                    type: number
+                    example: 3000.0
                   creneau:
                     type: object
                     properties:
@@ -11194,6 +11247,10 @@ paths:
                   statut: refusee
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: 'Je ne suis pas disponible à cette heure.'
+                  reponseAvant: null
+                  acompte: 4500.0
+                  commission: 1500.0
+                  montantCredite: 3000.0
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -11219,6 +11276,19 @@ paths:
                   motifRefus:
                     type: string
                     example: 'Je ne suis pas disponible à cette heure.'
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: number
+                    example: 1500.0
+                  montantCredite:
+                    type: number
+                    example: 3000.0
                   creneau:
                     type: object
                     properties:
@@ -11381,6 +11451,10 @@ paths:
                   statut: en_cours
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: null
+                  reponseAvant: null
+                  acompte: 4500.0
+                  commission: 1500.0
+                  montantCredite: 3000.0
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -11407,6 +11481,19 @@ paths:
                     type: string
                     example: null
                     nullable: true
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: number
+                    example: 1500.0
+                  montantCredite:
+                    type: number
+                    example: 3000.0
                   creneau:
                     type: object
                     properties:
@@ -11569,6 +11656,10 @@ paths:
                   statut: annulee
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: "Un imprévu m'empêche d'assurer la prestation."
+                  reponseAvant: null
+                  acompte: 4500.0
+                  commission: 1500.0
+                  montantCredite: 3000.0
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -11594,6 +11685,19 @@ paths:
                   motifRefus:
                     type: string
                     example: "Un imprévu m'empêche d'assurer la prestation."
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: number
+                    example: 1500.0
+                  montantCredite:
+                    type: number
+                    example: 3000.0
                   creneau:
                     type: object
                     properties:
@@ -11756,6 +11860,10 @@ paths:
                   statut: terminee
                   dateCreation: '2030-01-15T08:50:00+00:00'
                   motifRefus: null
+                  reponseAvant: null
+                  acompte: 4500.0
+                  commission: 1500
+                  montantCredite: 3000
                   creneau:
                     id: 0198a1b2-0000-7000-8000-000000000040
                     dateDebut: '2030-01-16T09:00:00+00:00'
@@ -11769,8 +11877,6 @@ paths:
                     prenom: Awa
                     initialeNom: D
                   montantTotal: 15000
-                  commission: 1500
-                  montantCredite: 3000
                   soldeApres: 3000
                 properties:
                   id:
@@ -11786,6 +11892,19 @@ paths:
                     type: string
                     example: null
                     nullable: true
+                  reponseAvant:
+                    type: string
+                    example: null
+                    nullable: true
+                  acompte:
+                    type: number
+                    example: 4500.0
+                  commission:
+                    type: integer
+                    example: 1500
+                  montantCredite:
+                    type: integer
+                    example: 3000
                   creneau:
                     type: object
                     properties:
@@ -11825,12 +11944,6 @@ paths:
                   montantTotal:
                     type: integer
                     example: 15000
-                  commission:
-                    type: integer
-                    example: 1500
-                  montantCredite:
-                    type: integer
-                    example: 3000
                   soldeApres:
                     type: integer
                     example: 3000
@@ -12975,7 +13088,7 @@ paths:
     get:
       summary: 'Historique du portefeuille'
       operationId: historiqueDuPortefeuille
-      description: "Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),\ndu plus récent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA)."
+      description: "Mouvements du solde (crédit de fin de prestation, demande de retrait, recrédit d'un retrait échoué), paginés (20 par page),\ndu plus récent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste après le mouvement (FCFA). `prestation` est le nom du service de la réservation liée (crédit), sinon `null` ; `operateur` (`wave` ou `orange_money`, `null` si inconnu) et `statutRetrait` (`en_cours`, `reussi` ou `echoue`) ne sont renseignés que pour un retrait."
       parameters: []
       responses:
         200:
@@ -12994,6 +13107,9 @@ paths:
                       soldeApres: 8000.0
                       reservationId: 0198a1b2-0000-7000-8000-000000000020
                       retraitId: null
+                      prestation: Vidange
+                      operateur: null
+                      statutRetrait: null
                       date: '2030-01-15T08:50:00+00:00'
                   links:
                     first: 'https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1'
@@ -13017,6 +13133,9 @@ paths:
                         soldeApres: 8000
                         reservationId: 0198a1b2-0000-7000-8000-000000000020
                         retraitId: null
+                        prestation: Vidange
+                        operateur: null
+                        statutRetrait: null
                         date: '2030-01-15T08:50:00+00:00'
                     items:
                       type: object
@@ -13040,6 +13159,17 @@ paths:
                           type: string
                           example: 0198a1b2-0000-7000-8000-000000000020
                         retraitId:
+                          type: string
+                          example: null
+                          nullable: true
+                        prestation:
+                          type: string
+                          example: Vidange
+                        operateur:
+                          type: string
+                          example: null
+                          nullable: true
+                        statutRetrait:
                           type: string
                           example: null
                           nullable: true
@@ -13123,6 +13253,7 @@ paths:
                       id: 0198a1b2-0000-7000-8000-000000000070
                       montant: 5000.0
                       statut: reussi
+                      operateur: wave
                       telephoneVersement: '+221******567'
                       dateDemande: '2030-01-15T08:50:00+00:00'
                       dateTraitement: '2030-01-15T08:50:02+00:00'
@@ -13144,6 +13275,7 @@ paths:
                         id: 0198a1b2-0000-7000-8000-000000000070
                         montant: 5000
                         statut: reussi
+                        operateur: wave
                         telephoneVersement: '+221******567'
                         dateDemande: '2030-01-15T08:50:00+00:00'
                         dateTraitement: '2030-01-15T08:50:02+00:00'
@@ -13159,6 +13291,9 @@ paths:
                         statut:
                           type: string
                           example: reussi
+                        operateur:
+                          type: string
+                          example: wave
                         telephoneVersement:
                           type: string
                           example: '+221******567'
@@ -13242,6 +13377,7 @@ paths:
                   id: 0198a1b2-0000-7000-8000-000000000070
                   montant: 5000.0
                   statut: reussi
+                  operateur: wave
                   telephoneVersement: '+221******567'
                   dateDemande: '2030-01-15T08:50:00+00:00'
                   dateTraitement: '2030-01-15T08:50:02+00:00'
@@ -13255,6 +13391,9 @@ paths:
                   statut:
                     type: string
                     example: reussi
+                  operateur:
+                    type: string
+                    example: wave
                   telephoneVersement:
                     type: string
                     example: '+221******567'
@@ -13381,6 +13520,7 @@ paths:
                   id: 0198a1b2-0000-7000-8000-000000000070
                   montant: 5000.0
                   statut: reussi
+                  operateur: wave
                   telephoneVersement: '+221******567'
                   dateDemande: '2030-01-15T08:50:00+00:00'
                   dateTraitement: '2030-01-15T08:50:02+00:00'
@@ -13394,6 +13534,9 @@ paths:
                   statut:
                     type: string
                     example: reussi
+                  operateur:
+                    type: string
+                    example: wave
                   telephoneVersement:
                     type: string
                     example: '+221******567'
@@ -13454,7 +13597,7 @@ paths:
     get:
       summary: 'Voir mon profil'
       operationId: voirMonProfil
-      description: ''
+      description: "Pour un prestataire, un bloc `prestataire` (`id`, `nomEntreprise`, `metier`, `quartier`) s'ajoute ; il est absent pour un client et un administrateur."
       parameters: []
       responses:
         200:
@@ -13462,41 +13605,101 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                example:
-                  id: 0198a1b2-0000-7000-8000-000000000001
-                  nom: Diop
-                  prenom: Awa
-                  email: awa@example.com
-                  telephone: '+221771234567'
-                  role: client
-                  statutCompte: actif
-                  dateCreation: '2026-10-11T09:30:00+00:00'
-                properties:
-                  id:
-                    type: string
-                    example: 0198a1b2-0000-7000-8000-000000000001
-                  nom:
-                    type: string
-                    example: Diop
-                  prenom:
-                    type: string
-                    example: Awa
-                  email:
-                    type: string
-                    example: awa@example.com
-                  telephone:
-                    type: string
-                    example: '+221771234567'
-                  role:
-                    type: string
-                    example: client
-                  statutCompte:
-                    type: string
-                    example: actif
-                  dateCreation:
-                    type: string
-                    example: '2026-10-11T09:30:00+00:00'
+                oneOf:
+                  -
+                    description: client
+                    type: object
+                    example:
+                      id: 0198a1b2-0000-7000-8000-000000000001
+                      nom: Diop
+                      prenom: Awa
+                      email: awa@example.com
+                      telephone: '+221771234567'
+                      role: client
+                      statutCompte: actif
+                      dateCreation: '2026-10-11T09:30:00+00:00'
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000001
+                      nom:
+                        type: string
+                        example: Diop
+                      prenom:
+                        type: string
+                        example: Awa
+                      email:
+                        type: string
+                        example: awa@example.com
+                      telephone:
+                        type: string
+                        example: '+221771234567'
+                      role:
+                        type: string
+                        example: client
+                      statutCompte:
+                        type: string
+                        example: actif
+                      dateCreation:
+                        type: string
+                        example: '2026-10-11T09:30:00+00:00'
+                  -
+                    description: prestataire
+                    type: object
+                    example:
+                      id: 0198a1b2-0000-7000-8000-000000000002
+                      nom: Ndiaye
+                      prenom: Fatou
+                      email: fatou@example.com
+                      telephone: '+221781234567'
+                      role: prestataire
+                      statutCompte: actif
+                      dateCreation: '2026-10-11T09:30:00+00:00'
+                      prestataire:
+                        id: 0198a1b2-0000-7000-8000-000000000003
+                        nomEntreprise: 'Salon Fatou'
+                        metier: Coiffure
+                        quartier: 'Keur Massar Nord'
+                    properties:
+                      id:
+                        type: string
+                        example: 0198a1b2-0000-7000-8000-000000000002
+                      nom:
+                        type: string
+                        example: Ndiaye
+                      prenom:
+                        type: string
+                        example: Fatou
+                      email:
+                        type: string
+                        example: fatou@example.com
+                      telephone:
+                        type: string
+                        example: '+221781234567'
+                      role:
+                        type: string
+                        example: prestataire
+                      statutCompte:
+                        type: string
+                        example: actif
+                      dateCreation:
+                        type: string
+                        example: '2026-10-11T09:30:00+00:00'
+                      prestataire:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            example: 0198a1b2-0000-7000-8000-000000000003
+                          nomEntreprise:
+                            type: string
+                            example: 'Salon Fatou'
+                          metier:
+                            type: string
+                            example: Coiffure
+                          quartier:
+                            type: string
+                            example: 'Keur Massar Nord'
         401:
           description: ''
           content:
@@ -13854,8 +14057,18 @@ paths:
     get:
       summary: 'Lister les quartiers'
       operationId: listerLesQuartiers
-      description: "Quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces superflus ignorés), triés\npar ordre alphabétique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.\nPassez la valeur telle quelle au filtre `GET /prestataires?quartier=`."
-      parameters: []
+      description: "Sans paramètre : quartiers où au moins un prestataire au compte actif est installé, sans doublon (casse et espaces\nsuperflus ignorés), triés par ordre alphabétique. C'est la liste de la recherche des clients.\n\nAvec `tous=1` : liste complète pour l'inscription d'un prestataire, c'est-à-dire le référentiel des quartiers (table\n`quartiers`) réuni aux quartiers des prestataires actifs, sans doublon (casse, accents et espaces en trop ignorés), triée\nsans tenir compte des accents. Le référentiel n'est qu'une liste de suggestions : le quartier d'un prestataire reste un texte libre.\n\nSans authentification. Passez la valeur telle quelle au filtre `GET /prestataires?quartier=`."
+      parameters:
+        -
+          in: query
+          name: tous
+          description: 'Mettre `1` (ou `true`) pour obtenir le référentiel complet. Toute autre valeur est ignorée.'
+          example: true
+          required: false
+          schema:
+            type: boolean
+            description: 'Mettre `1` (ou `true`) pour obtenir le référentiel complet. Toute autre valeur est ignorée.'
+            example: true
       responses:
         200:
           description: ''

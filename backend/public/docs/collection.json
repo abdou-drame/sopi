@@ -10,7 +10,7 @@
     ],
     "info": {
         "name": "Sopi API",
-        "_postman_id": "ca486994-2cbe-479e-acdc-a4208731b68d",
+        "_postman_id": "0f37ae3a-4746-4134-9c61-79e26a1947ea",
         "description": "API REST de Sopi (r\u00e9servation de services de proximit\u00e9 \u00e0 Keur Massar). Pr\u00e9fixe \/api\/v1, JSON uniquement, erreurs en fran\u00e7ais : { \"message\": \"...\", \"errors\": { \"champ\": [\"...\"] } }.",
         "schema": "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"
     },
@@ -3653,7 +3653,7 @@
                                 }
                             ],
                             "code": 503,
-                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-16T21:20:25+00:00\"}",
+                            "body": "{\"status\":\"ok\",\"app\":\"Sopi\",\"version\":\"0.1.0\",\"database\":\"erreur\",\"time\":\"2026-10-17T21:50:33+00:00\"}",
                             "name": ""
                         }
                     ]
@@ -4642,7 +4642,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"reponseAvant\":\"2030-01-16T08:50:00+00:00\",\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/reservations?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -4700,7 +4700,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_attente\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"reponseAvant\":\"2030-01-16T08:50:00+00:00\",\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
@@ -4758,7 +4758,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"acceptee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"acceptee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"reponseAvant\":null,\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
@@ -4831,7 +4831,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"refusee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Je ne suis pas disponible \u00e0 cette heure.\",\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"refusee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Je ne suis pas disponible \u00e0 cette heure.\",\"reponseAvant\":null,\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
@@ -4910,7 +4910,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_cours\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"en_cours\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"reponseAvant\":null,\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
@@ -4989,7 +4989,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"annulee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Un impr\u00e9vu m'emp\u00eache d'assurer la prestation.\",\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"annulee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":\"Un impr\u00e9vu m'emp\u00eache d'assurer la prestation.\",\"reponseAvant\":null,\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"}}",
                             "name": ""
                         },
                         {
@@ -5065,7 +5065,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"terminee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"},\"montantTotal\":15000,\"commission\":1500,\"montantCredite\":3000,\"soldeApres\":3000}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000060\",\"statut\":\"terminee\",\"dateCreation\":\"2030-01-15T08:50:00+00:00\",\"motifRefus\":null,\"reponseAvant\":null,\"acompte\":4500.0,\"commission\":1500.0,\"montantCredite\":3000.0,\"creneau\":{\"id\":\"0198a1b2-0000-7000-8000-000000000040\",\"dateDebut\":\"2030-01-16T09:00:00+00:00\",\"dateFin\":\"2030-01-16T10:00:00+00:00\"},\"prestation\":{\"id\":\"0198a1b2-0000-7000-8000-000000000050\",\"nom\":\"Vidange\",\"dureeMinutes\":60,\"prix\":15000},\"client\":{\"prenom\":\"Awa\",\"initialeNom\":\"D\"},\"montantTotal\":15000,\"commission\":1500,\"montantCredite\":3000,\"soldeApres\":3000}",
                             "name": ""
                         },
                         {
@@ -5752,13 +5752,13 @@
                             }
                         ],
                         "body": null,
-                        "description": "Mouvements du solde (cr\u00e9dit de fin de prestation, demande de retrait, recr\u00e9dit d'un retrait \u00e9chou\u00e9), pagin\u00e9s (20 par page),\ndu plus r\u00e9cent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste apr\u00e8s le mouvement (FCFA)."
+                        "description": "Mouvements du solde (cr\u00e9dit de fin de prestation, demande de retrait, recr\u00e9dit d'un retrait \u00e9chou\u00e9), pagin\u00e9s (20 par page),\ndu plus r\u00e9cent au plus ancien. `montant` est toujours positif : le sens se lit dans `type` (`credit` et `remboursement_retrait`\naugmentent le solde, `retrait` le diminue). `soldeApres` est le solde juste apr\u00e8s le mouvement (FCFA). `prestation` est le nom du service de la r\u00e9servation li\u00e9e (cr\u00e9dit), sinon `null` ; `operateur` (`wave` ou `orange_money`, `null` si inconnu) et `statutRetrait` (`en_cours`, `reussi` ou `echoue`) ne sont renseign\u00e9s que pour un retrait."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"type\":\"credit\",\"montant\":3000.0,\"libelle\":\"Prestation termin\u00e9e (acompte moins commission)\",\"soldeApres\":8000.0,\"reservationId\":\"0198a1b2-0000-7000-8000-000000000020\",\"retraitId\":null,\"date\":\"2030-01-15T08:50:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000080\",\"type\":\"credit\",\"montant\":3000.0,\"libelle\":\"Prestation termin\u00e9e (acompte moins commission)\",\"soldeApres\":8000.0,\"reservationId\":\"0198a1b2-0000-7000-8000-000000000020\",\"retraitId\":null,\"prestation\":\"Vidange\",\"operateur\":null,\"statutRetrait\":null,\"date\":\"2030-01-15T08:50:00+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/portefeuille\/mouvements?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -5802,7 +5802,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/retraits?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/retraits?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
+                            "body": "{\"data\":[{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"operateur\":\"wave\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}],\"links\":{\"first\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/retraits?page=1\",\"last\":\"https:\/\/api.exemple.test\/api\/v1\/prestataire\/retraits?page=1\",\"prev\":null,\"next\":null},\"meta\":{\"current_page\":1,\"last_page\":1,\"per_page\":20,\"total\":1}}",
                             "name": ""
                         },
                         {
@@ -5854,7 +5854,7 @@
                         {
                             "header": [],
                             "code": 200,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"operateur\":\"wave\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}",
                             "name": ""
                         },
                         {
@@ -5907,7 +5907,7 @@
                         {
                             "header": [],
                             "code": 201,
-                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}",
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000070\",\"montant\":5000.0,\"statut\":\"reussi\",\"operateur\":\"wave\",\"telephoneVersement\":\"+221******567\",\"dateDemande\":\"2030-01-15T08:50:00+00:00\",\"dateTraitement\":\"2030-01-15T08:50:02+00:00\"}",
                             "name": ""
                         },
                         {
@@ -5969,14 +5969,20 @@
                             }
                         ],
                         "body": null,
-                        "description": ""
+                        "description": "Pour un prestataire, un bloc `prestataire` (`id`, `nomEntreprise`, `metier`, `quartier`) s'ajoute ; il est absent pour un client et un administrateur."
                     },
                     "response": [
                         {
                             "header": [],
                             "code": 200,
                             "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000001\",\"nom\":\"Diop\",\"prenom\":\"Awa\",\"email\":\"awa@example.com\",\"telephone\":\"+221771234567\",\"role\":\"client\",\"statutCompte\":\"actif\",\"dateCreation\":\"2026-10-11T09:30:00+00:00\"}",
-                            "name": ""
+                            "name": "client"
+                        },
+                        {
+                            "header": [],
+                            "code": 200,
+                            "body": "{\"id\":\"0198a1b2-0000-7000-8000-000000000002\",\"nom\":\"Ndiaye\",\"prenom\":\"Fatou\",\"email\":\"fatou@example.com\",\"telephone\":\"+221781234567\",\"role\":\"prestataire\",\"statutCompte\":\"actif\",\"dateCreation\":\"2026-10-11T09:30:00+00:00\",\"prestataire\":{\"id\":\"0198a1b2-0000-7000-8000-000000000003\",\"nomEntreprise\":\"Salon Fatou\",\"metier\":\"Coiffure\",\"quartier\":\"Keur Massar Nord\"}}",
+                            "name": "prestataire"
                         },
                         {
                             "header": [],
@@ -6212,8 +6218,15 @@
                         "url": {
                             "host": "{{baseUrl}}",
                             "path": "api\/v1\/quartiers",
-                            "query": [],
-                            "raw": "{{baseUrl}}\/api\/v1\/quartiers"
+                            "query": [
+                                {
+                                    "key": "tous",
+                                    "value": "1",
+                                    "description": "Mettre `1` (ou `true`) pour obtenir le r\u00e9f\u00e9rentiel complet. Toute autre valeur est ignor\u00e9e.",
+                                    "disabled": false
+                                }
+                            ],
+                            "raw": "{{baseUrl}}\/api\/v1\/quartiers?tous=1"
                         },
                         "method": "GET",
                         "header": [
@@ -6227,7 +6240,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "Quartiers o\u00f9 au moins un prestataire au compte actif est install\u00e9, sans doublon (casse et espaces superflus ignor\u00e9s), tri\u00e9s\npar ordre alphab\u00e9tique. Sans authentification. Il n'existe pas de table des quartiers : la liste vient des profils.\nPassez la valeur telle quelle au filtre `GET \/prestataires?quartier=`.",
+                        "description": "Sans param\u00e8tre : quartiers o\u00f9 au moins un prestataire au compte actif est install\u00e9, sans doublon (casse et espaces\nsuperflus ignor\u00e9s), tri\u00e9s par ordre alphab\u00e9tique. C'est la liste de la recherche des clients.\n\nAvec `tous=1` : liste compl\u00e8te pour l'inscription d'un prestataire, c'est-\u00e0-dire le r\u00e9f\u00e9rentiel des quartiers (table\n`quartiers`) r\u00e9uni aux quartiers des prestataires actifs, sans doublon (casse, accents et espaces en trop ignor\u00e9s), tri\u00e9e\nsans tenir compte des accents. Le r\u00e9f\u00e9rentiel n'est qu'une liste de suggestions : le quartier d'un prestataire reste un texte libre.\n\nSans authentification. Passez la valeur telle quelle au filtre `GET \/prestataires?quartier=`.",
                         "auth": {
                             "type": "noauth"
                         }
