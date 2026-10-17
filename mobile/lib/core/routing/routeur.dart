@@ -37,6 +37,13 @@ import '../../features/prestataire/aiguillage_reservation.dart';
 import '../../features/prestataire/disponibilites_page.dart';
 import '../../features/prestataire/indisponibilite_page.dart';
 import '../../features/prestataire/plage_horaire_page.dart';
+import '../../features/prestataire/portefeuille_page.dart';
+import '../../features/prestataire/retrait_page.dart';
+import '../../features/prestataire/avis_recus_page.dart';
+import '../../features/prestataire/photos_page.dart';
+import '../../features/prestataire/profil_prestataire_page.dart';
+import '../../features/prestataire/litige_reponse_page.dart';
+import '../../features/prestataire/litiges_recus_page.dart';
 import '../../features/prestataire/service_form_page.dart';
 import '../../features/prestataire/services_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
@@ -75,8 +82,8 @@ String? redirectionSopi(
       if (chemin == '/' || Chemins.authentification.contains(chemin)) {
         return accueil;
       }
-      if (chemin == Chemins.etatApi || chemin == Chemins.notifications) {
-        // Les notifications sont communes aux deux espaces.
+      if (chemin == Chemins.etatApi || Chemins.communs.contains(chemin)) {
+        // Notifications, profil, mot de passe et aide sont communs aux deux espaces.
         return null;
       }
       final espacePrestataire =
@@ -229,8 +236,12 @@ GoRouter creerRouteur({
         routes: [
           GoRoute(
             path: 'avis',
-            builder: (context, state) =>
-                AvisPrestatairePage(prestataireId: state.pathParameters['id']!),
+            builder: (context, state) => AvisPrestatairePage(
+              prestataireId: state.pathParameters['id']!,
+              nomEntreprise: state.extra is String
+                  ? state.extra as String
+                  : null,
+            ),
           ),
         ],
       ),
@@ -303,11 +314,8 @@ GoRouter creerRouteur({
         branches: [
           _onglet(Chemins.tableau, () => const TableauPage()),
           _onglet(Chemins.agenda, () => const AgendaPage()),
-          _onglet(
-            Chemins.portefeuille,
-            () => const EcranProvisoire(nom: 'Portefeuille'),
-          ),
-          _onglet(Chemins.profilPrestataire, () => const ProfilProvisoire()),
+          _onglet(Chemins.portefeuille, () => const PortefeuillePage()),
+          _onglet(Chemins.profilPrestataire, () => const ProfilPrestaPage()),
         ],
       ),
 
@@ -333,8 +341,20 @@ GoRouter creerRouteur({
         path: Chemins.indisponibilite,
         builder: (_, _) => const IndisponibilitePage(),
       ),
-      _provisoire(Chemins.retrait, 'Retrait'),
-      _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),
+      GoRoute(path: Chemins.retrait, builder: (_, _) => const RetraitPage()),
+      GoRoute(path: Chemins.photos, builder: (_, _) => const PhotosPage()),
+      GoRoute(
+        path: Chemins.avisRecus,
+        builder: (_, _) => const AvisRecusPage(),
+      ),
+      GoRoute(
+        path: Chemins.litigesRecus,
+        builder: (_, _) => const LitigesRecusPage(),
+      ),
+      GoRoute(
+        path: Chemins.litigeRecu(':id'),
+        builder: (_, etat) => LitigeReponsePage(id: etat.pathParameters['id']!),
+      ),
       GoRoute(
         path: Chemins.reservationsPrestataire,
         builder: (_, _) => const ReservationsPrestatairePage(),

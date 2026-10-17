@@ -11,6 +11,36 @@ enum RoleSopi {
       };
 }
 
+/// Bloc `prestataire` de `/me` (rôle prestataire uniquement).
+class IdentitePrestataire {
+  const IdentitePrestataire({
+    required this.id,
+    required this.nomEntreprise,
+    this.metier,
+    this.quartier,
+  });
+
+  final String id;
+  final String nomEntreprise;
+  final String? metier;
+  final String? quartier;
+
+  static IdentitePrestataire? depuisJson(Object? brut) {
+    if (brut is! Map || brut['id'] == null) return null;
+    String? texte(Object? v) {
+      final s = (v ?? '').toString().trim();
+      return s.isEmpty ? null : s;
+    }
+
+    return IdentitePrestataire(
+      id: brut['id'].toString(),
+      nomEntreprise: texte(brut['nomEntreprise']) ?? "",
+      metier: texte(brut['metier']),
+      quartier: texte(brut['quartier']),
+    );
+  }
+}
+
 class Utilisateur {
   const Utilisateur({
     required this.id,
@@ -19,6 +49,8 @@ class Utilisateur {
     this.nom,
     this.email,
     this.telephone,
+    this.statutCompte,
+    this.prestataire,
   });
 
   final String id;
@@ -27,6 +59,10 @@ class Utilisateur {
   final String? nom;
   final String? email;
   final String? telephone;
+
+  /// `actif`, `suspendu`… tel que renvoyé par `/me` (null si absent).
+  final String? statutCompte;
+  final IdentitePrestataire? prestataire;
 
   String get nomComplet =>
       [prenom, nom].whereType<String>().where((s) => s.isNotEmpty).join(' ');
@@ -45,6 +81,8 @@ class Utilisateur {
       nom: json['nom'] as String?,
       email: json['email'] as String?,
       telephone: json['telephone'] as String?,
+      statutCompte: json['statutCompte'] as String?,
+      prestataire: IdentitePrestataire.depuisJson(json['prestataire']),
     );
   }
 }

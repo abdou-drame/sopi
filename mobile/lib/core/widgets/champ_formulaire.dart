@@ -25,6 +25,8 @@ class ChampFormulaire extends StatefulWidget {
     this.hauteur = DimensionsSopi.hauteurChampFormulaire,
     this.margeInterne = 16,
     this.erreurSansTexte = false,
+    this.tailleTexte = 15,
+    this.poidsTexte = FontWeight.w400,
   });
 
   final String libelle;
@@ -44,6 +46,10 @@ class ChampFormulaire extends StatefulWidget {
 
   /// Bordure rouge sans message (le message est affiché ailleurs, par exemple dans un bandeau).
   final bool erreurSansTexte;
+
+  /// Taille et graisse du texte saisi (15 / 400 par défaut ; 24 / 800 pour un montant).
+  final double tailleTexte;
+  final FontWeight poidsTexte;
 
   @override
   State<ChampFormulaire> createState() => _ChampFormulaireState();
@@ -92,8 +98,8 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
             // Le défilement de l'écran laisse toujours le champ visible au-dessus du clavier.
             scrollPadding: const EdgeInsets.only(bottom: 120),
             style: theme.textTheme.bodyLarge?.copyWith(
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
+              fontSize: widget.tailleTexte,
+              fontWeight: widget.poidsTexte,
               color: CouleursSopi.marine,
             ),
             decoration: InputDecoration(

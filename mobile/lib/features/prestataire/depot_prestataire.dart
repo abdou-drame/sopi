@@ -1,11 +1,17 @@
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_client.dart';
+import '../../core/widgets/liste_infinie.dart' show PageListe;
 import '../reservation/depot_reservation.dart'
     show horlogeProvider, sansRelance;
 import '../reservation/formats.dart' show formaterJourApi;
 import 'modeles.dart';
+import '../reservation/modeles.dart' show PageAvis;
+import 'modeles_litiges.dart';
+import 'modeles_portefeuille.dart';
 
 /// Requêtes de l'espace prestataire (`/api/v1/prestataire/...`). Aucune règle métier ici : le serveur décide.
 class DepotPrestataire {
@@ -22,11 +28,104 @@ class DepotPrestataire {
     return corps is Map ? Map<String, dynamic>.from(corps) : {};
   }
 
-  /// Solde du portefeuille en FCFA (`GET /prestataire/solde`).
-  Future<num> solde() async {
-    final corps = await _lire('/prestataire/solde');
-    final solde = corps['solde'];
-    return solde is num ? solde : num.tryParse('$solde') ?? 0;
+  /// Solde du portefeuille en FCFA et limites d'un retrait (`GET /prestataire/solde`).
+  Future<SoldePortefeuille> solde() async =>
+      SoldePortefeuille.depuisJson(await _lire('/prestataire/solde'));
+
+  /// Une page de l'historique du portefeuille, du plus récent au plus ancien (20 par page).
+  Future<PageMouvements> mouvements({int page = 1}) async =>
+      PageMouvements.depuisJson(
+        await _lire(
+          '/prestataire/portefeuille/mouvements',
+          requete: {'page': page},
+        ),
+      );
+
+  /// Demande un retrait. Le serveur débite, verse et décide (422 par champ, 429, 503 : versement refusé, solde intact).
+  Future<RetraitCree> demanderRetrait({
+    required int montant,
+    required String telephone,
+    required OperateurRetrait operateur,
+  }) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/retraits',
+      data: {
+        'montant': montant,
+        'telephone_versement': telephone,
+        'operateur': operateur.code,
+      },
+    );
+    return RetraitCree.depuisJson(reponse.data);
+  }
+
+  /// Mes avis reçus : page, note moyenne et nombre d'avis (`GET /prestataire/avis`).
+  Future<PageAvis> avisRecus({int page = 1}) async => PageAvis.depuisJson(
+    await _lire('/prestataire/avis', requete: {'page': page}),
+  );
+
+  /// Une page des signalements (litiges) qui me visent, du plus récent au plus ancien.
+  Future<PageListe<LitigeRecu>> litiges({int page = 1}) async =>
+      LitigeRecu.pageDepuisJson(
+        await _lire('/prestataire/litiges', requete: {'page': page}),
+      );
+
+  Future<LitigeRecu> litige(String id) async =>
+      LitigeRecu.depuisJson(await _lire('/prestataire/litiges/$id'));
+
+  /// Envoie ma version des faits (une seule réponse par litige : 409 ensuite).
+  Future<void> repondreLitige(String id, String reponse) async {
+    await _dio.post<Object?>(
+      '/prestataire/litiges/$id/reponse',
+      data: {'reponse': reponse},
+    );
+  }
+
+  /// Octets d'une preuve du client ; le jeton est ajouté par le client HTTP commun.
+  Future<Uint8List> preuveLitige(String litigeId, String preuveId) async {
+    final reponse = await _dio.get<List<int>>(
+      '/prestataire/litiges/$litigeId/preuves/$preuveId',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(reponse.data ?? const []);
+  }
+
+  /// Identifiants de mes photos d'entreprise, dans l'ordre d'ajout (`GET /prestataire/photos`).
+  Future<List<String>> photos() async {
+    final corps = await _lire('/prestataire/photos');
+    final liste = corps['data'];
+    return [
+      for (final p in (liste is List ? liste : const []))
+        if (p is Map && p['id'] != null) p['id'].toString(),
+    ];
+  }
+
+  /// Octets d'une de mes photos ; le jeton est ajouté par le client HTTP commun.
+  Future<Uint8List> photo(String id) async {
+    final reponse = await _dio.get<List<int>>(
+      '/prestataire/photos/$id',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(reponse.data ?? const []);
+  }
+
+  /// Envoi multipart, champ `photo`. Le serveur décide (format, taille, nombre) : 422 avec son message.
+  Future<void> ajouterPhoto({
+    required String nom,
+    required Uint8List octets,
+    required String typeMime,
+  }) async {
+    final formulaire = FormData.fromMap({
+      'photo': MultipartFile.fromBytes(
+        octets,
+        filename: nom,
+        contentType: DioMediaType.parse(typeMime),
+      ),
+    });
+    await _dio.post<Object?>('/prestataire/photos', data: formulaire);
+  }
+
+  Future<void> supprimerPhoto(String id) async {
+    await _dio.delete<Object?>('/prestataire/photos/$id');
   }
 
   /// Une page de demandes pour un onglet de la liste (statut ou groupe selon l'onglet).
@@ -176,11 +275,29 @@ final depotPrestataireProvider = Provider<DepotPrestataire>(
   (ref) => DepotPrestataire(ref.watch(dioProvider)),
 );
 
-/// Solde du portefeuille, relu à l'ouverture du tableau.
-final soldeProvider = FutureProvider.autoDispose<num>(
+/// Solde et limites de retrait, relus à l'ouverture du tableau, du portefeuille et du retrait.
+final soldeProvider = FutureProvider.autoDispose<SoldePortefeuille>(
   retry: sansRelance,
   (ref) => ref.watch(depotPrestataireProvider).solde(),
 );
+
+/// Compteur que l'onglet Portefeuille écoute pour relire son historique (après un retrait ou un crédit).
+class VersionPortefeuille extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void incrementer() => state++;
+}
+
+final versionPortefeuilleProvider = NotifierProvider<VersionPortefeuille, int>(
+  VersionPortefeuille.new,
+);
+
+/// Le solde ou l'historique a changé côté serveur : relit les deux.
+void rafraichirPortefeuille(WidgetRef ref) {
+  ref.invalidate(soldeProvider);
+  ref.read(versionPortefeuilleProvider.notifier).incrementer();
+}
 
 /// Nombre de demandes à traiter : `meta.total` de `?statut=en_attente`.
 final demandesATraiterProvider = FutureProvider.autoDispose<PageDemandes>(
@@ -218,4 +335,56 @@ final creneauxProvider = FutureProvider.autoDispose<List<CreneauAgenda>>(
           formaterJourApi(du.add(const Duration(days: joursAgendaConsultes))),
         );
   },
+);
+
+/// Tous les signalements qui me visent. L'API ne filtre pas par statut et ils sont peu nombreux : toutes les pages sont lues
+/// (jusqu'à 25) pour que chaque onglet affiche la totalité de ses éléments.
+final litigesRecusProvider = FutureProvider.autoDispose<List<LitigeRecu>>(
+  retry: sansRelance,
+  (ref) async {
+    final depot = ref.watch(depotPrestataireProvider);
+    final tous = <LitigeRecu>[];
+    var page = 1;
+    while (true) {
+      final reponse = await depot.litiges(page: page);
+      tous.addAll(reponse.elements);
+      if (reponse.page >= reponse.derniere || page >= 25) break;
+      page++;
+    }
+    return tous;
+  },
+);
+
+/// Détail d'un signalement (avec les identifiants des preuves du client).
+final litigeRecuProvider = FutureProvider.autoDispose
+    .family<LitigeRecu, String>(
+      retry: sansRelance,
+      (ref, id) => ref.watch(depotPrestataireProvider).litige(id),
+    );
+
+final preuveLitigeProvider = FutureProvider.autoDispose
+    .family<Uint8List, ({String litigeId, String preuveId})>(
+      retry: sansRelance,
+      (ref, c) => ref
+          .watch(depotPrestataireProvider)
+          .preuveLitige(c.litigeId, c.preuveId),
+    );
+
+/// Mes photos d'entreprise (identifiants, dans l'ordre d'ajout).
+final photosAtelierProvider = FutureProvider.autoDispose<List<String>>(
+  retry: sansRelance,
+  (ref) => ref.watch(depotPrestataireProvider).photos(),
+);
+
+final photoAtelierProvider = FutureProvider.autoDispose
+    .family<Uint8List, String>(
+      retry: sansRelance,
+      (ref, id) => ref.watch(depotPrestataireProvider).photo(id),
+    );
+
+/// Note moyenne affichée sur la ligne « Avis reçus » du profil ; null si elle est indisponible (aucun avis, erreur).
+final noteMoyennePrestataireProvider = FutureProvider.autoDispose<double?>(
+  retry: sansRelance,
+  (ref) async =>
+      (await ref.watch(depotPrestataireProvider).avisRecus()).noteMoyenne,
 );

@@ -60,7 +60,7 @@ void main() {
       final serveur = AdaptateurSimule({
         'GET /prestataire/solde': const Simulee(200, {'solde': 42500.0}),
       });
-      expect(await _depot(serveur).solde(), 42500);
+      expect((await _depot(serveur).solde()).solde, 42500);
     });
 
     test('demandes : À traiter envoie statut=en_attente et la page', () async {

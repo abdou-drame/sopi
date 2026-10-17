@@ -82,13 +82,13 @@ void main() {
       expect(liste.queryParameters['statut'], 'en_attente');
     });
 
-    testWidgets('le bouton Retirer est inactif', (tester) async {
+    testWidgets('le bouton Retirer ouvre l’écran de retrait', (tester) async {
       _vue390(tester);
       await lancerAcces(tester, AdaptateurSimule(_routes()), jeton: 'jeton');
       await passerTransition(tester);
       await tester.tap(find.byKey(const ValueKey('bouton-retirer')));
       await avancer(tester, 100);
-      expect(cheminCourant(tester), Chemins.tableau);
+      expect(cheminCourant(tester), Chemins.retrait);
     });
 
     testWidgets('la cloche affiche un point s\'il y a des non lues', (

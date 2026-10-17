@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../features/auth/session.dart';
-import 'chemins.dart';
 import '../theme/dimensions.dart';
-import '../widgets/boutons.dart';
 
 /// Écran PROVISOIRE : affiche seulement son nom. Remplacé écran par écran dans les prompts suivants.
 class EcranProvisoire extends StatelessWidget {
@@ -41,52 +36,6 @@ class EcranProvisoire extends StatelessWidget {
                     '${e.key} : ${e.value}',
                     style: theme.textTheme.bodySmall,
                   ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Onglet « Profil » provisoire : en plus de son nom, permet de tester la déconnexion.
-class ProfilProvisoire extends ConsumerWidget {
-  const ProfilProvisoire({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final etat = ref.watch(sessionProvider);
-    final nom = etat is Connecte ? etat.utilisateur.nomComplet : '';
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(DimensionsSopi.margeEcran),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Profil',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                if (nom.isNotEmpty) Text(nom),
-                const SizedBox(height: 24),
-                BoutonSecondaire(
-                  libelle: 'Mes services',
-                  onPressed: () => context.push(Chemins.services),
-                ),
-                const SizedBox(height: 12),
-                BoutonSecondaire(
-                  libelle: 'Mes disponibilités',
-                  onPressed: () => context.push(Chemins.disponibilites),
-                ),
-                const SizedBox(height: 12),
-                BoutonSecondaire(
-                  libelle: 'Se déconnecter',
-                  onPressed: () =>
-                      ref.read(sessionProvider.notifier).deconnecter(),
-                ),
               ],
             ),
           ),

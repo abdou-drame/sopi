@@ -194,7 +194,7 @@ class _EnteteTableau extends ConsumerWidget {
   }
 }
 
-/// Carte bleue du solde disponible. « Retirer » reste inactif tant que les retraits ne sont pas développés.
+/// Carte bleue du solde disponible ; « Retirer » ouvre la demande de retrait.
 class _CarteSolde extends ConsumerWidget {
   const _CarteSolde();
 
@@ -205,7 +205,7 @@ class _CarteSolde extends ConsumerWidget {
 
     Widget montant;
     if (solde.hasValue) {
-      final texte = formaterArgent(solde.value!);
+      final texte = formaterArgent(solde.value!.solde);
       final coupure = texte.lastIndexOf(' ');
       montant = Text.rich(
         TextSpan(
@@ -266,25 +266,26 @@ class _CarteSolde extends ConsumerWidget {
               const SizedBox(width: 8),
               Semantics(
                 button: true,
-                enabled: false,
                 label: 'Retirer',
-                child: Opacity(
-                  opacity: 0.55,
-                  child: Container(
-                    key: const ValueKey('bouton-retirer'),
-                    height: 44,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: CouleursSopi.blanc,
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                    child: Text(
-                      'Retirer',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: CouleursSopi.bleu,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
+                excludeSemantics: true,
+                child: Material(
+                  key: const ValueKey('bouton-retirer'),
+                  color: CouleursSopi.blanc,
+                  borderRadius: BorderRadius.circular(22),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(22),
+                    onTap: () => context.push(Chemins.retrait),
+                    child: Container(
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Retirer',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: CouleursSopi.bleu,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                   ),

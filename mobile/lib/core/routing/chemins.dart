@@ -42,6 +42,14 @@ abstract final class Chemins {
   static const signalements = '/profil/signalements';
   static String signalement(String id) => '/signalements/$id';
   static const aide = '/profil/aide';
+
+  /// Écrans accessibles au client comme au prestataire.
+  static const communs = {
+    notifications,
+    aide,
+    profilModifier,
+    motDePasseChanger,
+  };
   static const profilModifier = '/profil/modifier';
   static const motDePasseChanger = '/profil/mot-de-passe';
 
@@ -55,11 +63,14 @@ abstract final class Chemins {
   static const serviceNouveau = '/prestataire/services/nouveau';
   static String serviceModifier(String id) =>
       '/prestataire/services/$id/modifier';
+  static const photos = '/prestataire/photos';
   static const disponibilites = '/prestataire/disponibilites';
   static const plageHoraire = '/prestataire/disponibilites/plage';
   static const indisponibilite = '/prestataire/disponibilites/indisponibilite';
   static const retrait = '/prestataire/retrait';
-  static const historiqueRetraits = '/prestataire/retraits';
+  static const avisRecus = '/prestataire/avis';
+  static const litigesRecus = '/prestataire/litiges';
+  static String litigeRecu(String id) => '/prestataire/litiges/$id';
   static const reservationsPrestataire = '/prestataire/reservations';
   static String refusReservation(String id) =>
       '/prestataire/reservations/$id/refus';

@@ -147,6 +147,10 @@ void main() {
       expect(cheminCourant(tester), Chemins.avisPrestataire('p-1'));
       expect(find.text('Ibou T.'), findsOneWidget);
       expect(find.text('Quatrième avis.'), findsOneWidget);
+      // Le nom de l'entreprise est transmis par la fiche pour le titre « Avis sur … ».
+      expect(find.text('Avis sur'), findsOneWidget);
+      expect(find.text('Salon Fatou'), findsOneWidget);
+      expect(find.byKey(const ValueKey('synthese-avis')), findsOneWidget);
     });
 
     testWidgets('petit écran 320×568 : pas de débordement', (tester) async {
@@ -160,6 +164,11 @@ void main() {
 
   group('Tous les avis', () {
     testWidgets('pagination : la page 2 s\'ajoute', (tester) async {
+      // Vue haute : tous les avis et le bouton « Voir plus d'avis » tiennent à l'écran.
+      tester.view.physicalSize = const Size(390, 2400);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
       final routes = _routes(
         avis: avisApi([
           for (var i = 1; i <= 8; i++) unAvis('a-$i', 'Client $i', 4, 'Bien'),
@@ -172,9 +181,19 @@ void main() {
         200,
         avisApi([unAvis('a-9', 'Client 9', 5, 'Top')], page: 2, derniere: 2),
       );
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -3000));
-      await passerTransition(tester);
+      await tester.tap(find.text("Voir plus d'avis"));
+      await avancer(tester, 300);
       expect(find.text('Client 9'), findsOneWidget);
+      expect(find.text("Voir plus d'avis"), findsNothing);
+    });
+
+    testWidgets('lien direct sans nom : titre générique', (tester) async {
+      await _ouvrir(
+        tester,
+        AdaptateurSimule(_routes()),
+        chemin: Chemins.avisPrestataire('p-1'),
+      );
+      expect(find.text('ce prestataire'), findsOneWidget);
     });
 
     testWidgets('vide et erreur', (tester) async {

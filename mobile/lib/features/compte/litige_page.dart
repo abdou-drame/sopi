@@ -65,7 +65,7 @@ class _EtatLitige extends ConsumerState<LitigePage> {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       barrierColor: CouleursSopi.marine.withValues(alpha: .6),
-      builder: (_) => const _ChoixSource(),
+      builder: (_) => const ChoixSourcePhoto(),
     );
     if (source == null || !mounted) return;
     final PhotoChoisie? photo;
@@ -624,9 +624,9 @@ class _Vignette extends StatelessWidget {
   );
 }
 
-/// Feuille de choix de la source de la photo (ajout hors maquette, nécessaire pour la galerie et l'appareil photo).
-class _ChoixSource extends StatelessWidget {
-  const _ChoixSource();
+/// Feuille de choix de la source de la photo, partagée avec les photos d'entreprise (ajout hors maquette, nécessaire pour la galerie et l'appareil photo).
+class ChoixSourcePhoto extends StatelessWidget {
+  const ChoixSourcePhoto({super.key});
 
   @override
   Widget build(BuildContext context) {

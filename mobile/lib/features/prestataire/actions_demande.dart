@@ -90,7 +90,7 @@ Future<bool> terminerPrestation(
   try {
     final credit = await ref.read(depotPrestataireProvider).terminer(id);
     rafraichirDemandes(ref, id);
-    ref.invalidate(soldeProvider);
+    rafraichirPortefeuille(ref);
     final montant = credit.montantCredite;
     messager.showSnackBar(
       SnackBar(
