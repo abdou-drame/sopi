@@ -43,6 +43,8 @@ class ReservationController extends Controller
      */
     public function index(ListerReservationsRequest $request)
     {
+        request()->attributes->set(DemandeReservationResource::AVEC_MONTANTS, true);
+
         return DemandeReservationResource::collection($this->service->lister($this->prestataire($request), $request->statut(), $request->groupe()));
     }
 
@@ -60,6 +62,7 @@ class ReservationController extends Controller
      */
     public function show(Request $request, string $id): JsonResponse|DemandeReservationResource
     {
+        request()->attributes->set(DemandeReservationResource::AVEC_MONTANTS, true);
         $reservation = $this->service->trouver($this->prestataire($request), $id);
 
         return $reservation === null

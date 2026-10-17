@@ -19,6 +19,9 @@ class DemandeReservationResource extends JsonResource
 {
     public static $wrap = null;
 
+    /** Attribut de requête posé par la liste et le détail : les montants ne sont pas rendus dans les réponses d'action (annulation, etc.). */
+    public const AVEC_MONTANTS = 'demande_avec_montants';
+
     /**
      * Acompte et commission de la réservation : ceux du paiement le plus récent non échoué s'il existe (montants figés à
      * l'ouverture du paiement), sinon calculés par le serveur sur le prix, avec les mêmes taux et la même règle.
@@ -43,7 +46,15 @@ class DemandeReservationResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        [$acompte, $commission] = $this->montants();
+        $montants = [];
+        if ($request->attributes->get(self::AVEC_MONTANTS, false)) {
+            [$acompte, $commission] = $this->montants();
+            $montants = [
+                'acompte' => (float) $acompte,
+                'commission' => (float) $commission,
+                'montantCredite' => (float) CalculPaiement::montantCredite($acompte, $commission),
+            ];
+        }
 
         return [
             'id' => $this->id,
@@ -51,9 +62,7 @@ class DemandeReservationResource extends JsonResource
             'dateCreation' => $this->created_at->toIso8601String(),
             'motifRefus' => $this->motif_refus,
             'reponseAvant' => ReponseReservationService::echeanceReponse($this->resource)?->toIso8601String(),
-            'acompte' => (float) $acompte,
-            'commission' => (float) $commission,
-            'montantCredite' => (float) CalculPaiement::montantCredite($acompte, $commission),
+            ...$montants,
             'creneau' => [
                 'id' => $this->creneau->id,
                 'dateDebut' => $this->creneau->date_debut->toIso8601String(),
