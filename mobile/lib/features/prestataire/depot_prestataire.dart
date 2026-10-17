@@ -89,6 +89,45 @@ class DepotPrestataire {
     return Uint8List.fromList(reponse.data ?? const []);
   }
 
+  /// Identifiants de mes photos d'entreprise, dans l'ordre d'ajout (`GET /prestataire/photos`).
+  Future<List<String>> photos() async {
+    final corps = await _lire('/prestataire/photos');
+    final liste = corps['data'];
+    return [
+      for (final p in (liste is List ? liste : const []))
+        if (p is Map && p['id'] != null) p['id'].toString(),
+    ];
+  }
+
+  /// Octets d'une de mes photos ; le jeton est ajouté par le client HTTP commun.
+  Future<Uint8List> photo(String id) async {
+    final reponse = await _dio.get<List<int>>(
+      '/prestataire/photos/$id',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(reponse.data ?? const []);
+  }
+
+  /// Envoi multipart, champ `photo`. Le serveur décide (format, taille, nombre) : 422 avec son message.
+  Future<void> ajouterPhoto({
+    required String nom,
+    required Uint8List octets,
+    required String typeMime,
+  }) async {
+    final formulaire = FormData.fromMap({
+      'photo': MultipartFile.fromBytes(
+        octets,
+        filename: nom,
+        contentType: DioMediaType.parse(typeMime),
+      ),
+    });
+    await _dio.post<Object?>('/prestataire/photos', data: formulaire);
+  }
+
+  Future<void> supprimerPhoto(String id) async {
+    await _dio.delete<Object?>('/prestataire/photos/$id');
+  }
+
   /// Une page de demandes pour un onglet de la liste (statut ou groupe selon l'onglet).
   Future<PageDemandes> demandes(OngletDemandes onglet, {int page = 1}) async {
     final corps = await _lire(
@@ -330,3 +369,22 @@ final preuveLitigeProvider = FutureProvider.autoDispose
           .watch(depotPrestataireProvider)
           .preuveLitige(c.litigeId, c.preuveId),
     );
+
+/// Mes photos d'entreprise (identifiants, dans l'ordre d'ajout).
+final photosAtelierProvider = FutureProvider.autoDispose<List<String>>(
+  retry: sansRelance,
+  (ref) => ref.watch(depotPrestataireProvider).photos(),
+);
+
+final photoAtelierProvider = FutureProvider.autoDispose
+    .family<Uint8List, String>(
+      retry: sansRelance,
+      (ref, id) => ref.watch(depotPrestataireProvider).photo(id),
+    );
+
+/// Note moyenne affichée sur la ligne « Avis reçus » du profil ; null si elle est indisponible (aucun avis, erreur).
+final noteMoyennePrestataireProvider = FutureProvider.autoDispose<double?>(
+  retry: sansRelance,
+  (ref) async =>
+      (await ref.watch(depotPrestataireProvider).avisRecus()).noteMoyenne,
+);

@@ -40,6 +40,8 @@ import '../../features/prestataire/plage_horaire_page.dart';
 import '../../features/prestataire/portefeuille_page.dart';
 import '../../features/prestataire/retrait_page.dart';
 import '../../features/prestataire/avis_recus_page.dart';
+import '../../features/prestataire/photos_page.dart';
+import '../../features/prestataire/profil_prestataire_page.dart';
 import '../../features/prestataire/litige_reponse_page.dart';
 import '../../features/prestataire/litiges_recus_page.dart';
 import '../../features/prestataire/service_form_page.dart';
@@ -80,8 +82,8 @@ String? redirectionSopi(
       if (chemin == '/' || Chemins.authentification.contains(chemin)) {
         return accueil;
       }
-      if (chemin == Chemins.etatApi || chemin == Chemins.notifications) {
-        // Les notifications sont communes aux deux espaces.
+      if (chemin == Chemins.etatApi || Chemins.communs.contains(chemin)) {
+        // Notifications, profil, mot de passe et aide sont communs aux deux espaces.
         return null;
       }
       final espacePrestataire =
@@ -309,7 +311,7 @@ GoRouter creerRouteur({
           _onglet(Chemins.tableau, () => const TableauPage()),
           _onglet(Chemins.agenda, () => const AgendaPage()),
           _onglet(Chemins.portefeuille, () => const PortefeuillePage()),
-          _onglet(Chemins.profilPrestataire, () => const ProfilProvisoire()),
+          _onglet(Chemins.profilPrestataire, () => const ProfilPrestaPage()),
         ],
       ),
 
@@ -336,6 +338,7 @@ GoRouter creerRouteur({
         builder: (_, _) => const IndisponibilitePage(),
       ),
       GoRoute(path: Chemins.retrait, builder: (_, _) => const RetraitPage()),
+      GoRoute(path: Chemins.photos, builder: (_, _) => const PhotosPage()),
       GoRoute(
         path: Chemins.avisRecus,
         builder: (_, _) => const AvisRecusPage(),

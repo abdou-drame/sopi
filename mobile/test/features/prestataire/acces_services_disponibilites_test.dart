@@ -37,7 +37,7 @@ void main() {
 
   testWidgets('Profil → Mes services', (tester) async {
     await ouvrir(tester);
-    await tester.tap(find.text('Mes services'));
+    await tester.tap(find.text('Mes services et tarifs'));
     await passerTransition(tester);
     expect(cheminCourant(tester), Chemins.services);
   });

@@ -62,6 +62,12 @@ Map<String, Object?> utilisateurPrestataire({String prenom = 'Fatou'}) => {
     'telephone': '+221771234568',
     'email': 'fatou@exemple.sn',
     'role': 'prestataire',
-    'statut': 'actif',
+    'statutCompte': 'actif',
+    'prestataire': {
+      'id': 'p-1',
+      'nomEntreprise': 'Salon Fatou',
+      'metier': 'Coiffure',
+      'quartier': 'Keur Massar Nord',
+    },
   },
 };
