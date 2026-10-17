@@ -50,9 +50,21 @@ class ListeInfinie<T> extends StatefulWidget {
     this.controleur,
     this.action,
     this.enTete,
+    this.avecRetour = true,
+    this.enfantEntete,
+    this.margeBasse,
   });
 
   final String titreLigne1;
+
+  /// Faux pour un onglet (pas de bouton retour).
+  final bool avecRetour;
+
+  /// Contenu sous le titre, dans l'en-tête dégradé (carte de solde, onglets…).
+  final Widget? enfantEntete;
+
+  /// Espace sous la dernière ligne (par défaut : bas de l'écran + 24).
+  final double? margeBasse;
   final String? titreLigne2;
   final Future<PageListe<T>> Function(int page) charger;
   final Widget Function(BuildContext, T) construire;
@@ -157,6 +169,8 @@ class _EtatListeInfinie<T> extends State<ListeInfinie<T>> {
       titreLigne1: widget.titreLigne1,
       titreLigne2: widget.titreLigne2,
       action: widget.action,
+      avecRetour: widget.avecRetour,
+      enfant: widget.enfantEntete,
     );
 
     Widget zone(Widget enfant, {double hauteur = 320}) => SliverToBoxAdapter(
@@ -195,7 +209,7 @@ class _EtatListeInfinie<T> extends State<ListeInfinie<T>> {
             DimensionsSopi.margeCarte,
             16,
             DimensionsSopi.margeCarte,
-            bas + 24,
+            widget.margeBasse ?? bas + 24,
           ),
           sliver: SliverList.separated(
             itemCount: _elements.length + 1,

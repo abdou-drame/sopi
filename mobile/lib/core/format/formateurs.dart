@@ -32,6 +32,10 @@ String formaterDate(DateTime date) {
 String formaterDateCourte(DateTime date) =>
     DateFormat('d MMM y', 'fr_FR').format(date.toUtc());
 
+/// « 22 oct. » (jour et mois, sans l'année). Nécessite [initialiserFormats].
+String formaterJourMois(DateTime date) =>
+    DateFormat('d MMM', 'fr_FR').format(date.toUtc());
+
 /// « +221 77 123 45 67 » à partir de +221771234567, 221771234567 ou 771234567. Autre valeur : renvoyée telle quelle
 /// (par exemple un numéro masqué comme +221******567).
 String formaterTelephone(String numero) {

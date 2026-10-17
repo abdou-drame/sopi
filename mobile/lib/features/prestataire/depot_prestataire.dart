@@ -6,6 +6,7 @@ import '../reservation/depot_reservation.dart'
     show horlogeProvider, sansRelance;
 import '../reservation/formats.dart' show formaterJourApi;
 import 'modeles.dart';
+import 'modeles_portefeuille.dart';
 
 /// Requêtes de l'espace prestataire (`/api/v1/prestataire/...`). Aucune règle métier ici : le serveur décide.
 class DepotPrestataire {
@@ -22,11 +23,34 @@ class DepotPrestataire {
     return corps is Map ? Map<String, dynamic>.from(corps) : {};
   }
 
-  /// Solde du portefeuille en FCFA (`GET /prestataire/solde`).
-  Future<num> solde() async {
-    final corps = await _lire('/prestataire/solde');
-    final solde = corps['solde'];
-    return solde is num ? solde : num.tryParse('$solde') ?? 0;
+  /// Solde du portefeuille en FCFA et limites d'un retrait (`GET /prestataire/solde`).
+  Future<SoldePortefeuille> solde() async =>
+      SoldePortefeuille.depuisJson(await _lire('/prestataire/solde'));
+
+  /// Une page de l'historique du portefeuille, du plus récent au plus ancien (20 par page).
+  Future<PageMouvements> mouvements({int page = 1}) async =>
+      PageMouvements.depuisJson(
+        await _lire(
+          '/prestataire/portefeuille/mouvements',
+          requete: {'page': page},
+        ),
+      );
+
+  /// Demande un retrait. Le serveur débite, verse et décide (422 par champ, 429, 503 : versement refusé, solde intact).
+  Future<RetraitCree> demanderRetrait({
+    required int montant,
+    required String telephone,
+    required OperateurRetrait operateur,
+  }) async {
+    final reponse = await _dio.post<Object?>(
+      '/prestataire/retraits',
+      data: {
+        'montant': montant,
+        'telephone_versement': telephone,
+        'operateur': operateur.code,
+      },
+    );
+    return RetraitCree.depuisJson(reponse.data);
   }
 
   /// Une page de demandes pour un onglet de la liste (statut ou groupe selon l'onglet).
@@ -176,11 +200,29 @@ final depotPrestataireProvider = Provider<DepotPrestataire>(
   (ref) => DepotPrestataire(ref.watch(dioProvider)),
 );
 
-/// Solde du portefeuille, relu à l'ouverture du tableau.
-final soldeProvider = FutureProvider.autoDispose<num>(
+/// Solde et limites de retrait, relus à l'ouverture du tableau, du portefeuille et du retrait.
+final soldeProvider = FutureProvider.autoDispose<SoldePortefeuille>(
   retry: sansRelance,
   (ref) => ref.watch(depotPrestataireProvider).solde(),
 );
+
+/// Compteur que l'onglet Portefeuille écoute pour relire son historique (après un retrait ou un crédit).
+class VersionPortefeuille extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void incrementer() => state++;
+}
+
+final versionPortefeuilleProvider = NotifierProvider<VersionPortefeuille, int>(
+  VersionPortefeuille.new,
+);
+
+/// Le solde ou l'historique a changé côté serveur : relit les deux.
+void rafraichirPortefeuille(WidgetRef ref) {
+  ref.invalidate(soldeProvider);
+  ref.read(versionPortefeuilleProvider.notifier).incrementer();
+}
 
 /// Nombre de demandes à traiter : `meta.total` de `?statut=en_attente`.
 final demandesATraiterProvider = FutureProvider.autoDispose<PageDemandes>(

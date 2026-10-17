@@ -36,6 +36,33 @@ class SaisieMasquee extends TextInputFormatter {
   }
 }
 
+/// Ne garde que les chiffres et groupe les milliers par un espace : « 20000 » → « 20 000 ».
+class SaisieMilliers extends TextInputFormatter {
+  const SaisieMilliers();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue ancien,
+    TextEditingValue nouveau,
+  ) {
+    final chiffres = nouveau.text.replaceAll(RegExp(r'\D'), '');
+    final sortie = StringBuffer();
+    for (var i = 0; i < chiffres.length; i++) {
+      if (i > 0 && (chiffres.length - i) % 3 == 0) sortie.write(' ');
+      sortie.write(chiffres[i]);
+    }
+    final texte = sortie.toString();
+    return TextEditingValue(
+      text: texte,
+      selection: TextSelection.collapsed(offset: texte.length),
+    );
+  }
+}
+
+/// « 20 000 » → 20000 ; `null` si la saisie est vide.
+int? lireMontant(String saisie) =>
+    int.tryParse(saisie.replaceAll(RegExp(r'\D'), ''));
+
 /// « 08:00 » → « 08:00 » ; `null` si l'heure n'est pas valide.
 String? lireHeure(String saisie) {
   final m = RegExp(r'^(\d{2}):(\d{2})$').firstMatch(saisie.trim());

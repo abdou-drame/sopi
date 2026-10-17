@@ -37,6 +37,8 @@ import '../../features/prestataire/aiguillage_reservation.dart';
 import '../../features/prestataire/disponibilites_page.dart';
 import '../../features/prestataire/indisponibilite_page.dart';
 import '../../features/prestataire/plage_horaire_page.dart';
+import '../../features/prestataire/portefeuille_page.dart';
+import '../../features/prestataire/retrait_page.dart';
 import '../../features/prestataire/service_form_page.dart';
 import '../../features/prestataire/services_page.dart';
 import '../../features/prestataire/refus_motif_page.dart';
@@ -303,10 +305,7 @@ GoRouter creerRouteur({
         branches: [
           _onglet(Chemins.tableau, () => const TableauPage()),
           _onglet(Chemins.agenda, () => const AgendaPage()),
-          _onglet(
-            Chemins.portefeuille,
-            () => const EcranProvisoire(nom: 'Portefeuille'),
-          ),
+          _onglet(Chemins.portefeuille, () => const PortefeuillePage()),
           _onglet(Chemins.profilPrestataire, () => const ProfilProvisoire()),
         ],
       ),
@@ -333,8 +332,7 @@ GoRouter creerRouteur({
         path: Chemins.indisponibilite,
         builder: (_, _) => const IndisponibilitePage(),
       ),
-      _provisoire(Chemins.retrait, 'Retrait'),
-      _provisoire(Chemins.historiqueRetraits, 'Historique des retraits'),
+      GoRoute(path: Chemins.retrait, builder: (_, _) => const RetraitPage()),
       GoRoute(
         path: Chemins.reservationsPrestataire,
         builder: (_, _) => const ReservationsPrestatairePage(),
