@@ -275,6 +275,27 @@
       "w": 390,
       "h": 844,
       "title": "Client · Réservation acceptée, à payer"
+    },
+    "ModifierProfil.dc.html": {
+      "x": 940,
+      "y": 8676,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Modifier le profil"
+    },
+    "ChangerMotDePasse.dc.html": {
+      "x": 1410,
+      "y": 8676,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Changer le mot de passe"
+    },
+    "Aide.dc.html": {
+      "x": 0,
+      "y": 9640,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Aide et support"
     }
   },
   "order": [
@@ -299,6 +320,9 @@
     "Litige.dc.html",
     "Notifications.dc.html",
     "Profil.dc.html",
+    "ModifierProfil.dc.html",
+    "ChangerMotDePasse.dc.html",
+    "Aide.dc.html",
     "PrestaInscription1.dc.html",
     "PrestaInscription2.dc.html",
     "SuiviDossier.dc.html",
@@ -321,7 +345,7 @@
     "titre": {
       "x": 0,
       "y": -300,
-      "text": "Sopi · Application mobile — 38 écrans, client et prestataire",
+      "text": "Sopi · Application mobile — 41 écrans, client et prestataire",
       "kind": "title1",
       "maxW": 1800
     }

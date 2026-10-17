@@ -161,6 +161,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Se déconnecter'));
       await tester.pumpAndSettle();
+      // Confirmation demandée avant la déconnexion.
+      await tester.tap(find.text('Se déconnecter').last);
+      await tester.pumpAndSettle();
       expect(chemin(tester), Chemins.connexion);
     });
 

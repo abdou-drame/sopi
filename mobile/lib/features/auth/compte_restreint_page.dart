@@ -11,7 +11,7 @@ import '../../core/widgets/en_tete_degrade.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
 
-/// Nature de la restriction, déduite du message du serveur (l'API ne renvoie pas le statut séparément).
+/// Nature de la restriction : donnée par `statutCompte` du 403 de connexion, ou déduite du message du serveur en secours.
 enum TypeRestriction {
   suspendu(
     titre: 'suspendu',
@@ -21,7 +21,11 @@ enum TypeRestriction {
     titre: 'refusé',
     phrase: "Votre demande d'inscription n'a pas été acceptée.",
   ),
-  banni(titre: 'banni', phrase: 'Votre accès à Sopi a été retiré.');
+  banni(titre: 'banni', phrase: 'Votre accès à Sopi a été retiré.'),
+  enAttente(
+    titre: 'en attente',
+    phrase: "Votre compte est en attente de validation par l'équipe Sopi.",
+  );
 
   const TypeRestriction({required this.titre, required this.phrase});
 
@@ -29,12 +33,26 @@ enum TypeRestriction {
   final String titre;
   final String phrase;
 
+  /// Statut envoyé par le serveur ; null si absent ou inconnu.
+  static TypeRestriction? depuisStatut(String? statut) => switch (statut) {
+    'suspendu' => suspendu,
+    'refuse' => refuse,
+    'banni' => banni,
+    'en_attente' => enAttente,
+    _ => null,
+  };
+
   static TypeRestriction depuisMessage(String message) {
     final m = message.toLowerCase();
     if (m.contains('banni')) return banni;
     if (m.contains('refus')) return refuse;
     return suspendu;
   }
+
+  /// Le statut du serveur d'abord, le texte du message en secours.
+  static TypeRestriction pour(Restreint? restreint) =>
+      depuisStatut(restreint?.statutCompte) ??
+      depuisMessage(restreint?.message ?? '');
 }
 
 /// Écran « compte suspendu / refusé / banni » (maquette Suspendu).
@@ -55,7 +73,7 @@ class CompteRestreintPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final etat = ref.watch(sessionProvider);
     final restreint = etat is Restreint ? etat : null;
-    final type = TypeRestriction.depuisMessage(restreint?.message ?? '');
+    final type = TypeRestriction.pour(restreint);
     final motif = restreint?.motif?.trim();
     final aMotif = motif != null && motif.isNotEmpty;
     final fin = restreint?.finSuspension;

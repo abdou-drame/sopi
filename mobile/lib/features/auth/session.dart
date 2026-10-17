@@ -27,10 +27,18 @@ class Connecte extends EtatSession {
 
 /// Compte suspendu, refusé ou banni : connexion refusée (403) avec le motif du serveur.
 class Restreint extends EtatSession {
-  const Restreint({required this.message, this.motif, this.finSuspension});
+  const Restreint({
+    required this.message,
+    this.motif,
+    this.finSuspension,
+    this.statutCompte,
+  });
   final String message;
   final String? motif;
   final DateTime? finSuspension;
+
+  /// `en_attente`, `refuse`, `suspendu` ou `banni` (null si le serveur ne l'envoie pas).
+  final String? statutCompte;
 }
 
 const messageRoleNonSupporte =
@@ -134,6 +142,11 @@ class SessionControleur extends Notifier<EtatSession> {
     _oublier();
   }
 
+  /// Remplace l'utilisateur connecté (profil modifié) : le nom change partout sans nouvelle connexion.
+  void mettreAJourUtilisateur(Utilisateur utilisateur) {
+    if (state is Connecte) _definir(Connecte(utilisateur));
+  }
+
   /// Sort de l'état « compte restreint » (retour à l'écran de connexion).
   void quitterRestriction() {
     if (state is Restreint) state = const NonConnecte();
@@ -162,6 +175,7 @@ class SessionControleur extends Notifier<EtatSession> {
     message: e.message,
     motif: e.motif,
     finSuspension: e.finSuspension,
+    statutCompte: e.statutCompte,
   );
 }
 

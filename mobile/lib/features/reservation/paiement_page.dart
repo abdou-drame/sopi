@@ -20,6 +20,7 @@ import 'depot_reservation.dart';
 import 'modeles.dart';
 import 'presentation_reservation.dart';
 import 'reservations_controleur.dart';
+import 'widgets/composants.dart';
 
 /// Délai entre deux vérifications du paiement après le retour de la page du prestataire de paiement.
 const intervalleVerificationPaiement = Duration(seconds: 3);
@@ -378,6 +379,7 @@ class _Contenu extends ConsumerWidget {
     final connu = acompteConnu(r);
     final montant = connu ?? profil.value?.montant;
     final pourcentage = profil.value?.pourcentage;
+    final limite = r.paiementAvant;
 
     if (montant == null) {
       if (profil.hasError) {
@@ -455,25 +457,43 @@ class _Contenu extends ConsumerWidget {
                     color: CouleursSopi.bleu,
                     borderRadius: BorderRadius.circular(26),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        pourcentage == null
-                            ? 'Acompte à payer maintenant'
-                            : 'Acompte à payer maintenant (${_pourcent(pourcentage)} %)',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: CouleursSopi.blanc.withValues(alpha: .85),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pourcentage == null
+                                  ? 'Acompte à payer maintenant'
+                                  : 'Acompte à payer maintenant (${_pourcent(pourcentage)} %)',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: CouleursSopi.blanc.withValues(
+                                  alpha: .85,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              formaterArgent(montant),
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                color: CouleursSopi.blanc,
+                                fontWeight: FontWeight.w800,
+                                height: 34 / 28,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Text(
-                        formaterArgent(montant),
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          color: CouleursSopi.blanc,
-                          fontWeight: FontWeight.w800,
-                          height: 34 / 28,
+                      if (limite != null) ...[
+                        const SizedBox(width: 12),
+                        PastilleDecompte(
+                          expiration: limite,
+                          hauteur: 34,
+                          maintenant: ref.read(horlogeProvider),
+                          onExpire: () =>
+                              ref.invalidate(detailReservationProvider(r.id)),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -493,9 +513,9 @@ class _Contenu extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const _PuceMoyen('Wave'),
+                      const _LogoMoyen('assets/wave.png'),
                       const SizedBox(width: 6),
-                      const _PuceMoyen('Orange Money'),
+                      const _LogoMoyen('assets/orange_money.png'),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -554,25 +574,21 @@ class _Contenu extends ConsumerWidget {
 
 String _pourcent(num p) => (p == p.round() ? p.round() : p).toString();
 
-/// Faute des logos Wave et Orange Money (fichiers non fournis), le nom du moyen de paiement.
-class _PuceMoyen extends StatelessWidget {
-  const _PuceMoyen(this.nom);
+/// Logo d'un moyen de paiement (Wave, Orange Money), 40 × 40 arrondi (maquette Paiement).
+class _LogoMoyen extends StatelessWidget {
+  const _LogoMoyen(this.asset);
 
-  final String nom;
+  final String asset;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    decoration: BoxDecoration(
-      color: CouleursSopi.bleuPastel,
-      borderRadius: BorderRadius.circular(10),
-    ),
-    child: Text(
-      nom,
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-        color: CouleursSopi.bleuProfond,
-        fontWeight: FontWeight.w700,
-      ),
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: Image.asset(
+      asset,
+      width: 40,
+      height: 40,
+      fit: BoxFit.cover,
+      excludeFromSemantics: true,
     ),
   );
 }

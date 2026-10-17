@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Modifier mon profil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input{font-family:inherit}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #f4f7fd; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0f1b3d">
+
+  <div style="position: absolute; left: 0; top: 0; width: 390px; height: 200px; border-radius: 0 0 36px 36px; background: radial-gradient(110% 90% at 92% 0%, #bfdbfe 0%, rgba(191,219,254,0) 62%), radial-gradient(90% 80% at 0% 30%, #c7d2fe 0%, rgba(199,210,254,0) 60%), #eef4ff"></div>
+
+  <div style="position: absolute; left: 20px; right: 20px; top: 24px">
+    <button aria-label="Retour" style="width: 64px; height: 44px; border: none; border-radius: 22px; background: #0f1b3d; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+    </button>
+  </div>
+
+  <div style="position: absolute; left: 24px; right: 24px; top: 92px; font-size: 30px; line-height: 36px; font-weight: 400">Modifier<br><span style="font-weight: 800">mon profil</span></div>
+  <div style="position: absolute; left: 16px; right: 16px; top: 214px; box-sizing: border-box; padding: 20px; border-radius: 30px; background: #ffffff; border: 1px solid #e3e9f6; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; gap: 10px"><div style="flex: 1"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Prénom
+      <input type="text" value="Aminata" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label></div><div style="flex: 1"><label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Nom
+      <input type="text" value="Diallo" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label></div></div>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: #4a5678">Téléphone
+      <input type="tel" value="+221 77 000 00 00" style="height: 52px; box-sizing: border-box; padding: 0 16px; border: 1px solid #d5ddf0; border-radius: 18px; background: #f7f9ff; font-size: 15px; color: #0f1b3d">
+    </label>
+    <div style="font-size: 12px; line-height: 17px; color: #64708f">L'adresse e-mail ne peut pas être modifiée ici. Pour la changer, contactez le support Sopi.</div>
+  </div>
+  <div style="position: absolute; left: 16px; right: 16px; bottom: 24px">
+    <button style="width: 100%; height: 54px; border: none; border-radius: 27px; background: #1d4ed8; color: #ffffff; font-size: 16px; font-weight: 700">Enregistrer</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

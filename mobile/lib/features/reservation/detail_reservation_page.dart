@@ -24,6 +24,7 @@ import 'depot_reservation.dart';
 import 'modeles.dart';
 import 'presentation_reservation.dart';
 import 'reservations_controleur.dart';
+import 'widgets/composants.dart';
 
 /// Délai entre deux relectures automatiques tant que la réservation attend une réponse ou un paiement.
 const intervalleActualisationDetail = Duration(seconds: 30);
@@ -209,6 +210,19 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
     );
   }
 
+  /// Message de la réservation en attente : la limite donnée par l'API, sinon le délai fixe de la règle.
+  String _messageAttente(ReservationClient r) {
+    final limite = r.reponseAvant;
+    final delai = limite == null
+        ? 'Il a jusqu\'à $delaiReponsePrestataireHeures h pour répondre.'
+        : 'Le prestataire a jusqu\'au ${_enMinuscule(formaterDate(limite))} pour répondre.';
+    return 'En attente de la réponse du prestataire. $delai Vous êtes prévenu dès qu\'il répond.';
+  }
+
+  /// « Sam. 24 oct., 10h00 » → « sam. 24 oct., 10h00 » (au milieu d'une phrase).
+  String _enMinuscule(String texte) =>
+      texte.isEmpty ? texte : '${texte[0].toLowerCase()}${texte.substring(1)}';
+
   List<Widget> _blocs(ReservationClient r) {
     final theme = Theme.of(context);
     final cle = (prestataireId: r.prestataireId, prestationId: r.prestationId);
@@ -218,18 +232,16 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
     final blocs = <Widget>[];
 
     if (r.statut == StatutReservation.enAttente) {
-      blocs.add(
-        _BlocInfo(
-          message:
-              'En attente de la réponse du prestataire. Il a jusqu\'à $delaiReponsePrestataireHeures h pour répondre. Vous êtes prévenu dès qu\'il répond.',
-        ),
-      );
+      blocs.add(_BlocInfo(message: _messageAttente(r)));
     } else if (r.statut == StatutReservation.acceptee) {
       blocs.add(
-        const _BlocAcceptee(
+        _BlocAcceptee(
           message: 'Payez l\'acompte pour confirmer votre réservation.',
+          paiementAvant: r.paiementAvant,
           delai:
               'Vous avez $delaiPaiementHeures h après l\'acceptation pour payer.',
+          maintenant: ref.read(horlogeProvider),
+          onExpire: _relire,
         ),
       );
     } else if (r.statut.ferme) {
@@ -582,17 +594,31 @@ class _BlocInfo extends StatelessWidget {
   );
 }
 
-/// Bloc bleu « Le prestataire a accepté » (maquette DetailAPayer). L'API ne renvoie pas l'échéance
-/// du paiement : on rappelle le délai de la règle plutôt que d'afficher un compte à rebours.
+/// Bloc bleu « Le prestataire a accepté » (maquette DetailAPayer). Avec la limite de paiement donnée par l'API
+/// (`paiementAvant`), la pastille « Il reste 1 h 52 » compte à rebours ; sans elle, le délai fixe de la règle.
 class _BlocAcceptee extends StatelessWidget {
-  const _BlocAcceptee({required this.message, required this.delai});
+  const _BlocAcceptee({
+    required this.message,
+    required this.delai,
+    required this.maintenant,
+    this.paiementAvant,
+    this.onExpire,
+  });
 
   final String message;
   final String delai;
+  final DateTime? paiementAvant;
+  final DateTime Function() maintenant;
+  final VoidCallback? onExpire;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final limite = paiementAvant;
+    final styleTexte = theme.textTheme.bodySmall?.copyWith(
+      color: CouleursSopi.blanc.withValues(alpha: .9),
+      height: 17 / 12,
+    );
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -600,32 +626,38 @@ class _BlocAcceptee extends StatelessWidget {
         color: CouleursSopi.bleu,
         borderRadius: BorderRadius.circular(26),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'Le prestataire a accepté',
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: CouleursSopi.blanc,
-              fontWeight: FontWeight.w700,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Le prestataire a accepté',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: CouleursSopi.blanc,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(message, style: styleTexte),
+                if (limite == null) ...[
+                  const SizedBox(height: 4),
+                  Text(delai, style: styleTexte),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: CouleursSopi.blanc.withValues(alpha: .9),
-              height: 17 / 12,
+          if (limite != null) ...[
+            const SizedBox(width: 12),
+            PastilleDecompte(
+              expiration: limite,
+              hauteur: 40,
+              maintenant: maintenant,
+              onExpire: onExpire,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            delai,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: CouleursSopi.blanc.withValues(alpha: .9),
-              height: 17 / 12,
-            ),
-          ),
+          ],
         ],
       ),
     );
