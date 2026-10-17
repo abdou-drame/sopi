@@ -78,6 +78,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.headlineMedium?.copyWith(
                                   fontWeight: FontWeight.w400,
+                                  fontSize: 28,
                                   height: 34 / 28,
                                 ),
                               ),
@@ -86,6 +87,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.headlineMedium?.copyWith(
                                   fontWeight: FontWeight.w800,
+                                  fontSize: 28,
                                   height: 34 / 28,
                                 ),
                               ),

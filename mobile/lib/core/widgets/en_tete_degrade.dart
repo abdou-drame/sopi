@@ -166,6 +166,8 @@ class EnTeteDegrade extends StatefulWidget {
     this.onRetour,
     this.action,
     this.enfant,
+    this.tailleTitre = DimensionsSopi.tailleTitreEcran,
+    this.interligneTitre = DimensionsSopi.interligneTitreEcran,
   });
 
   final String titreLigne1;
@@ -178,6 +180,10 @@ class EnTeteDegrade extends StatefulWidget {
 
   /// Contenu sous le titre (champ de recherche, onglets…).
   final Widget? enfant;
+
+  /// Taille et interligne du titre : 30 / 36 par défaut, 28 / 34 pour l'écran de choix du créneau (maquette Creneau).
+  final double tailleTitre;
+  final double interligneTitre;
 
   static const dureeDescente = Duration(milliseconds: 450);
 
@@ -234,22 +240,18 @@ class _EnTeteDegradeState extends State<EnTeteDegrade>
         Text(
           widget.titreLigne1,
           style: theme.textTheme.headlineMedium?.copyWith(
-            fontSize: DimensionsSopi.tailleTitreEcran,
+            fontSize: widget.tailleTitre,
             fontWeight: FontWeight.w400,
-            height:
-                DimensionsSopi.interligneTitreEcran /
-                DimensionsSopi.tailleTitreEcran,
+            height: widget.interligneTitre / widget.tailleTitre,
           ),
         ),
         if (widget.titreLigne2 != null)
           Text(
             widget.titreLigne2!,
             style: theme.textTheme.headlineMedium?.copyWith(
-              fontSize: DimensionsSopi.tailleTitreEcran,
+              fontSize: widget.tailleTitre,
               fontWeight: FontWeight.w800,
-              height:
-                  DimensionsSopi.interligneTitreEcran /
-                  DimensionsSopi.tailleTitreEcran,
+              height: widget.interligneTitre / widget.tailleTitre,
             ),
           ),
       ],

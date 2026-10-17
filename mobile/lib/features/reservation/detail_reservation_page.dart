@@ -551,6 +551,7 @@ class _EnTeteReservation extends StatelessWidget {
           r.prestataireNom,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w800,
+            fontSize: 28,
             height: 34 / 28,
           ),
         ),
