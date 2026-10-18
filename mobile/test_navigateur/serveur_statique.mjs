@@ -8,7 +8,7 @@ const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
   '.png': 'image/png', '.ico': 'image/x-icon', '.wasm': 'application/wasm', '.otf': 'font/otf', '.ttf': 'font/ttf', '.css': 'text/css' };
 
 createServer(async (req, res) => {
-  const chemin = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^([/\])+/, '');
+  const chemin = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^[\\/]+/, '');
   if (chemin.includes('..')) { res.writeHead(400).end(); return; }
   for (const f of [join(dossier, chemin), join(dossier, 'index.html')]) {
     try {

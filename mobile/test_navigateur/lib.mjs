@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ICI = dirname(fileURLToPath(import.meta.url));
 export const PORT_API = process.env.PORT_API ?? '8765';
-export const PORT_WEB = process.env.PORT_WEB ?? '8080';
+export const PORT_WEB = process.env.PORT_WEB ?? '8099';
 export const API = `http://127.0.0.1:${PORT_API}/api/v1`;
 export const APP = `http://127.0.0.1:${PORT_WEB}`;
 if (API.includes('duckdns.org')) throw new Error('Refus : URL de production.');
