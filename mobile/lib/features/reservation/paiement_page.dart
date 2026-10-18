@@ -84,6 +84,7 @@ class _EtatPaiement extends ConsumerState<PaiementPage>
   }
 
   Future<void> _payer() async {
+    if (_chargement) return;
     setState(() {
       _chargement = true;
       _erreur = null;

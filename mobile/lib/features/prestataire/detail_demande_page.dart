@@ -34,6 +34,7 @@ class _DetailDemandePageState extends ConsumerState<DetailDemandePage> {
   bool _enCours = false;
 
   Future<void> _accepter() async {
+    if (_enCours) return;
     setState(() => _enCours = true);
     await accepterDemande(context, ref, widget.id);
     if (mounted) setState(() => _enCours = false);

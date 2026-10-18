@@ -72,6 +72,7 @@ class _EtatModifierProfil extends ConsumerState<ModifierProfilPage> {
       _succes = null;
     });
     if (erreurs.values.any((e) => e != null)) return;
+    if (_enCours) return;
     setState(() => _enCours = true);
     try {
       final utilisateur = await ref

@@ -26,6 +26,7 @@ class PhotosPage extends ConsumerStatefulWidget {
 
 class _PhotosPageState extends ConsumerState<PhotosPage> {
   bool _envoi = false;
+  final Set<String> _suppressions = {};
   String? _erreur;
 
   void _retour() =>
@@ -87,6 +88,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
   }
 
   Future<void> _supprimer(String id) async {
+    if (_suppressions.contains(id)) return;
     final confirme = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -105,6 +107,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
       ),
     );
     if (confirme != true || !mounted) return;
+    if (!_suppressions.add(id)) return;
     setState(() => _erreur = null);
     try {
       await ref.read(depotPrestataireProvider).supprimerPhoto(id);
@@ -114,6 +117,8 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
       // Une photo déjà supprimée (404) : on relit la liste pour refléter le serveur.
       ref.invalidate(photosAtelierProvider);
       setState(() => _erreur = _message(e));
+    } finally {
+      _suppressions.remove(id);
     }
   }
 

@@ -14,6 +14,9 @@ import 'modeles.dart';
 
 /// Mes disponibilités (maquette Disponibilites) : créneaux des prochaines semaines, groupés par jour.
 /// Seul un créneau libre porte une croix ; les réservés, verrouillés et indisponibles ne se retirent pas.
+/// Créneaux dont le retrait est en cours : un second retrait du même créneau est ignoré (pas de double requête).
+final _retraitsEnCours = <String>{};
+
 class DisponibilitesPage extends ConsumerWidget {
   const DisponibilitesPage({super.key});
 
@@ -46,6 +49,7 @@ class DisponibilitesPage extends ConsumerWidget {
       ),
     );
     if (confirme != true || !context.mounted) return;
+    if (!_retraitsEnCours.add(creneau.id)) return;
     final messager = ScaffoldMessenger.of(context);
     try {
       await ref.read(depotPrestataireProvider).supprimerCreneau(creneau.id);
@@ -57,6 +61,8 @@ class DisponibilitesPage extends ConsumerWidget {
       messager.showSnackBar(
         SnackBar(content: Text(ErreurApi.depuis(e).message)),
       );
+    } finally {
+      _retraitsEnCours.remove(creneau.id);
     }
   }
 
