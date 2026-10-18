@@ -52,3 +52,25 @@ export const jourDans = (n) => {
 };
 
 export const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+
+/** Réserve par l'API (verrou puis création) : sert à préparer des demandes que l'on traite ensuite dans l'interface. */
+export async function reserverViaApi(jetonClient, nomEntreprise, nomPrestation, decalageJours, heureUtc) {
+  const liste = await api('/prestataires', { jeton: jetonClient });
+  const p = (liste.data ?? liste).find((x) => x.nomEntreprise === nomEntreprise);
+  const fiche = await api(`/prestataires/${p.id}`, { jeton: jetonClient });
+  const prestation = fiche.prestations.find((x) => x.nom === nomPrestation);
+  const jour = jourDans(decalageJours);
+  const agenda = await api(`/prestataires/${p.id}/agenda?du=${jour}&au=${jour}`, { jeton: jetonClient });
+  const creneau = (agenda.data ?? agenda).find((c) => c.dateDebut.startsWith(`${jour}T${heureUtc}`));
+  await api(`/creneaux/${creneau.id}/verrou`, { methode: 'POST', jeton: jetonClient });
+  const r = await api('/reservations', { methode: 'POST', jeton: jetonClient, corps: { creneau_id: creneau.id, prestation_id: prestation.id } });
+  return (r.data ?? r).id ?? (r.reservation ?? {}).id;
+}
+
+/** Accepte (côté prestataire) puis paie (client, webhook signé) : la réservation devient CONFIRMEE. */
+export async function confirmerViaApi(jetonClient, jetonPrestataire, reservationId) {
+  await api(`/prestataire/reservations/${reservationId}/accepter`, { methode: 'POST', jeton: jetonPrestataire });
+  const p = await api(`/reservations/${reservationId}/payer`, { methode: 'POST', jeton: jetonClient, corps: {} });
+  const statut = await webhookPaiement(p.urlPaiement.split('/').pop(), p.paiement.montantAcompte, 'reussi');
+  if (statut !== 200) throw new Error(`webhook ${statut}`);
+}
