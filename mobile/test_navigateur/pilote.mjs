@@ -38,8 +38,15 @@ export class Session {
     await this.page.keyboard.type(valeur, { delay: 5 });
   }
   async cliquer(nom, opts = {}) { await this.bouton(nom, opts).first().click({ timeout: 10000 }); await this.attendre(700); }
+  /** Attend que l'arbre d'accessibilité contienne [motif] (texte ou expression). */
   async texte(motif, timeout = 8000) {
-    try { await this.page.getByText(motif).first().waitFor({ timeout }); return true; } catch { return false; }
+    const fin = Date.now() + timeout;
+    const ok = (a) => (motif instanceof RegExp ? motif.test(a) : a.includes(motif));
+    while (Date.now() < fin) {
+      if (ok(await this.arbre())) return true;
+      await this.attendre(400);
+    }
+    return false;
   }
   async capture(parcours, ecran) {
     const dossier = join(ICI, 'captures', parcours);
@@ -51,3 +58,54 @@ export class Session {
   }
   async fermer() { await this.navigateur.close(); }
 }
+
+/** Ajoute (ou remplace) le fichier du groupe nommé [groupe] (ex. /Diplôme/) via l'option [option] (Galerie ou Fichier) du feuillet. */
+Session.prototype.ajouterFichier = async function (groupe, option, chemin) {
+  await this.page.getByRole('group', { name: groupe }).getByRole('button').click();
+  await this.attendre(700);
+  const [choix] = await Promise.all([this.page.waitForEvent('filechooser', { timeout: 8000 }), this.bouton(option).first().click()]);
+  await choix.setFiles(chemin);
+  await this.attendre(1000);
+};
+
+/** Dans le sélecteur de date Material ouvert : choisit le jour d'aujourd'hui + [n] jours, puis OK. */
+Session.prototype.choisirDate = async function (n) {
+  const cible = new Date(Date.now() + n * 86400000);
+  const jour = cible.getUTCDate();
+  const mois = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][cible.getUTCMonth()];
+  const motif = new RegExp(`^${jour}, [a-zé]+ ${jour} ${mois} ${cible.getUTCFullYear()}`);
+  for (let i = 0; i < 3; i++) {
+    const b = this.page.getByRole('button', { name: motif });
+    if (await b.count()) { await b.first().click(); break; }
+    await this.page.getByRole('button', { name: 'Mois suivant' }).click();
+    await this.attendre(300);
+  }
+  await this.page.getByRole('button', { name: 'OK' }).click();
+  await this.attendre(600);
+};
+
+/** Passe par l'onglet Profil puis ouvre l'entrée [nom]. */
+Session.prototype.profil = async function (nom) {
+  await this.cliquer(/^Profil/);
+  await this.attendre(800);
+  await this.cliquer(nom);
+  await this.attendre(1800);
+};
+Session.prototype.retour = async function () {
+  await this.cliquer(/^Retour/);
+  await this.attendre(1000);
+};
+
+/** Clique l'icône crayon située à droite d'une ligne (seule zone tactile de la ligne). */
+Session.prototype.cliquerCrayon = async function (nom) {
+  const boite = await this.page.getByRole('button', { name: nom }).first().boundingBox();
+  await this.page.mouse.click(boite.x + boite.width - 36, boite.y + boite.height / 2);
+  await this.attendre(1300);
+};
+
+/** Fait défiler la page (les listes Flutter ne construisent que les éléments proches de l'écran). */
+Session.prototype.defiler = async function (dy = 1500) {
+  await this.page.mouse.move(195, 420);
+  await this.page.mouse.wheel(0, dy);
+  await this.attendre(900);
+};

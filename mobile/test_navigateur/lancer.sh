@@ -55,7 +55,13 @@ export CORS_ALLOWED_ORIGINS="http://127.0.0.1:${PORT_WEB}"
 export SOPI_INTEGRATION_DIR="$JETABLE/base"
 
 echo "== Backend local sur 127.0.0.1:${PORT_API}"
-nohup bash "$MOBILE/test/integration/lancer_backend_local.sh" "$PORT_API" > "$JETABLE/backend.log" 2>&1 &
+# « php artisan serve » plante parfois en relisant ses propres logs (ServeCommand::getDateFromLine) :
+# on utilise le serveur PHP intégré avec le même routeur, sur une copie jetable du script (le script commité reste intact).
+RACINE_ABS="$(cd "$MOBILE/.." && pwd)"
+sed -e "s#^RACINE=.*#RACINE=\"$RACINE_ABS\"#" \
+    -e 's#^exec php artisan serve.*#cd public; exec php -S "127.0.0.1:$PORT" -t . ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php#' \
+    "$MOBILE/test/integration/lancer_backend_local.sh" > "$JETABLE/backend_local.sh"
+nohup bash "$JETABLE/backend_local.sh" "$PORT_API" > "$JETABLE/backend.log" 2>&1 &
 echo $! > "$JETABLE/backend.pid"
 for i in $(seq 1 60); do
   if curl -s -o /dev/null "http://127.0.0.1:${PORT_API}/api/v1/metiers"; then break; fi
