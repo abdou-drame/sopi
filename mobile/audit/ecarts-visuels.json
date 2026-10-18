@@ -1,0 +1,780 @@
+[
+  {
+    "nom": "Agenda",
+    "ecran": "features/prestataire/agenda_page.dart",
+    "total": 42,
+    "dansEcran": 26,
+    "dansPartage": 16,
+    "manques": []
+  },
+  {
+    "nom": "Aide",
+    "ecran": "features/compte/aide_page.dart",
+    "total": 27,
+    "dansEcran": 7,
+    "dansPartage": 19,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Annulation",
+    "ecran": "features/reservation/annulation_reservation.dart",
+    "total": 28,
+    "dansEcran": 14,
+    "dansPartage": 13,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Avis",
+    "ecran": "features/reservation/avis_page.dart",
+    "total": 36,
+    "dansEcran": 14,
+    "dansPartage": 22,
+    "manques": []
+  },
+  {
+    "nom": "AvisPrestataire",
+    "ecran": "features/reservation/avis_prestataire_page.dart",
+    "total": 33,
+    "dansEcran": 0,
+    "dansPartage": 33,
+    "manques": []
+  },
+  {
+    "nom": "ChangerMotDePasse",
+    "ecran": "features/compte/changer_mot_de_passe_page.dart",
+    "total": 34,
+    "dansEcran": 2,
+    "dansPartage": 31,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "CodeFaux",
+    "ecran": "features/prestataire/prestation_page.dart",
+    "total": 38,
+    "dansEcran": 6,
+    "dansPartage": 31,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "CodeValide",
+    "ecran": "features/prestataire/prestation_page.dart",
+    "total": 38,
+    "dansEcran": 6,
+    "dansPartage": 29,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 96,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "height",
+        "valeur": 96,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "CodeVerification",
+    "ecran": "features/prestataire/prestation_page.dart",
+    "total": 35,
+    "dansEcran": 6,
+    "dansPartage": 27,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 96,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "height",
+        "valeur": 96,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Conge",
+    "ecran": "features/prestataire/indisponibilite_page.dart",
+    "total": 39,
+    "dansEcran": 8,
+    "dansPartage": 29,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Connexion",
+    "ecran": "features/auth/connexion_page.dart",
+    "total": 43,
+    "dansEcran": 20,
+    "dansPartage": 23,
+    "manques": []
+  },
+  {
+    "nom": "ConnexionBloquee",
+    "ecran": "features/auth/connexion_page.dart + features/auth/compte_restreint_page.dart",
+    "total": 47,
+    "dansEcran": 21,
+    "dansPartage": 26,
+    "manques": []
+  },
+  {
+    "nom": "Creneau",
+    "ecran": "features/reservation/choix_creneau_page.dart",
+    "total": 45,
+    "dansEcran": 22,
+    "dansPartage": 22,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 23,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "DemandeEnvoyee",
+    "ecran": "features/reservation/demande_envoyee_page.dart",
+    "total": 36,
+    "dansEcran": 14,
+    "dansPartage": 19,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 52,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "padding",
+        "valeur": 36,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "DetailAPayer",
+    "ecran": "features/reservation/detail_reservation_page.dart",
+    "total": 41,
+    "dansEcran": 18,
+    "dansPartage": 21,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 7,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "DetailEnAttente",
+    "ecran": "features/reservation/detail_reservation_page.dart",
+    "total": 39,
+    "dansEcran": 16,
+    "dansPartage": 20,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 7,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "DetailReservation",
+    "ecran": "features/reservation/detail_reservation_page.dart",
+    "total": 43,
+    "dansEcran": 20,
+    "dansPartage": 21,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 7,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Disponibilites",
+    "ecran": "features/prestataire/disponibilites_page.dart",
+    "total": 41,
+    "dansEcran": 15,
+    "dansPartage": 25,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "DossierRefuse",
+    "ecran": "features/inscription_prestataire/suivi_dossier_page.dart",
+    "total": 38,
+    "dansEcran": 16,
+    "dansPartage": 20,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 52,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Fiche",
+    "ecran": "features/reservation/fiche_prestataire_page.dart",
+    "total": 45,
+    "dansEcran": 30,
+    "dansPartage": 14,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 23,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Inscription",
+    "ecran": "features/auth/inscription_page.dart",
+    "total": 38,
+    "dansEcran": 9,
+    "dansPartage": 28,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Litige",
+    "ecran": "features/compte/litige_page.dart",
+    "total": 40,
+    "dansEcran": 18,
+    "dansPartage": 22,
+    "manques": []
+  },
+  {
+    "nom": "Main",
+    "ecran": "features/reservation/accueil_client_page.dart",
+    "total": 51,
+    "dansEcran": 23,
+    "dansPartage": 26,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 5,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "width",
+        "valeur": 52,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "ModifierProfil",
+    "ecran": "features/compte/modifier_profil_page.dart",
+    "total": 35,
+    "dansEcran": 2,
+    "dansPartage": 32,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "MotDePasse",
+    "ecran": "features/auth/mot_de_passe_oublie_page.dart",
+    "total": 42,
+    "dansEcran": 4,
+    "dansPartage": 38,
+    "manques": []
+  },
+  {
+    "nom": "Notifications",
+    "ecran": "features/compte/notifications_page.dart",
+    "total": 31,
+    "dansEcran": 11,
+    "dansPartage": 19,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 5,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Paiement",
+    "ecran": "features/reservation/paiement_page.dart",
+    "total": 38,
+    "dansEcran": 19,
+    "dansPartage": 16,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 17,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "height",
+        "valeur": 56,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PaiementEchec",
+    "ecran": "features/reservation/paiement_page.dart",
+    "total": 32,
+    "dansEcran": 16,
+    "dansPartage": 15,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 56,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PaiementOk",
+    "ecran": "features/reservation/paiement_page.dart",
+    "total": 31,
+    "dansEcran": 14,
+    "dansPartage": 16,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 56,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PlageHoraire",
+    "ecran": "features/prestataire/plage_horaire_page.dart",
+    "total": 44,
+    "dansEcran": 11,
+    "dansPartage": 31,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 11,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Portefeuille",
+    "ecran": "features/prestataire/portefeuille_page.dart",
+    "total": 42,
+    "dansEcran": 20,
+    "dansPartage": 22,
+    "manques": []
+  },
+  {
+    "nom": "PrestaAvis",
+    "ecran": "features/prestataire/avis_recus_page.dart",
+    "total": 33,
+    "dansEcran": 0,
+    "dansPartage": 32,
+    "manques": [
+      {
+        "type": "height",
+        "valeur": 92,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaCompte",
+    "ecran": "features/inscription_prestataire/etape_informations_page.dart",
+    "total": 36,
+    "dansEcran": 1,
+    "dansPartage": 34,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaDetailDemande",
+    "ecran": "features/prestataire/detail_demande_page.dart",
+    "total": 41,
+    "dansEcran": 20,
+    "dansPartage": 20,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaInscription1",
+    "ecran": "features/inscription_prestataire/etape_activite_page.dart",
+    "total": 39,
+    "dansEcran": 14,
+    "dansPartage": 24,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaInscription2",
+    "ecran": "features/inscription_prestataire/etape_justificatifs_page.dart",
+    "total": 42,
+    "dansEcran": 16,
+    "dansPartage": 25,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaLitigeReponse",
+    "ecran": "features/prestataire/litige_reponse_page.dart",
+    "total": 45,
+    "dansEcran": 22,
+    "dansPartage": 23,
+    "manques": []
+  },
+  {
+    "nom": "PrestaLitiges",
+    "ecran": "features/prestataire/litiges_recus_page.dart",
+    "total": 39,
+    "dansEcran": 19,
+    "dansPartage": 20,
+    "manques": []
+  },
+  {
+    "nom": "PrestaPhotos",
+    "ecran": "features/prestataire/photos_page.dart",
+    "total": 21,
+    "dansEcran": 8,
+    "dansPartage": 13,
+    "manques": []
+  },
+  {
+    "nom": "PrestaProfil",
+    "ecran": "features/prestataire/profil_prestataire_page.dart",
+    "total": 43,
+    "dansEcran": 20,
+    "dansPartage": 22,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "PrestaReservations",
+    "ecran": "features/prestataire/reservations_prestataire_page.dart",
+    "total": 43,
+    "dansEcran": 15,
+    "dansPartage": 28,
+    "manques": []
+  },
+  {
+    "nom": "PrestaTerminer",
+    "ecran": "features/prestataire/terminer_prestation_page.dart",
+    "total": 36,
+    "dansEcran": 2,
+    "dansPartage": 33,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Prestataires",
+    "ecran": "features/reservation/liste_prestataires_page.dart",
+    "total": 39,
+    "dansEcran": 19,
+    "dansPartage": 19,
+    "manques": [
+      {
+        "type": "height",
+        "valeur": 56,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Prestation",
+    "ecran": "features/prestataire/prestation_page.dart",
+    "total": 37,
+    "dansEcran": 6,
+    "dansPartage": 29,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 1,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Profil",
+    "ecran": "features/compte/profil_client_page.dart",
+    "total": 40,
+    "dansEcran": 13,
+    "dansPartage": 26,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "RefusMotif",
+    "ecran": "features/prestataire/refus_motif_page.dart",
+    "total": 39,
+    "dansEcran": 15,
+    "dansPartage": 23,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Reservations",
+    "ecran": "features/reservation/mes_reservations_page.dart",
+    "total": 45,
+    "dansEcran": 16,
+    "dansPartage": 29,
+    "manques": []
+  },
+  {
+    "nom": "Retrait",
+    "ecran": "features/prestataire/retrait_page.dart",
+    "total": 48,
+    "dansEcran": 23,
+    "dansPartage": 24,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "RetraitEchec",
+    "ecran": "features/prestataire/retrait_page.dart",
+    "total": 48,
+    "dansEcran": 23,
+    "dansPartage": 24,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "ServiceForm",
+    "ecran": "features/prestataire/service_form_page.dart",
+    "total": 46,
+    "dansEcran": 13,
+    "dansPartage": 31,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 11,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Services",
+    "ecran": "features/prestataire/services_page.dart",
+    "total": 34,
+    "dansEcran": 10,
+    "dansPartage": 23,
+    "manques": [
+      {
+        "type": "width",
+        "valeur": 100,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "SuiviDossier",
+    "ecran": "features/inscription_prestataire/suivi_dossier_page.dart",
+    "total": 39,
+    "dansEcran": 16,
+    "dansPartage": 21,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 52,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Suspendu",
+    "ecran": "features/auth/compte_restreint_page.dart",
+    "total": 33,
+    "dansEcran": 12,
+    "dansPartage": 19,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 52,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 25,
+        "gravite": "MINEUR"
+      }
+    ]
+  },
+  {
+    "nom": "Tableau",
+    "ecran": "features/prestataire/tableau_page.dart",
+    "total": 47,
+    "dansEcran": 23,
+    "dansPartage": 22,
+    "manques": [
+      {
+        "type": "border-radius",
+        "valeur": 5,
+        "gravite": "MINEUR"
+      },
+      {
+        "type": "border-radius",
+        "valeur": 21,
+        "gravite": "MINEUR"
+      }
+    ]
+  }
+]

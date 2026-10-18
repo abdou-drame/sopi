@@ -84,6 +84,7 @@ class _EtatPaiement extends ConsumerState<PaiementPage>
   }
 
   Future<void> _payer() async {
+    if (_chargement) return;
     setState(() {
       _chargement = true;
       _erreur = null;
@@ -407,6 +408,7 @@ class _Contenu extends ConsumerWidget {
                       'Confirmez et',
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w400,
+                        fontSize: 28,
                         height: 34 / 28,
                       ),
                     ),
@@ -414,6 +416,7 @@ class _Contenu extends ConsumerWidget {
                       'payez l\'acompte',
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.w800,
+                        fontSize: 28,
                         height: 34 / 28,
                       ),
                     ),
@@ -478,6 +481,7 @@ class _Contenu extends ConsumerWidget {
                               style: theme.textTheme.headlineMedium?.copyWith(
                                 color: CouleursSopi.blanc,
                                 fontWeight: FontWeight.w800,
+                                fontSize: 28,
                                 height: 34 / 28,
                               ),
                             ),
@@ -733,6 +737,7 @@ class _EnTeteResultat extends StatelessWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w400,
+            fontSize: 28,
             height: 34 / 28,
           ),
         ),
@@ -741,6 +746,7 @@ class _EnTeteResultat extends StatelessWidget {
           textAlign: TextAlign.center,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w800,
+            fontSize: 28,
             height: 34 / 28,
           ),
         ),

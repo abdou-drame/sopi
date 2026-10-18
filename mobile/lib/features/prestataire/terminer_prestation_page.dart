@@ -53,6 +53,7 @@ class _TerminerPrestationPageState
       ),
     );
     if (confirme != true || !mounted) return;
+    if (_enCours) return;
     setState(() => _enCours = true);
     final ok = await terminerPrestation(context, ref, widget.id);
     if (!mounted) return;

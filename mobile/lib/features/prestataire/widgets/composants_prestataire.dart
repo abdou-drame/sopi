@@ -180,6 +180,7 @@ class _BoutonsReponseState extends ConsumerState<BoutonsReponse> {
   void _refuser() => context.push(Chemins.refusReservation(widget.demande.id));
 
   Future<void> _accepter() async {
+    if (_enCours) return;
     setState(() => _enCours = true);
     await accepterDemande(context, ref, widget.demande.id);
     if (mounted) setState(() => _enCours = false);

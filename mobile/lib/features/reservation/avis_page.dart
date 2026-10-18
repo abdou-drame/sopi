@@ -78,6 +78,7 @@ class _EtatAvis extends ConsumerState<AvisPage> {
       });
       return;
     }
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreur = null;

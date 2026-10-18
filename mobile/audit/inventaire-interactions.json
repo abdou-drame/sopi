@@ -1,0 +1,2893 @@
+[
+  {
+    "chemin": "features/accueil/accueil_page.dart",
+    "elements": [
+      {
+        "ligne": 42,
+        "geste": "onPressed",
+        "cible": "Column",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/auth/compte_restreint_page.dart",
+    "elements": [
+      {
+        "ligne": 173,
+        "geste": "onPressed",
+        "cible": "_contacter",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 179,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [
+          "sessionProvider.quitterRestriction"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/auth/connexion_page.dart",
+    "elements": [
+      {
+        "ligne": 126,
+        "geste": "onChanged",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 140,
+        "geste": "onChanged",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 145,
+        "geste": "onSubmitted",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 153,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 159,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 190,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 195,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 204,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 370,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/auth/inscription_page.dart",
+    "elements": [
+      {
+        "ligne": 145,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 158,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 172,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 184,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 195,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 206,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 207,
+        "geste": "onSubmitted",
+        "cible": "_envoyer",
+        "apis": [
+          "sessionProvider.inscrire"
+        ],
+        "appelApi": true,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 222,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [
+          "sessionProvider.inscrire"
+        ],
+        "appelApi": true,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 254,
+        "geste": "onTap",
+        "cible": "retourOuConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/auth/mot_de_passe_oublie_page.dart",
+    "elements": [
+      {
+        "ligne": 131,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 142,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 179,
+        "geste": "onChanged",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 184,
+        "geste": "onSubmitted",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 225,
+        "geste": "onTap",
+        "cible": "_contacterSupport",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/aide_page.dart",
+    "elements": [
+      {
+        "ligne": 138,
+        "geste": "onPressed",
+        "cible": "_contacter",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/changer_mot_de_passe_page.dart",
+    "elements": [
+      {
+        "ligne": 124,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 137,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 157,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/litige_page.dart",
+    "elements": [
+      {
+        "ligne": 167,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 210,
+        "geste": "onPressed",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 293,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 393,
+        "geste": "onTap",
+        "cible": "onMotif",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 417,
+        "geste": "onChanged",
+        "cible": "onDescription",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 454,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 496,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 526,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 606,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 648,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 771,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/modifier_profil_page.dart",
+    "elements": [
+      {
+        "ligne": 127,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 139,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 152,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/notifications_page.dart",
+    "elements": [
+      {
+        "ligne": 89,
+        "geste": "onPressed",
+        "cible": "_toutMarquer",
+        "apis": [
+          "toutMarquerLu",
+          "depotCompteProvider.toutMarquerLu"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 96,
+        "geste": "onTap",
+        "cible": "_ouvrir",
+        "apis": [
+          "marquerLue",
+          "depotCompteProvider.marquerLue"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 134,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/compte/profil_client_page.dart",
+    "elements": [
+      {
+        "ligne": 33,
+        "geste": "onPressed",
+        "cible": "deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 37,
+        "geste": "onPressed",
+        "cible": "deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 157,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 162,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 167,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 172,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 178,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 193,
+        "geste": "onPressed",
+        "cible": "_deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 232,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/inscription_prestataire/etape_activite_page.dart",
+    "elements": [
+      {
+        "ligne": 169,
+        "geste": "onPressed",
+        "cible": "Wrap",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 182,
+        "geste": "onTap",
+        "cible": "_apresModification",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 227,
+        "geste": "onChanged",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 249,
+        "geste": "onTap",
+        "cible": "_choisirQuartier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 294,
+        "geste": "onChanged",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 308,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 318,
+        "geste": "onChanged",
+        "cible": "_apresModification",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 331,
+        "geste": "onChanged",
+        "cible": "_continuer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 335,
+        "geste": "onSubmitted",
+        "cible": "_continuer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 362,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 424,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/inscription_prestataire/etape_informations_page.dart",
+    "elements": [
+      {
+        "ligne": 117,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 127,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 135,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 144,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 153,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 162,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 171,
+        "geste": "onChanged",
+        "cible": "_modifier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 172,
+        "geste": "onSubmitted",
+        "cible": "_continuer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/inscription_prestataire/etape_justificatifs_page.dart",
+    "elements": [
+      {
+        "ligne": 174,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 197,
+        "geste": "onTap",
+        "cible": "_ajouter",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 298,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 348,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/inscription_prestataire/suivi_dossier_page.dart",
+    "elements": [
+      {
+        "ligne": 79,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 82,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 97,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 114,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 135,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 137,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 149,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 176,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 188,
+        "geste": "onPressed",
+        "cible": "_retourConnexion",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 206,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/actions_demande.dart",
+    "elements": []
+  },
+  {
+    "chemin": "features/prestataire/agenda_page.dart",
+    "elements": [
+      {
+        "ligne": 111,
+        "geste": "onRefresh",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 195,
+        "geste": "onTap",
+        "cible": "onChoix",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 239,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 369,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 383,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 414,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/aiguillage_reservation.dart",
+    "elements": []
+  },
+  {
+    "chemin": "features/prestataire/avis_recus_page.dart",
+    "elements": [
+      {
+        "ligne": 20,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/detail_demande_page.dart",
+    "elements": [
+      {
+        "ligne": 73,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 93,
+        "geste": "onPressed",
+        "cible": "_accepter",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 102,
+        "geste": "onPressed",
+        "cible": "_enCours",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 141,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/disponibilites_page.dart",
+    "elements": [
+      {
+        "ligne": 38,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 42,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [
+          "supprimerCreneau",
+          "depotPrestataireProvider.supprimerCreneau"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 77,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 150,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 159,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 270,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/indisponibilite_page.dart",
+    "elements": [
+      {
+        "ligne": 99,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 103,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 176,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 190,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 212,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 268,
+        "geste": "onPressed",
+        "cible": "_declarer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 277,
+        "geste": "onPressed",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/litiges_recus_page.dart",
+    "elements": [
+      {
+        "ligne": 88,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 97,
+        "geste": "onRetour",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 152,
+        "geste": "onTap",
+        "cible": "onChange",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 242,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 280,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/litige_reponse_page.dart",
+    "elements": [
+      {
+        "ligne": 127,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 137,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 159,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [
+          "repondreLitige",
+          "depotPrestataireProvider.repondreLitige"
+        ],
+        "appelApi": true,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 377,
+        "geste": "onChanged",
+        "cible": "onChange",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/photos_page.dart",
+    "elements": [
+      {
+        "ligne": 97,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 101,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [
+          "supprimerPhoto",
+          "depotPrestataireProvider.supprimerPhoto"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 177,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 187,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 196,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 254,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 314,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/plage_horaire_page.dart",
+    "elements": [
+      {
+        "ligne": 161,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 181,
+        "geste": "onTap",
+        "cible": "_choisirJour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 197,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 211,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 269,
+        "geste": "onChanged",
+        "cible": "_enCours",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 328,
+        "geste": "onPressed",
+        "cible": "_creer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 360,
+        "geste": "onTap",
+        "cible": "onChange",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/portefeuille_page.dart",
+    "elements": [
+      {
+        "ligne": 111,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 172,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/prestation_page.dart",
+    "elements": [
+      {
+        "ligne": 60,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 64,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 93,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 157,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 166,
+        "geste": "onPressed",
+        "cible": "_annuler",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/profil_prestataire_page.dart",
+    "elements": [
+      {
+        "ligne": 27,
+        "geste": "onPressed",
+        "cible": "deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 31,
+        "geste": "onPressed",
+        "cible": "deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 156,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 161,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 166,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 172,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 177,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 186,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 191,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 196,
+        "geste": "onTap",
+        "cible": "_deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 201,
+        "geste": "onTap",
+        "cible": "_deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 207,
+        "geste": "onTap",
+        "cible": "_deconnecter",
+        "apis": [
+          "sessionProvider.deconnecter"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 271,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 282,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/refus_motif_page.dart",
+    "elements": [
+      {
+        "ligne": 87,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 171,
+        "geste": "onChanged",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 264,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 273,
+        "geste": "onPressed",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/reservations_prestataire_page.dart",
+    "elements": [
+      {
+        "ligne": 79,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 88,
+        "geste": "onRetour",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 143,
+        "geste": "onTap",
+        "cible": "onChange",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 244,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 275,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/retrait_page.dart",
+    "elements": [
+      {
+        "ligne": 148,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 189,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 217,
+        "geste": "onChanged",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 251,
+        "geste": "onTap",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 277,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 323,
+        "geste": "onPressed",
+        "cible": "_envoyer",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 367,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 430,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 511,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/services_page.dart",
+    "elements": [
+      {
+        "ligne": 37,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 87,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 158,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/service_form_page.dart",
+    "elements": [
+      {
+        "ligne": 49,
+        "geste": "onAction",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 207,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 230,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 265,
+        "geste": "onChanged",
+        "cible": "_effacer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 317,
+        "geste": "onChanged",
+        "cible": "_enCours",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 346,
+        "geste": "onPressed",
+        "cible": "_enregistrer",
+        "apis": [
+          "creerPrestation",
+          "modifierPrestation"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/tableau_page.dart",
+    "elements": [
+      {
+        "ligne": 74,
+        "geste": "onRefresh",
+        "cible": "_actualiser",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 121,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 132,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 139,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 233,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 281,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 449,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/prestataire/terminer_prestation_page.dart",
+    "elements": [
+      {
+        "ligne": 45,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 49,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 84,
+        "geste": "onRetour",
+        "cible": "_retour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 128,
+        "geste": "onPressed",
+        "cible": "_terminer",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/accueil_client_page.dart",
+    "elements": [
+      {
+        "ligne": 138,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 201,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 212,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 219,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 293,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 339,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 376,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 481,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 597,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 658,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/annulation_reservation.dart",
+    "elements": [
+      {
+        "ligne": 177,
+        "geste": "onPressed",
+        "cible": "_enCours",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 184,
+        "geste": "onPressed",
+        "cible": "_annuler",
+        "apis": [
+          "annuler",
+          "depotReservationProvider.annuler"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/avis_page.dart",
+    "elements": [
+      {
+        "ligne": 170,
+        "geste": "onPressed",
+        "cible": "_enCours",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 263,
+        "geste": "onPressed",
+        "cible": "_publier",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": true
+      },
+      {
+        "ligne": 303,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 387,
+        "geste": "onTap",
+        "cible": "onNote",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 440,
+        "geste": "onChanged",
+        "cible": "onCommentaire",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/avis_prestataire_page.dart",
+    "elements": [
+      {
+        "ligne": 29,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/choix_creneau_page.dart",
+    "elements": [
+      {
+        "ligne": 258,
+        "geste": "onRefresh",
+        "cible": "_charger",
+        "apis": [
+          "agenda"
+        ],
+        "appelApi": true,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 269,
+        "geste": "onRetour",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 303,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 357,
+        "geste": "onTap",
+        "cible": "_choisirJour",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 399,
+        "geste": "onTap",
+        "cible": "_choisir",
+        "apis": [
+          "liberer",
+          "verrouiller"
+        ],
+        "appelApi": true,
+        "garde": true,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 487,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 545,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/demande_envoyee_page.dart",
+    "elements": [
+      {
+        "ligne": 164,
+        "geste": "onPressed",
+        "cible": "_voirReservation",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 169,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/detail_reservation_page.dart",
+    "elements": [
+      {
+        "ligne": 182,
+        "geste": "onRefresh",
+        "cible": "_actualiser",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 358,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 390,
+        "geste": "onPressed",
+        "cible": "_aller",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 402,
+        "geste": "onPressed",
+        "cible": "_appeler",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": true,
+        "navigation": false
+      },
+      {
+        "ligne": 427,
+        "geste": "onPressed",
+        "cible": "_aller",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 484,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 711,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/fiche_prestataire_page.dart",
+    "elements": [
+      {
+        "ligne": 190,
+        "geste": "onChoisir",
+        "cible": "setState",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 199,
+        "geste": "onRefresh",
+        "cible": "_actualiser",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 230,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 273,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 548,
+        "geste": "onTap",
+        "cible": "onChoisir",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 624,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/liste_prestataires_page.dart",
+    "elements": [
+      {
+        "ligne": 151,
+        "geste": "onAction",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 172,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 272,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 295,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 330,
+        "geste": "onChanged",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 363,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 369,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 376,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 415,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 498,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 523,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 611,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/mes_reservations_page.dart",
+    "elements": [
+      {
+        "ligne": 77,
+        "geste": "onRefresh",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 137,
+        "geste": "onTap",
+        "cible": "onChange",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 237,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 267,
+        "geste": "onTap",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 359,
+        "geste": "onPressed",
+        "cible": "ouvrirAnnulation",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 393,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": true,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 412,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  },
+  {
+    "chemin": "features/reservation/paiement_page.dart",
+    "elements": [
+      {
+        "ligne": 317,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 567,
+        "geste": "onPressed",
+        "cible": "toString",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 691,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": false
+      },
+      {
+        "ligne": 871,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 878,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 920,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      },
+      {
+        "ligne": 923,
+        "geste": "onPressed",
+        "cible": "(inline)",
+        "apis": [],
+        "appelApi": false,
+        "garde": false,
+        "erreur": false,
+        "navigation": true
+      }
+    ]
+  }
+]

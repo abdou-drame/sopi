@@ -55,6 +55,7 @@ class _EtatFeuille extends ConsumerState<_FeuilleAnnulation> {
   String? _erreur;
 
   Future<void> _annuler() async {
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreur = null;

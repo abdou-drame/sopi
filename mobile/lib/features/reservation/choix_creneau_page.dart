@@ -264,6 +264,8 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
                   child: EnTeteDegrade(
                     titreLigne1: 'Choisissez un',
                     titreLigne2: 'créneau',
+                    tailleTitre: 28,
+                    interligneTitre: 34,
                     onRetour: () => context.pop(),
                     action: prestataire == null
                         ? null

@@ -70,6 +70,7 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
       _succes = null;
     });
     if (erreurs.values.any((e) => e != null)) return;
+    if (_enCours) return;
     setState(() => _enCours = true);
     try {
       await ref

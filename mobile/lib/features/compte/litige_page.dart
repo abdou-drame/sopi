@@ -115,6 +115,7 @@ class _EtatLitige extends ConsumerState<LitigePage> {
       });
       return;
     }
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreur = null;

@@ -34,6 +34,7 @@ class _EtatNotifications extends ConsumerState<NotificationsPage> {
   }
 
   Future<void> _toutMarquer() async {
+    if (_toutEnCours) return;
     setState(() => _toutEnCours = true);
     try {
       await ref.read(depotCompteProvider).toutMarquerLu();

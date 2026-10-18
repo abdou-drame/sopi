@@ -121,6 +121,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
     final messager = ScaffoldMessenger.of(context);
     final depot = ref.read(depotPrestataireProvider);
     final s = _service;
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreurs = {};

@@ -44,6 +44,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
       context.canPop() ? context.pop() : context.go(Chemins.tableau);
 
   Future<void> _confirmer() async {
+    if (_enCours) return;
     setState(() => _enCours = true);
     final bool ok;
     if (widget.annulation) {

@@ -90,6 +90,7 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
       return;
     }
     final messager = ScaffoldMessenger.of(context);
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreurs = {};

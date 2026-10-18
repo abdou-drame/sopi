@@ -108,6 +108,7 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
     );
     if (confirme != true || !mounted) return;
     final messager = ScaffoldMessenger.of(context);
+    if (_enCours) return;
     setState(() {
       _enCours = true;
       _erreurs = {};
