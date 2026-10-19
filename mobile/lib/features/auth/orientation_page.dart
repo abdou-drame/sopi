@@ -22,7 +22,7 @@ class OrientationPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       body: EcranAcces(
-        chevauchement: 32,
+        chevauchement: 34,
         margePied: 28,
         entete: const _EnteteOrientation(),
         corps: [
@@ -101,7 +101,7 @@ class _EnteteOrientation extends StatelessWidget {
     final haut = MediaQuery.paddingOf(context).top;
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(
-        bottom: Radius.circular(DimensionsSopi.rayonEnteteConnexion),
+        bottom: Radius.circular(DimensionsSopi.rayonEnteteRestreint),
       ),
       child: FondDegrade(
         tacheBasse: true,
@@ -115,17 +115,24 @@ class _EnteteOrientation extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 52,
-                      height: 52,
+                      width: 48,
+                      height: 48,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: CouleursSopi.bleu,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(17),
+                        boxShadow: [
+                          BoxShadow(
+                            color: CouleursSopi.bleu.withValues(alpha: 0.35),
+                            blurRadius: 22,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
                       ),
                       child: Text(
                         'S',
                         style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 26,
+                          fontSize: 24,
                           fontWeight: FontWeight.w800,
                           color: CouleursSopi.blanc,
                         ),
@@ -135,7 +142,7 @@ class _EnteteOrientation extends StatelessWidget {
                     Text(
                       'Sopi',
                       style: theme.textTheme.headlineSmall?.copyWith(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.5,
                       ),
@@ -162,19 +169,23 @@ class _EnteteOrientation extends StatelessWidget {
                     ),
                     style: theme.textTheme.headlineMedium!.copyWith(
                       fontSize: 36,
+                      letterSpacing: -0.6,
                       height: 42 / 36,
                       color: CouleursSopi.marine,
                     ),
                   ),
                 ),
                 const SizedBox(height: 14),
-                Text(
-                  "Choisissez comment vous souhaitez utiliser l'application.",
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 16,
-                    height: 22 / 16,
-                    fontWeight: FontWeight.w400,
-                    color: CouleursSopi.texteSecondaire,
+                Padding(
+                  padding: const EdgeInsets.only(right: 32),
+                  child: Text(
+                    "Choisissez comment vous souhaitez utiliser l'application.",
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 15,
+                      height: 22 / 15,
+                      fontWeight: FontWeight.w400,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
                   ),
                 ),
               ],
@@ -201,13 +212,13 @@ class _PastilleQuartier extends StatelessWidget {
           border: Border.all(color: CouleursSopi.bordure),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
                 Icons.location_on_outlined,
-                size: 18,
+                size: 16,
                 color: CouleursSopi.bleu,
               ),
               const SizedBox(width: 6),
@@ -217,7 +228,7 @@ class _PastilleQuartier extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: CouleursSopi.bleu,
                   ),
@@ -253,7 +264,7 @@ class _CarteChoix extends StatelessWidget {
     final fond = sombre ? CouleursSopi.marine : CouleursSopi.blanc;
     final couleurTitre = sombre ? CouleursSopi.blanc : CouleursSopi.marine;
     final couleurTexte = sombre
-        ? CouleursSopi.blanc.withValues(alpha: 0.72)
+        ? const Color(0xFFC9D6F5)
         : CouleursSopi.texteSecondaire;
     return Semantics(
       button: true,
@@ -263,26 +274,22 @@ class _CarteChoix extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: fond,
-          borderRadius: BorderRadius.circular(
-            DimensionsSopi.rayonCarteFormulaire,
-          ),
+          borderRadius: BorderRadius.circular(32.0),
           border: sombre ? null : Border.all(color: CouleursSopi.bordure),
           boxShadow: [
             BoxShadow(
               color: CouleursSopi.marine.withValues(
-                alpha: sombre ? 0.22 : 0.08,
+                alpha: sombre ? 0.30 : 0.10,
               ),
-              blurRadius: 24,
-              offset: const Offset(0, 10),
+              blurRadius: 36,
+              offset: const Offset(0, 18),
             ),
           ],
         ),
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            borderRadius: BorderRadius.circular(
-              DimensionsSopi.rayonCarteFormulaire,
-            ),
+            borderRadius: BorderRadius.circular(32.0),
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -291,23 +298,23 @@ class _CarteChoix extends StatelessWidget {
                 children: [
                   ExcludeSemantics(child: illustration),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(6, 14, 6, 0),
+                    padding: const EdgeInsets.fromLTRB(8, 14, 8, 0),
                     child: Text(
                       titre,
                       style: theme.textTheme.titleLarge?.copyWith(
-                        fontSize: 20,
-                        height: 22 / 20,
+                        fontSize: 18,
+                        height: 22 / 18,
                         fontWeight: FontWeight.w800,
                         color: couleurTitre,
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(6, 6, 6, 0),
+                    padding: const EdgeInsets.fromLTRB(8, 6, 8, 0),
                     child: Text(
                       texte,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
+                        fontSize: 13,
                         height: 18 / 14,
                         fontWeight: FontWeight.w400,
                         color: couleurTexte,
@@ -316,14 +323,14 @@ class _CarteChoix extends StatelessWidget {
                   ),
                   const Spacer(),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(6, 16, 0, 4),
+                    padding: const EdgeInsets.fromLTRB(8, 12, 8, 6),
                     child: Row(
                       children: [
                         Expanded(
                           child: Text(
                             'Commencer',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 15,
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: sombre
                                   ? CouleursSopi.blanc
@@ -332,8 +339,8 @@ class _CarteChoix extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          width: 44,
-                          height: 44,
+                          width: 40,
+                          height: 40,
                           decoration: BoxDecoration(
                             color: sombre
                                 ? CouleursSopi.blanc
@@ -342,7 +349,7 @@ class _CarteChoix extends StatelessWidget {
                           ),
                           child: Icon(
                             Icons.arrow_forward_rounded,
-                            size: 22,
+                            size: 18,
                             color: sombre
                                 ? CouleursSopi.marine
                                 : CouleursSopi.blanc,
@@ -361,19 +368,20 @@ class _CarteChoix extends StatelessWidget {
   }
 }
 
-/// Zone d'illustration : proportions fixes, dessin mis à l'échelle de la largeur de la carte.
+/// Zone d'illustration : 176 px de haut, pleine largeur de la carte ; le dessin (repère 150 × 176 de la maquette)
+/// est centré et mis à l'échelle, le fond remplit toute la zone.
 class _Illustration extends StatelessWidget {
   const _Illustration({required this.peintre});
 
-  final CustomPainter peintre;
+  final _Peinture peintre;
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: AspectRatio(
-        aspectRatio: _PeintureBase.largeur / _PeintureBase.hauteur,
-        child: CustomPaint(painter: peintre),
+      child: SizedBox(
+        height: 176,
+        child: CustomPaint(painter: peintre, size: Size.infinite),
       ),
     );
   }
@@ -384,60 +392,70 @@ class _PeintureClient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      _Illustration(peintre: _CalendrierEpingle());
+      const _Illustration(peintre: _CalendrierEpingle());
 }
 
 class _PeintureArtisan extends StatelessWidget {
   const _PeintureArtisan();
 
   @override
-  Widget build(BuildContext context) => _Illustration(peintre: _CleEngrenage());
+  Widget build(BuildContext context) =>
+      const _Illustration(peintre: _CleEngrenage());
 }
 
-/// Les dessins sont tracés dans un repère de 151 × 176 puis mis à l'échelle.
-abstract class _PeintureBase extends CustomPainter {
-  static const largeur = 151.0;
+abstract class _Peinture extends CustomPainter {
+  const _Peinture();
+
+  static const largeur = 150.0;
   static const hauteur = 176.0;
 
+  /// Fond de toute la zone.
+  Shader fond(Rect zone);
+
+  /// Dessin dans le repère 150 × 176 (équivalent du viewBox SVG de la maquette).
   void dessiner(Canvas canvas);
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.save();
-    canvas.scale(size.width / largeur, size.height / hauteur);
+    final zone = Offset.zero & size;
+    canvas.clipRect(zone);
+    canvas.drawRect(zone, Paint()..shader = fond(zone));
+    final echelle = math.min(size.width / largeur, size.height / hauteur);
+    canvas.translate(
+      (size.width - largeur * echelle) / 2,
+      (size.height - hauteur * echelle) / 2,
+    );
+    canvas.scale(echelle);
     dessiner(canvas);
-    canvas.restore();
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _CalendrierEpingle extends _PeintureBase {
+class _CalendrierEpingle extends _Peinture {
+  const _CalendrierEpingle();
+
+  @override
+  Shader fond(Rect zone) => const LinearGradient(
+    begin: Alignment(-0.34, -1),
+    end: Alignment(0.34, 1),
+    colors: [CouleursSopi.bleuPastel, CouleursSopi.enteteFond],
+  ).createShader(zone);
+
   @override
   void dessiner(Canvas canvas) {
-    const rect = Rect.fromLTWH(0, 0, 151, 176);
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFE6EEFF), Color(0xFFDCE8FF)],
-        ).createShader(rect),
+    canvas.drawCircle(
+      const Offset(118, 40),
+      44,
+      Paint()..color = CouleursSopi.enteteTacheBleue.withValues(alpha: 0.7),
     );
     canvas.drawCircle(
-      const Offset(125, 30),
-      52,
-      Paint()..color = CouleursSopi.enteteTacheBleue.withValues(alpha: 0.55),
-    );
-    canvas.drawCircle(
-      const Offset(14, 160),
-      40,
+      const Offset(22, 150),
+      34,
       Paint()..color = CouleursSopi.enteteTacheIndigo.withValues(alpha: 0.6),
     );
 
-    // Calendrier : corps blanc, bandeau bleu, deux anneaux marine.
     final corps = RRect.fromRectAndRadius(
       const Rect.fromLTWH(22, 50, 96, 92),
       const Radius.circular(16),
@@ -448,152 +466,179 @@ class _CalendrierEpingle extends _PeintureBase {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
-        ..color = CouleursSopi.bordureForte,
+        ..color = const Color(0xFFC7D6F5),
     );
-    canvas.save();
-    canvas.clipRRect(corps);
-    canvas.drawRect(
-      const Rect.fromLTWH(22, 50, 96, 27),
+    canvas.drawPath(
+      Path()
+        ..moveTo(22, 66)
+        ..arcToPoint(const Offset(38, 50), radius: const Radius.circular(16))
+        ..lineTo(102, 50)
+        ..arcToPoint(const Offset(118, 66), radius: const Radius.circular(16))
+        ..lineTo(118, 76)
+        ..lineTo(22, 76)
+        ..close(),
       Paint()..color = CouleursSopi.bleu,
     );
-    canvas.restore();
     final anneau = Paint()..color = CouleursSopi.marine;
-    for (final x in const [47.0, 93.0]) {
+    for (final x in const [44.0, 90.0]) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(x, 38, 5, 20),
+          Rect.fromLTWH(x, 42, 6, 16),
           const Radius.circular(3),
         ),
         anneau,
       );
     }
-    final cellule = Paint()..color = const Color(0xFFDBE7FF);
-    const cases = [
+    final cellule = Paint()..color = CouleursSopi.bleuPastel;
+    for (final c in const [
       Rect.fromLTWH(34, 88, 18, 14),
       Rect.fromLTWH(60, 88, 18, 14),
       Rect.fromLTWH(34, 110, 18, 14),
       Rect.fromLTWH(60, 110, 18, 14),
-    ];
-    for (final c in cases) {
+    ]) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(c, const Radius.circular(5)),
         cellule,
       );
     }
-    const choisie = Rect.fromLTWH(87, 88, 18, 14);
     canvas.drawRRect(
-      RRect.fromRectAndRadius(choisie, const Radius.circular(5)),
+      RRect.fromRectAndRadius(
+        const Rect.fromLTWH(86, 88, 18, 14),
+        const Radius.circular(5),
+      ),
       Paint()..color = CouleursSopi.bleu,
     );
     canvas.drawPath(
       Path()
-        ..moveTo(91.5, 95)
-        ..lineTo(94.8, 98.2)
-        ..lineTo(100.5, 91.6),
+        ..moveTo(91, 95)
+        ..relativeLineTo(3, 3)
+        ..relativeLineTo(6, -6),
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
+        ..strokeWidth = 2.4
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..color = CouleursSopi.blanc,
     );
 
-    // Épingle orange : disque et pointe, point blanc au centre.
-    const centre = Offset(114, 36);
-    const r = 22.0;
-    final epingle = Path()
-      ..addOval(Rect.fromCircle(center: centre, radius: r))
-      ..moveTo(centre.dx - r * 0.9, centre.dy + r * 0.42)
-      ..quadraticBezierTo(
-        centre.dx - r * 0.35,
-        centre.dy + r * 1.05,
-        centre.dx,
-        centre.dy + r * 1.7,
-      )
-      ..quadraticBezierTo(
-        centre.dx + r * 0.35,
-        centre.dy + r * 1.05,
-        centre.dx + r * 0.9,
-        centre.dy + r * 0.42,
-      )
-      ..close();
-    canvas.drawPath(epingle, Paint()..color = _orange);
-    canvas.drawCircle(centre, 9, Paint()..color = CouleursSopi.blanc);
+    // Épingle orange (translate 92, 14).
+    canvas.save();
+    canvas.translate(92, 14);
+    canvas.drawPath(
+      Path()
+        ..moveTo(22, 0)
+        ..cubicTo(10, 0, 0, 10, 0, 22)
+        ..relativeCubicTo(0, 16, 22, 38, 22, 38)
+        ..relativeCubicTo(0, 0, 22, -22, 22, -38)
+        ..cubicTo(44, 10, 34, 0, 22, 0)
+        ..close(),
+      Paint()..color = _orange,
+    );
+    canvas.drawCircle(
+      const Offset(22, 22),
+      9,
+      Paint()..color = CouleursSopi.blanc,
+    );
+    canvas.restore();
   }
 }
 
-class _CleEngrenage extends _PeintureBase {
+class _CleEngrenage extends _Peinture {
+  const _CleEngrenage();
+
+  @override
+  Shader fond(Rect zone) => const LinearGradient(
+    begin: Alignment(-0.34, -1),
+    end: Alignment(0.34, 1),
+    colors: [Color(0xFF2F5BE0), CouleursSopi.bleu, Color(0xFF17338F)],
+    stops: [0, 0.45, 1],
+  ).createShader(zone);
+
   @override
   void dessiner(Canvas canvas) {
-    const rect = Rect.fromLTWH(0, 0, 151, 176);
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2252D6), Color(0xFF1D4ED8), Color(0xFF1E3FAE)],
-        ).createShader(rect),
-    );
-    canvas.drawCircle(
-      const Offset(38, 28),
-      76,
-      Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.1),
-    );
-    canvas.drawCircle(
-      const Offset(125, 150),
-      58,
-      Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.07),
-    );
+    final voile = Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.08);
+    canvas.drawCircle(const Offset(30, 30), 46, voile);
+    canvas.drawCircle(const Offset(128, 150), 40, voile);
 
-    // Engrenage : disque pâle et douze dents arrondies.
-    const centre = Offset(76, 85);
-    canvas.drawCircle(
-      centre,
-      31,
-      Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.12),
-    );
-    final dent = Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.35);
-    for (var i = 0; i < 12; i++) {
-      canvas.save();
-      canvas.translate(centre.dx, centre.dy);
-      canvas.rotate(i * math.pi / 6);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          const Rect.fromLTWH(-4.5, -46, 9, 12),
-          const Radius.circular(3),
-        ),
+    // Couronne de dents : cercle de rayon 40, trait de 12, tirets de 9,4 séparés de 9,4.
+    const centre = Offset(75, 84);
+    const rayon = 40.0;
+    final dent = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 12
+      ..color = CouleursSopi.blanc.withValues(alpha: 0.28);
+    const tiret = 9.4;
+    final perimetre = 2 * math.pi * rayon;
+    for (var debut = 0.0; debut < perimetre; debut += 2 * tiret) {
+      canvas.drawArc(
+        Rect.fromCircle(center: centre, radius: rayon),
+        debut / rayon,
+        math.min(tiret, perimetre - debut) / rayon,
+        false,
         dent,
       );
-      canvas.restore();
     }
+    canvas.drawCircle(
+      centre,
+      30,
+      Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.16),
+    );
 
-    // Clé à molette : contour blanc.
-    final cle = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(Icons.build_outlined.codePoint),
-        style: TextStyle(
-          fontFamily: Icons.build_outlined.fontFamily,
-          package: Icons.build_outlined.fontPackage,
-          fontSize: 74,
-          color: CouleursSopi.blanc,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    cle.paint(canvas, centre - Offset(cle.width / 2, cle.height / 2));
-
-    // Pastille de validation orange.
-    const pastille = Offset(113, 137);
-    canvas.drawCircle(pastille, 20, Paint()..color = _orange);
+    // Clé à molette (tracé 24 × 24, translate 34, 43, échelle 3,4).
+    canvas.save();
+    canvas.translate(34, 43);
+    canvas.scale(3.4);
+    final cle = Path()
+      ..moveTo(14.7, 6.3)
+      ..relativeArcToPoint(
+        const Offset(0, 1.4),
+        radius: const Radius.circular(1),
+      )
+      ..relativeLineTo(1.6, 1.6)
+      ..relativeArcToPoint(
+        const Offset(1.4, 0),
+        radius: const Radius.circular(1),
+      )
+      ..relativeLineTo(3.77, -3.77)
+      ..relativeArcToPoint(
+        const Offset(-7.94, 7.94),
+        radius: const Radius.circular(6),
+        clockwise: true,
+      )
+      ..relativeLineTo(-6.91, 6.91)
+      ..relativeArcToPoint(
+        const Offset(-3, -3),
+        radius: const Radius.circular(2.12),
+        clockwise: true,
+      )
+      ..relativeLineTo(6.91, -6.91)
+      ..relativeArcToPoint(
+        const Offset(7.94, -7.94),
+        radius: const Radius.circular(6),
+        clockwise: true,
+      )
+      ..relativeLineTo(-3.76, 3.76)
+      ..close();
     canvas.drawPath(
-      Path()
-        ..moveTo(pastille.dx - 8, pastille.dy)
-        ..lineTo(pastille.dx - 2, pastille.dy + 6)
-        ..lineTo(pastille.dx + 9, pastille.dy - 6),
+      cle,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3.5
+        ..strokeWidth = 1.7
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..color = CouleursSopi.blanc,
+    );
+    canvas.restore();
+
+    canvas.drawCircle(const Offset(112, 138), 20, Paint()..color = _orange);
+    canvas.drawPath(
+      Path()
+        ..moveTo(103, 138)
+        ..relativeLineTo(7, 7)
+        ..relativeLineTo(12, -14),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..color = CouleursSopi.blanc,
