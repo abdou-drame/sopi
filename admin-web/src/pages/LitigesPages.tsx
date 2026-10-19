@@ -6,7 +6,7 @@ import { api } from '../api/endpoints'
 import type { CibleSanction, DecisionLitige, Litige, LitigeDetail, PartieLitige } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
@@ -156,7 +156,7 @@ function Partie({ titre, partie, entreprise }: { titre: string; partie: PartieLi
 export function LitigeDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['litige', id], queryFn: () => api.litige(id) })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   return (
     <PageDetail
       requete={requete}
@@ -164,11 +164,10 @@ export function LitigeDetailPage() {
       titre={(l) => l.motif}
       sousTitre={(l) => `${l.reservation.prestation} · ${T.ouvertLe.toLowerCase()} ${formatDateHeure(l.dateCreation)}`}
       badge={(l) => <BadgeStatut statut={l.statut} />}
-      actions={(l) => (l.statut === 'ouvert' ? <ActionTrancher litige={l} onFait={setMessage} /> : null)}
+      actions={(l) => (l.statut === 'ouvert' ? <ActionTrancher litige={l} onFait={retour.succes} /> : null)}
     >
       {(l) => (
         <>
-          {message && <BanniereAlerte gravite="info" titre={message} />}
           <div className="grid gap-5 lg:grid-cols-2">
             <Carte titre={T.description}>
               <p className="text-sm whitespace-pre-line text-texte">{l.description}</p>

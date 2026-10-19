@@ -5,7 +5,7 @@ import { api } from '../api/endpoints'
 import type { AvisAdmin } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import EnTetePage from '../components/ui/EnTetePage'
 import FiltresListe from '../components/ui/FiltresListe'
@@ -94,7 +94,7 @@ function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode;
 
 export default function AvisListePage() {
   const etat = useFiltresUrl(['vue', 'note', 'prestataire'], { vue: 'a_traiter' })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   const colonnes: Colonne<AvisAdmin>[] = [
     {
       cle: 'avis',
@@ -131,8 +131,8 @@ export default function AvisListePage() {
           <Link to={`/reservations/${a.reservationId}`} className="self-center text-xs font-semibold text-primaire-700 hover:underline">
             {T.reservation}
           </Link>
-          {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={setMessage} />}
-          {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={setMessage} /> : <ActionModeration avis={a} mode="masquer" onFait={setMessage} />}
+          {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
+          {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={retour.succes} /> : <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
         </div>
       ),
     },
@@ -140,7 +140,6 @@ export default function AvisListePage() {
   return (
     <div className="flex flex-col gap-6">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      {message && <BanniereAlerte gravite="info" titre={message} />}
       <FiltresListe
         legende={T.filtres}
         etat={etat}

@@ -7,6 +7,7 @@ import type { DemandeDetail, DemandeListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import Definitions from '../components/ui/Definitions'
@@ -131,7 +132,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
 export function DossierDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['demande', id], queryFn: () => api.demande(id) })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   return (
     <PageDetail
       requete={requete}
@@ -139,11 +140,10 @@ export function DossierDetailPage() {
       titre={(d) => d.nomEntreprise}
       sousTitre={(d) => `${nomComplet(d)} · ${L.metiers[d.metier] ?? d.metier} · ${d.quartier}`}
       badge={(d) => <BadgeStatut statut={d.statutCompte} />}
-      actions={(d) => (d.statutCompte === 'en_attente' ? <ActionsDossier d={d} onFait={setMessage} /> : null)}
+      actions={(d) => (d.statutCompte === 'en_attente' ? <ActionsDossier d={d} onFait={retour.succes} /> : null)}
     >
       {(d) => (
         <>
-          {message && <BanniereAlerte gravite="info" titre={message} />}
           {d.statutCompte === 'refuse' && <BanniereAlerte gravite="attention" titre={T.dejaRefuse} detail={d.motifRefus ?? undefined} />}
           {d.statutCompte === 'actif' && <BanniereAlerte gravite="info" titre={T.dejaAccepte} />}
           <Carte titre={T.identite}>
