@@ -5,6 +5,7 @@ abstract final class Chemins {
   static const etatApi = '/etat-api';
 
   // — Authentification (publiques)
+  static const orientation = '/orientation';
   static const connexion = '/connexion';
   static const inscription = '/inscription';
   static const motDePasseOublie = '/mot-de-passe-oublie';
@@ -79,6 +80,7 @@ abstract final class Chemins {
   static const publiques = <String>{
     demarrage,
     etatApi,
+    orientation,
     connexion,
     inscription,
     motDePasseOublie,
@@ -91,6 +93,7 @@ abstract final class Chemins {
   /// Routes d'authentification : un utilisateur connecté en est renvoyé vers son accueil.
   static const authentification = <String>{
     demarrage,
+    orientation,
     connexion,
     inscription,
     motDePasseOublie,
