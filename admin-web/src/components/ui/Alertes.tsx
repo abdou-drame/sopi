@@ -6,6 +6,9 @@ export type TypeRetour = 'succes' | 'info' | 'erreur'
 /** Durée d'affichage de chaque type de retour, en millisecondes. */
 export const DUREES_RETOUR: Record<TypeRetour, number> = { succes: 4000, info: 5000, erreur: 8000 }
 
+/** Nombre maximal d'alertes affichées en même temps : les plus anciennes sont retirées. */
+export const MAX_RETOURS = 3
+
 interface Retour {
   id: number
   type: TypeRetour
@@ -66,7 +69,11 @@ export function AlertesProvider({ children }: { children: ReactNode }) {
   const notifieur = useMemo<Notifieur>(() => {
     let suivant = 0
     const ajouter = (type: TypeRetour) => (texte: string) =>
-      setRetours((liste) => [...liste, { id: ++suivant, type, texte }])
+      setRetours((liste) => {
+        // Un message identique déjà affiché est remplacé (le compte à rebours repart), pas dupliqué.
+        const sansDoublon = liste.filter((r) => !(r.type === type && r.texte === texte))
+        return [...sansDoublon, { id: ++suivant, type, texte }].slice(-MAX_RETOURS)
+      })
     return { succes: ajouter('succes'), info: ajouter('info'), erreur: ajouter('erreur') }
   }, [])
   return (
