@@ -7,6 +7,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase : le plugin Google Services n'est appliqué que si google-services.json est présent
+// (ignoré par git ; reconstruit par la CI). Sans lui, l'application se construit et le push est désactivé.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // Signature release : lue depuis android/key.properties (ignoré par git).
 // Absent => signature debug (builds locaux et branches feature).
 val keyPropertiesFile = rootProject.file("key.properties")

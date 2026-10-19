@@ -53,6 +53,10 @@ class SessionControleur extends Notifier<EtatSession> {
 
   Dio get _dio => ref.read(dioProvider);
 
+  /// Action à terminer avant la fermeture de la session côté serveur (retrait de l'appareil push).
+  /// Posée par le contrôleur push : la session ne dépend pas de lui.
+  Future<void> Function()? avantDeconnexion;
+
   /// Au démarrage : relit le jeton stocké et le valide par `GET /me`.
   Future<void> restaurer() async {
     final stockage = ref.read(stockageJetonProvider);
@@ -128,6 +132,10 @@ class SessionControleur extends Notifier<EtatSession> {
 
   /// Déconnexion : appel serveur, puis effacement local même si l'appel échoue.
   Future<void> deconnecter() async {
+    // L'appareil est retiré du compte avant la fermeture du jeton (la route exige d'être connecté).
+    try {
+      await avantDeconnexion?.call();
+    } catch (_) {}
     try {
       await _dio.post<Object?>('/auth/deconnexion');
     } catch (_) {

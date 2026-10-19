@@ -47,6 +47,7 @@ Future<ProviderContainer> lancerAcces(
   bool sansAnimation = true,
   StockageJetonSuiviMemoire? stockageSuivi,
   List<Override> surcharges = const [],
+  GlobalKey<ScaffoldMessengerState>? messagerie,
 }) async {
   final conteneur = ProviderContainer(
     overrides: <Override>[
@@ -68,6 +69,7 @@ Future<ProviderContainer> lancerAcces(
       container: conteneur,
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          scaffoldMessengerKey: messagerie,
           theme: ThemeSopi.construire(policeGoogle: false),
           locale: const Locale('fr', 'FR'),
           supportedLocales: const [Locale('fr', 'FR')],

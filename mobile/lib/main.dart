@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/format/formateurs.dart';
+import 'core/push/controleur_push.dart';
 import 'core/routing/routeur.dart';
 import 'core/theme/theme_sopi.dart';
 
@@ -17,7 +18,9 @@ class SopiApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(pushProvider);
     return MaterialApp.router(
+      scaffoldMessengerKey: cleMessagerie,
       title: 'Sopi',
       debugShowCheckedModeBanner: false,
       theme: ThemeSopi.construire(),
