@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { L } from '../../i18n/libelles'
 
 export type TypeRetour = 'succes' | 'info' | 'erreur'
 
@@ -26,13 +27,34 @@ const styles: Record<TypeRetour, string> = {
 }
 
 function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number) => void }) {
+  const [enPause, setEnPause] = useState(false)
+  const restant = useRef(DUREES_RETOUR[retour.type])
   useEffect(() => {
-    const minuteur = setTimeout(() => onFin(retour.id), DUREES_RETOUR[retour.type])
-    return () => clearTimeout(minuteur)
-  }, [retour.id, retour.type, onFin])
+    if (enPause) return
+    const debut = Date.now()
+    const minuteur = setTimeout(() => onFin(retour.id), restant.current)
+    return () => {
+      clearTimeout(minuteur)
+      restant.current -= Date.now() - debut
+    }
+  }, [enPause, retour.id, onFin])
   return (
-    <div className={`animate-glissement rounded-grand px-5 py-3.5 text-sm font-semibold shadow-bouton ${styles[retour.type]}`}>
-      {retour.texte}
+    <div
+      onMouseEnter={() => setEnPause(true)}
+      onMouseLeave={() => setEnPause(false)}
+      onFocus={() => setEnPause(true)}
+      onBlur={() => setEnPause(false)}
+      className={`animate-glissement flex items-start gap-3 rounded-grand px-5 py-3.5 text-sm font-semibold shadow-bouton ${styles[retour.type]}`}
+    >
+      <span className="min-w-0 flex-1">{retour.texte}</span>
+      <button
+        type="button"
+        aria-label={L.commun.fermer}
+        onClick={() => onFin(retour.id)}
+        className="-my-1 -mr-2 shrink-0 rounded-petit px-2 text-lg leading-none opacity-70 hover:opacity-100"
+      >
+        ×
+      </button>
     </div>
   )
 }
