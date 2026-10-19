@@ -1,7 +1,7 @@
 // B. Prestataire : profil, services (créer, modifier, désactiver), créneaux, indisponibilité, photos, tableau de bord.
 import { join } from 'node:path';
 import { Session, note } from './pilote.mjs';
-import { ICI, comptes } from './lib.mjs';
+import { ICI, comptes, etiqDate, rx } from './lib.mjs';
 
 const f = (n) => join(ICI, '.jetable', 'fichiers', n);
 const P = 'B-prestataire-gestion';
@@ -101,7 +101,7 @@ export default async function parcoursB() {
     await s.defiler(3000);
     await s.capture(P, 'plage-creee-bas');
     a = await s.arbre();
-    note('B', 'plage créée → retour à la liste avec les nouveaux créneaux', /14h00/.test(a) && /15h00/.test(a), a.split('\n').filter((l) => /24 oct/.test(l)).join(' | '));
+    note('B', 'plage créée → retour à la liste avec les nouveaux créneaux', /14h00/.test(a) && /15h00/.test(a), a.split('\n').filter((l) => rx(etiqDate(6)).test(l)).join(' | '));
 
     // Retrait d'un créneau libre.
     await s.page.getByRole('button', { name: 'Retirer le créneau de 15h00' }).last().click();
@@ -114,7 +114,7 @@ export default async function parcoursB() {
     await s.attendre(1500);
     await s.capture(P, 'creneau-retire');
     a = await s.arbre();
-    note('B', 'créneau libre retiré après confirmation (« Non » conserve)', /24 oct\. 14h00 Retirer/.test(a) && !/24 oct\. 14h00 15h00/.test(a), a.split('\n').filter((l) => /24 oct/.test(l)).join(' | '));
+    note('B', 'créneau libre retiré après confirmation (« Non » conserve)', /24 oct\. 14h00 Retirer/.test(a) && !/24 oct\. 14h00 15h00/.test(a), a.split('\n').filter((l) => rx(etiqDate(6)).test(l)).join(' | '));
 
     // Indisponibilité.
     await s.cliquer('Déclarer une indisponibilité');
@@ -146,7 +146,7 @@ export default async function parcoursB() {
     await s.defiler(3000);
     await s.capture(P, 'disponibilites-apres-indisponibilite');
     a = await s.arbre();
-    note('B', 'créneau 14h00 bloqué par l\'indisponibilité', !/24 oct. 14h00/.test(a) || /indispon/i.test(a), a.split('\n').filter((l) => /24 oct/.test(l)).join(' | '));
+    note('B', 'créneau 14h00 bloqué par l\'indisponibilité', !rx(`${etiqDate(6)}. 14h00`).test(a) || /indispon/i.test(a), a.split('\n').filter((l) => rx(etiqDate(6)).test(l)).join(' | '));
     await s.defiler(-4000);
     await s.retour();
 

@@ -51,6 +51,14 @@ export const jourDans = (n) => {
   return d.toISOString().slice(0, 10);
 };
 
+const JOURS = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+/** Étiquette de jour telle qu'affichée par l'app (ex. « Lun. 19 »), n jours après aujourd'hui : les créneaux semés suivent la date du jour. */
+export const etiqJour = (n) => { const d = new Date(Date.now() + n * 86400000); return `${JOURS[d.getUTCDay()]} ${d.getUTCDate()}`; };
+/** Jour et mois abrégé (ex. « 24 oct »), sans le nom du jour. */
+export const etiqDate = (n) => `${new Date(Date.now() + n * 86400000).getUTCDate()} oct`;
+/** Échappe un texte pour l'utiliser dans une expression régulière. */
+export const rx = (t) => new RegExp(t.replace(/[.*+?^${}()|[]\]/g, '\export const PNG ='));
+
 export const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
 
 /** Réserve par l'API (verrou puis création) : sert à préparer des demandes que l'on traite ensuite dans l'interface. */

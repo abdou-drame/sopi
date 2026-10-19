@@ -3,7 +3,7 @@ import { writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHmac } from 'node:crypto';
 import { Session, note } from './pilote.mjs';
-import { API, ICI, SECRET_WEBHOOK, api, comptes, connexion, webhookPaiement } from './lib.mjs';
+import { API, etiqJour, rx, ICI, SECRET_WEBHOOK, api, comptes, connexion, webhookPaiement } from './lib.mjs';
 
 const P = 'C-client-reservation';
 
@@ -52,12 +52,12 @@ export default async function parcoursC2() {
     await s.texte('Heures disponibles', 10000);
     await s.attendre(1500);
     await s.capture(P, 'creneau-ecran');
-    await s.cliquer('Dim. 18');
+    await s.cliquer(etiqJour(0));
     await s.attendre(1500);
     await s.capture(P, 'creneau-jour-sans-creneau');
     a = await s.arbre();
     note('C', 'créneau : jour sans créneau → message, « Continuer » désactivé', /Aucun créneau libre ce jour-là/.test(a) && /Continuer" \[disabled\]/.test(a));
-    await s.cliquer('Lun. 19');
+    await s.cliquer(etiqJour(1));
     await s.attendre(1500);
     await s.cliquer('10h00');
     await s.attendre(900);

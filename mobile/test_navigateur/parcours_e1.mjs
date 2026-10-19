@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Session, note } from './pilote.mjs';
-import { ICI, api, comptes, confirmerViaApi, connexion, reserverViaApi } from './lib.mjs';
+import { ICI, etiqJour, api, comptes, confirmerViaApi, connexion, reserverViaApi } from './lib.mjs';
 
 const P = 'E-demarrage-fin-retrait';
 
@@ -20,8 +20,7 @@ export async function saisirCode(s, code) {
   await s.attendre(300);
   const valeur = await champ.inputValue().catch(() => '?');
   if (valeur !== '' && valeur.length < 6) {
-    // Observé : à la première saisie sur l'écran du 2e rendez-vous, seuls 3 caractères sur 6 sont retenus (reproductible).
-    // Cause non établie (test ou app) : consigné dans le rapport.
+    // Garde-fou : le formateur de l'app retire 0, O, 1, I, L (alphabet du serveur) ; les codes d'essai doivent les éviter.
     console.log(`FRAPPE TRONQUÉE : ${valeur.length} caractère(s) sur 6 retenus après la saisie de « ${code} »`);
   }
   await s.attendre(2200);
@@ -70,7 +69,7 @@ export default async function parcoursE1() {
     if (/Retour/.test(a)) await s.retour();
     await s.cliquer(/^Agenda/);
     await s.attendre(2000);
-    await s.cliquer('Mer. 21');
+    await s.cliquer(etiqJour(3));
     await s.attendre(1500);
     await s.cliquer(/09h00.*Confirmée/);
     await s.texte('Code du client', 8000);
@@ -78,7 +77,7 @@ export default async function parcoursE1() {
     const messages = [];
     await s.attendre(2000);
     for (let i = 1; i <= 6; i++) {
-      await saisirCode(s, `BAD${i}${i}${i}`.slice(0, 6));
+      await saisirCode(s, `BAD${i + 1}${i + 1}${i + 1}`.slice(0, 6));
       await s.texte(/incorrect|Trop de tentatives/, 5000);
       a = await s.arbre();
       if (i === 1 && !/incorrect|Trop de tentatives/.test(a)) console.log('ESSAI 1 SANS MESSAGE\n' + a.split('\n').filter((l) => /textbox|button/.test(l)).join('\n'));
@@ -88,8 +87,8 @@ export default async function parcoursE1() {
       if (i === 6) await s.capture(P, 'code-sixieme-essai');
     }
     console.log('ESSAIS\n' + messages.join('\n'));
-    note('E', '5 essais de mauvais code (observation : le 1er essai a été tronqué à 3 caractères, voir rapport)', true, messages.join(' ; '));
-    note('E', 'blocage « Trop de tentatives » au-delà de 5 essais/min (observation : non atteint, 5 essais seulement envoyés)', true, messages[5]);
+    note('E', '5 essais de mauvais code : message d\'erreur à chaque essai', messages.slice(0, 5).every((m) => /incorrect/.test(m)) && !/Trop de tentatives/.test(messages.slice(0, 5).join()), messages.join(' ; '));
+    note('E', 'au-delà de 5 essais par minute : blocage « Trop de tentatives »', /Trop de tentatives/.test(messages[5]), messages[5]);
     note('E', 'après 5 mauvais codes, la réservation n\'a pas démarré', (await statutPresta(r5)) === 'confirmee');
   } catch (e) {
     note('E', 'exception', false, e.message.split('\n')[0]);

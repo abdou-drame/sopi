@@ -1,6 +1,6 @@
 // D (2/2). Prestataire : annulation avec motif (client remboursé). Client : annulation (acompte non remboursé).
 import { Session, note } from './pilote.mjs';
-import { api, comptes, connexion } from './lib.mjs';
+import { api, etiqJour, rx, comptes, connexion } from './lib.mjs';
 
 const P = 'D-reponses-annulations';
 

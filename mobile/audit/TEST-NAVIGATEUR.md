@@ -10,12 +10,18 @@ Branche `feature/p4f-test-navigateur`, non fusionnée. App Flutter web (release)
 - C1 (17 contrôles) : inscription client, connexion refusée/valide, recherche, tri, filtres quartier/note/prix, texte libre.
 - C2 (21) : fiche, créneau avec verrou, réservation, acceptation, paiement, webhook signé (signature invalide refusée 4xx, rejeu idempotent), échec puis réessai, retour dans l'app, réservation confirmée avec code.
 - D / D2 (8 + 8) : demandes, acceptation, refus avec motif, annulation prestataire (remboursée), annulation client (acompte non remboursé), onglet Annulées.
-- E1 : mauvais code refusé, réservation inchangée, bon code → `en_cours`, écran « Terminer la prestation ».
+- E1 (exécution du 18 oct.) : mauvais code refusé, réservation inchangée, bon code → `en_cours`, écran « Terminer la prestation ».
 
-## Échecs / points non résolus
-- **Frappe tronquée sur le code de démarrage** : à la première saisie sur l'écran d'un 2e rendez-vous, seuls 3 caractères sur 6 sont retenus (reproductible, 3 exécutions sur 3). Le code n'est donc pas envoyé. Cause non établie (simulation de clavier de Playwright ou perte de focus après un rechargement de l'écran). À vérifier sur téléphone.
-- Conséquence : le blocage « Trop de tentatives » (5 essais/min) n'a pas pu être vérifié par ce parcours (il l'avait été lors d'un essai antérieur avec 7 essais : blocage au 7e).
-- Les assertions correspondantes sont des observations, pas des vérifications.
+## Défaut du code de démarrage : élucidé, ce n'est pas un bug de l'app
+- Symptôme : le champ ne gardait que 3 caractères sur 6 (« B A D ») avec le code d'essai `BAD111`.
+- Cause : le formateur de l'app (`FormateurCode`, `lib/core/widgets/code_saisie/code_saisie.dart`) retire tout caractère hors alphabet (sans 0, O, 1, I, L), comme le serveur. Les « 1 » de `BAD111` étaient donc supprimés. Aucun contrôleur recréé, aucun focus qui saute, aucun rebuild fautif.
+- Vérification : tests widget ajoutés dans `mobile/test/core/code_saisie_test.dart` (frappe caractère par caractère, 6 d'un coup, minuscules, `BAD111`) : tous verts, aucune correction de l'app nécessaire.
+- Le parcours E1 utilise désormais des codes valides (`BAD222`…) et le contrôle « Trop de tentatives » (au-delà de 5 essais par minute) y est de nouveau un vrai contrôle.
+- **Limite honnête : cette version de E1 n'a pas été rejouée en exécution complète** après la correction. Le blocage avait été constaté lors d'un essai antérieur (7e essai). À revérifier lors d'un prochain passage.
+
+## Parcours : dates et lancement
+- Les créneaux semés suivent la date du jour. Les jours codés en dur dans les parcours (« Lun. 19 »…) ont été remplacés par des dates calculées (`etiqJour`, `etiqDate` dans `lib.mjs`) ; ces parcours modifiés n'ont pas été rejoués après le changement de date.
+- Les parcours doivent être lancés en premier plan : en arrière-plan, l'app web ne s'affiche pas dans Chrome (aucun contrôle exécuté).
 
 ## Écarts constatés, non corrigés
 - Le toast « Service enregistré » recouvre le bouton « Ajouter un service ».
