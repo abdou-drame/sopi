@@ -79,6 +79,23 @@ jobs:
             echo "::warning::Secrets de signature absents : APK signé avec la clé de debug (non publiable)."
           fi
 
+      # Firebase : google-services.json est reconstruit depuis le secret (jamais dans le dépôt, jamais affiché).
+      - name: Préparer Firebase
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            echo "::error title=Secret Firebase manquant::Le secret GOOGLE_SERVICES_JSON_BASE64 est absent. L'ajouter dans Settings > Secrets and variables > Actions (contenu de google-services.json encodé en base64)."
+            exit 1
+          fi
+          if ! echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 -d > android/app/google-services.json 2>/dev/null \
+             || ! jq -e . android/app/google-services.json > /dev/null 2>&1; then
+            rm -f android/app/google-services.json
+            echo "::error title=Secret Firebase invalide::GOOGLE_SERVICES_JSON_BASE64 n'est pas un fichier JSON encodé en base64."
+            exit 1
+          fi
+          echo "Firebase : google-services.json reconstruit."
+
       - name: Construire l'APK release
         run: >
           flutter build apk --release
