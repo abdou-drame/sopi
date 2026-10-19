@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { L } from '../../i18n/libelles'
 import Bouton from './Bouton'
 import Squelette from './Squelette'
+import SopiLogo from './SopiLogo'
 
 export interface LigneCarteSopi {
   libelle: string
@@ -23,13 +24,9 @@ interface Props {
   delai?: number
 }
 
-/** Logo rond « S » (décoratif : le mot « Sopi » est écrit à côté). */
+/** Logo Sopi (décoratif : le mot « Sopi » est écrit à côté). */
 function LogoRond() {
-  return (
-    <span aria-hidden="true" className="grid size-9 place-items-center rounded-full bg-white text-base font-extrabold text-[#1f4f95]">
-      S
-    </span>
-  )
+  return <SopiLogo taille={36} decoratif />
 }
 
 /**

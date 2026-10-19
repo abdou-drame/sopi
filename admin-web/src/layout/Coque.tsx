@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthContext'
 import { L } from '../i18n/libelles'
 import { HoteEnTete } from './EnTeteLarge'
 import { MENU } from './menu'
+import SopiLogo from '../components/ui/SopiLogo'
 
 const ENTREES = MENU.flatMap((g) => g.entrees)
 /** Raccourcis de la barre du haut : les écrans les plus consultés. */
@@ -21,9 +22,7 @@ const VERRE = 'verre sombre:border sombre:border-white/15 sombre:backdrop-blur-x
 function Logo() {
   return (
     <Link to="/" className="flex shrink-0 items-center gap-3 rounded-gelule pr-2" aria-label={L.marque}>
-      <span aria-hidden="true" className="grid size-10 place-items-center rounded-full bg-primaire-600 text-lg font-bold text-white shadow-bouton">
-        S
-      </span>
+      <SopiLogo taille={40} className="shadow-bouton" decoratif />
       <span aria-hidden="true" className="hidden text-lg font-bold text-primaire-800 sm:block">
         {L.marque}
       </span>
