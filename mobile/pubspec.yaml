@@ -78,6 +78,7 @@ flutter:
   assets:
     - assets/wave.png
     - assets/orange_money.png
+    - assets/logo/sopi_icon_1024.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
