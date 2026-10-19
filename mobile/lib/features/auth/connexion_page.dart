@@ -11,6 +11,7 @@ import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
 import '../../core/widgets/compte_a_rebours.dart';
+import '../../core/widgets/sopi_logo.dart';
 import '../../core/widgets/decompte.dart';
 import '../../core/widgets/en_tete_degrade.dart';
 import '../inscription_prestataire/stockage_jeton_suivi.dart';
@@ -239,23 +240,7 @@ class _EnteteConnexion extends StatelessWidget {
                     delai: DescenteDepuisLeHaut.duree,
                     child: Row(
                       children: [
-                        Container(
-                          width: 52,
-                          height: 52,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: CouleursSopi.bleu,
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: Text(
-                            'S',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w800,
-                              color: CouleursSopi.blanc,
-                            ),
-                          ),
-                        ),
+                        const SopiLogo(taille: 52),
                         const SizedBox(width: 12),
                         Text(
                           'Sopi',

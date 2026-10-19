@@ -7,6 +7,7 @@ import '../../core/animation/apparition.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/widgets/sopi_logo.dart';
 import '../../core/widgets/en_tete_degrade.dart';
 import 'widgets/mise_en_page_acces.dart';
 
@@ -114,30 +115,7 @@ class _EnteteOrientation extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.bleu,
-                        borderRadius: BorderRadius.circular(17),
-                        boxShadow: [
-                          BoxShadow(
-                            color: CouleursSopi.bleu.withValues(alpha: 0.35),
-                            blurRadius: 22,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        'S',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: CouleursSopi.blanc,
-                        ),
-                      ),
-                    ),
+                    const SopiLogo(taille: 48, ombre: true),
                     const SizedBox(width: 12),
                     Text(
                       'Sopi',
