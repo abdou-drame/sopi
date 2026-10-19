@@ -125,6 +125,45 @@ describe('envoi', function () {
         expect(Http::recorded(fn ($r) => str_contains($r->url(), 'oauth2.test')))->toHaveCount(1);
     });
 
+    it('transmet type et identifiants de l\'objet en chaînes, sans pouvoir écraser le type', function (TypeNotification $type, array $donnees, array $attendu) {
+        configurerFcm();
+        fauxFcm([Http::response(['name' => 'm1'])]);
+        $user = utilisateurAvecAppareils(['jeton-appareil-000000000001']);
+        $n = notificationPush($user);
+        $n->type = $type;
+        $n->donnees = $donnees;
+        $n->save();
+
+        app(NotificationService::class)->envoyer($n);
+
+        $envois = Http::recorded(fn ($requete) => str_contains($requete->url(), 'messages:send'));
+        $data = $envois->first()[0]->data()['message']['data'];
+        expect($data)->toBe([...$attendu, 'type' => $type->value, 'notificationId' => (string) $n->id]);
+        foreach ($data as $valeur) {
+            expect($valeur)->toBeString();
+        }
+    })->with([
+        'réservation demandée' => [TypeNotification::ReservationNouvelleDemande, ['reservationId' => 'r-1'], ['reservationId' => 'r-1']],
+        'réservation acceptée' => [TypeNotification::ReservationAcceptee, ['reservationId' => 'r-2'], ['reservationId' => 'r-2']],
+        'réservation confirmée' => [TypeNotification::ReservationConfirmee, ['reservationId' => 'r-3'], ['reservationId' => 'r-3']],
+        'prestation terminée' => [TypeNotification::ReservationTerminee, ['reservationId' => 'r-4'], ['reservationId' => 'r-4']],
+        'avis reçu' => [TypeNotification::AvisRecu, ['avisId' => 'a-1', 'reservationId' => 'r-5'], ['avisId' => 'a-1', 'reservationId' => 'r-5']],
+        'litige ouvert' => [TypeNotification::LitigeOuvert, ['litigeId' => 'l-1', 'reservationId' => 'r-6'], ['litigeId' => 'l-1', 'reservationId' => 'r-6']],
+        'valeurs non texte et type usurpé' => [TypeNotification::SanctionPosee, ['sanctionId' => 42, 'urgent' => true, 'liste' => ['x'], 'type' => 'pirate'], ['sanctionId' => '42', 'urgent' => '1']],
+    ]);
+
+    it('une erreur de FCM ne fait jamais échouer l\'envoi côté métier : la notification reste en attente', function () {
+        configurerFcm();
+        fauxFcm([Http::response(['error' => ['status' => 'INTERNAL']], 500)]);
+        $user = utilisateurAvecAppareils(['jeton-appareil-000000000001']);
+        $n = notificationPush($user);
+
+        app(NotificationService::class)->envoyer($n);
+
+        expect($n->refresh()->canal_push_statut)->toBe(StatutEnvoi::EnAttente)
+            ->and(Appareil::query()->count())->toBe(1);
+    });
+
     it('supprime un jeton refusé comme invalide et garde les autres', function (int $statut, array $corps) {
         configurerFcm();
         fauxFcm([Http::response($corps, $statut), Http::response(['name' => 'ok'])]);
