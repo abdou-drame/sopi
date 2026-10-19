@@ -41,7 +41,7 @@ class FcmEnvoiPush implements EnvoiPush
                     $jeton,
                     $notification->titre,
                     Str::limit($notification->corps, self::LONGUEUR_MAX_CORPS),
-                    ['type' => $notification->type->value, 'notificationId' => $notification->id],
+                    $this->donnees($notification),
                 );
             } catch (FcmErreur $e) {
                 $echec = $e;
@@ -64,5 +64,23 @@ class FcmEnvoiPush implements EnvoiPush
         if ($echec !== null && $envoyes === 0) {
             throw $echec;
         }
+    }
+
+    /**
+     * Données du message : FCM n'accepte que des chaînes. Le type et l'identifiant de la notification sont toujours présents ;
+     * les identifiants de l'objet concerné (reservationId, litigeId, avisId, sanctionId) permettent à l'app d'ouvrir le bon écran.
+     *
+     * @return array<string, string>
+     */
+    private function donnees(Notification $notification): array
+    {
+        $donnees = [];
+        foreach ((array) $notification->donnees as $cle => $valeur) {
+            if (is_scalar($valeur)) {
+                $donnees[(string) $cle] = (string) $valeur;
+            }
+        }
+
+        return [...$donnees, 'type' => $notification->type->value, 'notificationId' => (string) $notification->id];
     }
 }
