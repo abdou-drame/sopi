@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/widgets/sopi_logo.dart';
 import 'etat_api.dart';
 
 class AccueilPage extends ConsumerWidget {
@@ -11,7 +12,12 @@ class AccueilPage extends ConsumerWidget {
     final etat = ref.watch(etatApiProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Sopi')),
+      appBar: AppBar(
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [SopiLogo(taille: 28), SizedBox(width: 10), Text('Sopi')],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Card(
