@@ -61,6 +61,8 @@ dev_dependencies:
 
   # Tests d'intégration (test/integration/) : signature HMAC du faux webhook de paiement local.
   crypto: ^3.0.7
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -102,3 +104,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Icône de l'application (Android seulement : le projet n'a pas de dossier ios/).
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/logo/sopi_icon_1024.png
+  adaptive_icon_background: "#1d4ed8"
+  adaptive_icon_foreground: assets/logo/sopi_foreground_1024.png
+  adaptive_icon_monochrome: assets/logo/sopi_monochrome_1024.png
