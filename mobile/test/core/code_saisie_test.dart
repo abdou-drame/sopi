@@ -48,6 +48,71 @@ void main() {
       expect(find.text('0'), findsNothing);
     });
 
+    testWidgets('frappe caractère par caractère : les 6 restent, envoi au 6e', (
+      tester,
+    ) async {
+      final recus = <String>[];
+      await tester.pumpWidget(
+        enrober(
+          CodeSaisie(onSubmit: (c) async => recus.add(c)),
+          sansAnimation: true,
+        ),
+      );
+      var saisi = '';
+      for (final c in 'bad222'.split('')) {
+        saisi += c;
+        await tester.enterText(find.byType(TextField), saisi);
+        await tester.pump();
+        if (saisi.length < longueurCode) expect(recus, isEmpty);
+      }
+      expect(recus, ['BAD222']);
+    });
+
+    testWidgets('les 6 d\'un coup, en majuscules', (tester) async {
+      final recus = <String>[];
+      await tester.pumpWidget(
+        enrober(
+          CodeSaisie(onSubmit: (c) async => recus.add(c)),
+          sansAnimation: true,
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'BAD222');
+      await tester.pump();
+      expect(recus, ['BAD222']);
+    });
+
+    testWidgets('minuscules : mises en majuscules, 6 caractères conservés', (
+      tester,
+    ) async {
+      final recus = <String>[];
+      await tester.pumpWidget(
+        enrober(
+          CodeSaisie(onSubmit: (c) async => recus.add(c)),
+          sansAnimation: true,
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'zzkqpt');
+      await tester.pump();
+      expect(recus, ['ZZKQPT']);
+    });
+
+    testWidgets('« BAD111 » : les « 1 » sont hors alphabet, seuls B, A, D restent', (
+      tester,
+    ) async {
+      final recus = <String>[];
+      await tester.pumpWidget(
+        enrober(
+          CodeSaisie(onSubmit: (c) async => recus.add(c)),
+          sansAnimation: true,
+        ),
+      );
+      await tester.enterText(find.byType(TextField), 'BAD111');
+      await tester.pump();
+      expect(find.text('B'), findsOneWidget);
+      expect(find.text('D'), findsOneWidget);
+      expect(recus, isEmpty);
+    });
+
     testWidgets('un code collé est nettoyé et tronqué, puis envoyé', (
       tester,
     ) async {
