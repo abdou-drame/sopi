@@ -43,6 +43,7 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
   }, [enPause, retour.id, onFin])
   return (
     <div
+      role={retour.type === 'erreur' ? 'alert' : 'status'}
       onMouseEnter={() => setEnPause(true)}
       onMouseLeave={() => setEnPause(false)}
       onFocus={() => setEnPause(true)}
