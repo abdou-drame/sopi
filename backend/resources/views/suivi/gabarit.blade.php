@@ -10,7 +10,8 @@
         * { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; padding: 16px; background: #eff6ff; color: #0f172a; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
         main { width: 100%; max-width: 520px; margin: 24px auto; padding: 28px 24px; background: #ffffff; border-top: 6px solid #1d4ed8; border-radius: 12px; box-shadow: 0 4px 16px rgba(29, 78, 216, 0.12); }
-        .marque { margin: 0 0 16px; color: #1d4ed8; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; }
+        .marque { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: #1d4ed8; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; }
+        .logo { width: 32px; height: 32px; border-radius: 8px; }
         h1 { margin: 0 0 4px; color: #1d4ed8; font-size: 1.4rem; overflow-wrap: anywhere; }
         h2 { margin: 24px 0 8px; font-size: 1rem; color: #1e293b; }
         p { margin: 0; line-height: 1.5; }
@@ -31,7 +32,7 @@
 </head>
 <body>
     <main>
-        <p class="marque">SOPI</p>
+        <p class="marque"><img src="/logo/sopi_icon_rounded_96.png" alt="" width="32" height="32" class="logo"> Sopi</p>
         @yield('contenu')
     </main>
 </body>

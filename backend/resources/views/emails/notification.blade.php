@@ -9,7 +9,7 @@
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef4ff;padding:24px 12px;">
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px;overflow:hidden;">
-<tr><td style="background:#1d4ed8;color:#ffffff;padding:20px 24px;font-size:22px;font-weight:bold;">Sopi</td></tr>
+<tr><td style="background:#1d4ed8;color:#ffffff;padding:20px 24px;font-size:22px;font-weight:bold;"><img src="{{ rtrim(config('app.url'), '/') }}/logo/sopi_icon_rounded_96.png" alt="Sopi" width="48" height="48" style="display:inline-block;vertical-align:middle;border:0;width:48px;height:48px;margin-right:12px;"><span style="vertical-align:middle;">Sopi</span></td></tr>
 <tr><td style="padding:24px;">
 <p style="margin:0 0 12px;font-size:16px;">Bonjour {{ $prenom }},</p>
 <p style="margin:0 0 16px;font-size:14px;color:#475569;">{{ $accroche }}</p>

@@ -6,6 +6,7 @@ import { ApiError, erreursParChamp } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import Bouton from '../components/ui/Bouton'
 import { IconeCadenas, IconeOeil, IconeTelephone } from '../components/ui/Icones'
+import SopiLogo from '../components/ui/SopiLogo'
 import { L } from '../i18n/libelles'
 
 type ChampConnexionProps = {
@@ -148,9 +149,7 @@ function Apercus() {
 function Marque() {
   return (
     <span className="flex items-center gap-2.5">
-      <span aria-hidden="true" className="grid size-8 place-items-center rounded-petit bg-primaire-700 text-sm font-bold text-white">
-        S
-      </span>
+      <SopiLogo taille={32} decoratif />
       <span className="text-lg font-semibold text-primaire-800">{L.marque}</span>
     </span>
   )
@@ -267,7 +266,7 @@ export default function ConnexionPage() {
             <Apercus />
           </div>
           <div className="relative flex flex-col items-center gap-3 px-12 pb-8 text-center">
-            <span className="grid size-14 place-items-center rounded-grand bg-white/15 text-2xl font-bold shadow-eleve backdrop-blur-sm">S</span>
+            <SopiLogo taille={56} className="shadow-eleve" decoratif />
             <h2 className="text-2xl font-semibold">{L.connexion.accrocheTitre}</h2>
             <p className="max-w-md text-sm text-primaire-100">{L.connexion.accrocheTexte}</p>
             <div className="mt-3 flex w-full gap-2">

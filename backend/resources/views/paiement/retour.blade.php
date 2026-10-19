@@ -28,14 +28,15 @@
             box-shadow: 0 4px 16px rgba(29, 78, 216, 0.12);
             text-align: center;
         }
-        .marque { margin: 0 0 16px; color: #1d4ed8; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; }
+        .marque { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: #1d4ed8; font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em; }
+        .logo { width: 32px; height: 32px; border-radius: 8px; }
         h1 { margin: 0 0 12px; color: #1d4ed8; font-size: 1.5rem; }
         p { margin: 0; line-height: 1.5; }
     </style>
 </head>
 <body>
     <main>
-        <p class="marque">SOPI</p>
+        <p class="marque"><img src="/logo/sopi_icon_rounded_96.png" alt="" width="32" height="32" class="logo"> Sopi</p>
         <h1>{{ $titre }}</h1>
         <p>{{ $message }}</p>
     </main>
