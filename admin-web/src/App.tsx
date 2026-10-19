@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
+import { AlertesProvider } from './components/ui/Alertes'
 import { AuthProvider } from './auth/AuthContext'
 import Routage from './Routage'
 import { ThemeProvider } from './theme/ThemeContext'
@@ -15,9 +16,11 @@ export default function App() {
     <ThemeProvider>
       <QueryClientProvider client={client}>
         <BrowserRouter>
-          <AuthProvider>
+          <AlertesProvider>
+<AuthProvider>
             <Routage />
           </AuthProvider>
+</AlertesProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </ThemeProvider>

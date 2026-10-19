@@ -6,7 +6,7 @@ import { api } from '../api/endpoints'
 import type { Metier } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import { Champ } from '../components/ui/Champs'
@@ -132,7 +132,7 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
 
 export default function MetiersPage() {
   const requete = useQuery({ queryKey: ['metiers'], queryFn: api.metiers })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   const colonnes: Colonne<Metier>[] = [
     { cle: 'nom', titre: T.nom, rendu: (m) => <span className="font-semibold text-texte">{m.libelle}</span> },
     { cle: 'code', titre: T.code, rendu: (m) => <span className="text-texte-doux">{m.code}</span> },
@@ -144,8 +144,8 @@ export default function MetiersPage() {
       alignement: 'droite',
       rendu: (m) => (
         <div className="flex flex-wrap justify-end gap-2">
-          <ActionRenommer metier={m} onFait={setMessage} />
-          <ActionActivation metier={m} onFait={setMessage} />
+          <ActionRenommer metier={m} onFait={retour.succes} />
+          <ActionActivation metier={m} onFait={retour.succes} />
         </div>
       ),
     },
@@ -153,8 +153,7 @@ export default function MetiersPage() {
   return (
     <div className="flex flex-col gap-6">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      {message && <BanniereAlerte gravite="info" titre={message} />}
-      <FormulaireAjout onFait={setMessage} />
+      <FormulaireAjout onFait={retour.succes} />
       <Tableau
         legende={T.legende}
         colonnes={colonnes}

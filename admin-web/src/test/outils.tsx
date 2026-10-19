@@ -3,6 +3,7 @@ import { render } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { vi } from 'vitest'
 import { creerClientRequetes } from '../App'
+import { AlertesProvider } from '../components/ui/Alertes'
 import { AuthProvider } from '../auth/AuthContext'
 import Routage from '../Routage'
 import { ThemeProvider } from '../theme/ThemeContext'
@@ -68,10 +69,12 @@ export function afficherApplication(adresse = '/') {
     <ThemeProvider>
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[adresse]}>
-        <AuthProvider>
+        <AlertesProvider>
+<AuthProvider>
           <Routage />
           <AfficheLieu />
         </AuthProvider>
+</AlertesProvider>
       </MemoryRouter>
     </QueryClientProvider>
     </ThemeProvider>,

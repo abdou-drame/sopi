@@ -4,7 +4,7 @@ import { api } from '../api/endpoints'
 import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import EnTetePage from '../components/ui/EnTetePage'
 import FiltresListe from '../components/ui/FiltresListe'
@@ -60,7 +60,7 @@ export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFa
 
 export default function SanctionsListePage() {
   const etat = useFiltresUrl(['actives', 'type', 'utilisateur', 'echeanceDansHeures'], { actives: 'true' })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   const colonnes: Colonne<SanctionListe>[] = [
     {
       cle: 'utilisateur',
@@ -88,13 +88,12 @@ export default function SanctionsListePage() {
       cle: 'action',
       titre: T.actionsColonne,
       alignement: 'droite',
-      rendu: (s) => (s.active ? <BoutonLever id={s.id} nom={`${s.utilisateur.prenom} ${s.utilisateur.nom}`} onFait={setMessage} /> : null),
+      rendu: (s) => (s.active ? <BoutonLever id={s.id} nom={`${s.utilisateur.prenom} ${s.utilisateur.nom}`} onFait={retour.succes} /> : null),
     },
   ]
   return (
     <div className="flex flex-col gap-6">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      {message && <BanniereAlerte gravite="info" titre={message} />}
       <FiltresListe
         legende={T.filtres}
         etat={etat}

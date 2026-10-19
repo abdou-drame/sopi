@@ -6,7 +6,7 @@ import { api } from '../api/endpoints'
 import type { TypeSanction, UtilisateurDetail, UtilisateurListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
+import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
@@ -179,7 +179,7 @@ function HistoriqueSanctions({ id, onFait }: { id: string; onFait: (message: str
 export function UtilisateurDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['utilisateur', id], queryFn: () => api.utilisateur(id) })
-  const [message, setMessage] = useState<string | null>(null)
+  const retour = useRetours()
   return (
     <PageDetail
       requete={requete}
@@ -187,13 +187,12 @@ export function UtilisateurDetailPage() {
       titre={(u) => `${u.prenom} ${u.nom}`}
       sousTitre={(u) => `${L.roles[u.role] ?? u.role} · ${T.creeLe.toLowerCase()} ${formatDate(u.dateCreation)}`}
       badge={(u) => <BadgeStatut statut={u.statut} />}
-      actions={(u) => (u.sanctionActive ? null : <ActionSanctionner utilisateur={u} onFait={setMessage} />)}
+      actions={(u) => (u.sanctionActive ? null : <ActionSanctionner utilisateur={u} onFait={retour.succes} />)}
     >
       {(u) => {
         const p = u.prestataire
         return (
           <>
-            {message && <BanniereAlerte gravite="info" titre={message} />}
             <div className="grid gap-5 lg:grid-cols-2">
               <Carte titre={T.compte}>
                 <Definitions
@@ -255,7 +254,7 @@ export function UtilisateurDetailPage() {
             )}
 
             <Carte titre={T.historique}>
-              <HistoriqueSanctions id={u.id} onFait={setMessage} />
+              <HistoriqueSanctions id={u.id} onFait={retour.succes} />
             </Carte>
           </>
         )
