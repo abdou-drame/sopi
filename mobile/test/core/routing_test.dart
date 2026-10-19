@@ -31,19 +31,20 @@ void main() {
     });
 
     test(
-      'non connecté : routes publiques libres, le reste renvoie à la connexion',
+      "non connecté : routes publiques libres, le reste renvoie à l'orientation",
       () {
         const s = NonConnecte();
         expect(redirectionSopi(s, Chemins.connexion), isNull);
         expect(redirectionSopi(s, Chemins.inscription), isNull);
         expect(redirectionSopi(s, Chemins.motDePasseOublie), isNull);
-        expect(redirectionSopi(s, Chemins.accueil), Chemins.connexion);
-        expect(redirectionSopi(s, Chemins.tableau), Chemins.connexion);
+        expect(redirectionSopi(s, Chemins.orientation), isNull);
+        expect(redirectionSopi(s, Chemins.accueil), Chemins.orientation);
+        expect(redirectionSopi(s, Chemins.tableau), Chemins.orientation);
         expect(
           redirectionSopi(s, Chemins.detailReservation('abc')),
-          Chemins.connexion,
+          Chemins.orientation,
         );
-        expect(redirectionSopi(s, Chemins.demarrage), Chemins.connexion);
+        expect(redirectionSopi(s, Chemins.demarrage), Chemins.orientation);
       },
     );
 
@@ -54,7 +55,7 @@ void main() {
           redirectionSopi(const SessionInconnue(), '/'),
           Chemins.demarrage,
         );
-        expect(redirectionSopi(const NonConnecte(), '/'), Chemins.connexion);
+        expect(redirectionSopi(const NonConnecte(), '/'), Chemins.orientation);
         expect(redirectionSopi(const Connecte(_client), '/'), Chemins.accueil);
         expect(
           redirectionSopi(const Connecte(_prestataire), '/'),
@@ -126,10 +127,10 @@ void main() {
     String chemin(WidgetTester tester) =>
         GoRouter.of(tester.element(find.byType(Scaffold).first)).state.uri.path;
 
-    testWidgets('sans jeton : écran de connexion', (tester) async {
+    testWidgets("sans jeton : écran d'orientation", (tester) async {
       await lancer(tester, AdaptateurSimule({}));
       expect(find.text('Se connecter'), findsOneWidget);
-      expect(chemin(tester), Chemins.connexion);
+      expect(chemin(tester), Chemins.orientation);
     });
 
     testWidgets('client : coque Accueil / Rechercher / Réservations / Profil', (
@@ -187,7 +188,7 @@ void main() {
       // Confirmation demandée avant la déconnexion.
       await tester.tap(find.text('Se déconnecter').last);
       await tester.pumpAndSettle();
-      expect(chemin(tester), Chemins.connexion);
+      expect(chemin(tester), Chemins.orientation);
     });
 
     testWidgets('un 403 à la connexion affiche l\'écran « compte restreint »', (
@@ -200,11 +201,17 @@ void main() {
         }),
       });
       await lancer(tester, serveur);
-      await tester.enterText(find.byType(TextField).first, 'awa@exemple.sn');
-      await tester.enterText(find.byType(TextField).last, 'secret');
       await tester.ensureVisible(find.text('Se connecter'));
       await tester.pump();
       await tester.tap(find.text('Se connecter'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'awa@exemple.sn');
+      await tester.enterText(find.byType(TextField).last, 'secret');
+      await tester.ensureVisible(
+        find.widgetWithText(FilledButton, 'Se connecter'),
+      );
+      await tester.pump();
+      await tester.tap(find.widgetWithText(FilledButton, 'Se connecter'));
       await tester.pumpAndSettle();
       expect(chemin(tester), Chemins.compteRestreint);
       expect(find.textContaining('suspendu'), findsOneWidget);

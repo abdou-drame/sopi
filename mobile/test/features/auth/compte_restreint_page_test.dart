@@ -111,13 +111,11 @@ void main() {
       expect(urls.single.toString(), 'mailto:support@exemple.test');
     });
 
-    testWidgets('« Se déconnecter » revient à la connexion', (tester) async {
+    testWidgets("« Se déconnecter » revient à l'orientation", (tester) async {
       await _arriver(tester, {'message': 'Votre compte est suspendu.'});
       await toucher(tester, find.text('Se déconnecter'));
       await passerTransition(tester);
-      expect(cheminCourant(tester), Chemins.connexion);
-      expect(find.text('Heureux de'), findsNothing);
-      expect(find.textContaining('vous revoir'), findsOneWidget);
+      expect(cheminCourant(tester), Chemins.orientation);
     });
 
     testWidgets('petit écran : défile sans débordement', (tester) async {

@@ -162,7 +162,7 @@ void main() {
         expect(suppression, isNonNegative);
         expect(suppression, lessThan(appels.indexOf('POST /auth/deconnexion')));
         expect(faux.jetonsOublies, 1);
-        expect(cheminCourant(tester), Chemins.connexion);
+        expect(cheminCourant(tester), Chemins.orientation);
       },
     );
 

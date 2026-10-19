@@ -96,22 +96,23 @@ void main() {
       expect(recus, ['ZZKQPT']);
     });
 
-    testWidgets('« BAD111 » : les « 1 » sont hors alphabet, seuls B, A, D restent', (
-      tester,
-    ) async {
-      final recus = <String>[];
-      await tester.pumpWidget(
-        enrober(
-          CodeSaisie(onSubmit: (c) async => recus.add(c)),
-          sansAnimation: true,
-        ),
-      );
-      await tester.enterText(find.byType(TextField), 'BAD111');
-      await tester.pump();
-      expect(find.text('B'), findsOneWidget);
-      expect(find.text('D'), findsOneWidget);
-      expect(recus, isEmpty);
-    });
+    testWidgets(
+      '« BAD111 » : les « 1 » sont hors alphabet, seuls B, A, D restent',
+      (tester) async {
+        final recus = <String>[];
+        await tester.pumpWidget(
+          enrober(
+            CodeSaisie(onSubmit: (c) async => recus.add(c)),
+            sansAnimation: true,
+          ),
+        );
+        await tester.enterText(find.byType(TextField), 'BAD111');
+        await tester.pump();
+        expect(find.text('B'), findsOneWidget);
+        expect(find.text('D'), findsOneWidget);
+        expect(recus, isEmpty);
+      },
+    );
 
     testWidgets('un code collé est nettoyé et tronqué, puis envoyé', (
       tester,

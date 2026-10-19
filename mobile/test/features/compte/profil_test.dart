@@ -111,7 +111,7 @@ void main() {
       expect(cheminCourant(tester), Chemins.profil);
     });
 
-    testWidgets('déconnexion confirmée : retour à la connexion', (
+    testWidgets("déconnexion confirmée : retour à l'orientation", (
       tester,
     ) async {
       final (serveur, _) = await _ouvrir(tester, Chemins.profil);
@@ -120,7 +120,7 @@ void main() {
       await tester.tap(find.text('Se déconnecter').last);
       await passerTransition(tester);
       expect(_appels(serveur, 'POST', '/auth/deconnexion'), hasLength(1));
-      expect(cheminCourant(tester), Chemins.connexion);
+      expect(cheminCourant(tester), Chemins.orientation);
     });
   });
 

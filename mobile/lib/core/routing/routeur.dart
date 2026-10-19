@@ -7,6 +7,7 @@ import '../../features/auth/compte_restreint_page.dart';
 import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
+import '../../features/auth/orientation_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/compte/aide_page.dart';
 import '../../features/compte/changer_mot_de_passe_page.dart';
@@ -71,10 +72,10 @@ String? redirectionSopi(
       return chemin == cible ? null : cible;
     case NonConnecte():
       if (Chemins.publiques.contains(chemin)) {
-        // Le démarrage n'est qu'un passage : une fois la session connue, on va à la connexion.
-        return chemin == Chemins.demarrage ? Chemins.connexion : null;
+        // Le démarrage n'est qu'un passage : une fois la session connue, on va à l'orientation.
+        return chemin == Chemins.demarrage ? Chemins.orientation : null;
       }
-      return Chemins.connexion;
+      return Chemins.orientation;
     case Connecte(:final utilisateur):
       final estPrestataire = utilisateur.role == RoleSopi.prestataire;
       final accueil = estPrestataire ? Chemins.tableau : Chemins.accueil;
@@ -153,6 +154,10 @@ GoRouter creerRouteur({
       GoRoute(path: Chemins.etatApi, builder: (_, _) => const AccueilPage()),
 
       // — Authentification
+      GoRoute(
+        path: Chemins.orientation,
+        builder: (_, _) => const OrientationPage(),
+      ),
       GoRoute(
         path: Chemins.connexion,
         builder: (_, _) => const ConnexionPage(),

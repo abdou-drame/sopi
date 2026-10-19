@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sopi/core/api/stockage_jeton.dart';
 import 'package:sopi/core/config/support.dart';
+import 'package:sopi/core/routing/chemins.dart';
 import 'package:sopi/core/routing/routeur.dart';
 import 'package:sopi/core/theme/theme_sopi.dart';
 import 'package:sopi/features/inscription_prestataire/stockage_jeton_suivi.dart';
@@ -48,6 +49,7 @@ Future<ProviderContainer> lancerAcces(
   StockageJetonSuiviMemoire? stockageSuivi,
   List<Override> surcharges = const [],
   GlobalKey<ScaffoldMessengerState>? messagerie,
+  bool depuisOrientation = false,
 }) async {
   final conteneur = ProviderContainer(
     overrides: <Override>[
@@ -91,6 +93,8 @@ Future<ProviderContainer> lancerAcces(
   );
   await tester.pump();
   await tester.pump();
+  // Sans session, l'application arrive sur l'orientation ; la plupart des tests visent la connexion.
+  chemin ??= jeton == null && !depuisOrientation ? Chemins.connexion : null;
   if (chemin != null) {
     GoRouter.of(tester.element(find.byType(Scaffold).first)).go(chemin);
   }
