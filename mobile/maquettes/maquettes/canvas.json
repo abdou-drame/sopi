@@ -10,6 +10,13 @@
   },
   "pages": [],
   "boards": {
+    "Orientation.dc.html": {
+      "x": -470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Commun · Orientation (1er lancement)"
+    },
     "Connexion.dc.html": {
       "x": 0,
       "y": 0,
@@ -390,6 +397,7 @@
     }
   },
   "order": [
+    "Orientation.dc.html",
     "Main.dc.html",
     "Connexion.dc.html",
     "ConnexionBloquee.dc.html",
@@ -449,7 +457,7 @@
     "titre": {
       "x": 0,
       "y": -300,
-      "text": "Sopi · Application mobile — 54 écrans, client et prestataire",
+      "text": "Sopi · Application mobile — 55 écrans, client et prestataire",
       "kind": "title1",
       "maxW": 1800
     }
