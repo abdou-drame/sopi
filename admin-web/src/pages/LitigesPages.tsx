@@ -8,6 +8,7 @@ import type { CibleSanction, DecisionLitige, LitigeDetail } from '../api/typesAd
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
+import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
 import { Badge, BoutonExporter, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, Recherche, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
 import { IHorloge, IImage, IMessage } from '../design/icones'
@@ -31,6 +32,9 @@ const nomComplet = (p: { prenom: string; nom: string }) => `${p.prenom} ${p.nom}
 
 const TON_STATUT: Record<string, TonBadge> = { ouvert: 'danger', cloture: 'succes' }
 
+/** « Clôturé · rejet » quand la clôture est un rejet de la plainte, « Clôturé » pour toute autre décision. */
+const libelleStatut = (statut: string, decision: DecisionLitige | null) => (statut === 'cloture' && decision === 'rejet' ? T.clotureRejet : (L.statuts[statut] ?? statut))
+
 export function LitigesListePage() {
   const etat = useFiltresUrl(['statut'], { statut: 'ouvert' })
   const liste = useListe('litiges', api.litiges, etat)
@@ -42,7 +46,7 @@ export function LitigesListePage() {
   }
   return (
     <div className="flex flex-col gap-4">
-      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis remboursez l'acompte ou rejetez la demande.">
+      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement.">
         <BoutonExporter />
       </TitrePage>
       <CarteMq className="flex flex-col gap-3.5">
@@ -91,7 +95,7 @@ export function LitigesListePage() {
                     </td>
                     <td>{formatDate(l.dateCreation)}</td>
                     <td>
-                      <Badge ton={l.statut === 'cloture' && l.decision === 'rejet' ? 'neutre' : (TON_STATUT[l.statut] ?? 'neutre')}>{L.statuts[l.statut] ?? l.statut}</Badge>
+                      <Badge ton={l.statut === 'cloture' && l.decision === 'rejet' ? 'neutre' : (TON_STATUT[l.statut] ?? 'neutre')}>{libelleStatut(l.statut, l.decision)}</Badge>
                     </td>
                   </LigneLien>
                 )
@@ -158,16 +162,10 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
     <>
       <button
         type="button"
-        onClick={() => {
-          setDecision('rejet')
-          setOuverte(true)
-        }}
-        className="mq-btn-blanc h-12 cursor-pointer rounded-3xl border-none bg-white px-[22px] text-[13px] font-bold text-[#12172b]"
+        onClick={() => setOuverte(true)}
+        className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]"
       >
-        Rejeter le litige
-      </button>
-      <button type="button" disabled className="mq-btn-bleu h-12 rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
-        Rembourser l'acompte
+        {T.trancher}
       </button>
       <ModaleConfirmation
         ouverte={ouverte}
@@ -249,6 +247,17 @@ export function LitigeDetailPage() {
         const acompte = l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)
         const depuis = Math.max(0, (maintenant - new Date(l.dateCreation).getTime()) / 60000)
         const ouvert = l.statut === 'ouvert'
+        const reponse = l.reponsePrestataire
+          ? `Réponse du prestataire${l.reponseLe ? ` le ${formatDate(l.reponseLe)}` : ''} : « ${l.reponsePrestataire} »`
+          : 'Aucune réponse écrite du prestataire pour le moment'
+        const cloture =
+          [
+            l.clotureLe ? formatDate(l.clotureLe) : null,
+            l.decision ? (T.decisionsCourt[l.decision] ?? l.decision) : null,
+            l.motifDecision ? `« ${l.motifDecision} »` : null,
+          ]
+            .filter(Boolean)
+            .join(' · ') || ABSENT
         const nomPrestataire = l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)
         return (
           <>
@@ -259,7 +268,7 @@ export function LitigeDetailPage() {
               suite={ABSENT}
               badge={
                 <Badge ton={ouvert ? 'danger' : l.decision === 'rejet' ? 'neutre' : 'succes'} gras>
-                  {L.statuts[l.statut] ?? l.statut}
+                  {libelleStatut(l.statut, l.decision)}
                 </Badge>
               }
               infos={`Ouvert le ${formatDate(l.dateCreation)} à ${heureDe(l.dateCreation)}${ouvert ? ` · sans décision depuis ${dureeMinutes(depuis)}` : ''}`}
@@ -284,22 +293,28 @@ export function LitigeDetailPage() {
                         derniere
                         couleur="#cdd9fb"
                         titre="En attente d'une décision"
-                        detail={l.reponsePrestataire ? `Réponse écrite du prestataire le ${formatDate(l.reponseLe ?? l.dateCreation)}` : 'Aucune réponse écrite du prestataire pour le moment'}
+                        detail={reponse}
                       />
                     ) : (
-                      <EtapeChrono grand derniere couleur="#1d4ed8" titre="Litige clôturé" detail={l.clotureLe ? formatDate(l.clotureLe) : ABSENT} />
+                      <EtapeChrono grand derniere couleur="#1d4ed8" titre="Litige clôturé" detail={cloture} />
                     )}
                   </div>
                 </CarteMq>
                 <CarteMq>
-                  <EnteteCarte icone={<IImage taille={18} trait={1.9} />} titre="Photos de fin de prestation" sousTitre="Envoyées par le prestataire" />
+                  <EnteteCarte icone={<IImage taille={18} trait={1.9} />} titre="Preuves jointes" sousTitre="Envoyées par le client" />
                   <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
-                    {[1, 2].map((n) => (
-                      <div key={n} className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-[22px] bg-[#e7edff] text-xs font-semibold text-[#6b84c9]">
-                        <IImage taille={24} />
-                        Photo {n} · {ABSENT}
-                      </div>
-                    ))}
+                    {l.preuves.length > 0
+                      ? l.preuves.map((preuve, i) => (
+                          <div key={preuve.id} className="flex h-[150px] items-center justify-center overflow-hidden rounded-[22px] bg-[#e7edff]">
+                            <FichierProtege chemin={cheminApi(preuve.url)} alt={`Preuve ${i + 1} du client`} className="h-[150px] w-full rounded-[22px]!" />
+                          </div>
+                        ))
+                      : [1, 2].map((n) => (
+                          <div key={n} className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-[22px] bg-[#e7edff] text-xs font-semibold text-[#6b84c9]">
+                            <IImage taille={24} />
+                            Photo {n} · {ABSENT}
+                          </div>
+                        ))}
                   </div>
                 </CarteMq>
               </div>

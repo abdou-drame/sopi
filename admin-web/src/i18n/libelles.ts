@@ -129,6 +129,7 @@ export const L = {
     statut: 'Statut',
     ouverts: 'Ouverts',
     clotures: 'Clôturés',
+    clotureRejet: 'Clôturé · rejet',
     tous: 'Tous',
     vide: 'Aucun litige ne correspond.',
     ouvertLe: 'Ouvert le',

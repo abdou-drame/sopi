@@ -46,7 +46,7 @@ const routesDetail = {
 }
 
 async function ouvrirModaleTrancher() {
-  await userEvent.click(await screen.findByRole('button', { name: 'Rejeter le litige' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Trancher le litige' }))
   return screen.getByRole('dialog')
 }
 
@@ -72,7 +72,7 @@ describe('litiges', () => {
   })
 
   it('affiche le détail : motif, chronologie, acompte, réservation et personnes concernées', async () => {
-    const { appels } = simulerApi(routesDetail)
+    simulerApi(routesDetail)
     afficherApplication(`/litiges/${ID}`)
     expect(await screen.findByRole('heading', { level: 1, name: /Litige/ })).toBeInTheDocument()
     expect(screen.getByText(/Le prestataire ne s’est pas présenté/)).toBeInTheDocument()
@@ -82,9 +82,29 @@ describe('litiges', () => {
     expect(screen.getByText(/4.500/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir le profil du client' })).toHaveAttribute('href', '/utilisateurs/c-1')
     expect(screen.getByRole('link', { name: 'Voir le profil du prestataire' })).toHaveAttribute('href', '/utilisateurs/p-1')
-    expect(screen.getByRole('button', { name: 'Rembourser l\'acompte' })).toBeDisabled()
-    // Les emplacements photo des maquettes ne chargent aucune preuve.
-    expect(appels.some((a) => a.chemin.includes('/preuves/'))).toBe(false)
+    expect(screen.getByRole('button', { name: 'Trancher le litige' })).toBeEnabled()
+    expect(screen.queryByRole('button', { name: /Rembourser/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
+  })
+
+  it('charge les preuves du client avec le jeton dans les emplacements dessinés', async () => {
+    const { appels } = simulerApi(routesDetail)
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByRole('button', { name: /Preuve 1 du client/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Preuve 2 du client/ })).toBeInTheDocument()
+    const preuves = appels.filter((a) => a.chemin.includes('/preuves/'))
+    expect(preuves.map((a) => a.chemin).sort()).toEqual([`/admin/litiges/${ID}/preuves/pr-1`, `/admin/litiges/${ID}/preuves/pr-2`])
+    expect(preuves.every((a) => a.methode === 'GET')).toBe(true)
+  })
+
+  it('affiche le texte de la réponse du prestataire dans la chronologie', async () => {
+    simulerApi({
+      ...routesDetail,
+      [`GET /admin/litiges/${ID}`]: { corps: { ...DETAIL, reponsePrestataire: 'J’étais sur place à l’heure.', reponseLe: '2030-01-16T08:00:00+00:00' } },
+    })
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByText(/J’étais sur place à l’heure./)).toBeInTheDocument()
+    expect(screen.queryByText('Aucune réponse écrite du prestataire pour le moment')).not.toBeInTheDocument()
   })
 
   it('rejette la plainte : décision et motif obligatoires, corps conforme à l’API', async () => {
@@ -92,7 +112,7 @@ describe('litiges', () => {
     afficherApplication(`/litiges/${ID}`)
     const modale = await ouvrirModaleTrancher()
     const confirmer = within(modale).getByRole('button', { name: 'Trancher le litige' })
-    expect(confirmer).toBeEnabled()
+    expect(confirmer).toBeDisabled() // le rejet est une décision à choisir dans la modale, pas une action séparée
 
     await userEvent.selectOptions(within(modale).getByLabelText('Décision'), 'rejet')
     expect(confirmer).toBeEnabled()
@@ -164,7 +184,9 @@ describe('litiges', () => {
     })
     afficherApplication(`/litiges/${ID}`)
     expect(await screen.findByText('Litige clôturé')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Clôturé · rejet').length).toBeGreaterThan(0)
+    expect(screen.getByText(/Plainte rejetée/)).toHaveTextContent('« Signalement non fondé. »')
+    expect(screen.queryByRole('button', { name: 'Trancher le litige' })).not.toBeInTheDocument()
   })
 
   it('affiche « introuvable » pour un litige inconnu', async () => {
