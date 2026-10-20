@@ -6,9 +6,9 @@ import { api } from '../api/endpoints'
 import type { AvisAdmin } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
+import Filtres from '../design/Filtres'
 import Fenetre from '../design/Fenetre'
-import { Badge, Carte as CarteMq, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
-import { IDocument } from '../design/icones'
+import { Badge, Carte as CarteMq, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate } from '../lib/format'
@@ -157,10 +157,6 @@ function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useR
       </div>
       <Etoiles note={a.note} />
       <p className="m-0 text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">{a.commentaire ? `« ${a.commentaire} »` : '—'}</p>
-      <div className="flex items-center gap-2 text-xs text-[#6b7287]">
-        <IDocument taille={14} trait={2} />
-        Réservation — · —
-      </div>
       <div className="mt-0.5 flex flex-wrap gap-2">
         {!a.masque && <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
         <Link
@@ -194,21 +190,26 @@ export default function AvisListePage() {
     <div className="flex flex-col gap-4">
       <TitrePage titre="Avis" suite="des clients" sousTitre="Consultez les avis publiés et masquez ceux qui enfreignent les règles." />
       <CarteMq className="flex flex-col gap-3.5">
-        <div className="flex flex-wrap items-center gap-3">
-          <Onglets
-            libelle={T.vue}
-            onglets={OPTIONS_VUE.map((o) => ({
-              cle: o.valeur,
-              libelle: o.libelle,
-              compteur: compteurs[o.valeur] ?? '—',
-              actif: etat.valeurs.vue === o.valeur,
-              onSelect: () => etat.definir({ vue: o.valeur }),
-            }))}
-          />
-          <div className="flex-1" />
-          <Recherche valeur="" onChange={() => {}} placeholder="Rechercher dans les avis" libelle="Rechercher dans les avis" />
-        </div>
-        <div className="grid grid-cols-2 gap-4" aria-label={T.legende}>
+        <Filtres
+          etat={etat}
+          avant={
+            <Onglets
+              libelle={T.vue}
+              onglets={OPTIONS_VUE.map((o) => ({
+                cle: o.valeur,
+                libelle: o.libelle,
+                compteur: compteurs[o.valeur] ?? '—',
+                actif: etat.valeurs.vue === o.valeur,
+                onSelect: () => etat.definir({ vue: o.valeur }),
+              }))}
+            />
+          }
+          filtres={[
+            { cle: 'note', type: 'select', label: T.note, options: OPTIONS_NOTE },
+            { cle: 'prestataire', type: 'recherche', label: T.prestataire, placeholder: T.prestataire },
+          ]}
+        />
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4" aria-label={T.legende}>
           {liste.lignes.map((a) => (
             <CarteAvis key={a.id} a={a} retour={retour} />
           ))}
