@@ -11,8 +11,8 @@ interface CommunProps {
 }
 
 const classeChamp = (erreur?: string) =>
-  `w-full rounded-gelule border bg-fond px-4 py-2.5 text-sm text-texte placeholder:text-texte-discret transition-colors duration-[var(--duree-rapide)] focus:bg-surface disabled:text-texte-discret ${
-    erreur ? 'border-erreur' : 'border-transparent hover:border-primaire-200'
+  `w-full min-h-12 rounded-gelule border-[1.5px] bg-fond px-[18px] py-3 text-sm text-texte placeholder:text-texte-discret transition-[border-color,background-color,box-shadow] duration-[var(--duree-rapide)] focus:bg-surface focus:outline-none focus:shadow-[0_0_0_4px_rgb(29_78_216/0.12)] disabled:text-texte-discret ${
+    erreur ? 'border-erreur bg-surface' : 'border-transparent focus:border-primaire-600'
   }`
 
 function Enveloppe({
@@ -24,7 +24,7 @@ function Enveloppe({
 }: CommunProps & { id: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-texte">
+      <label htmlFor={id} className="pl-1 text-[13px] font-semibold text-texte">
         {label}
       </label>
       {children}
@@ -34,7 +34,7 @@ function Enveloppe({
         </p>
       )}
       {erreur && (
-        <p id={`${id}-erreur`} role="alert" className="text-xs font-medium text-erreur-texte">
+        <p id={`${id}-erreur`} role="alert" className="pl-[18px] text-xs font-medium text-erreur-texte">
           {erreur}
         </p>
       )}
