@@ -6,7 +6,7 @@ import { api } from '../api/endpoints'
 import type { AvisAdmin } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import { Badge, Carte as CarteMq, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
 import { IDocument } from '../design/icones'
 import { EtatsListe, useListe } from '../design/useListe'
@@ -90,7 +90,7 @@ export function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode
       >
         {mode === 'masquer' ? "Masquer l'avis" : textes.bouton}
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={textes.titre}
         description={textes.texte}

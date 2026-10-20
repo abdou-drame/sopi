@@ -7,7 +7,7 @@ import type { DemandeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import FichierProtege from '../components/ui/FichierProtege'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import {
   Avatar,
   Badge,
@@ -163,7 +163,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
       <button type="button" onClick={() => setModale('accepter')} className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
         Valider le dossier
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={modale === 'accepter'}
         titre={T.accepterTitre}
         description={T.accepterTexte}
@@ -180,7 +180,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
           })
         }
       />
-      <ModaleConfirmation
+      <Fenetre
         ouverte={modale === 'refuser'}
         titre={T.refuserTitre}
         description={T.refuserTexte}

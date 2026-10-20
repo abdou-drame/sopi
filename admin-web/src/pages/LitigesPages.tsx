@@ -9,7 +9,7 @@ import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import { Badge, BoutonExporter, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, Recherche, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
 import { IHorloge, IImage, IMessage } from '../design/icones'
 import PageDetailMq from '../design/PageDetailMq'
@@ -167,7 +167,7 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
       >
         {T.trancher}
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={T.trancherTitre}
         description={T.trancherTexte}

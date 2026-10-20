@@ -11,7 +11,7 @@ import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import Definitions from '../components/ui/Definitions'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import PageDetail from '../components/ui/PageDetail'
 import { L } from '../i18n/libelles'
 import { aujourdhui, formatDate, formatDateHeure, formatMontant } from '../lib/format'
@@ -153,7 +153,7 @@ function ActionSanctionner({ utilisateur, onFait }: { utilisateur: UtilisateurDe
       <Bouton variante="danger" onClick={() => setOuverte(true)}>
         {T.poserSanction}
       </Bouton>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={T.poserTitre}
         description={T.poserTexte}

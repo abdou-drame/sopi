@@ -8,7 +8,7 @@ import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import { Champ } from '../components/ui/Champs'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import Carte from '../components/ui/Carte'
 import { Badge, BoutonPlus, Carte as CarteMq, TitrePage } from '../design/composants'
 import { ICiseaux, IChemise, IMetiers } from '../design/icones'
@@ -71,7 +71,7 @@ function ActionRenommer({ metier, onFait }: { metier: Metier; onFait: (message: 
       >
         Modifier
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={T.renommerTitre}
         libelleConfirmer={T.enregistrer}
@@ -121,7 +121,7 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
       <button type="button" className={BOUTON_MQ} aria-label={textes.libelle} onClick={() => setOuverte(true)}>
         {textes.bouton}
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={textes.titre}
         description={textes.texte}

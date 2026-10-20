@@ -2,9 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { messageDErreur } from '../api/client'
 import type { Page } from '../api/types'
 import type { FiltresUrl } from '../lib/useFiltresUrl'
-import Bouton from '../components/ui/Bouton'
-import Squelette from '../components/ui/Squelette'
-import { L } from '../i18n/libelles'
+import { EtatChargement, EtatErreur, EtatVide } from './etats'
 
 /** Lignes montrées par page à l'écran. L'API en renvoie 20 : chaque page de l'API fournit deux pages de l'écran. */
 export const LIGNES_PAR_PAGE = 10
@@ -43,25 +41,10 @@ export function useListe<T>(cle: string, charger: (params: Record<string, string
   }
 }
 
-/** États vide, chargement et erreur d'une liste : composants existants, non redessinés (absents des maquettes). */
+/** États vide, chargement et erreur d'une liste (Etats.html), identiques sur toutes les pages. */
 export function EtatsListe({ chargement, erreur, vide, messageVide, onReessayer }: { chargement: boolean; erreur: string | null; vide: boolean; messageVide: string; onReessayer: () => void }) {
-  if (chargement)
-    return (
-      <div role="status" aria-label={L.commun.chargement} className="flex flex-col gap-2">
-        <Squelette className="h-14 w-full rounded-grand" />
-        <Squelette className="h-14 w-full rounded-grand" />
-        <Squelette className="h-14 w-full rounded-grand" />
-      </div>
-    )
-  if (erreur)
-    return (
-      <div role="alert" className="flex flex-col items-start gap-3 rounded-grand bg-erreur-fond p-5 text-erreur-texte">
-        <p className="text-sm font-medium">{erreur}</p>
-        <Bouton variante="secondaire" taille="p" onClick={onReessayer}>
-          {L.commun.reessayer}
-        </Bouton>
-      </div>
-    )
-  if (vide) return <p className="py-10 text-center text-sm text-[#8a90a2]">{messageVide}</p>
+  if (chargement) return <EtatChargement />
+  if (erreur) return <EtatErreur texte={erreur} onReessayer={onReessayer} />
+  if (vide) return <EtatVide texte={messageVide} />
   return null
 }

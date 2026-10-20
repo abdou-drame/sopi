@@ -235,3 +235,32 @@ html.maquette .fond-sopi {
 html.maquette body {
   background: #eceef2;
 }
+
+/* Champ de date : l'indicateur natif s'étend sur l'icône dessinée et reste cliquable */
+.mq-jour::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 48px;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Lignes animées de l'état de chargement (Etats.html) */
+@keyframes mq-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.mq-sk {
+  background: #eceef2;
+  animation: mq-pulse 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-sk {
+    animation: none;
+  }
+}

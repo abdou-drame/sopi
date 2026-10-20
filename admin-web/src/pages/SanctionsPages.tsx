@@ -7,7 +7,7 @@ import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import Fenetre from '../design/Fenetre'
 import { Avatar, Badge, BoutonPlus, Carte as CarteMq, DEGRADE_BLEU, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
@@ -52,7 +52,7 @@ export function BoutonLever({ id, nom, onFait, mq = false }: { id: string; nom: 
           {T.lever}
         </Bouton>
       )}
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={T.leverTitre}
         description={T.leverTexte}
