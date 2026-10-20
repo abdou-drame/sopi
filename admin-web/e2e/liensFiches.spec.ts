@@ -16,7 +16,6 @@ const LISTES = [
   { nom: 'utilisateurs', adresse: '/utilisateurs', cellule: 'Awa Diallo', fiche: '/utilisateurs/u-1' },
   { nom: 'reservations', adresse: '/reservations', cellule: 'Vidange', fiche: '/reservations/r-1' },
   { nom: 'litiges', adresse: '/litiges', cellule: 'Service non réalisé', fiche: '/litiges/l-1' },
-  { nom: 'avis', adresse: '/avis', cellule: 'Garage Exemple', fiche: '/reservations/r-1' },
   { nom: 'paiements', adresse: '/paiements', cellule: 'Paiement r-1'.replace('Paiement ', ''), fiche: '/paiements/pa-1' },
   { nom: 'retraits', adresse: '/retraits', cellule: 'Garage Exemple', fiche: '/retraits/re-1' },
   { nom: 'sanctions', adresse: '/sanctions', cellule: 'Awa Diallo', fiche: '/utilisateurs/u-1' },
@@ -60,6 +59,17 @@ for (const l of LISTES) {
     })
   })
 }
+
+test('avis : cartes (pas de ligne ni de bouton « Voir »), lien vers la réservation', async ({ page }) => {
+  await simulerApi(page)
+  await page.goto('/avis')
+  await expect(page.getByText('Retard important')).toBeVisible()
+  await expect(page.getByRole('link', { name: /^Voir le détail/ })).toHaveCount(0)
+  const lien = page.getByRole('link', { name: 'Voir la réservation' }).first()
+  await expect(lien).toHaveAttribute('href', '/reservations/r-1')
+  await lien.click()
+  await expect(page).toHaveURL(/\/reservations\/r-1$/)
+})
 
 test('métiers : pas de fiche, les actions restent dans la ligne', async ({ page }) => {
   await simulerApi(page)

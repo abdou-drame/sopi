@@ -58,7 +58,7 @@ function LigneAvecLien({ href, nom, style, children }: { href: string; nom: stri
           data-voir
           state={{ recherche: search }}
           aria-label={`${L.commun.voir} : ${nom}`}
-          className="inline-grid size-9 place-items-center rounded-full bg-fond text-texte transition-transform active:scale-[0.97] group-even:bg-surface after:absolute after:inset-0 after:z-0 after:content-[''] group-hover:bg-surface group-even:group-hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
+          className="inline-grid size-9 place-items-center rounded-full bg-fond text-texte group-even:bg-surface after:absolute after:inset-0 after:z-0 after:content-[''] group-hover:bg-surface group-even:group-hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
         >
           <IconeFleche width={14} height={14} aria-hidden="true" />
         </Link>
