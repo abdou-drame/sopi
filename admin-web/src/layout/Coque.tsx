@@ -187,8 +187,8 @@ export default function Coque() {
 
   // Jetons des maquettes (maquette.css) : actifs seulement dans la coque, la connexion reste inchangée.
   useEffect(() => {
-    document.documentElement.classList.add(maquette)
-    return () => document.documentElement.classList.remove(maquette)
+    document.documentElement.classList.add('maquette')
+    return () => document.documentElement.classList.remove('maquette')
   }, [])
 
   // Nouvelle page : on revient en haut de la zone défilante.
