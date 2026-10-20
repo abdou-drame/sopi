@@ -1,25 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { useParams } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
-import type { CibleSanction, DecisionLitige, LitigeDetail, PartieLitige } from '../api/typesAdmin'
+import type { CibleSanction, DecisionLitige, LitigeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
-import Bouton from '../components/ui/Bouton'
-import CarteStatutActuel from '../components/ui/CarteStatutActuel'
-import { IconeAvis, IconeDossier, IconeLitige, IconeSanction } from '../components/ui/Icones'
-import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
-import Definitions from '../components/ui/Definitions'
-import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import PageDetail from '../components/ui/PageDetail'
-import { Badge, BoutonExporter, Carte as CarteMq, LigneLien, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
+import { Badge, BoutonExporter, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, Recherche, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
+import { IHorloge, IImage, IMessage } from '../design/icones'
+import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
-import { L } from '../i18n/libelles'
-import { aujourdhui, formatDate, formatDateHeure, formatMontant } from '../lib/format'
+import { L, dureeMinutes } from '../i18n/libelles'
+import { aujourdhui, formatDate, formatHeureDuJour, formatMontant, formatNombre } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
 const T = L.litiges
@@ -161,7 +156,19 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
 
   return (
     <>
-      <Bouton onClick={() => setOuverte(true)}>{T.trancher}</Bouton>
+      <button
+        type="button"
+        onClick={() => {
+          setDecision('rejet')
+          setOuverte(true)
+        }}
+        className="mq-btn-blanc h-12 cursor-pointer rounded-3xl border-none bg-white px-[22px] text-[13px] font-bold text-[#12172b]"
+      >
+        Rejeter le litige
+      </button>
+      <button type="button" disabled className="mq-btn-bleu h-12 rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
+        Rembourser l'acompte
+      </button>
       <ModaleConfirmation
         ouverte={ouverte}
         titre={T.trancherTitre}
@@ -200,26 +207,33 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
   )
 }
 
-function Partie({ titre, partie, entreprise }: { titre: string; partie: PartieLitige; entreprise?: boolean }) {
-  const nom = entreprise && partie.nomEntreprise ? partie.nomEntreprise : nomComplet(partie)
-  const initiales = `${partie.prenom.charAt(0)}${partie.nom.charAt(0)}`.toUpperCase()
+const ABSENT = '—'
+const heureDe = (iso: string) => formatHeureDuJour(iso)
+
+/** Ligne « libellé / valeur » du bloc Réservation : une ligne sur deux grisée. */
+function LigneInfo({ libelle, children, grise }: { libelle: string; children: ReactNode; grise: boolean }) {
   return (
-    <li className="flex items-center gap-3 rounded-[22px] bg-fond px-3.5 py-3">
-      <span
-        aria-hidden="true"
-        className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${entreprise ? 'bg-[#fff0d4] text-[#983705]' : 'bg-[#dbeafe] text-[#1d4ed8]'}`}
-      >
+    <div className={`flex justify-between gap-3 rounded-2xl px-4 py-3 ${grise ? 'bg-[#f3f4f7]' : ''}`}>
+      <span className="font-medium text-[#6b7287]">{libelle}</span>
+      <span className="text-right font-semibold">{children}</span>
+    </div>
+  )
+}
+
+function Personne({ nom, role, couleur, lien, libelleLien }: { nom: string; role: string; couleur: string; lien: string; libelleLien: string }) {
+  const mots = nom.trim().split(/\s+/)
+  const initiales = ((mots[0]?.[0] ?? '') + (mots.length > 1 ? (mots[mots.length - 1][0] ?? '') : (mots[0]?.[1] ?? ''))).toUpperCase()
+  return (
+    <div className="flex items-center gap-3 rounded-[22px] bg-[#f3f4f7] px-3.5 py-3">
+      <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${couleur}`}>
         {initiales}
       </span>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold">{nom}</p>
-        <p className="mt-px text-xs text-texte-discret">{titre}</p>
-        <p className="flex flex-wrap gap-x-2 text-xs break-words text-texte-doux">
-          <span>{partie.telephone}</span>
-          <span>{partie.email}</span>
-        </p>
-      </div>
-    </li>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold">{nom}</span>
+        <span className="mt-px block text-xs text-[#8a90a2]">{role}</span>
+      </span>
+      <LienRond vers={lien} libelle={libelleLien} blanc />
+    </div>
   )
 }
 
@@ -227,105 +241,110 @@ export function LitigeDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['litige', id], queryFn: () => api.litige(id) })
   const retour = useRetours()
+  const [maintenant] = useState(() => Date.now())
   return (
-    <PageDetail
-      requete={requete}
-      retour={{ vers: '/litiges', libelle: T.retour }}
-      titre={(l) => l.motif}
-      sousTitre={(l) => `${l.reservation.prestation} · ${T.ouvertLe.toLowerCase()} ${formatDateHeure(l.dateCreation)}`}
-      badge={(l) => <BadgeStatut statut={l.statut} />}
-      actions={(l) => (l.statut === 'ouvert' ? <ActionTrancher litige={l} onFait={retour.succes} /> : null)}
-    >
-      {(l) => (
-        <div className="flex flex-wrap items-start gap-3.5">
-          <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
-            <Carte titre={T.description} icone={<IconeLitige width={18} height={18} />}>
-              <p className="rounded-[22px] bg-fond px-5 py-[18px] text-sm leading-[22px] whitespace-pre-line text-texte">{l.description}</p>
-            </Carte>
-            <Carte titre={T.reponse} icone={<IconeAvis width={18} height={18} />}>
-              {l.reponsePrestataire ? (
-                <>
-                  <p className="rounded-[22px] bg-fond px-5 py-[18px] text-sm leading-[22px] whitespace-pre-line text-texte">{l.reponsePrestataire}</p>
-                  {l.reponseLe && <p className="mt-2 text-xs text-texte-doux">{T.reponduLe(formatDateHeure(l.reponseLe))}</p>}
-                </>
-              ) : (
-                <p className="text-sm text-texte-doux">{T.aucuneReponse}</p>
-              )}
-            </Carte>
-            <Carte titre={T.preuves} icone={<IconeDossier width={18} height={18} />}>
-              {l.preuves.length === 0 ? (
-                <p className="text-sm text-texte-doux">{T.aucunePreuve}</p>
-              ) : (
-                <ul className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
-                  {l.preuves.map((p, i) => (
-                    <li key={p.id} className="grid place-items-center rounded-[22px] bg-primaire-100 p-3">
-                      <FichierProtege chemin={cheminApi(p.url)} alt={T.preuve(i + 1)} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Carte>
-            {l.decision && (
-              <Carte titre={T.decision} icone={<IconeSanction width={18} height={18} />}>
-                <Definitions
-                  elements={[
-                    { libelle: T.decisionDe, valeur: T.decisionsCourt[l.decision] ?? l.decision },
-                    { libelle: T.clotureLe, valeur: l.clotureLe ? formatDateHeure(l.clotureLe) : null },
-                    { libelle: T.motifDecision, valeur: l.motifDecision, large: true },
-                  ]}
-                />
-              </Carte>
-            )}
-          </div>
-
-          <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
-            <CarteStatutActuel
-              titre={T.paiements}
-              libelleStatut={T.acompte}
-              statut={l.paiements.length === 0 ? '—' : formatMontant(l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0))}
-              note={
-                l.paiements.length === 0 ? (
-                  T.aucunPaiement
-                ) : (
-                  <ul className="flex flex-col gap-1.5">
-                    {l.paiements.map((p) => (
-                      <li key={p.id} className="flex flex-wrap items-center justify-between gap-2">
-                        <span>
-                          {T.acompte} {formatMontant(p.montantAcompte)} · {T.commission.toLowerCase()} {formatMontant(p.commission)}
-                        </span>
-                        <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{L.statuts[p.statut] ?? p.statut}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )
+    <PageDetailMq requete={requete} retour="/litiges" libelleRetour="Retour aux litiges">
+      {(l) => {
+        const paiement = l.paiements[0]
+        const acompte = l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)
+        const depuis = Math.max(0, (maintenant - new Date(l.dateCreation).getTime()) / 60000)
+        const ouvert = l.statut === 'ouvert'
+        const nomPrestataire = l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)
+        return (
+          <>
+            <TitreDetail
+              retour="/litiges"
+              libelleRetour="Retour aux litiges"
+              titre="Litige"
+              suite={ABSENT}
+              badge={
+                <Badge ton={ouvert ? 'danger' : l.decision === 'rejet' ? 'neutre' : 'succes'} gras>
+                  {L.statuts[l.statut] ?? l.statut}
+                </Badge>
               }
-            />
-            <Carte titre={T.reservation}>
-              <Definitions
-                elements={[
-                  { libelle: T.prestation, valeur: l.reservation.prestation },
-                  { libelle: L.commun.statut, valeur: <BadgeStatut statut={l.reservation.statut} /> },
-                  { libelle: T.montantReservation, valeur: formatMontant(l.prixApplique) },
-                  {
-                    libelle: T.reservation,
-                    valeur: (
-                      <Link to={`/reservations/${l.reservation.id}`} className="font-semibold text-primaire-700 hover:underline">
-                        {T.voirReservation}
-                      </Link>
-                    ),
-                  },
-                ]}
-              />
-            </Carte>
-            <Carte titre={T.parties}>
-              <ul className="flex flex-col gap-2.5">
-                <Partie titre={T.client} partie={l.client} />
-                <Partie titre={T.prestataire} partie={l.prestataire} entreprise />
-              </ul>
-            </Carte>
-          </div>
-        </div>
-      )}
-    </PageDetail>
+              infos={`Ouvert le ${formatDate(l.dateCreation)} à ${heureDe(l.dateCreation)}${ouvert ? ` · sans décision depuis ${dureeMinutes(depuis)}` : ''}`}
+            >
+              {ouvert && <ActionTrancher litige={l} onFait={retour.succes} />}
+            </TitreDetail>
+            <div className="flex flex-wrap items-start gap-3.5">
+              <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
+                <CarteMq>
+                  <EnteteCarte icone={<IMessage />} titre="Motif du client" sousTitre={l.motif} />
+                  <p className="mt-[18px] mb-0 rounded-[22px] bg-[#f3f4f7] px-5 py-[18px] text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">« {l.description} »</p>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IHorloge />} titre="Chronologie" sousTitre="Du début de la réservation à aujourd'hui" />
+                  <div className="mt-5 flex flex-col">
+                    <EtapeChrono grand couleur="#1d4ed8" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
+                    <EtapeChrono grand couleur="#1d4ed8" titre="Prestation terminée par le prestataire" detail={ABSENT} />
+                    <EtapeChrono grand couleur="#e5484d" titre="Litige ouvert par le client" detail={`${formatDate(l.dateCreation)} · ${heureDe(l.dateCreation)}`} />
+                    {ouvert ? (
+                      <EtapeChrono
+                        grand
+                        derniere
+                        couleur="#cdd9fb"
+                        titre="En attente d'une décision"
+                        detail={l.reponsePrestataire ? `Réponse écrite du prestataire le ${formatDate(l.reponseLe ?? l.dateCreation)}` : 'Aucune réponse écrite du prestataire pour le moment'}
+                      />
+                    ) : (
+                      <EtapeChrono grand derniere couleur="#1d4ed8" titre="Litige clôturé" detail={l.clotureLe ? formatDate(l.clotureLe) : ABSENT} />
+                    )}
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IImage taille={18} trait={1.9} />} titre="Photos de fin de prestation" sousTitre="Envoyées par le prestataire" />
+                  <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+                    {[1, 2].map((n) => (
+                      <div key={n} className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-[22px] bg-[#e7edff] text-xs font-semibold text-[#6b84c9]">
+                        <IImage taille={24} />
+                        Photo {n} · {ABSENT}
+                      </div>
+                    ))}
+                  </div>
+                </CarteMq>
+              </div>
+              <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+                <CarteMq>
+                  <TitreCarte titre="Acompte concerné" sousTitre="Retenu en attendant la décision" />
+                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+                    <div className="text-xs font-semibold opacity-80">Montant de l'acompte</div>
+                    <div className="mt-1.5 flex items-baseline gap-2">
+                      <span className="text-[38px] leading-[44px] font-bold tracking-[-1px] tabular-nums">{acompte === null ? ABSENT : formatNombre(acompte)}</span>
+                      <span className="text-sm font-semibold opacity-85">FCFA</span>
+                    </div>
+                    <div className="mt-[18px] flex items-center justify-between text-xs">
+                      <span className="opacity-80">Réservation {ABSENT}</span>
+                      <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{paiement ? (L.statuts[paiement.statut] ?? paiement.statut) : ABSENT}</span>
+                    </div>
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <TitreCarte titre="Réservation" />
+                  <div className="mt-3.5 flex flex-col gap-1 text-[13px]">
+                    <LigneInfo libelle="Service" grise>
+                      {l.reservation.prestation}
+                    </LigneInfo>
+                    <LigneInfo libelle="Métier" grise={false}>
+                      {ABSENT}
+                    </LigneInfo>
+                    <LigneInfo libelle="Date prévue" grise>{`${formatDate(l.reservation.dateDebut)} · ${heureDe(l.reservation.dateDebut)}`}</LigneInfo>
+                    <LigneInfo libelle="Quartier" grise={false}>
+                      {ABSENT}
+                    </LigneInfo>
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <TitreCarte titre="Personnes concernées" />
+                  <div className="mt-3.5 flex flex-col gap-2.5">
+                    <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-[#dbeafe] text-[#1d4ed8]" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
+                    <Personne nom={nomPrestataire} role={`Prestataire · note ${ABSENT}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
+                  </div>
+                </CarteMq>
+              </div>
+            </div>
+          </>
+        )
+      }}
+    </PageDetailMq>
   )
 }
