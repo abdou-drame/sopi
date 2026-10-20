@@ -185,6 +185,12 @@ export default function Coque() {
   const [hote, setHote] = useState<HTMLElement | null>(null)
   const defilement = useRef<HTMLDivElement>(null)
 
+  // Jetons des maquettes (maquette.css) : actifs seulement dans la coque, la connexion reste inchangée.
+  useEffect(() => {
+    document.documentElement.classList.add(maquette)
+    return () => document.documentElement.classList.remove(maquette)
+  }, [])
+
   // Nouvelle page : on revient en haut de la zone défilante.
   useEffect(() => {
     defilement.current?.scrollTo?.({ top: 0 })
