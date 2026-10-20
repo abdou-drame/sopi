@@ -65,7 +65,7 @@ export const LISTES: Record<string, { api: string; ligne: Record<string, unknown
     ligne: {
       id: 'l-1', statut: 'ouvert', motif: 'Service non réalisé', description: 'Le garage n’est pas venu.', dateCreation: '2030-01-18T10:00:00+00:00',
       reservation: { id: 'r-1', statut: 'confirmee', dateDebut: '2030-01-16T09:00:00+00:00', prestation: 'Vidange' }, nombrePreuves: 0,
-      reponsePrestataire: null, reponseLe: null, decision: null, motifDecision: null, clotureLe: null,
+      reponsePrestataire: null, reponseLe: null, decision: null, motifDecision: null, clotureLe: null, paiements: [],
       client: { id: 'u-1', nom: 'Diallo', prenom: 'Awa', telephone: '+22177***67', email: null },
       prestataire: { id: 'u-2', nom: 'Sy', prenom: 'Ibou', telephone: '+22177***01', email: null, nomEntreprise: 'Garage Exemple' },
     },
