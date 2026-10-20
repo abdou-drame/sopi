@@ -98,20 +98,18 @@ export default function SanctionsListePage() {
       </TitrePage>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
         <CarteMq>
-          <div className="text-[13px] leading-normal font-medium text-[#8a90a2]">Sanctions actives</div>
+          <div className="text-[13px] leading-[normal] font-medium text-[#8a90a2]">Sanctions actives</div>
           <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">{comptes.true ?? '—'}</div>
         </CarteMq>
         <CarteMq>
-          <div className="text-[13px] leading-normal font-medium text-[#8a90a2]">Prestataires suspendus</div>
+          <div className="text-[13px] leading-[normal] font-medium text-[#8a90a2]">Prestataires suspendus</div>
           <div className="mt-2 flex items-baseline gap-2.5">
             <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{tableau?.sanctions.suspensionsEnCours ?? '—'}</span>
-            <Badge ton="danger" gras>
-              Hors ligne
-            </Badge>
+            <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] leading-[normal] font-bold text-[#b0161b]">Hors ligne</span>
           </div>
         </CarteMq>
         <CarteMq className="text-white" style={{ background: DEGRADE_BLEU }}>
-          <div className="text-[13px] leading-normal font-medium opacity-80">Levées ce mois-ci</div>
+          <div className="text-[13px] leading-[normal] font-medium opacity-80">Levées ce mois-ci</div>
           <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">—</div>
         </CarteMq>
       </div>

@@ -160,6 +160,18 @@ describe('tableau de bord', () => {
     for (const metier of ['Mécanique', 'Coiffure', 'Pressing']) expect(await screen.findByText(metier)).toBeInTheDocument()
   })
 
+  it('branche la pastille « +N » des prestataires actifs sur le total de la pagination', async () => {
+    const { appels } = simulerApi({
+      ...toutes,
+      'GET /admin/utilisateurs': { corps: { data: [PRESTATAIRE], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 14 } } },
+    })
+    afficherApplication('/')
+    expect(await screen.findByText('+13')).toBeInTheDocument()
+    const appel = appels.find((x) => x.chemin === '/admin/utilisateurs')
+    expect(appel?.recherche.get('role')).toBe('prestataire')
+    expect(appel?.recherche.get('statut')).toBe('actif')
+  })
+
   it('n’invente aucune donnée absente de l’API : graphique des réservations par mois en « — »', async () => {
     simulerApi(toutes)
     afficherApplication('/')

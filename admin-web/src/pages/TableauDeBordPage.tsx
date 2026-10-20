@@ -93,7 +93,7 @@ function CarteReservations() {
   const [annuel, setAnnuel] = useState(true)
   const mois = derniersMois()
   return (
-    <section className="box-border flex min-w-0 flex-[2_1_560px] flex-col rounded-[32px] bg-white p-[18px]">
+    <section className="box-border flex min-h-[435px] min-w-0 flex-[2_1_560px] flex-col rounded-[32px] bg-white p-[18px]">
       <div className="flex flex-wrap items-center gap-3.5">
         <span className="grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
           <IGraphique />
@@ -180,11 +180,11 @@ function CarteMetiers() {
   const metiers = (data?.data ?? []).filter((m) => m.actif).slice(0, 3)
   return (
     <Carte>
-      <div className="text-[15px] font-bold">Revenus par métier</div>
-      <div className="mt-0.5 text-xs text-[#8a90a2]">Commissions Sopi, 30 derniers jours</div>
+      <div className="text-[15px] leading-[normal] font-bold">Revenus par métier</div>
+      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Commissions Sopi, 30 derniers jours</div>
       {metiers.map((m, i) => (
         <div key={m.id} className="mt-3">
-          <div className="flex justify-between text-xs">
+          <div className="flex justify-between text-xs leading-[normal]">
             <span className="font-semibold">{m.libelle}</span>
             <span className="text-[#6b7287] tabular-nums">{ABSENT}</span>
           </div>

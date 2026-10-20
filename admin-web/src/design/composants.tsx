@@ -13,7 +13,7 @@ export function TitrePage({ titre, suite, sousTitre, children }: { titre: string
           {titre}
           {suite && <> <span className="font-normal text-[#9aa0b2]">{suite}</span></>}
         </h1>
-        {sousTitre && <p className="mt-1.5 mb-0 text-sm text-[#8a90a2]">{sousTitre}</p>}
+        {sousTitre && <p className="mt-1.5 mb-0 text-sm leading-[normal] text-[#8a90a2]">{sousTitre}</p>}
       </div>
       {children}
     </div>
@@ -342,8 +342,8 @@ export function EtapeChrono({
 export function Tuile({ libelle, children, className = '' }: { libelle: string; children: ReactNode; className?: string }) {
   return (
     <div className={`rounded-[20px] bg-[#f3f4f7] px-[18px] py-3.5 ${className}`}>
-      <div className="text-xs text-[#8a90a2]">{libelle}</div>
-      <div className="mt-[3px] text-sm font-semibold">{children}</div>
+      <div className="text-xs leading-[normal] text-[#8a90a2]">{libelle}</div>
+      <div className="mt-[3px] text-sm leading-[normal] font-semibold">{children}</div>
     </div>
   )
 }
