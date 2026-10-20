@@ -127,7 +127,7 @@ describe('écrans de consultation', () => {
     expect(await screen.findByText('+22177***01')).toBeInTheDocument()
     const tableau = screen.getByRole('table')
     expect(within(tableau).getByText('Bloqué')).toBeInTheDocument()
-    expect(within(tableau).getByRole('link', { name: 'Garage Exemple' })).toHaveAttribute('href', '/retraits/re-1')
+    expect(within(tableau).getByRole('link', { name: 'Voir le détail du retrait de Garage Exemple' })).toHaveAttribute('href', '/retraits/re-1')
     expect(appels.find((a) => a.chemin === '/admin/retraits')?.recherche.get('bloques')).toBe('true')
   })
 

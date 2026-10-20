@@ -290,20 +290,22 @@ export function LienRond({ vers, libelle, blanc = false }: { vers: string; libel
  * Ligne de tableau dont toute la surface mène à la fiche : le lien rond ↗ étire une zone invisible sur la ligne
  * (clic, clic molette, Ctrl/Cmd+clic et clavier sont ceux d'un lien natif). Les autres liens et boutons de la ligne restent au-dessus.
  */
-export function LigneLien({ vers, libelle, children }: { vers: string; libelle: string; children: ReactNode }) {
+export function LigneLien({ vers, libelle, texte, children }: { vers: string; libelle: string; texte?: string; children: ReactNode }) {
   const { search } = useLocation()
   return (
     <tr className="relative cursor-pointer focus-within:bg-[#f6f7fa] [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10">
       {children}
-      <td>
+      <td style={texte ? { textAlign: 'right' } : undefined}>
         <Link
           to={vers}
           data-voir
           state={{ recherche: search }}
           aria-label={libelle}
-          className="mq-rond mq-lr inline-flex size-9 items-center justify-center rounded-full bg-[#f3f4f7] text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8]"
+          className={`mq-rond mq-lr inline-flex items-center justify-center bg-[#f3f4f7] text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8] ${
+            texte ? 'h-[34px] rounded-[17px] px-3.5 text-xs font-bold' : 'size-9 rounded-full'
+          }`}
         >
-          <IFlecheHautDroite />
+          {texte ?? <IFlecheHautDroite />}
         </Link>
       </td>
     </tr>
