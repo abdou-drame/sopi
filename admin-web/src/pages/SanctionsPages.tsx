@@ -6,7 +6,6 @@ import { api } from '../api/endpoints'
 import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
-import Bouton from '../components/ui/Bouton'
 import Fenetre from '../design/Fenetre'
 import { Avatar, Badge, BoutonPlus, Carte as CarteMq, DEGRADE_BLEU, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
 import { EtatsListe, useListe } from '../design/useListe'
@@ -29,7 +28,7 @@ export function etatSanction(s: { active: boolean; leveeLe: string | null }): { 
 }
 
 /** Bouton « Lever » avec sa confirmation (action irréversible : la sanction ne peut pas être reposée telle quelle). */
-export function BoutonLever({ id, nom, onFait, mq = false }: { id: string; nom: string; onFait: (message: string) => void; mq?: boolean }) {
+export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFait: (message: string) => void }) {
   const [ouverte, setOuverte] = useState(false)
   const lever = useAction(() => api.leverSanction(id))
   const fermer = () => {
@@ -38,20 +37,14 @@ export function BoutonLever({ id, nom, onFait, mq = false }: { id: string; nom: 
   }
   return (
     <>
-      {mq ? (
-        <button
-          type="button"
-          aria-label={T.leverLibelle(nom)}
-          onClick={() => setOuverte(true)}
-          className="mq-btn-gris h-[34px] cursor-pointer rounded-[17px] border-none bg-[#f3f4f7] px-3.5 text-xs font-bold text-[#12172b]"
-        >
-          {T.lever}
-        </button>
-      ) : (
-        <Bouton variante="secondaire" taille="p" aria-label={T.leverLibelle(nom)} onClick={() => setOuverte(true)}>
-          {T.lever}
-        </Bouton>
-      )}
+      <button
+        type="button"
+        aria-label={T.leverLibelle(nom)}
+        onClick={() => setOuverte(true)}
+        className="mq-btn-gris h-[34px] cursor-pointer rounded-[17px] border-none bg-[#f3f4f7] px-3.5 text-xs font-bold text-[#12172b]"
+      >
+        {T.lever}
+      </button>
       <Fenetre
         ouverte={ouverte}
         titre={T.leverTitre}
@@ -161,7 +154,7 @@ export default function SanctionsListePage() {
                     </td>
                     <td>
                       {s.active ? (
-                        <BoutonLever mq id={s.id} nom={nom} onFait={retour.succes} />
+                        <BoutonLever id={s.id} nom={nom} onFait={retour.succes} />
                       ) : (
                         <span className="text-xs text-[#9aa0b2]">{T.etatTerminee}</span>
                       )}
