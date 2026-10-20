@@ -7,10 +7,10 @@ import { api } from '../api/endpoints'
 import type { CibleSanction, DecisionLitige, LitigeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
-import { ChampDate, Selecteur } from '../components/ui/Champs'
 import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
+import { ChampJour, ChampSelect } from '../design/champs'
 import Fenetre from '../design/Fenetre'
-import { Badge, BoutonExporter, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, Recherche, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
+import { Badge, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
 import { IHorloge, IImage, IMessage } from '../design/icones'
 import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
@@ -46,9 +46,7 @@ export function LitigesListePage() {
   }
   return (
     <div className="flex flex-col gap-4">
-      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement.">
-        <BoutonExporter />
-      </TitrePage>
+      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement." />
       <CarteMq className="flex flex-col gap-3.5">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
@@ -61,8 +59,6 @@ export function LitigesListePage() {
               onSelect: () => etat.definir({ statut: o.valeur }),
             }))}
           />
-          <div className="flex-1" />
-          <Recherche valeur="" onChange={() => {}} placeholder="Rechercher un litige" libelle="Rechercher un litige" />
         </div>
         <div className="overflow-x-auto">
           <table className="mq-table min-w-[860px]" aria-label={T.legende}>
@@ -136,14 +132,14 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
 
   const champs = (
     <>
-      <Selecteur
+      <ChampSelect
         label={T.decisionChamp}
         value={decision}
         onChange={(e) => setDecision(e.target.value as DecisionLitige | '')}
         options={[{ valeur: '', libelle: T.choisir }, ...Object.entries(T.decisions).map(([valeur, libelle]) => ({ valeur, libelle }))]}
       />
       {sanction && (
-        <Selecteur
+        <ChampSelect
           label={T.cible}
           value={cible}
           onChange={(e) => setCible(e.target.value as CibleSanction | '')}
@@ -154,7 +150,7 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
           ]}
         />
       )}
-      {suspension && <ChampDate label={T.dateFin} value={dateFin} onChange={setDateFin} min={aujourdhui()} />}
+      {suspension && <ChampJour label={T.dateFin} value={dateFin} onChange={(e) => setDateFin(e.target.value)} min={aujourdhui()} />}
     </>
   )
 
