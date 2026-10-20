@@ -1,19 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { FormEvent, ReactNode } from 'react'
 import { erreursParChamp, messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { Metier } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
-import Carte from '../components/ui/Carte'
 import { Champ } from '../components/ui/Champs'
-import EnTetePage from '../components/ui/EnTetePage'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import Tableau from '../components/ui/Tableau'
-import type { Colonne } from '../components/ui/Tableau'
+import Carte from '../components/ui/Carte'
+import { Badge, BoutonPlus, Carte as CarteMq, TitrePage } from '../design/composants'
+import { ICiseaux, IChemise, IMetiers } from '../design/icones'
+import { EtatsListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatNombre } from '../lib/format'
 
@@ -48,6 +47,8 @@ function FormulaireAjout({ onFait }: { onFait: (message: string) => void }) {
   )
 }
 
+const BOUTON_MQ = 'mq-btn-gris h-11 min-w-0 flex-1 cursor-pointer rounded-[22px] border-none bg-[#f3f4f7] px-3 text-[13px] font-bold text-[#12172b]'
+
 function ActionRenommer({ metier, onFait }: { metier: Metier; onFait: (message: string) => void }) {
   const [ouverte, setOuverte] = useState(false)
   const [libelle, setLibelle] = useState(metier.libelle)
@@ -59,17 +60,17 @@ function ActionRenommer({ metier, onFait }: { metier: Metier; onFait: (message: 
   const propre = libelle.trim()
   return (
     <>
-      <Bouton
-        variante="secondaire"
-        taille="p"
+      <button
+        type="button"
+        className={BOUTON_MQ}
         aria-label={T.renommerLibelle(metier.libelle)}
         onClick={() => {
           setLibelle(metier.libelle)
           setOuverte(true)
         }}
       >
-        {T.renommer}
-      </Bouton>
+        Modifier
+      </button>
       <ModaleConfirmation
         ouverte={ouverte}
         titre={T.renommerTitre}
@@ -101,13 +102,25 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
     action.reset()
   }
   const textes = desactiver
-    ? { bouton: T.desactiver, libelle: T.desactiverLibelle(metier.libelle), titre: T.desactiverTitre, texte: T.desactiverTexte, fait: T.desactiverFait }
-    : { bouton: T.reactiver, libelle: T.reactiverLibelle(metier.libelle), titre: T.reactiverTitre, texte: T.reactiverTexte, fait: T.reactiverFait }
+    ? {
+        bouton: T.desactiver,
+        libelle: T.desactiverLibelle(metier.libelle),
+        titre: T.desactiverTitre,
+        texte: T.desactiverTexte,
+        fait: T.desactiverFait,
+      }
+    : {
+        bouton: T.reactiver,
+        libelle: T.reactiverLibelle(metier.libelle),
+        titre: T.reactiverTitre,
+        texte: T.reactiverTexte,
+        fait: T.reactiverFait,
+      }
   return (
     <>
-      <Bouton variante={desactiver ? 'danger' : 'secondaire'} taille="p" aria-label={textes.libelle} onClick={() => setOuverte(true)}>
+      <button type="button" className={BOUTON_MQ} aria-label={textes.libelle} onClick={() => setOuverte(true)}>
         {textes.bouton}
-      </Bouton>
+      </button>
       <ModaleConfirmation
         ouverte={ouverte}
         titre={textes.titre}
@@ -130,70 +143,92 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
   )
 }
 
-const COULEURS_PASTILLE = ['bg-[#e7edff] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#d7f7e4] text-[#0e6245]', 'bg-[#fff0d4] text-[#983705]']
+/** Pastille d'icône des maquettes : clé (Mécanique), ciseaux (Coiffure), chemise (Pressing) ; autre métier : son initiale. */
+const PASTILLES: Record<string, { fond: string; icone: ReactNode }> = {
+  mecanique: {
+    fond: 'bg-[#e7edff] text-[#1d4ed8]',
+    icone: <IMetiers taille={24} trait={1.8} />,
+  },
+  coiffure: {
+    fond: 'bg-[#fde7f3] text-[#a3206b]',
+    icone: <ICiseaux taille={24} trait={1.8} />,
+  },
+  pressing: {
+    fond: 'bg-[#d7f7e4] text-[#0e6245]',
+    icone: <IChemise taille={24} trait={1.8} />,
+  },
+}
 
-/** Carte d'un métier : pastille à l'initiale, état, nombre de prestataires et actions. */
-function CarteMetier({ m, onFait }: { m: Metier; onFait: (message: string) => void }) {
-  const couleur = COULEURS_PASTILLE[m.libelle.length % COULEURS_PASTILLE.length]
+const cle = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+
+function TuileChiffre({ libelle, valeur }: { libelle: string; valeur: string }) {
   return (
-    <section aria-label={m.libelle} className="flex flex-col gap-[18px] rounded-[26px] bg-fond p-5">
+    <div className="rounded-[20px] bg-[#f3f4f7] px-4 py-3.5">
+      <div className="text-xs text-[#8a90a2]">{libelle}</div>
+      <div className="mt-0.5 text-[22px] font-bold tabular-nums">{valeur}</div>
+    </div>
+  )
+}
+
+/** Carte d'un métier : pastille d'icône, nom, état, tuiles Prestataires / Réservations, actions. */
+function CarteMetier({ m, onFait }: { m: Metier; onFait: (message: string) => void }) {
+  const pastille = PASTILLES[cle(m.code)] ??
+    PASTILLES[cle(m.libelle)] ?? {
+      fond: 'bg-[#fff0d4] text-[#983705]',
+      icone: <span className="text-xl font-bold">{m.libelle.charAt(0).toUpperCase()}</span>,
+    }
+  return (
+    <CarteMq aria-label={m.libelle} className="flex flex-col gap-[18px]">
       <div className="flex items-center gap-3.5">
-        <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-bold ${couleur}`}>
-          {m.libelle.charAt(0).toUpperCase()}
+        <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-full ${pastille.fond}`}>
+          {pastille.icone}
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-bold text-texte">{m.libelle}</p>
-          <p className="truncate text-xs text-texte-discret">{m.code}</p>
-        </div>
-        <BadgeStatut ton={m.actif ? 'succes' : 'neutre'} libelle={m.actif ? T.actif : T.inactif} />
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg font-bold">{m.libelle}</span>
+          <span className="mt-0.5 block text-xs text-[#8a90a2]">—</span>
+        </span>
+        <Badge ton={m.actif ? 'succes' : 'neutre'} gras>
+          {m.actif ? T.actif : T.inactif}
+        </Badge>
       </div>
-      <div className="rounded-moyen bg-surface px-4 py-3.5">
-        <p className="text-xs text-texte-discret">{T.prestataires}</p>
-        <p className="mt-0.5 text-[22px] font-bold tabular-nums text-texte">{formatNombre(m.nombrePrestataires)}</p>
+      <div className="grid grid-cols-2 gap-2">
+        <TuileChiffre libelle={T.prestataires} valeur={formatNombre(m.nombrePrestataires)} />
+        <TuileChiffre libelle="Réservations" valeur="—" />
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2">
         <ActionRenommer metier={m} onFait={onFait} />
         <ActionActivation metier={m} onFait={onFait} />
       </div>
-    </section>
+    </CarteMq>
   )
 }
 
 export default function MetiersPage() {
   const requete = useQuery({ queryKey: ['metiers'], queryFn: api.metiers })
   const retour = useRetours()
-  const colonnes: Colonne<Metier>[] = [
-    { cle: 'nom', titre: T.nom, rendu: (m) => <span className="font-semibold text-texte">{m.libelle}</span> },
-    { cle: 'code', titre: T.code, rendu: (m) => <span className="text-texte-doux">{m.code}</span> },
-    { cle: 'prestataires', titre: T.prestataires, rendu: (m) => formatNombre(m.nombrePrestataires) },
-    { cle: 'etat', titre: T.etat, rendu: (m) => <BadgeStatut ton={m.actif ? 'succes' : 'neutre'} libelle={m.actif ? T.actif : T.inactif} /> },
-    {
-      cle: 'actions',
-      titre: T.actions,
-      alignement: 'droite',
-      rendu: (m) => (
-        <div className="flex flex-wrap justify-end gap-2">
-          <ActionRenommer metier={m} onFait={retour.succes} />
-          <ActionActivation metier={m} onFait={retour.succes} />
-        </div>
-      ),
-    },
-  ]
+  const [ajout, setAjout] = useState(false)
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      <FormulaireAjout onFait={retour.succes} />
-      <Tableau
-        legende={T.legende}
-        colonnes={colonnes}
-        lignes={requete.data?.data ?? []}
-        cleLigne={(m) => m.id}
-        carte={(m) => <CarteMetier m={m} onFait={retour.succes} />}
+    <div className="flex flex-col gap-4">
+      <TitrePage titre="Métiers" suite="proposés" sousTitre="Gérez les catégories de services que les clients peuvent réserver.">
+        <BoutonPlus onClick={() => setAjout((v) => !v)}>Ajouter un métier</BoutonPlus>
+      </TitrePage>
+      {ajout && <FormulaireAjout onFait={retour.succes} />}
+      <EtatsListe
         chargement={requete.isPending}
         erreur={requete.isError ? messageDErreur(requete.error) : null}
-        onReessayer={() => void requete.refetch()}
+        vide={!!requete.data && requete.data.data.length === 0}
         messageVide={T.vide}
+        onReessayer={() => void requete.refetch()}
       />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3.5" aria-label={T.legende}>
+        {(requete.data?.data ?? []).map((m) => (
+          <CarteMetier key={m.id} m={m} onFait={retour.succes} />
+        ))}
+      </div>
     </div>
   )
 }
