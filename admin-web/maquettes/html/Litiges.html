@@ -70,7 +70,7 @@ input:focus{outline:none;box-shadow:0 0 0 3px rgba(29,78,216,0.20)}
   <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 8px 8px 0">
     <div style="flex: 1 1 360px">
       <h1 style="margin: 0; font-size: 42px; line-height: 50px; font-weight: 600; letter-spacing: -1.2px">Litiges <span style="font-weight: 400; color: #9aa0b2">à trancher</span></h1>
-      <p style="margin: 6px 0 0; font-size: 14px; color: #8a90a2">Examinez chaque litige, puis remboursez l'acompte ou rejetez la demande.</p>
+      <p style="margin: 6px 0 0; font-size: 14px; color: #8a90a2">Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement.</p>
     </div>
     <button class="rond" style="height: 48px; padding: 0 20px 0 16px; border: none; border-radius: 24px; background: #ffffff; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #12172b; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Exporter</button>
   </div>
@@ -79,8 +79,7 @@ input:focus{outline:none;box-shadow:0 0 0 3px rgba(29,78,216,0.20)}
     <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
       <div role="tablist" style="display: flex; padding: 4px; background: #f3f4f7; border-radius: 999px; overflow-x: auto; max-width: 100%">
         <a role="tab" aria-selected="true" href="#" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 999px; background: #1d4ed8; color: #ffffff; font-size: 13px; font-weight: 600; white-space: nowrap">Ouverts <span style="padding: 0 7px; border-radius: 9px; background: rgba(255,255,255,0.22); font-size: 11px; line-height: 18px">3</span></a>
-        <a role="tab" aria-selected="false" href="#" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 999px; color: #6b7287; font-size: 13px; font-weight: 600; white-space: nowrap">Résolus <span style="font-size: 11px; color: #9aa0b2">21</span></a>
-        <a role="tab" aria-selected="false" href="#" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 999px; color: #6b7287; font-size: 13px; font-weight: 600; white-space: nowrap">Rejetés <span style="font-size: 11px; color: #9aa0b2">6</span></a>
+        <a role="tab" aria-selected="false" href="#" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 999px; color: #6b7287; font-size: 13px; font-weight: 600; white-space: nowrap">Clôturés <span style="font-size: 11px; color: #9aa0b2">21</span></a>
         <a role="tab" aria-selected="false" href="#" style="display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 999px; color: #6b7287; font-size: 13px; font-weight: 600; white-space: nowrap">Tous <span style="font-size: 11px; color: #9aa0b2">30</span></a>
       </div>
       <div style="flex: 1"></div>
@@ -123,7 +122,7 @@ input:focus{outline:none;box-shadow:0 0 0 3px rgba(29,78,216,0.20)}
             <td style="padding: 12px; font-weight: 500">Fatou Sow</td><td style="padding: 12px; font-weight: 500">Garage Ndiaye</td>
             <td style="padding: 12px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums">12 000 FCFA</td>
             <td style="padding: 12px; font-weight: 500">14 oct. 2026</td>
-            <td style="padding: 12px"><span style="padding: 5px 12px; border-radius: 999px; background: #d7f7e4; color: #0e6245; font-size: 12px; font-weight: 600">Résolu</span></td>
+            <td style="padding: 12px"><span style="padding: 5px 12px; border-radius: 999px; background: #d7f7e4; color: #0e6245; font-size: 12px; font-weight: 600">Clôturé</span></td>
             <td style="padding: 12px 16px; border-radius: 0 16px 16px 0; text-align: right"><a href="Litige.html" class="rond" aria-label="Ouvrir le litige LIT-0039" style="display: inline-flex; width: 36px; height: 36px; border-radius: 18px; background: #ffffff; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></td>
           </tr>
           <tr class="rang">
@@ -131,7 +130,7 @@ input:focus{outline:none;box-shadow:0 0 0 3px rgba(29,78,216,0.20)}
             <td style="padding: 12px; font-weight: 500">Aminata Diop</td><td style="padding: 12px; font-weight: 500">Salon Khadija</td>
             <td style="padding: 12px; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums">4 500 FCFA</td>
             <td style="padding: 12px; font-weight: 500">12 oct. 2026</td>
-            <td style="padding: 12px"><span style="padding: 5px 12px; border-radius: 999px; background: #eef1f6; color: #4f566b; font-size: 12px; font-weight: 600">Rejeté</span></td>
+            <td style="padding: 12px"><span style="padding: 5px 12px; border-radius: 999px; background: #eef1f6; color: #4f566b; font-size: 12px; font-weight: 600">Clôturé · rejet</span></td>
             <td style="padding: 12px 16px; border-radius: 0 16px 16px 0; text-align: right"><a href="Litige.html" class="rond" aria-label="Ouvrir le litige LIT-0038" style="display: inline-flex; width: 36px; height: 36px; border-radius: 18px; background: #f3f4f7; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></td>
           </tr>
         </tbody>
