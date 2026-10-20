@@ -93,6 +93,9 @@
   --animate-infobulle: infobulle 180ms var(--ease-sortie) both;
   --animate-pulsation: pulsation 1.6s var(--ease-standard) infinite;
   --animate-trace: trace var(--duree-trace) var(--ease-sortie) both;
+  --animate-coche: coche-entree 200ms var(--ease-sortie) both;
+  --animate-modale: modale-entree 200ms var(--ease-sortie) both;
+  --animate-fondu: fondu-entree 200ms var(--ease-standard) both;
 }
 
 @keyframes apparition {
@@ -128,6 +131,37 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes coche-entree {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes modale-entree {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fondu-entree {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
