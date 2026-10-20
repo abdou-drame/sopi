@@ -3,6 +3,7 @@ import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
+import AvatarInitiales from '../components/ui/AvatarInitiales'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
@@ -66,9 +67,12 @@ export default function SanctionsListePage() {
       cle: 'utilisateur',
       titre: T.utilisateur,
       rendu: (s) => (
-        <div>
-          <LienLigne vers={`/utilisateurs/${s.utilisateur.id}`}>{`${s.utilisateur.prenom} ${s.utilisateur.nom}`}</LienLigne>
-          <p className="text-xs text-texte-doux">{L.roles[s.utilisateur.role] ?? s.utilisateur.role}</p>
+        <div className="flex items-center gap-3">
+          <AvatarInitiales prenom={s.utilisateur.prenom} nom={s.utilisateur.nom} />
+          <div>
+            <LienLigne vers={`/utilisateurs/${s.utilisateur.id}`}>{`${s.utilisateur.prenom} ${s.utilisateur.nom}`}</LienLigne>
+            <p className="text-xs text-texte-doux">{L.roles[s.utilisateur.role] ?? s.utilisateur.role}</p>
+          </div>
         </div>
       ),
     },
@@ -102,6 +106,7 @@ export default function SanctionsListePage() {
             cle: 'actives',
             type: 'select',
             label: T.etat,
+            onglets: true,
             options: [
               { valeur: 'true', libelle: T.actives },
               { valeur: 'false', libelle: T.nonActives },

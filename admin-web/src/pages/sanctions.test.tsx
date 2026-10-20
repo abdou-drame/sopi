@@ -35,7 +35,7 @@ describe('sanctions', () => {
     expect(lien).toHaveAttribute('href', '/utilisateurs/u-1')
     expect(within(screen.getByRole('table')).getByText('Suspension temporaire')).toBeInTheDocument()
     expect(appels.find((a) => a.chemin === '/admin/sanctions')?.recherche.get('actives')).toBe('true')
-    await userEvent.selectOptions(screen.getByLabelText('État'), '')
+    await userEvent.click(screen.getByRole('tab', { name: 'Toutes' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/sanctions?actives=')
   })
 
