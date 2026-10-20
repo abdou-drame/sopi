@@ -29,10 +29,10 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   const lienRetour = (
     <Link
       to={`${retour.vers}${recherche}`}
-      className="inline-flex h-10 w-fit items-center gap-2 rounded-gelule bg-surface px-4 text-[13px] font-semibold text-texte-doux transition-colors hover:text-texte"
+      className="grid size-12 shrink-0 place-items-center rounded-full bg-surface text-texte transition-transform active:scale-[0.97]"
     >
-      <IconeRetour width={16} height={16} />
-      {retour.libelle}
+      <IconeRetour width={18} height={18} />
+      <span className="sr-only">{retour.libelle}</span>
     </Link>
   )
 
@@ -71,14 +71,14 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   const d = requete.data
   return (
     <div className="flex flex-col gap-3.5">
-      {lienRetour}
-      <header className="animate-apparition flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-[clamp(28px,4vw,42px)] leading-[1.15] font-semibold tracking-tight text-titre">{titre(d)}</h1>
+      <header className="animate-apparition flex flex-wrap items-center gap-4 px-2 pt-2">
+        {lienRetour}
+        <div className="min-w-0 flex-1 basis-80">
+          <h1 className="text-[clamp(26px,3.4vw,36px)] leading-[1.2] font-semibold tracking-tight text-titre">{titre(d)}</h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2.5 text-[13px] text-[#8a90a2]">
             {badge?.(d)}
+            {sousTitre?.(d)}
           </div>
-          {sousTitre?.(d) && <p className="mt-1 text-[13px] text-[#9aa0b2]">{sousTitre(d)}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions(d)}</div>}
       </header>

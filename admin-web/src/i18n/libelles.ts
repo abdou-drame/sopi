@@ -82,6 +82,7 @@ export const L = {
   metiers: { mecanique: 'Mécanique', coiffure: 'Coiffure', pressing: 'Pressing' } as Record<string, string>,
   roles: { client: 'Client', prestataire: 'Prestataire', administrateur: 'Administrateur' } as Record<string, string>,
   dossiers: {
+    decision: 'Décision',
     dejaRefuse: 'Ce dossier a été refusé.',
     dejaAccepte: 'Ce dossier a été accepté.',
     titre: 'Dossiers prestataires',

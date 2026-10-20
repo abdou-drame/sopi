@@ -9,6 +9,8 @@ import BadgeStatut from '../components/ui/BadgeStatut'
 import BanniereAlerte from '../components/ui/BanniereAlerte'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
+import CarteStatutActuel from '../components/ui/CarteStatutActuel'
+import { IconeDossier, IconeUtilisateurs } from '../components/ui/Icones'
 import Carte from '../components/ui/Carte'
 import Definitions from '../components/ui/Definitions'
 import EnTetePage from '../components/ui/EnTetePage'
@@ -146,38 +148,52 @@ export function DossierDetailPage() {
         <>
           {d.statutCompte === 'refuse' && <BanniereAlerte gravite="attention" titre={T.dejaRefuse} detail={d.motifRefus ?? undefined} />}
           {d.statutCompte === 'actif' && <BanniereAlerte gravite="info" titre={T.dejaAccepte} />}
-          <Carte titre={T.identite}>
-            <Definitions
-              elements={[
-                { libelle: T.nom, valeur: nomComplet(d) },
-                { libelle: T.entreprise, valeur: d.nomEntreprise },
-                { libelle: T.telephone, valeur: d.telephone },
-                { libelle: T.email, valeur: d.email },
-                { libelle: T.metier, valeur: L.metiers[d.metier] ?? d.metier },
-                { libelle: T.quartier, valeur: d.quartier },
-                { libelle: T.adresse, valeur: d.adresse, large: true },
-                { libelle: T.soumisLe, valeur: formatDateHeure(d.dateSoumission) },
-              ]}
-            />
-          </Carte>
-          <Carte titre={T.justificatifs}>
-            {d.justificatifs.length === 0 ? (
-              <p className="text-sm text-texte-doux">{T.aucunJustificatif}</p>
-            ) : (
-              <ul className="flex flex-wrap gap-5">
-                {d.justificatifs.map((j) => {
-                  const nom = T.documents[j.typeDocument] ?? j.typeDocument
-                  return (
-                    <li key={j.id} className="flex w-32 flex-col items-center gap-2 text-center">
-                      <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={`${nom} (${j.nomOriginal})`} typeMime={j.typeMime} />
-                      <p className="text-sm font-medium">{nom}</p>
-                      <BadgeStatut statut={j.statut} />
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </Carte>
+          <div className="flex flex-wrap items-start gap-3.5">
+            <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
+              <Carte titre={T.identite} icone={<IconeUtilisateurs width={18} height={18} />}>
+                <Definitions
+                  elements={[
+                    { libelle: T.nom, valeur: nomComplet(d) },
+                    { libelle: T.entreprise, valeur: d.nomEntreprise },
+                    { libelle: T.telephone, valeur: d.telephone },
+                    { libelle: T.email, valeur: d.email },
+                    { libelle: T.metier, valeur: L.metiers[d.metier] ?? d.metier },
+                    { libelle: T.quartier, valeur: d.quartier },
+                    { libelle: T.adresse, valeur: d.adresse, large: true },
+                    { libelle: T.soumisLe, valeur: formatDateHeure(d.dateSoumission) },
+                  ]}
+                />
+              </Carte>
+              <Carte titre={T.justificatifs} icone={<IconeDossier width={18} height={18} />}>
+                {d.justificatifs.length === 0 ? (
+                  <p className="text-sm text-texte-doux">{T.aucunJustificatif}</p>
+                ) : (
+                  <ul className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
+                    {d.justificatifs.map((j) => {
+                      const nom = T.documents[j.typeDocument] ?? j.typeDocument
+                      return (
+                        <li key={j.id} className="flex flex-col items-center gap-2 rounded-[22px] bg-fond p-2.5 text-center">
+                          <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={`${nom} (${j.nomOriginal})`} typeMime={j.typeMime} />
+                          <div className="flex w-full items-center justify-between gap-2 px-1.5 pt-1 pb-1">
+                            <p className="text-[13px] font-semibold">{nom}</p>
+                            <BadgeStatut statut={j.statut} />
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </Carte>
+            </div>
+            <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+              <CarteStatutActuel
+                titre={T.decision}
+                libelleStatut={L.commun.statut}
+                statut={L.statuts[d.statutCompte] ?? d.statutCompte}
+                note={formatDateHeure(d.dateSoumission)}
+              />
+            </div>
+          </div>
         </>
       )}
     </PageDetail>
