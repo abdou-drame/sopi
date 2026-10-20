@@ -347,3 +347,35 @@ export function Tuile({ libelle, children, className = '' }: { libelle: string; 
     </div>
   )
 }
+
+/** Statut en texte précédé d'un point de 7 px (colonne « Statut » des réservations). */
+export function PointStatut({ couleur, children }: { couleur: string; children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 font-medium">
+      <span aria-hidden="true" className="size-[7px] rounded-full" style={{ background: couleur }} />
+      {children}
+    </span>
+  )
+}
+
+/** Grille de tuiles d'information (libellé + valeur) ; une valeur absente de l'API s'affiche « — ». */
+export function GrilleTuiles({ elements, className = '' }: { elements: { libelle: string; valeur?: ReactNode; large?: boolean }[]; className?: string }) {
+  return (
+    <div className={`mt-3.5 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2.5 ${className}`}>
+      {elements.map((e) => (
+        <Tuile key={e.libelle} libelle={e.libelle} className={e.large ? 'col-span-full' : ''}>
+          {e.valeur === undefined || e.valeur === null || e.valeur === '' ? <span className="text-[#9aa0b2]">—</span> : e.valeur}
+        </Tuile>
+      ))}
+    </div>
+  )
+}
+
+/** Lien dans le texte d'une tuile ou d'une carte. */
+export function LienTexte({ vers, children }: { vers: string; children: ReactNode }) {
+  return (
+    <Link to={vers} className="font-semibold text-[#1d4ed8] hover:underline">
+      {children}
+    </Link>
+  )
+}
