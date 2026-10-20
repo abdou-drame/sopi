@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { messageDErreur, telecharger } from '../../api/client'
 import { L } from '../../i18n/libelles'
-import Bouton from './Bouton'
+import { BoutonAction } from '../../design/boutons'
 import Squelette from './Squelette'
 import VisionneuseImage from './VisionneuseImage'
 
@@ -50,17 +50,17 @@ export default function FichierProtege({ chemin, alt, typeMime, className = 'siz
   if (isPending || (data && !adresse)) {
     return (
       <div role="status" aria-label={L.commun.chargement}>
-        <Squelette className={`${className} rounded-moyen`} />
+        <Squelette className={`${className} rounded-2xl`} />
       </div>
     )
   }
   if (isError) {
     return (
-      <div role="alert" className={`flex ${className} flex-col items-center justify-center gap-1 rounded-moyen bg-fond p-2 text-center`}>
-        <p className="text-micro text-erreur-texte">{messageDErreur(error)}</p>
-        <Bouton variante="secondaire" taille="p" onClick={() => void refetch()}>
+      <div role="alert" className={`flex ${className} flex-col items-center justify-center gap-1 rounded-2xl bg-[#f3f4f7] p-2 text-center`}>
+        <p className="text-xs text-[#b0161b]">{messageDErreur(error)}</p>
+        <BoutonAction variante="gris" onClick={() => void refetch()}>
           {L.commun.reessayer}
-        </Bouton>
+        </BoutonAction>
       </div>
     )
   }
@@ -73,7 +73,7 @@ export default function FichierProtege({ chemin, alt, typeMime, className = 'siz
       href={adresse!}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex ${className} flex-col items-center justify-center gap-1 rounded-moyen border border-bordure bg-fond p-2 text-center text-xs font-medium text-primaire-700 hover:bg-primaire-50`}
+      className={`inline-flex ${className} flex-col items-center justify-center gap-1 rounded-2xl border border-[#e6e8ee] bg-[#f3f4f7] p-2 text-center text-xs font-medium text-[#1d4ed8] hover:bg-[#e7edff]`}
     >
       <span aria-hidden="true" className="text-lg font-bold">PDF</span>
       {L.fichiers.ouvrir}

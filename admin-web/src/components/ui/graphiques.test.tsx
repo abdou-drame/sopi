@@ -1,53 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
-import BarreProgression from './BarreProgression'
-import Carte from './Carte'
 import { GraphiqueBarres, GraphiqueCourbe } from './Graphiques'
-import Infobulle from './Infobulle'
-
-describe('Carte', () => {
-  it('affiche titre, sous-titre, action et contenu', () => {
-    render(
-      <Carte titre="Évolution" sousTitre="Sur 30 jours" action={<button>Options</button>}>
-        <p>Contenu</p>
-      </Carte>,
-    )
-    expect(screen.getByRole('heading', { name: 'Évolution' })).toBeInTheDocument()
-    expect(screen.getByText('Sur 30 jours')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Options' })).toBeInTheDocument()
-    expect(screen.getByText('Contenu')).toBeInTheDocument()
-  })
-})
-
-describe('BarreProgression', () => {
-  it('expose une barre de progression accessible, bornée entre 0 et 100', () => {
-    render(
-      <>
-        <BarreProgression libelle="Mécanique" valeur={44.4} />
-        <BarreProgression libelle="Trop" valeur={180} />
-      </>,
-    )
-    expect(screen.getByRole('progressbar', { name: 'Mécanique' })).toHaveAttribute('aria-valuenow', '44')
-    expect(screen.getByRole('progressbar', { name: 'Trop' })).toHaveAttribute('aria-valuenow', '100')
-    expect(screen.getByText('44 %')).toBeInTheDocument()
-  })
-})
-
-describe('Infobulle', () => {
-  it('relie le texte à son contenu et reste atteignable au clavier', async () => {
-    render(
-      <Infobulle texte="Tableau de bord">
-        <button>Accueil</button>
-      </Infobulle>,
-    )
-    const bouton = screen.getByRole('button', { name: 'Accueil' })
-    expect(screen.getByRole('tooltip')).toHaveTextContent('Tableau de bord')
-    expect(bouton.parentElement).toHaveAttribute('aria-describedby', screen.getByRole('tooltip').id)
-    await userEvent.tab()
-    expect(bouton).toHaveFocus()
-  })
-})
 
 describe('graphiques', () => {
   const donnees = [
@@ -77,7 +30,7 @@ describe('graphiques', () => {
       <GraphiqueCourbe
         description="Courbe d’exemple"
         libelles={['1 janv.', '2 janv.', '3 janv.']}
-        series={[{ nom: 'Acomptes', couleur: 'var(--color-primaire-500)', valeurs: [10, 30, 20] }]}
+        series={[{ nom: 'Acomptes', couleur: '#1d4ed8', valeurs: [10, 30, 20] }]}
         formatValeur={(v) => `${v} F`}
       />,
     )

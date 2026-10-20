@@ -235,7 +235,7 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
                       height: `${hauteur}%`,
                       backgroundColor: estActif ? '#1d4ed8' : '#a9bdf6',
                       backgroundImage: rayures,
-                      animation: `croissance var(--duree-lente) var(--ease-sortie) ${i * 80}ms both`,
+                      animation: `croissance 500ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 80}ms both`,
                     }}
                   >
                     {estActif && d.valeur > 0 && (

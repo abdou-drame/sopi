@@ -34,7 +34,7 @@ export default function VisionneuseImage({ src, alt, className = '' }: Props) {
         type="button"
         onClick={() => setOuverte(true)}
         aria-label={`${L.commun.agrandir} : ${alt}`}
-        className={`overflow-hidden rounded-moyen border border-bordure transition-transform duration-[var(--duree-normale)] hover:scale-[1.02] ${className}`}
+        className={`overflow-hidden rounded-2xl border border-[#e6e8ee] transition-transform duration-200 hover:scale-[1.02] ${className}`}
       >
         <img src={src} alt={alt} loading="lazy" className="size-full object-cover" />
       </button>
@@ -44,7 +44,7 @@ export default function VisionneuseImage({ src, alt, className = '' }: Props) {
             role="dialog"
             aria-modal="true"
             aria-label={alt}
-            className="fixed inset-0 z-50 grid place-items-center bg-primaire-900/80 p-4"
+            className="fixed inset-0 z-50 grid place-items-center bg-[#12172b]/80 p-4"
             onClick={() => setOuverte(false)}
           >
             <button
@@ -52,7 +52,7 @@ export default function VisionneuseImage({ src, alt, className = '' }: Props) {
               type="button"
               onClick={() => setOuverte(false)}
               aria-label={L.commun.fermer}
-              className="absolute top-4 right-4 grid size-10 place-items-center rounded-full bg-surface text-texte shadow-eleve"
+              className="absolute top-4 right-4 grid size-10 place-items-center rounded-full bg-white text-[#12172b] shadow-[0_24px_60px_rgba(18,23,43,0.25)]"
             >
               <IconeFermer />
             </button>
@@ -60,7 +60,7 @@ export default function VisionneuseImage({ src, alt, className = '' }: Props) {
               src={src}
               alt={alt}
               onClick={(e) => e.stopPropagation()}
-              className="animate-apparition max-h-[85vh] max-w-full rounded-moyen bg-surface object-contain shadow-eleve"
+              className="animate-apparition max-h-[85vh] max-w-full rounded-2xl bg-white object-contain shadow-[0_24px_60px_rgba(18,23,43,0.25)]"
             />
           </div>,
           document.body,
