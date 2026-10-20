@@ -17,8 +17,8 @@ export default function EnTetePage({ titre, sousTitre, actions }: Props) {
     <EnTeteLarge>
       <header className="animate-apparition flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-titre-page font-bold tracking-tight text-texte">{titre}</h1>
-          {sousTitre && <p className="mt-1 text-sm text-texte-doux">{sousTitre}</p>}
+          <h1 className="text-[clamp(28px,4vw,42px)] leading-[1.15] font-semibold tracking-tight text-texte">{titre}</h1>
+          {sousTitre && <p className="mt-1 text-[13px] text-[#9aa0b2]">{sousTitre}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-3">{actions}</div>}
       </header>

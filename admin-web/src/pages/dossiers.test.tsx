@@ -67,7 +67,7 @@ describe('dossiers prestataires', () => {
     simulerApi({ ...base, 'GET /admin/prestataires/demandes': { corps: PAGE([DEMANDE]) } })
     afficherApplication('/dossiers-prestataires')
     await screen.findByRole('table', { name: 'Liste des demandes de prestataires' })
-    await userEvent.selectOptions(screen.getByLabelText('Statut'), 'tous')
+    await userEvent.click(screen.getByRole('tab', { name: 'Tous' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/dossiers-prestataires?statut=tous')
   })
 

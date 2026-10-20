@@ -5,6 +5,7 @@ import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { TypeSanction, UtilisateurDetail, UtilisateurListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
+import AvatarInitiales from '../components/ui/AvatarInitiales'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
@@ -45,9 +46,12 @@ export function UtilisateursListePage() {
       cle: 'nom',
       titre: T.utilisateur,
       rendu: (u) => (
-        <div>
-          <LienLigne vers={`/utilisateurs/${u.id}`}>{`${u.prenom} ${u.nom}`}</LienLigne>
-          {u.prestataire && <p className="text-xs text-texte-doux">{u.prestataire.nomEntreprise}</p>}
+        <div className="flex items-center gap-3">
+          <AvatarInitiales prenom={u.prenom} nom={u.nom} />
+          <div>
+            <LienLigne vers={`/utilisateurs/${u.id}`}>{`${u.prenom} ${u.nom}`}</LienLigne>
+            {u.prestataire && <p className="text-xs text-texte-doux">{u.prestataire.nomEntreprise}</p>}
+          </div>
         </div>
       ),
     },
@@ -58,13 +62,13 @@ export function UtilisateursListePage() {
     { cle: 'statut', titre: L.commun.statut, rendu: (u) => <BadgeStatut statut={u.statut} /> },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FiltresListe
         legende={T.filtres}
         etat={etat}
         filtres={[
-          { cle: 'role', type: 'select', label: T.role, options: OPTIONS_ROLE },
+          { cle: 'role', type: 'select', label: T.role, options: OPTIONS_ROLE, onglets: true },
           { cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT },
           { cle: 'q', type: 'texte', label: T.recherche, placeholder: T.recherchePlaceholder },
         ]}

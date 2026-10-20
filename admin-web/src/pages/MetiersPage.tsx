@@ -130,6 +130,35 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
   )
 }
 
+const COULEURS_PASTILLE = ['bg-[#e7edff] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#d7f7e4] text-[#0e6245]', 'bg-[#fff0d4] text-[#983705]']
+
+/** Carte d'un métier : pastille à l'initiale, état, nombre de prestataires et actions. */
+function CarteMetier({ m, onFait }: { m: Metier; onFait: (message: string) => void }) {
+  const couleur = COULEURS_PASTILLE[m.libelle.length % COULEURS_PASTILLE.length]
+  return (
+    <section aria-label={m.libelle} className="flex flex-col gap-[18px] rounded-[26px] bg-fond p-5">
+      <div className="flex items-center gap-3.5">
+        <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-full text-xl font-bold ${couleur}`}>
+          {m.libelle.charAt(0).toUpperCase()}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-lg font-bold text-texte">{m.libelle}</p>
+          <p className="truncate text-xs text-texte-discret">{m.code}</p>
+        </div>
+        <BadgeStatut ton={m.actif ? 'succes' : 'neutre'} libelle={m.actif ? T.actif : T.inactif} />
+      </div>
+      <div className="rounded-moyen bg-surface px-4 py-3.5">
+        <p className="text-xs text-texte-discret">{T.prestataires}</p>
+        <p className="mt-0.5 text-[22px] font-bold tabular-nums text-texte">{formatNombre(m.nombrePrestataires)}</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <ActionRenommer metier={m} onFait={onFait} />
+        <ActionActivation metier={m} onFait={onFait} />
+      </div>
+    </section>
+  )
+}
+
 export default function MetiersPage() {
   const requete = useQuery({ queryKey: ['metiers'], queryFn: api.metiers })
   const retour = useRetours()
@@ -151,7 +180,7 @@ export default function MetiersPage() {
     },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FormulaireAjout onFait={retour.succes} />
       <Tableau
@@ -159,6 +188,7 @@ export default function MetiersPage() {
         colonnes={colonnes}
         lignes={requete.data?.data ?? []}
         cleLigne={(m) => m.id}
+        carte={(m) => <CarteMetier m={m} onFait={retour.succes} />}
         chargement={requete.isPending}
         erreur={requete.isError ? messageDErreur(requete.error) : null}
         onReessayer={() => void requete.refetch()}

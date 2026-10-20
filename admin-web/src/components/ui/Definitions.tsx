@@ -10,11 +10,11 @@ export interface Definition {
 /** Liste de définitions (libellé / valeur) en grille ; une valeur vide s'affiche « — ». */
 export default function Definitions({ elements }: { elements: Definition[] }) {
   return (
-    <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+    <dl className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2">
       {elements.map((e) => (
-        <div key={e.libelle} className={e.large ? 'sm:col-span-2' : undefined}>
-          <dt className="text-micro font-semibold tracking-wider text-texte-discret uppercase">{e.libelle}</dt>
-          <dd className="mt-1 text-sm break-words whitespace-pre-line text-texte">
+        <div key={e.libelle} className={`rounded-[20px] bg-fond px-[18px] py-3.5 ${e.large ? 'col-span-full' : ''}`}>
+          <dt className="text-xs font-medium text-[#9aa0b2]">{e.libelle}</dt>
+          <dd className="mt-[3px] text-sm font-semibold break-words whitespace-pre-line text-texte">
             {e.valeur === null || e.valeur === undefined || e.valeur === '' ? '—' : e.valeur}
           </dd>
         </div>

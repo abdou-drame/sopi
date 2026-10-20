@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { api } from '../api/endpoints'
 import { messageDErreur } from '../api/client'
@@ -15,7 +15,7 @@ import DerniersPaiements from '../components/ui/DerniersPaiements'
 import { useAuth } from '../auth/AuthContext'
 import EnTeteLarge from '../layout/EnTeteLarge'
 import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
-import { IconeActualiser, IconeAvis, IconeCalendrier, IconeDossier, IconeFleche, IconeGraphique, IconeLitige } from '../components/ui/Icones'
+import { IconeAvis, IconeCalendrier, IconeDossier, IconeFleche, IconeGraphique, IconeLitige } from '../components/ui/Icones'
 import LienGelule from '../components/ui/LienGelule'
 import NombreAnime from '../components/ui/NombreAnime'
 import Squelette from '../components/ui/Squelette'
@@ -23,6 +23,7 @@ import { L } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatJourCalendaire, formatMontant, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
+const LR = L.revenus
 const ORDRE_GRAVITE: Record<Gravite, number> = { critique: 0, attention: 1, info: 2 }
 const NOMBRE_BARRES_MAX = 7
 
@@ -247,6 +248,43 @@ function useRevenus30Jours() {
   })
 }
 
+function CarteRevenu({ titre, valeur, vers, degrade, chargement }: { titre: string; valeur?: number; vers: string; degrade?: boolean; chargement: boolean }) {
+  return (
+    <div
+      className={`animate-apparition flex min-h-[132px] flex-col justify-between rounded-carte p-[18px] ${degrade ? "text-white" : "bg-surface text-texte"}`}
+      style={degrade ? { backgroundImage: "linear-gradient(150deg, #3563e8, #1d4ed8 55%, #17338f)" } : undefined}
+      aria-busy={chargement || undefined}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <p className={`text-[13px] font-semibold ${degrade ? "text-white/85" : "text-texte-doux"}`}>{titre}</p>
+        <BoutonRond libelle={`${T.ouvrir} · ${titre}`} icone={<IconeFleche />} vers={vers} />
+      </div>
+      {chargement ? (
+        <Squelette className="h-9 w-32" />
+      ) : (
+        <p className="text-[28px] leading-9 font-bold tracking-tight">
+          {valeur === undefined ? "—" : <NombreAnime valeur={valeur} format={formatNombre} />}
+          <span className={`ml-1 text-sm font-medium ${degrade ? "text-white/75" : "text-texte-discret"}`}>FCFA</span>
+        </p>
+      )}
+    </div>
+  )
+}
+
+/** Quatre chiffres de revenus des 30 derniers jours (totaux déjà fournis par l'API des revenus). */
+function RangeeRevenus() {
+  const { data, isPending } = useRevenus30Jours()
+  const t = data?.totaux
+  return (
+    <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+      <CarteRevenu degrade titre={LR.revenus} valeur={t?.revenus} vers="/revenus" chargement={isPending} />
+      <CarteRevenu titre={LR.acomptesEncaisses} valeur={t?.acomptesEncaisses} vers="/paiements" chargement={isPending} />
+      <CarteRevenu titre={LR.remboursements} valeur={t?.remboursements} vers="/paiements" chargement={isPending} />
+      <CarteRevenu titre={LR.retraitsVerses} valeur={t?.retraitsVerses} vers="/retraits" chargement={isPending} />
+    </div>
+  )
+}
+
 function CarteCompteur({
   titre,
   sousTitre,
@@ -284,15 +322,14 @@ function CarteCompteur({
 /** En-tête pleine largeur : « Bienvenue, prénom », période affichée et bouton d'actualisation (lectures seulement). */
 function EnTeteAccueil() {
   const { utilisateur } = useAuth()
-  const client = useQueryClient()
   const fin = aujourdhui()
   const debut = ajouterJours(fin, -29)
   return (
     <EnTeteLarge>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-titre-page font-bold tracking-tight text-texte">
+        <h1 className="text-[clamp(28px,4vw,42px)] leading-[1.15] font-semibold tracking-tight text-texte">
           <span className="sr-only">{T.titre} — </span>
-          {T.bienvenue} <span className="font-light text-texte-doux">{utilisateur?.prenom}</span>
+          {T.bienvenue} <span className="font-normal text-[#9aa0b2]">{utilisateur?.prenom}</span>
         </h1>
         <div className="flex flex-wrap items-center gap-3">
           <p
@@ -302,14 +339,6 @@ function EnTeteAccueil() {
             <IconeCalendrier width={18} height={18} className="text-texte-doux" />
             {formatJourCalendaire(debut, true)} – {formatJourCalendaire(fin, true)}
           </p>
-          <button
-            type="button"
-            onClick={() => void client.invalidateQueries()}
-            className="flex items-center gap-2 rounded-gelule bg-surface px-5 py-2.5 text-sm font-semibold text-texte shadow-carte transition-colors hover:text-primaire-700"
-          >
-            <IconeActualiser width={16} height={16} />
-            {T.actualiser}
-          </button>
         </div>
       </div>
     </EnTeteLarge>
@@ -322,12 +351,14 @@ export default function TableauDeBordPage() {
   const erreur = isError ? messageDErreur(error) : null
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTeteAccueil />
 
       <BlocAlertes />
 
-      <div className="grid grid-flow-dense gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
+      <RangeeRevenus />
+
+      <div className="grid grid-flow-dense gap-3.5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
         <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
         <div className="md:col-span-2 xl:col-span-1 [&>*]:h-full">
           <CarteBarres />
@@ -337,7 +368,7 @@ export default function TableauDeBordPage() {
         <div className="md:col-span-2 xl:col-span-2 [&>*]:h-full">
           <CarteDerniersPaiements />
         </div>
-        <div className="grid gap-5 md:col-span-2 md:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
+        <div className="grid gap-3.5 md:col-span-2 md:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
           {erreur && !isPending ? (
             <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
           ) : (

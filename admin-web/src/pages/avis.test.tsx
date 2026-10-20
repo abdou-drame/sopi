@@ -41,7 +41,7 @@ describe('modération des avis', () => {
     const recherche = appels.find((a) => a.chemin === '/admin/avis')?.recherche
     expect(recherche?.get('aTraiter')).toBe('true')
     expect(recherche?.has('vue')).toBe(false)
-    await userEvent.selectOptions(screen.getByLabelText('Afficher'), 'masques')
+    await userEvent.click(screen.getByRole('tab', { name: 'Masqués' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=masques')
   })
 

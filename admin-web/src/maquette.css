@@ -1,0 +1,66 @@
+/*
+ * Jetons du back-office d'après admin-web/maquettes (Guide.dc.html).
+ * Ils ne s'appliquent que lorsque la coque est affichée : elle pose la classe « maquette » sur <html>.
+ * L'écran de connexion garde donc exactement son apparence d'origine.
+ */
+html.maquette {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Accent #1d4ed8 et marine #0f1b3d */
+  --color-primaire-50: #f1f5ff;
+  --color-primaire-100: #e7edff;
+  --color-primaire-200: #c7d6fe;
+  --color-primaire-300: #9db7fc;
+  --color-primaire-400: #6f92f5;
+  --color-primaire-500: #3b66ea;
+  --color-primaire-600: #1d4ed8;
+  --color-primaire-700: #1a44bd;
+  --color-primaire-800: #17338f;
+  --color-primaire-900: #0f1b3d;
+
+  /* Rayons : 32 cartes, 24 boutons, 20 tuiles, 999 pilules */
+  --radius-petit: 0.75rem;
+  --radius-moyen: 1.25rem;
+  --radius-grand: 1.5rem;
+  --radius-carte: 2rem;
+  --radius-gelule: 9999px;
+
+  --shadow-carte: none;
+  --shadow-bouton: 0 8px 18px rgb(29 78 216 / 0.3);
+  --shadow-eleve: 0 24px 60px rgb(18 23 43 / 0.2);
+
+  /* États */
+  --color-succes: #16a36a;
+  --color-succes-fond: #d7f7e4;
+  --color-succes-texte: #0e6245;
+  --color-erreur: #e5484d;
+  --color-erreur-fond: #fde3e4;
+  --color-erreur-texte: #a3262b;
+  --color-attention: #fbbf24;
+  --color-attention-fond: #fff1cc;
+  --color-attention-texte: #8a5a00;
+  --color-info: #1d4ed8;
+  --color-info-fond: #e7edff;
+  --color-info-texte: #1d4ed8;
+}
+
+html.maquette:not([data-theme="dark"]) {
+  --color-fond: #f3f4f7;
+  --color-surface: #ffffff;
+  --color-bordure: #e4e7ee;
+  --color-texte: #12172b;
+  --color-texte-doux: #6b7287;
+  --color-texte-discret: #8a90a2;
+  --color-titre: #12172b;
+  --color-sous-titre: #8a90a2;
+  --fond-page: #eceef2;
+}
+
+html.maquette body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fond plat : plus de taches animées */
+html.maquette .fond-sopi {
+  display: none;
+}

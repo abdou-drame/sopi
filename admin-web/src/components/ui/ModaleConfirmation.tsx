@@ -116,17 +116,17 @@ export default function ModaleConfirmation({
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 grid place-items-center bg-primaire-900/50 p-4 backdrop-blur-[2px]" onKeyDown={surClavier}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[#12172b]/50 p-4 backdrop-blur-[2px]" onKeyDown={surClavier}>
       <div
         ref={boite}
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
-        className="animate-apparition w-full max-w-md rounded-carte bg-surface p-7 shadow-eleve"
+        className="animate-apparition max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-carte bg-surface p-6 shadow-eleve sm:p-8"
       >
         <form onSubmit={soumettre} noValidate className="flex flex-col gap-4">
-          <h2 id={idTitre} className="text-lg font-semibold">
+          <h2 id={idTitre} className="text-2xl font-semibold tracking-tight">
             {titre}
           </h2>
           {description && (
@@ -150,8 +150,8 @@ export default function ModaleConfirmation({
               {erreur}
             </p>
           )}
-          <div className="flex justify-end gap-2">
-            <Bouton variante="fantome" onClick={onAnnuler} disabled={enCours}>
+          <div className="flex flex-wrap justify-end gap-2 pt-1">
+            <Bouton variante="secondaire" onClick={onAnnuler} disabled={enCours}>
               {L.commun.annuler}
             </Bouton>
             <Bouton type="submit" variante={danger ? 'danger' : 'primaire'} enCours={enCours} disabled={confirmerDesactive}>

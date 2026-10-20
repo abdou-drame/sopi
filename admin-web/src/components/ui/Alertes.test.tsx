@@ -47,8 +47,8 @@ describe('Alertes', () => {
     expect(screen.queryByText(texte)).not.toBeInTheDocument()
   })
 
-  it('les durées sont 4 s, 5 s et 8 s', () => {
-    expect(DUREES_RETOUR).toEqual({ succes: 4000, info: 5000, erreur: 8000 })
+  it('les durées sont 4 s, 4 s et 8 s', () => {
+    expect(DUREES_RETOUR).toEqual({ succes: 4000, info: 4000, erreur: 8000 })
   })
 
   it('se ferme avec le bouton ×', () => {

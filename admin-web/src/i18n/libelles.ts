@@ -82,6 +82,7 @@ export const L = {
   metiers: { mecanique: 'Mécanique', coiffure: 'Coiffure', pressing: 'Pressing' } as Record<string, string>,
   roles: { client: 'Client', prestataire: 'Prestataire', administrateur: 'Administrateur' } as Record<string, string>,
   dossiers: {
+    decision: 'Décision',
     dejaRefuse: 'Ce dossier a été refusé.',
     dejaAccepte: 'Ce dossier a été accepté.',
     titre: 'Dossiers prestataires',
@@ -510,6 +511,7 @@ export const L = {
   gravites: { info: 'Information', attention: 'Attention', critique: 'Critique' } as Record<string, string>,
   menu: {
     titre: 'Navigation principale',
+    plus: 'Plus',
     replier: 'Replier le menu',
     deplier: 'Déplier le menu',
     tableauDeBord: 'Tableau de bord',
@@ -569,6 +571,7 @@ export const L = {
   coque: {
     administrateur: 'Administrateur',
     deconnexion: 'Se déconnecter',
+    actualiser: 'Actualiser',
     modeSombre: 'Mode sombre',
     allerAuContenu: 'Aller au contenu principal',
     alertes: (n: number) => (n > 1 ? `${n} alertes` : `${n} alerte`),

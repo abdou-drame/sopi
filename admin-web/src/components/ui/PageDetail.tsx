@@ -29,16 +29,16 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   const lienRetour = (
     <Link
       to={`${retour.vers}${recherche}`}
-      className="inline-flex w-fit items-center gap-2 rounded-gelule text-sm font-medium text-sous-titre hover:text-titre"
+      className="grid size-12 shrink-0 place-items-center rounded-full bg-surface text-texte transition-transform active:scale-[0.97]"
     >
-      <IconeRetour width={16} height={16} />
-      {retour.libelle}
+      <IconeRetour width={18} height={18} />
+      <span className="sr-only">{retour.libelle}</span>
     </Link>
   )
 
   if (requete.isPending) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3.5">
         {lienRetour}
         <div role="status" aria-label={L.commun.chargement}>
           <Squelette className="h-10 w-72" />
@@ -51,7 +51,7 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   if (requete.isError) {
     const introuvable = requete.error instanceof ApiError && requete.error.status === 404
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3.5">
         {lienRetour}
         <Carte>
           <div role="alert" className="flex flex-col items-start gap-3">
@@ -70,15 +70,15 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
 
   const d = requete.data
   return (
-    <div className="flex flex-col gap-6">
-      {lienRetour}
-      <header className="animate-apparition flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-titre-page font-bold text-titre">{titre(d)}</h1>
+    <div className="flex flex-col gap-3.5">
+      <header className="animate-apparition flex flex-wrap items-center gap-4 px-2 pt-2">
+        {lienRetour}
+        <div className="min-w-0 flex-1 basis-80">
+          <h1 className="text-[clamp(26px,3.4vw,36px)] leading-[1.2] font-semibold tracking-tight text-titre">{titre(d)}</h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2.5 text-[13px] text-[#8a90a2]">
             {badge?.(d)}
+            {sousTitre?.(d)}
           </div>
-          {sousTitre?.(d) && <p className="mt-1 text-sm text-sous-titre">{sousTitre(d)}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions(d)}</div>}
       </header>

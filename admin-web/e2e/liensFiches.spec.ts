@@ -34,7 +34,6 @@ for (const l of LISTES) {
     test('le bouton « Voir » est un vrai lien vers la fiche', async ({ page }) => {
       const voir = page.getByRole('link', { name: /^Voir le détail/ }).first()
       await expect(voir).toHaveAttribute('href', l.fiche)
-      await expect(voir).toHaveText('Voir')
     })
 
     test('un clic au milieu de la ligne ouvre la fiche', async ({ page }) => {

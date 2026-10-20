@@ -4,7 +4,7 @@ import { L } from '../../i18n/libelles'
 export type TypeRetour = 'succes' | 'info' | 'erreur'
 
 /** Durée d'affichage de chaque type de retour, en millisecondes. */
-export const DUREES_RETOUR: Record<TypeRetour, number> = { succes: 4000, info: 5000, erreur: 8000 }
+export const DUREES_RETOUR: Record<TypeRetour, number> = { succes: 4000, info: 4000, erreur: 8000 }
 
 /** Nombre maximal d'alertes affichées en même temps : les plus anciennes sont retirées. */
 export const MAX_RETOURS = 3
@@ -24,9 +24,9 @@ interface Notifieur {
 const ContexteRetours = createContext<Notifieur | null>(null)
 
 const styles: Record<TypeRetour, string> = {
-  succes: 'bg-succes-fond text-succes-texte',
-  info: 'bg-primaire-50 text-primaire-800',
-  erreur: 'bg-erreur-fond text-erreur-texte',
+  succes: 'border-l-succes',
+  info: 'border-l-primaire-600',
+  erreur: 'border-l-erreur',
 }
 
 function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number) => void }) {
@@ -48,7 +48,7 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
       onMouseLeave={() => setEnPause(false)}
       onFocus={() => setEnPause(true)}
       onBlur={() => setEnPause(false)}
-      className={`animate-glissement flex items-start gap-3 rounded-grand px-5 py-3.5 text-sm font-semibold shadow-bouton ${styles[retour.type]}`}
+      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-surface px-5 py-3.5 text-[13px] font-semibold text-texte shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
     >
       <span className="min-w-0 flex-1">{retour.texte}</span>
       <button

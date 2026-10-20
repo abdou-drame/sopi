@@ -21,7 +21,7 @@ export default function BarreFiltres({ children, onReinitialiser, onAppliquer, l
       onSubmit={soumettre}
       role="search"
       aria-label={legende ?? 'Filtres'}
-      className="flex flex-wrap items-end gap-3 rounded-carte bg-surface p-5 shadow-carte"
+      className="flex flex-wrap items-end gap-3 rounded-carte bg-surface p-[18px] shadow-carte"
     >
       {children}
       {(onAppliquer || onReinitialiser) && (

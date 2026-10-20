@@ -187,83 +187,73 @@ interface PropsBarres {
 }
 
 /**
- * Barres verticales en gélule : barres inactives hachurées et claires, barre active pleine et foncée
- * (la plus haute par défaut, puis celle qui est survolée ou a le focus) surmontée d'une pastille de valeur.
+ * Barres verticales en capsule rayée d'après la maquette : échelle à gauche, grille en pointillés,
+ * barre mise en avant (la plus haute, puis celle survolée ou ayant le focus) avec point blanc et bulle de valeur.
+ * Hauteur fixe de 230 px, largeur fluide.
  */
-export function GraphiqueBarres({
-  description,
-  donnees,
-  couleur = 'var(--color-primaire-500)',
-  formatValeur = (v) => String(v),
-}: PropsBarres) {
-  const id = useId().replace(/:/g, '')
-  const n = donnees.length
+export function GraphiqueBarres({ description, donnees, formatValeur = (v) => String(v) }: PropsBarres) {
   const max = maximumRond(Math.max(0, ...donnees.map((d) => d.valeur)))
-  const largeur = L_VUE - MARGE.gauche - MARGE.droite
-  const hauteur = H_VUE - MARGE.haut - MARGE.bas
-  const pasX = largeur / Math.max(1, n)
-  const l = Math.min(44, pasX * 0.55)
-  const parDefaut = n ? donnees.findIndex((d) => d.valeur === Math.max(...donnees.map((e) => e.valeur))) : 0
+  const maxValeur = Math.max(0, ...donnees.map((d) => d.valeur))
+  const parDefaut = donnees.findIndex((d) => d.valeur === maxValeur)
   const [choix, setChoix] = useState<number | null>(null)
   const actif = choix ?? parDefaut
   const resume = donnees.map((d) => `${d.libelle} ${formatValeur(d.valeur)}`).join(', ')
+  const echelle = [...graduations(max)].reverse()
+  const rayures = 'repeating-linear-gradient(135deg, rgba(255,255,255,0.45) 0 1.5px, transparent 1.5px 5px)'
 
   return (
-    <svg viewBox={`0 0 ${L_VUE} ${H_VUE}`} role="img" aria-label={`${description} : ${resume}`} className="h-auto w-full">
-      <defs>
-        <pattern id={`${id}-h`} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <rect width="7" height="7" fill={couleur} fillOpacity="0.22" />
-          <rect width="3" height="7" fill={couleur} fillOpacity="0.55" />
-        </pattern>
-      </defs>
-      {graduations(max).map((g) => {
-        const yy = MARGE.haut + hauteur - (g / max) * hauteur
-        return (
-          <g key={g}>
-            <line x1={MARGE.gauche} x2={L_VUE - MARGE.droite} y1={yy} y2={yy} stroke="var(--color-bordure)" strokeDasharray="2 6" />
-            <text x={MARGE.gauche - 10} y={yy + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
-              {abrege(g)}
-            </text>
-          </g>
-        )
-      })}
-      {donnees.map((d, i) => {
-        const h = Math.max((d.valeur / max) * hauteur, d.valeur > 0 ? l : 0)
-        const cx = MARGE.gauche + pasX * i + pasX / 2
-        const yy = MARGE.haut + hauteur - h
-        const estActif = i === actif
-        return (
-          <g
-            key={d.libelle}
-            onMouseEnter={() => setChoix(i)}
-            onMouseLeave={() => setChoix(null)}
-            onFocus={() => setChoix(i)}
-            onBlur={() => setChoix(null)}
-            tabIndex={0}
-            style={{ outline: 'none' }}
-          >
-            <rect x={cx - pasX / 2} y={MARGE.haut - 10} width={pasX} height={hauteur + 10} fill="transparent" />
-            <rect
-              x={cx - l / 2}
-              y={yy}
-              width={l}
-              height={h}
-              rx={l / 2}
-              fill={estActif ? 'var(--color-primaire-800)' : `url(#${id}-h)`}
-              style={{
-                transformBox: 'fill-box',
-                transformOrigin: 'bottom',
-                transition: 'fill var(--duree-normale) var(--ease-standard)',
-                animation: `croissance var(--duree-lente) var(--ease-sortie) ${i * 80}ms both`,
-              }}
-            />
-            <text x={cx} y={H_VUE - 12} textAnchor="middle" fontSize="10.5" fill="var(--color-texte-discret)">
-              {d.libelle}
-            </text>
-            {estActif && <Pastille key={`${i}-${choix}`} x={cx} y={yy - 2} texte={formatValeur(d.valeur)} />}
-          </g>
-        )
-      })}
-    </svg>
+    <div role="img" aria-label={`${description} : ${resume}`} className="mt-1 flex h-[230px] gap-3">
+      <div aria-hidden="true" className="flex flex-col justify-between pb-[26px] text-right text-[11px] text-[#9aa0b2] tabular-nums">
+        {echelle.map((g) => (
+          <span key={g}>{abrege(g)}</span>
+        ))}
+      </div>
+      <div className="relative min-w-0 flex-1">
+        <div aria-hidden="true" className="absolute inset-x-0 top-1.5 bottom-8 flex flex-col justify-between">
+          {echelle.map((g) => (
+            <div key={g} className="border-t border-dashed border-[#e6e8ee]" />
+          ))}
+        </div>
+        <div className="relative box-border flex h-full justify-around gap-[clamp(8px,2.5vw,36px)] px-2 pt-11">
+          {donnees.map((d, i) => {
+            const estActif = i === actif
+            const hauteur = d.valeur > 0 ? Math.max((d.valeur / max) * 100, 4) : 0
+            return (
+              <div
+                key={d.libelle}
+                tabIndex={0}
+                onMouseEnter={() => setChoix(i)}
+                onMouseLeave={() => setChoix(null)}
+                onFocus={() => setChoix(i)}
+                onBlur={() => setChoix(null)}
+                className="flex h-full max-w-[84px] min-w-0 flex-1 flex-col items-center outline-none"
+              >
+                <div className="flex w-full flex-1 items-end">
+                  <div
+                    className="relative w-full origin-bottom rounded-full transition-colors duration-200"
+                    style={{
+                      height: `${hauteur}%`,
+                      backgroundColor: estActif ? '#1d4ed8' : '#a9bdf6',
+                      backgroundImage: rayures,
+                      animation: `croissance var(--duree-lente) var(--ease-sortie) ${i * 80}ms both`,
+                    }}
+                  >
+                    {estActif && d.valeur > 0 && (
+                      <>
+                        <span className="absolute -top-[38px] left-1/2 -translate-x-1/2 rounded-full bg-[#1d4ed8] px-[9px] py-[3px] text-[10px] font-bold whitespace-nowrap text-white">
+                          {formatValeur(d.valeur)}
+                        </span>
+                        <span className="absolute -top-2.5 left-1/2 box-border size-3.5 -translate-x-1/2 rounded-full border-[3px] border-[#1d4ed8] bg-white" />
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex h-[26px] items-end text-[11px] font-medium text-[#9aa0b2]">{d.libelle}</div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
   )
 }

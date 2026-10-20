@@ -21,25 +21,31 @@ describe('coque', () => {
     sessionStorage.clear()
   })
 
-  it('affiche le menu complet des 12 écrans de navigation', async () => {
+  it('affiche la barre de navigation (7 écrans), le menu « Plus » (5 écrans) et le rail (3 groupes)', async () => {
     simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } })
     afficherApplication('/')
     const nav = await screen.findByRole('navigation', { name: 'Navigation principale' })
-    const libelles = within(nav).getAllByRole('link').map((l) => l.getAttribute('aria-label'))
-    expect(libelles).toEqual([
+    expect(within(nav).getAllByRole('link').map((l) => l.getAttribute('aria-label'))).toEqual([
       'Tableau de bord',
-      'Revenus',
       'Dossiers prestataires',
       'Litiges',
-      'Sanctions',
       'Modération des avis',
+      'Sanctions',
       'Utilisateurs',
+      'Métiers',
+    ])
+    await userEvent.click(within(nav).getByRole('button', { name: /Plus/ }))
+    expect(within(nav).getAllByRole('link').slice(7).map((l) => l.textContent)).toEqual([
+      'Revenus',
       'Réservations',
       'Paiements',
       'Retraits',
       'Notifications en échec',
-      'Métiers',
     ])
+    const rail = screen.getByRole('complementary', { name: 'Raccourcis' })
+    expect(within(rail).getAllByRole('link')).toHaveLength(7)
+    expect(within(rail).getByRole('button', { name: 'Actualiser' })).toBeInTheDocument()
+    expect(within(rail).getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
   })
 
   it('affiche les pastilles de compteurs issues de /admin/alertes, cumulées par écran', async () => {
@@ -47,9 +53,10 @@ describe('coque', () => {
     afficherApplication('/')
     const nav = await screen.findByRole('navigation', { name: 'Navigation principale' })
     expect(await within(nav).findByRole('link', { name: 'Litiges, 2 alertes' })).toHaveTextContent('2')
-    // Deux types d'alertes pointent vers « Paiements » : 1 + 3.
-    expect(within(nav).getByRole('link', { name: 'Paiements, 4 alertes' })).toHaveTextContent('4')
-    expect(within(nav).getByRole('link', { name: /Retraits/ })).not.toHaveTextContent(/\d/)
+    // Le menu « Plus » cumule ses écrans : deux types d'alertes pointent vers « Paiements » (1 + 3).
+    await userEvent.click(within(nav).getByRole('button', { name: /Plus/ }))
+    expect(within(nav).getByRole('link', { name: /Paiements/ })).toHaveTextContent('4')
+    expect(within(nav).getByRole('link', { name: /Retraits/ })).not.toHaveTextContent(/d/)
   })
 
   it('marque l’écran courant dans le menu', async () => {
@@ -61,12 +68,10 @@ describe('coque', () => {
     expect(within(nav).getByRole('link', { name: 'Litiges' })).toHaveAttribute('aria-current', 'page')
   })
 
-  it('affiche la barre du haut : raccourcis, alertes et menu du compte', async () => {
+  it('affiche la barre du haut : alertes et menu du compte', async () => {
     const { appels } = simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES }, 'POST /auth/deconnexion': { corps: {} } })
     afficherApplication('/')
-    const raccourcis = await screen.findByRole('navigation', { name: 'Raccourcis' })
-    expect(within(raccourcis).getAllByRole('link').map((l) => l.textContent)).toEqual(['Tableau de bord', 'Réservations', 'Paiements', 'Revenus', 'Litiges'])
-    expect(within(raccourcis).getByRole('link', { name: 'Tableau de bord' })).toHaveAttribute('aria-current', 'page')
+    await screen.findByRole('navigation', { name: 'Navigation principale' })
     expect(await screen.findByRole('link', { name: 'Alertes : 3 alertes' })).toBeInTheDocument()
 
     const compte = screen.getByRole('button', { name: 'Menu du compte' })

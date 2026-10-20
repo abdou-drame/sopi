@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Guide de style</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input{font-family:inherit}
+.b{height:48px;padding:0 24px;border:none;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s,box-shadow .15s}
+.b:active{transform:scale(.97)}
+.bp{background:#1d4ed8;color:#fff;box-shadow:0 8px 18px rgba(29,78,216,.30)}
+.bp:hover{background:#1a44bd}
+.bs{background:#f3f4f7;color:#12172b}
+.bs:hover{background:#e4e7ee}
+.bd{background:#e5484d;color:#fff;box-shadow:0 8px 18px rgba(229,72,77,.28)}
+.bd:hover{background:#cf3a3f}
+.bg{background:#16a36a;color:#fff;box-shadow:0 8px 18px rgba(22,163,106,.28)}
+.bg:hover{background:#12905d}
+.off{opacity:.45;cursor:not-allowed;box-shadow:none}
+.spin{width:16px;height:16px;border-radius:8px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spin{animation:none}.b{transition:none}}
+.card{box-sizing:border-box;padding:28px;background:#fff;border-radius:32px}
+.h{margin:0 0 4px;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.p{margin:0 0 18px;font-size:13px;color:#8a90a2}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.sw{width:100%;height:64px;border-radius:20px}
+.lb{margin-top:6px;font-size:12px;font-weight:600}
+.lb small{display:block;font-weight:500;color:#8a90a2}
+.bdg{padding:5px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.inp{height:48px;box-sizing:border-box;width:100%;padding:0 18px;border:1.5px solid transparent;border-radius:24px;background:#f3f4f7;font-size:14px;color:#12172b;outline:none}
+.inp:focus{border-color:#1d4ed8;background:#fff;box-shadow:0 0 0 4px rgba(29,78,216,.12)}
+</style>
+</helmet>
+<div style="min-height:100vh;box-sizing:border-box;background:#eceef2;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#12172b;-webkit-font-smoothing:antialiased;padding:32px 24px 48px">
+<div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:20px">
+
+  <div style="padding:8px">
+    <h1 style="margin:0;font-size:42px;line-height:50px;font-weight:600;letter-spacing:-1.2px">Guide de <span style="font-weight:400;color:#9aa0b2">style</span></h1>
+    <p style="margin:6px 0 0;font-size:14px;color:#8a90a2">Jetons et composants du back-office Sopi. À reproduire tels quels.</p>
+  </div>
+
+  <section class="card">
+    <h2 class="h">Couleurs</h2><p class="p">Fond de page, surfaces, texte, accent et états.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:16px">
+      <div><div class="sw" style="background:#eceef2"></div><div class="lb">Fond de page<small>#eceef2</small></div></div>
+      <div><div class="sw" style="background:#fff;border:1px solid #e4e7ee;box-sizing:border-box"></div><div class="lb">Carte<small>#ffffff</small></div></div>
+      <div><div class="sw" style="background:#f3f4f7"></div><div class="lb">Surface douce<small>#f3f4f7</small></div></div>
+      <div><div class="sw" style="background:#12172b"></div><div class="lb">Texte<small>#12172b</small></div></div>
+      <div><div class="sw" style="background:#6b7287"></div><div class="lb">Texte secondaire<small>#6b7287</small></div></div>
+      <div><div class="sw" style="background:#9aa0b2"></div><div class="lb">Texte discret<small>#9aa0b2 / #8a90a2</small></div></div>
+      <div><div class="sw" style="background:#1d4ed8"></div><div class="lb">Accent Sopi<small>#1d4ed8</small></div></div>
+      <div><div class="sw" style="background:#e7edff"></div><div class="lb">Accent clair<small>#e7edff</small></div></div>
+      <div><div class="sw" style="background:#16a36a"></div><div class="lb">Succès<small>#16a36a · fond #d7f7e4 · texte #0e6245</small></div></div>
+      <div><div class="sw" style="background:#e5484d"></div><div class="lb">Danger<small>#e5484d · fond #fde3e4</small></div></div>
+      <div><div class="sw" style="background:#fbbf24"></div><div class="lb">Attention<small>#fbbf24 · fond #fff1cc</small></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="h">Typographie, rayons, ombres</h2><p class="p">Plus Jakarta Sans, deux graisses dans les grands titres.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:32px">
+      <div style="flex:1 1 380px">
+        <div style="font-size:42px;line-height:50px;font-weight:600;letter-spacing:-1.2px">Titre <span style="font-weight:400;color:#9aa0b2">de page</span></div>
+        <div style="margin-top:4px;font-size:12px;color:#8a90a2">42/50 · 600 + 400 · -1.2px</div>
+        <div style="margin-top:16px;font-size:20px;font-weight:700">Titre de carte</div>
+        <div style="margin-top:2px;font-size:12px;color:#8a90a2">20 · 700</div>
+        <div style="margin-top:16px;font-size:14px">Texte courant 14 · 400/500</div>
+        <div style="margin-top:8px;font-size:13px;font-weight:700">Libellé de bouton 13 · 700</div>
+        <div style="margin-top:8px;font-size:12px;color:#8a90a2">Légende 12 · 500 · chiffres en tabular-nums</div>
+      </div>
+      <div style="flex:1 1 380px;display:flex;flex-wrap:wrap;gap:14px;align-content:flex-start">
+        <div style="width:110px;height:80px;background:#f3f4f7;border-radius:32px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">32 · cartes</div>
+        <div style="width:110px;height:80px;background:#f3f4f7;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">24 · boutons</div>
+        <div style="width:110px;height:80px;background:#f3f4f7;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">20 · tuiles</div>
+        <div style="width:110px;height:80px;background:#f3f4f7;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">999 · pilules</div>
+        <div style="width:110px;height:80px;background:#fff;border-radius:20px;box-shadow:0 8px 18px rgba(29,78,216,.30);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;text-align:center">ombre bleue<br>boutons</div>
+        <div style="width:110px;height:80px;background:#fff;border-radius:20px;box-shadow:0 1px 3px rgba(18,23,43,.10);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;text-align:center">ombre<br>onglet actif</div>
+      </div>
+    </div>
+    <p style="margin:18px 0 0;font-size:13px;color:#6b7287">Espacements : 8 · 12 · 16 · 20 · 24 · 28. Écart entre cartes 20–24. Barre du haut et rail flottants, page max 1320.</p>
+  </section>
+
+  <section class="card">
+    <h2 class="h">Boutons d’action</h2><p class="p">Repos, survol (fond plus sombre), appui (réduit à 97 %), chargement, désactivé.</p>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="row"><span style="width:90px;font-size:12px;color:#8a90a2">Principal</span>
+        <button class="b bp">Valider le dossier</button>
+        <button class="b bp" style="background:#1a44bd">Survol</button>
+        <button class="b bp"><span class="spin"></span>Validation…</button>
+        <button class="b bp off">Désactivé</button></div>
+      <div class="row"><span style="width:90px;font-size:12px;color:#8a90a2">Secondaire</span>
+        <button class="b bs">Voir la réservation</button>
+        <button class="b bs" style="background:#e4e7ee">Survol</button>
+        <button class="b bs off">Désactivé</button></div>
+      <div class="row"><span style="width:90px;font-size:12px;color:#8a90a2">Danger</span>
+        <button class="b bd">Refuser</button>
+        <button class="b bd"><span class="spin"></span>Refus…</button>
+        <button class="b bd off">Désactivé</button></div>
+      <div class="row"><span style="width:90px;font-size:12px;color:#8a90a2">Succès</span>
+        <button class="b bg">Rembourser l’acompte</button>
+        <button class="b bg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>Fait</button></div>
+      <div class="row"><span style="width:90px;font-size:12px;color:#8a90a2">Rond</span>
+        <span style="width:44px;height:44px;border-radius:22px;background:#f3f4f7;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+        <span style="width:48px;height:48px;border-radius:24px;background:#1d4ed8;color:#fff;box-shadow:0 8px 16px rgba(29,78,216,.28);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
+        <span style="font-size:12px;color:#8a90a2">icône de rail actif</span></div>
+    </div>
+    <p style="margin:18px 0 0;font-size:13px;color:#6b7287">Pendant l’envoi : bouton figé, texte au gérondif, pastille tournante. À la réussite : coche brève puis alerte. Aucune animation si « réduire les animations » est activé.</p>
+  </section>
+
+  <section class="card">
+    <h2 class="h">Badges, onglets, champs</h2><p class="p">Statuts en pilules, onglets segmentés, champs arrondis.</p>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="row">
+        <span class="bdg" style="background:#fff1cc;color:#8a5a00">À examiner</span>
+        <span class="bdg" style="background:#d7f7e4;color:#0e6245">Validé</span>
+        <span class="bdg" style="background:#fde3e4;color:#a3262b">Refusé</span>
+        <span class="bdg" style="background:#e7edff;color:#1d4ed8">Ouvert</span>
+        <span class="bdg" style="background:#eceef2;color:#6b7287">Résolu</span>
+      </div>
+      <div style="display:flex;gap:2px;padding:4px;background:#f3f4f7;border-radius:999px;align-self:flex-start">
+        <span style="height:36px;padding:0 18px;display:flex;align-items:center;border-radius:999px;background:#fff;box-shadow:0 1px 3px rgba(18,23,43,.10);font-size:13px;font-weight:700">Ouverts</span>
+        <span style="height:36px;padding:0 18px;display:flex;align-items:center;border-radius:999px;font-size:13px;font-weight:600;color:#6b7287">Résolus</span>
+        <span style="height:36px;padding:0 18px;display:flex;align-items:center;border-radius:999px;font-size:13px;font-weight:600;color:#6b7287">Tous</span>
+      </div>
+      <div class="row" style="align-items:flex-start">
+        <div style="flex:1 1 260px"><input class="inp" placeholder="Rechercher un dossier, un nom…"></div>
+        <div style="flex:1 1 260px"><input class="inp" style="border-color:#e5484d;background:#fff" value="Texte invalide"><div style="margin-top:6px;padding-left:18px;font-size:12px;color:#a3262b">Message d’erreur sous le champ</div></div>
+      </div>
+      <div style="border-radius:20px;background:#e7edff;padding:14px 18px;font-size:13px;color:#1d4ed8;font-weight:600">Ligne mise en avant dans un tableau : fond #e7edff, coins 20.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="h">Alertes et confirmation</h2><p class="p">Alertes temporaires en haut à droite, fermables, qui disparaissent seules. Les actions sensibles passent par une confirmation.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:24px">
+      <div style="flex:1 1 360px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border-radius:20px;box-shadow:0 12px 32px rgba(18,23,43,.16);border-left:4px solid #16a36a"><span style="flex:1;font-size:13px;font-weight:600">Dossier validé. Le prestataire est prévenu.</span><span style="color:#9aa0b2;font-size:16px">×</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border-radius:20px;box-shadow:0 12px 32px rgba(18,23,43,.16);border-left:4px solid #e5484d"><span style="flex:1;font-size:13px;font-weight:600">Action impossible : dossier déjà traité.</span><span style="color:#9aa0b2;font-size:16px">×</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border-radius:20px;box-shadow:0 12px 32px rgba(18,23,43,.16);border-left:4px solid #1d4ed8"><span style="flex:1;font-size:13px;font-weight:600">Liste actualisée.</span><span style="color:#9aa0b2;font-size:16px">×</span></div>
+        <p style="margin:0;font-size:12px;color:#8a90a2">Succès et info : 4 s. Erreur : 8 s ou jusqu’à fermeture. Maximum 3 à la fois.</p>
+      </div>
+      <div style="flex:1 1 360px;box-sizing:border-box;padding:28px;background:#fff;border-radius:32px;box-shadow:0 24px 60px rgba(18,23,43,.20);border:1px solid #e4e7ee">
+        <div style="font-size:20px;font-weight:700">Refuser ce dossier ?</div>
+        <p style="margin:8px 0 20px;font-size:13px;line-height:20px;color:#6b7287">Le prestataire sera informé du refus. Cette action ne peut pas être annulée.</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end"><button class="b bs">Annuler</button><button class="b bd">Oui, refuser</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="h">Mise en page</h2><p class="p">Structure commune à tous les écrans.</p>
+    <ul style="margin:0;padding-left:20px;font-size:14px;line-height:26px;color:#12172b">
+      <li>Barre du haut : pilule blanche flottante, logo Sopi, groupe de navigation en pilule, recherche, cloche, avatar.</li>
+      <li>Rail à gauche : 3 groupes d’icônes dans des capsules blanches, fixe et centré verticalement ; masqué sous 900 px.</li>
+      <li>Contenu : grand titre à deux graisses, cartes blanches de rayon 32, tableaux avec ligne mise en avant.</li>
+      <li>Connexion : conserver le design actuel, ne pas le modifier.</li>
+    </ul>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
