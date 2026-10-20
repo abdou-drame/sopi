@@ -58,16 +58,11 @@ describe('revenus', () => {
     afficherApplication('/revenus')
 
     const totaux = await screen.findByRole('region', { name: 'Totaux de la période' })
-    expect(await within(totaux).findByText('42 000 FCFA')).toBeInTheDocument()
-    expect(within(totaux).getByText('150 000 FCFA')).toBeInTheDocument()
-    expect(within(totaux).getByText('60 000 FCFA')).toBeInTheDocument()
-    expect(within(totaux).getByText('9 000 FCFA')).toBeInTheDocument()
-    expect(screen.getByText(/Soldes des prestataires :/)).toHaveTextContent('84 000 FCFA')
-
-    // Carte Sopi : commission en grand, acomptes et soldes en lignes secondaires.
-    expect(screen.getAllByText('Sopi').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getAllByText('42 000 FCFA').length).toBeGreaterThanOrEqual(2)
-    expect(screen.getAllByText('84 000 FCFA').length).toBeGreaterThanOrEqual(2)
+    expect(await within(totaux).findByRole('region', { name: 'Commission retenue' })).toHaveTextContent('42 000 FCFA')
+    expect(within(totaux).getByRole('region', { name: 'Acomptes encaissés' })).toHaveTextContent('150 000 FCFA')
+    expect(within(totaux).getByRole('region', { name: 'Remboursements' })).toHaveTextContent('9 000 FCFA')
+    expect(within(totaux).getByRole('region', { name: 'Retraits versés' })).toHaveTextContent('60 000 FCFA')
+    expect(within(totaux).getByRole('region', { name: 'Soldes des prestataires' })).toHaveTextContent('84 000 FCFA')
 
     expect(screen.getByRole('img', { name: /Courbe de la commission et des acomptes/ })).toBeInTheDocument()
 
@@ -159,8 +154,9 @@ describe('revenus', () => {
       return new Promise(() => {})
     }))
     afficherApplication('/revenus')
-    expect(await screen.findByRole('status', { name: 'Chargement… Totaux de la période' })).toBeInTheDocument()
-    expect(screen.getByRole('status', { name: 'Chargement… Évolution sur la période' })).toBeInTheDocument()
+    const totaux = await screen.findByRole('region', { name: 'Totaux de la période' })
+    expect(await within(totaux).findByRole('status', { name: 'Chargement…' })).toBeInTheDocument()
+    expect(screen.getAllByRole('status', { name: 'Chargement…' })).toHaveLength(3)
   })
 
   it('affiche une erreur avec « Réessayer » puis les données', async () => {
@@ -171,6 +167,6 @@ describe('revenus', () => {
     expect(await within(totaux).findByRole('alert')).toHaveTextContent('problème momentané')
     echec = false
     await userEvent.click(within(totaux).getByRole('button', { name: 'Réessayer' }))
-    expect(await within(totaux).findByText('42 000 FCFA')).toBeInTheDocument()
+    expect(await within(totaux).findByRole('region', { name: 'Commission retenue' })).toHaveTextContent('42 000 FCFA')
   })
 })
