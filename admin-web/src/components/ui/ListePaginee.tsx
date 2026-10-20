@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { ReactNode } from 'react'
 import { messageDErreur } from '../../api/client'
 import type { Page } from '../../api/types'
 import type { FiltresUrl } from '../../lib/useFiltresUrl'
@@ -16,6 +17,7 @@ interface Props<T> {
   /** Adresse de la fiche de chaque ligne (ligne cliquable + bouton « Voir »). */
   lien?: (ligne: T) => { vers: string; nom: string }
   messageVide?: string
+  carte?: (ligne: T) => ReactNode
 }
 
 /** Lignes montrées par page. L'API en renvoie 20 : chaque page de l'API fournit deux pages de l'écran. */
@@ -26,7 +28,7 @@ const LIGNES_API = 20
  * Liste paginée (10 lignes par page à l'écran, ordre fixé par le serveur) : requête, tableau, pagination et états vide / chargement / erreur.
  * Les filtres et la page viennent de l'adresse ; aucun tri côté client (l'API renvoie les plus récents d'abord).
  */
-export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes, cleLigne, lien, messageVide }: Props<T>) {
+export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes, cleLigne, lien, messageVide, carte }: Props<T>) {
   const pagesParPageApi = LIGNES_API / LIGNES_PAR_PAGE
   const pageApi = Math.ceil(etat.page / pagesParPageApi)
   const params = { ...etat.parametresApi }
@@ -56,6 +58,7 @@ export default function ListePaginee<T>({ legende, cle, charger, etat, colonnes,
         erreur={isError ? messageDErreur(error) : null}
         onReessayer={() => void refetch()}
         messageVide={messageVide}
+        carte={carte}
         page={decoupe ? etat.page : (data?.meta.current_page ?? etat.page)}
         totalPages={totalPages}
         total={data?.meta.total}

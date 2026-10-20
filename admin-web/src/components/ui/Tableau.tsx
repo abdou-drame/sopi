@@ -29,6 +29,8 @@ interface Props<T> {
   erreur?: string | null
   onReessayer?: () => void
   messageVide?: string
+  /** Présente chaque ligne en carte (grille) plutôt qu'en ligne de tableau. */
+  carte?: (ligne: T) => ReactNode
   tri?: Tri
   onTri?: (cle: string) => void
   page?: number
@@ -76,6 +78,7 @@ export default function Tableau<T>({
   erreur,
   onReessayer,
   messageVide = L.commun.aucuneDonnee,
+  carte,
   tri,
   onTri,
   page = 1,
@@ -87,7 +90,16 @@ export default function Tableau<T>({
 
   return (
     <div className="overflow-hidden rounded-carte bg-surface p-[18px] shadow-carte">
-      <div className="overflow-x-auto">
+      {carte && !erreur && !chargement && lignes.length > 0 && (
+        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(340px,100%),1fr))] gap-4">
+          {lignes.map((ligne) => (
+            <li key={cleLigne(ligne)} className="animate-apparition">
+              {carte(ligne)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {(!carte || chargement) && <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] border-separate border-spacing-y-1 text-[13px]" aria-busy={chargement || undefined}>
           <caption className="sr-only">{legende}</caption>
           <thead>
@@ -161,7 +173,7 @@ export default function Tableau<T>({
               })}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {chargement && <p className="sr-only" role="status">{L.commun.chargement}</p>}
 

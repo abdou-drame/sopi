@@ -92,6 +92,63 @@ function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode;
   )
 }
 
+function Etoiles({ note }: { note: number }) {
+  return (
+    <svg width="90" height="16" viewBox="0 0 90 16" role="img" aria-label={T.sur5(note)}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <path key={i} transform={`translate(${i * 18} 0)`} fill={i < note ? '#f59e0b' : '#d9dce5'} d="M8 1l2 4.3 4.7.6-3.4 3.2.9 4.6L8 11.4 3.8 13.7l.9-4.6L1.3 5.9 6 5.3z" />
+      ))}
+    </svg>
+  )
+}
+
+const COULEURS_AVATAR = ['bg-[#dbeafe] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#fff0d4] text-[#983705]', 'bg-[#d7f7e4] text-[#0e6245]']
+
+function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useRetours> }) {
+  const initiales = `${a.client.prenom.charAt(0)}${a.client.nom.charAt(0)}`.toUpperCase()
+  const couleur = COULEURS_AVATAR[(a.client.nom.length + a.client.prenom.length) % COULEURS_AVATAR.length]
+  return (
+    <article className="flex h-full flex-col gap-3.5 rounded-[26px] bg-fond p-5">
+      <div className="flex items-center gap-3">
+        <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${couleur}`}>
+          {initiales}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold">{a.client.prenom} {a.client.nom}</p>
+          <p className="mt-px text-xs text-texte-discret">
+            {a.prestataire.nomEntreprise} · {formatDate(a.dateCreation)}
+          </p>
+        </div>
+        <BadgeStatut statut={a.statut} />
+      </div>
+      <Etoiles note={a.note} />
+      <p className="text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">{a.commentaire ?? <span className="text-texte-doux">{T.sansCommentaire}</span>}</p>
+      {a.signaleLe && (
+        <p className="text-xs text-texte-doux">
+          {T.signaleLe(formatDateHeure(a.signaleLe))}
+          {a.motifSignalement ? ` : « ${a.motifSignalement} »` : ''}
+        </p>
+      )}
+      {a.modereLe && (
+        <p className="text-xs text-texte-doux">
+          {T.modereLe(formatDateHeure(a.modereLe))}
+          {a.motifModeration ? ` : « ${a.motifModeration} »` : ''}
+        </p>
+      )}
+      <div className="mt-auto flex flex-wrap gap-2 pt-0.5">
+        {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
+        {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={retour.succes} /> : <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
+        <Link
+          to={`/reservations/${a.reservationId}`}
+          className="inline-flex h-10 items-center rounded-gelule bg-primaire-600 px-5 text-xs font-bold text-white shadow-bouton transition-transform active:scale-[0.97]"
+        >
+          {T.reservation}
+        </Link>
+      </div>
+    </article>
+  )
+}
+
 export default function AvisListePage() {
   const etat = useFiltresUrl(['vue', 'note', 'prestataire'], { vue: 'a_traiter' })
   const retour = useRetours()
@@ -144,12 +201,12 @@ export default function AvisListePage() {
         legende={T.filtres}
         etat={etat}
         filtres={[
-          { cle: 'vue', type: 'select', label: T.vue, options: OPTIONS_VUE },
+          { cle: 'vue', type: 'select', label: T.vue, options: OPTIONS_VUE, onglets: true },
           { cle: 'note', type: 'select', label: T.note, options: OPTIONS_NOTE },
           { cle: 'prestataire', type: 'texte', label: T.prestataire },
         ]}
       />
-      <ListePaginee legende={T.legende} cle="avis" charger={chargerAvis} etat={etat} colonnes={colonnes} cleLigne={(a) => a.id} lien={(a) => ({ vers: `/reservations/${a.reservationId}`, nom: a.prestataire.nomEntreprise })} messageVide={T.vide} />
+      <ListePaginee legende={T.legende} cle="avis" charger={chargerAvis} etat={etat} colonnes={colonnes} cleLigne={(a) => a.id} carte={(a) => <CarteAvis a={a} retour={retour} />} messageVide={T.vide} />
     </div>
   )
 }
