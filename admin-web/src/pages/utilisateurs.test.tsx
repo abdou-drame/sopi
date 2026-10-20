@@ -55,7 +55,7 @@ describe('utilisateurs', () => {
     const lien = await screen.findByRole('link', { name: 'Moussa Diop' })
     expect(lien).toHaveAttribute('href', `/utilisateurs/${ID}`)
     expect(screen.getByText('Garage Exemple')).toBeInTheDocument()
-    await userEvent.selectOptions(screen.getByLabelText('Rôle'), 'client')
+    await userEvent.click(screen.getByRole('tab', { name: 'Client' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/utilisateurs?role=client')
     expect(appels.some((a) => a.chemin === '/admin/utilisateurs' && a.recherche.get('role') === 'client')).toBe(true)
   })
