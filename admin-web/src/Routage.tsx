@@ -19,8 +19,9 @@ import { AccesRefusePage, NonTrouvePage } from './pages/PagesSimples'
 /** Toutes les routes du back-office ; sans routeur ni fournisseurs, pour être testées avec un MemoryRouter. */
 export default function Routage() {
   return (
-        <Routes>
-      <Route path="/connexion" element={<ConnexionPage />} />        <Route element={<RouteProtegee />}>
+    <Routes>
+      <Route path="/connexion" element={<ConnexionPage />} />
+      <Route element={<RouteProtegee />}>
         <Route element={<Coque />}>
           <Route index element={<TableauDeBordPage />} />
           <Route path="/revenus" element={<RevenusPage />} />
