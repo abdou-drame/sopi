@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
-import type { CibleSanction, DecisionLitige, Litige, LitigeDetail, PartieLitige } from '../api/typesAdmin'
+import type { CibleSanction, DecisionLitige, LitigeDetail, PartieLitige } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
@@ -13,16 +13,13 @@ import { IconeAvis, IconeDossier, IconeLitige, IconeSanction } from '../componen
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import Definitions from '../components/ui/Definitions'
-import EnTetePage from '../components/ui/EnTetePage'
 import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
-import FiltresListe from '../components/ui/FiltresListe'
-import LienLigne from '../components/ui/LienLigne'
-import ListePaginee from '../components/ui/ListePaginee'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
 import PageDetail from '../components/ui/PageDetail'
-import type { Colonne } from '../components/ui/Tableau'
+import { Badge, BoutonExporter, Carte as CarteMq, LigneLien, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
+import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
-import { aujourdhui, formatDateHeure, formatMontant } from '../lib/format'
+import { aujourdhui, formatDate, formatDateHeure, formatMontant } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
 const T = L.litiges
@@ -37,22 +34,85 @@ const OPTIONS_STATUT = [
 
 const nomComplet = (p: { prenom: string; nom: string }) => `${p.prenom} ${p.nom}`
 
+const TON_STATUT: Record<string, TonBadge> = { ouvert: 'danger', cloture: 'succes' }
+
 export function LitigesListePage() {
   const etat = useFiltresUrl(['statut'], { statut: 'ouvert' })
-  const colonnes: Colonne<Litige>[] = [
-    { cle: 'motif', titre: T.motif, rendu: (l) => <LienLigne vers={`/litiges/${l.id}`}>{l.motif}</LienLigne> },
-    { cle: 'client', titre: T.client, rendu: (l) => nomComplet(l.client) },
-    { cle: 'prestataire', titre: T.prestataire, rendu: (l) => l.prestataire.nomEntreprise ?? nomComplet(l.prestataire) },
-    { cle: 'prestation', titre: T.prestation, rendu: (l) => l.reservation.prestation },
-    { cle: 'date', titre: T.ouvertLe, rendu: (l) => formatDateHeure(l.dateCreation) },
-    { cle: 'preuves', titre: T.preuves, alignement: 'droite', rendu: (l) => l.nombrePreuves },
-    { cle: 'statut', titre: L.commun.statut, rendu: (l) => <BadgeStatut statut={l.statut} /> },
-  ]
+  const liste = useListe('litiges', api.litiges, etat)
+  const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  const compteurs: Record<string, number | undefined> = {
+    ouvert: tableau?.litiges.ouverts,
+    cloture: tableau?.litiges.clos,
+    tous: tableau?.litiges.total,
+  }
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      <FiltresListe legende={T.filtres} etat={etat} filtres={[{ cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT, onglets: true }]} />
-      <ListePaginee legende={T.legende} cle="litiges" charger={api.litiges} etat={etat} colonnes={colonnes} cleLigne={(l) => l.id} lien={(l) => ({ vers: `/litiges/${l.id}`, nom: l.motif })} messageVide={T.vide} />
+    <div className="flex flex-col gap-4">
+      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis remboursez l'acompte ou rejetez la demande.">
+        <BoutonExporter />
+      </TitrePage>
+      <CarteMq className="flex flex-col gap-3.5">
+        <div className="flex flex-wrap items-center gap-3">
+          <Onglets
+            libelle={T.statut}
+            onglets={OPTIONS_STATUT.map((o) => ({
+              cle: o.valeur,
+              libelle: o.libelle,
+              compteur: compteurs[o.valeur] ?? '—',
+              actif: etat.valeurs.statut === o.valeur,
+              onSelect: () => etat.definir({ statut: o.valeur }),
+            }))}
+          />
+          <div className="flex-1" />
+          <Recherche valeur="" onChange={() => {}} placeholder="Rechercher un litige" libelle="Rechercher un litige" />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="mq-table min-w-[860px]" aria-label={T.legende}>
+            <thead>
+              <tr>
+                <th>Litige</th>
+                <th>{T.client}</th>
+                <th>{T.prestataire}</th>
+                <th style={{ textAlign: 'right' }}>{T.acompte}</th>
+                <th>{T.ouvertLe}</th>
+                <th>{L.commun.statut}</th>
+                <th className="relative">
+                  <span className="sr-only">Action</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.lignes.map((l) => {
+                const acompte = l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)
+                return (
+                  <LigneLien key={l.id} vers={`/litiges/${l.id}`} libelle={`Ouvrir le litige ${l.motif}`}>
+                    <td>
+                      <span className="block font-semibold">{l.reservation.prestation}</span>
+                      <span className="mt-px block text-[11px] text-[#9aa0b2]">—</span>
+                    </td>
+                    <td>{nomComplet(l.client)}</td>
+                    <td>{l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <span className="font-semibold tabular-nums">{acompte === null ? '—' : formatMontant(acompte)}</span>
+                    </td>
+                    <td>{formatDate(l.dateCreation)}</td>
+                    <td>
+                      <Badge ton={l.statut === 'cloture' && l.decision === 'rejet' ? 'neutre' : (TON_STATUT[l.statut] ?? 'neutre')}>{L.statuts[l.statut] ?? l.statut}</Badge>
+                    </td>
+                  </LigneLien>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
+        <PiedListe
+          resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
+          precedent={liste.page > 1}
+          suivant={liste.page < liste.totalPages}
+          onPrecedent={() => etat.allerPage(liste.page - 1)}
+          onSuivant={() => etat.allerPage(liste.page + 1)}
+        />
+      </CarteMq>
     </div>
   )
 }
