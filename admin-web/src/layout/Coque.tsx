@@ -5,6 +5,7 @@ import { compteursParEcran, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
 import { L } from '../i18n/libelles'
 import { HoteEnTete } from './EnTeteLarge'
+import MenuPlus from './MenuPlus'
 import Logo from '../design/Logo'
 import {
   IActualiser,
@@ -87,6 +88,7 @@ function BarreDuHaut() {
               </NavLink>
             )
           })}
+          <MenuPlus />
         </div>
       </nav>
       <div className="flex items-center gap-2">

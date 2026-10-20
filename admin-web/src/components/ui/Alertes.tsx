@@ -24,9 +24,9 @@ interface Notifieur {
 const ContexteRetours = createContext<Notifieur | null>(null)
 
 const styles: Record<TypeRetour, string> = {
-  succes: 'border-l-succes',
-  info: 'border-l-primaire-600',
-  erreur: 'border-l-erreur',
+  succes: 'border-l-[#16a34a]',
+  info: 'border-l-[#1d4ed8]',
+  erreur: 'border-l-[#e5484d]',
 }
 
 function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number) => void }) {
@@ -48,14 +48,14 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
       onMouseLeave={() => setEnPause(false)}
       onFocus={() => setEnPause(true)}
       onBlur={() => setEnPause(false)}
-      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-surface px-4 py-3.5 text-[13px] font-semibold text-texte shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
+      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-white px-4 py-3.5 text-[13px] font-semibold text-[#12172b] shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
     >
       <span className="min-w-0 flex-1">{retour.texte}</span>
       <button
         type="button"
         aria-label={L.commun.fermer}
         onClick={() => onFin(retour.id)}
-        className="-my-1 -mr-2 shrink-0 rounded-petit px-2 text-lg leading-none opacity-70 hover:opacity-100"
+        className="-my-1 -mr-2 shrink-0 rounded-xl px-2 text-lg leading-none opacity-70 hover:opacity-100"
       >
         ×
       </button>

@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
 
@@ -33,11 +34,33 @@ describe('coque', () => {
       'Utilisateurs',
       'Métiers',
     ])
-    expect(within(nav).queryByRole('button', { name: /Plus/ })).not.toBeInTheDocument()
+    expect(within(nav).getByRole('button', { name: 'Plus' })).toHaveAttribute('aria-haspopup', 'menu')
     const rail = screen.getByRole('complementary', { name: 'Raccourcis' })
     expect(within(rail).getAllByRole('link')).toHaveLength(7)
     expect(within(rail).getByRole('button', { name: 'Actualiser' })).toBeInTheDocument()
     expect(within(rail).getByRole('button', { name: 'Se déconnecter' })).toBeInTheDocument()
+  })
+
+  it('ouvre le menu « Plus » vers les cinq pages et surligne la page active', async () => {
+    const page = { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } }
+    simulerApi({ 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES }, 'GET /admin/paiements': { corps: page } })
+    afficherApplication('/paiements')
+    const bouton = await screen.findByRole('button', { name: 'Plus' })
+    expect(bouton).toHaveAttribute('aria-current', 'page')
+    expect(bouton).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(bouton)
+    const menu = screen.getByRole('menu', { name: 'Plus' })
+    expect(within(menu).getAllByRole('menuitem').map((l) => [l.textContent, l.getAttribute('href')])).toEqual([
+      ['Revenus', '/revenus'],
+      ['Réservations', '/reservations'],
+      ['Paiements', '/paiements'],
+      ['Retraits', '/retraits'],
+      ['Notifications en échec', '/notifications-en-echec'],
+    ])
+    expect(within(menu).getByRole('menuitem', { name: 'Paiements' })).toHaveAttribute('aria-current', 'page')
+    expect(within(menu).getByRole('menuitem', { name: 'Revenus' })).not.toHaveAttribute('aria-current')
+    await userEvent.keyboard('{Escape}')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 
   it('affiche la pastille de compteur issue de /admin/alertes sur Litiges', async () => {

@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/endpoints'
-import { useAlertes } from '../api/useAlertes'
+import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
+import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, DEGRADE_BLEU, TitrePage } from '../design/composants'
-import { ICalendrier, IChevronBas, IFlecheHautDroite, IGraphique, ILitiges, IPlus } from '../design/icones'
+import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
 
@@ -303,6 +304,24 @@ function CartePrestataires() {
   )
 }
 
+const GRAVITE_BANNIERE = { critique: 'danger', attention: 'attention', info: 'info' } as const
+
+/** Bannières d'alerte de l'administrateur : une par alerte réelle de l'API, avec le lien de l'écran concerné. */
+function AlertesTableau() {
+  const { data } = useAlertes()
+  const alertes = data?.alertes ?? []
+  if (alertes.length === 0) return null
+  return (
+    <div className="flex flex-col gap-2.5" aria-label={T.alertes}>
+      {alertes.map((a) => (
+        <BanniereAlerteMq key={a.type} gravite={GRAVITE_BANNIERE[a.gravite]} action={{ libelle: L.commun.voirCourt, vers: lienDeLAlerte(a) }}>
+          {a.message}
+        </BanniereAlerteMq>
+      ))}
+    </div>
+  )
+}
+
 export default function TableauDeBordPage() {
   const { utilisateur } = useAuth()
   const fin = aujourdhui()
@@ -318,18 +337,13 @@ export default function TableauDeBordPage() {
   return (
     <div className="flex flex-col gap-4">
       <TitrePage titre={`${T.bienvenue}`} suite={utilisateur?.prenom}>
-        <button type="button" className="mq-btn-blanc flex h-12 cursor-pointer items-center gap-2.5 rounded-3xl border-none pr-[18px] pl-4 text-[13px] font-semibold text-[#12172b]">
+        <span className="flex h-12 items-center gap-2.5 rounded-3xl bg-white pr-5 pl-4 text-[13px] font-semibold text-[#12172b]">
           <ICalendrier />
           {periode}
-          <span className="text-[#8a90a2]">
-            <IChevronBas />
-          </span>
-        </button>
-        <button type="button" className="mq-btn-blanc flex h-12 cursor-pointer items-center gap-2 rounded-3xl border-none pr-5 pl-4 text-[13px] font-semibold text-[#12172b]">
-          <IPlus taille={16} trait={2.2} />
-          Exporter
-        </button>
+        </span>
       </TitrePage>
+
+      <AlertesTableau />
 
       <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} pastille={ABSENT} note="30 derniers jours" />

@@ -1,15 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import type { FormEvent, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { erreursParChamp, messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { Metier } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
-import Bouton from '../components/ui/Bouton'
-import { Champ } from '../components/ui/Champs'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import Carte from '../components/ui/Carte'
+import { ChampTexte } from '../design/champs'
+import Fenetre from '../design/Fenetre'
 import { Badge, BoutonPlus, Carte as CarteMq, TitrePage } from '../design/composants'
 import { ICiseaux, IChemise, IMetiers } from '../design/icones'
 import { EtatsListe } from '../design/useListe'
@@ -20,30 +18,33 @@ const T = L.metiersAdmin
 const LIBELLE_MIN = 2
 const LIBELLE_MAX = 60
 
-function FormulaireAjout({ onFait }: { onFait: (message: string) => void }) {
+function FenetreAjout({ ouverte, onFermer, onFait }: { ouverte: boolean; onFermer: () => void; onFait: (message: string) => void }) {
   const [libelle, setLibelle] = useState('')
   const action = useAction((nom: string) => api.creerMetier(nom))
-  const soumettre = (e: FormEvent) => {
-    e.preventDefault()
-    action.mutate(libelle, {
-      onSuccess: () => {
-        setLibelle('')
-        onFait(T.ajoute)
-      },
-    })
+  const fermer = () => {
+    setLibelle('')
+    action.reset()
+    onFermer()
   }
-  const erreur = action.isError ? (erreursParChamp(action.error).libelle ?? messageDErreur(action.error)) : undefined
   return (
-    <Carte titre={T.ajouterTitre}>
-      <form onSubmit={soumettre} noValidate className="flex flex-wrap items-start gap-3">
-        <div className="min-w-64 flex-1">
-          <Champ label={T.ajouterLibelle} aide={T.ajouterAide} value={libelle} maxLength={LIBELLE_MAX} erreur={erreur} onChange={(e) => setLibelle(e.target.value)} />
-        </div>
-        <Bouton type="submit" className="mt-7" enCours={action.isPending} disabled={libelle.trim().length < LIBELLE_MIN}>
-          {T.ajouter}
-        </Bouton>
-      </form>
-    </Carte>
+    <Fenetre
+      ouverte={ouverte}
+      titre={T.ajouterTitre}
+      libelleConfirmer={T.ajouter}
+      champs={<ChampTexte label={T.ajouterLibelle} aide={T.ajouterAide} value={libelle} maxLength={LIBELLE_MAX} onChange={(e) => setLibelle(e.target.value)} />}
+      confirmerDesactive={libelle.trim().length < LIBELLE_MIN}
+      enCours={action.isPending}
+      erreur={action.isError ? (erreursParChamp(action.error).libelle ?? messageDErreur(action.error)) : undefined}
+      onAnnuler={fermer}
+      onConfirmer={() =>
+        action.mutate(libelle, {
+          onSuccess: () => {
+            fermer()
+            onFait(T.ajoute)
+          },
+        })
+      }
+    />
   )
 }
 
@@ -71,11 +72,11 @@ function ActionRenommer({ metier, onFait }: { metier: Metier; onFait: (message: 
       >
         Modifier
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={T.renommerTitre}
         libelleConfirmer={T.enregistrer}
-        champs={<Champ label={T.renommerChamp} value={libelle} maxLength={LIBELLE_MAX} onChange={(e) => setLibelle(e.target.value)} />}
+        champs={<ChampTexte label={T.renommerChamp} value={libelle} maxLength={LIBELLE_MAX} onChange={(e) => setLibelle(e.target.value)} />}
         confirmerDesactive={propre.length < LIBELLE_MIN || propre === metier.libelle}
         enCours={action.isPending}
         erreur={action.isError ? (erreursParChamp(action.error).libelle ?? messageDErreur(action.error)) : undefined}
@@ -121,7 +122,7 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
       <button type="button" className={BOUTON_MQ} aria-label={textes.libelle} onClick={() => setOuverte(true)}>
         {textes.bouton}
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={ouverte}
         titre={textes.titre}
         description={textes.texte}
@@ -214,9 +215,9 @@ export default function MetiersPage() {
   return (
     <div className="flex flex-col gap-4">
       <TitrePage titre="Métiers" suite="proposés" sousTitre="Gérez les catégories de services que les clients peuvent réserver.">
-        <BoutonPlus onClick={() => setAjout((v) => !v)}>Ajouter un métier</BoutonPlus>
+        <BoutonPlus onClick={() => setAjout(true)}>Ajouter un métier</BoutonPlus>
       </TitrePage>
-      {ajout && <FormulaireAjout onFait={retour.succes} />}
+      <FenetreAjout ouverte={ajout} onFermer={() => setAjout(false)} onFait={retour.succes} />
       <EtatsListe
         chargement={requete.isPending}
         erreur={requete.isError ? messageDErreur(requete.error) : null}

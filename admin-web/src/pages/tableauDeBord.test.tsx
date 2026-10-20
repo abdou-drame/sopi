@@ -134,6 +134,22 @@ describe('tableau de bord', () => {
     expect(screen.getByText('dossiers')).toBeInTheDocument()
   })
 
+  it('affiche une bannière par alerte réelle, avec le lien de l’écran concerné', async () => {
+    simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
+    afficherApplication('/')
+    const bannieres = await screen.findAllByRole('alert')
+    const banniere = bannieres.find((b) => b.textContent?.includes('2 dossiers en attente.'))!
+    expect(banniere).toBeDefined()
+    expect(within(banniere).getByRole('link', { name: 'Voir' })).toHaveAttribute('href', '/dossiers-prestataires')
+  })
+
+  it('n’affiche aucune bannière quand il n’y a aucune alerte', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    await screen.findByRole('link', { name: 'Ouvrir les dossiers' })
+    expect(screen.queryByText('2 dossiers en attente.')).not.toBeInTheDocument()
+  })
+
   it('montre les litiges ouverts et relie la carte à la liste des litiges', async () => {
     simulerApi(toutes)
     afficherApplication('/')

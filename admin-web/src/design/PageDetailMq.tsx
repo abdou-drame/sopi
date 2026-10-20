@@ -2,15 +2,14 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError, messageDErreur } from '../api/client'
-import Bouton from '../components/ui/Bouton'
-import Squelette from '../components/ui/Squelette'
 import { L } from '../i18n/libelles'
-import { IRetour } from './icones'
 import { Carte } from './composants'
+import { EtatChargement, EtatErreur } from './etats'
+import { IRetour } from './icones'
 
 /**
- * Chargement, erreur et 404 d'une page de détail dessinée : états absents des maquettes, on garde les composants existants
- * (Squelette, Bouton) sous le seul rond « retour » dessiné. Une fois les données là, le contenu est celui de la maquette.
+ * Chargement, erreur et 404 d'une page de détail, au style des états des maquettes (Etats.html), sous le rond « retour ».
+ * Une fois les données là, le contenu est celui de la maquette de l'écran.
  */
 export default function PageDetailMq<T>({
   requete,
@@ -30,24 +29,15 @@ export default function PageDetailMq<T>({
         <Link to={retour} aria-label={libelleRetour} className="mq-btn-blanc grid size-12 shrink-0 place-items-center rounded-3xl text-[#12172b]">
           <IRetour />
         </Link>
-        {requete.isPending ? (
-          <div role="status" aria-label={L.commun.chargement}>
-            <Squelette className="h-10 w-72" />
-            <Squelette className="mt-6 h-64 w-full rounded-grand" />
-          </div>
-        ) : (
-          <Carte>
-            <div role="alert" className="flex flex-col items-start gap-3">
-              <p className="text-lg font-semibold">{introuvable ? L.commun.elementIntrouvable : L.commun.erreurChargement}</p>
-              <p className="text-sm text-[#8a90a2]">{messageDErreur(requete.error)}</p>
-              {!introuvable && (
-                <Bouton variante="secondaire" taille="p" onClick={() => void requete.refetch()}>
-                  {L.commun.reessayer}
-                </Bouton>
-              )}
-            </div>
-          </Carte>
-        )}
+        <Carte>
+          {requete.isPending ? (
+            <EtatChargement lignes={5} />
+          ) : introuvable ? (
+            <EtatErreur titre={L.commun.elementIntrouvable} texte={messageDErreur(requete.error)} />
+          ) : (
+            <EtatErreur titre={L.commun.erreurChargement} texte={messageDErreur(requete.error)} onReessayer={() => void requete.refetch()} />
+          )}
+        </Carte>
       </div>
     )
   }

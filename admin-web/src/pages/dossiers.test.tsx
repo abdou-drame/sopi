@@ -149,6 +149,16 @@ describe('dossiers prestataires', () => {
     afficherApplication(ADRESSE_DETAIL)
     expect(await screen.findByText('Pièces illisibles.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Valider le dossier' })).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Ce dossier a déjà été refusé.')
+  })
+
+  it('affiche la bannière « déjà accepté » pour un dossier actif', async () => {
+    simulerApi({
+      ...base,
+      'GET /admin/prestataires/0198a1b2-0000-7000-8000-000000000002': { corps: { ...DETAIL, statutCompte: 'actif', justificatifs: [] } },
+    })
+    afficherApplication(ADRESSE_DETAIL)
+    expect(await screen.findByText('Ce dossier a déjà été accepté.')).toBeInTheDocument()
   })
 
   it('affiche « introuvable » pour un dossier inconnu', async () => {

@@ -63,7 +63,7 @@ function Pastille({ x, y, texte }: { x: number; y: number; texte: string }) {
   const gauche = Math.max(2, Math.min(L_VUE - largeur - 2, x - largeur / 2))
   return (
     <g className="animate-infobulle" style={{ pointerEvents: 'none' }}>
-      <rect x={gauche} y={y - 30} width={largeur} height={22} rx={11} fill="var(--color-primaire-900)" />
+      <rect x={gauche} y={y - 30} width={largeur} height={22} rx={11} fill="#12172b" />
       <text x={gauche + largeur / 2} y={y - 15} textAnchor="middle" fontSize="11" fontWeight="600" fill="#fff">
         {texte}
       </text>
@@ -103,21 +103,21 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
         </defs>
         {graduations(max).map((g) => (
           <g key={g}>
-            <line x1={MARGE.gauche} x2={L_VUE - MARGE.droite} y1={y(g)} y2={y(g)} stroke="var(--color-bordure)" strokeDasharray="2 6" />
-            <text x={MARGE.gauche - 10} y={y(g) + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
+            <line x1={MARGE.gauche} x2={L_VUE - MARGE.droite} y1={y(g)} y2={y(g)} stroke="#e6e8ee" strokeDasharray="2 6" />
+            <text x={MARGE.gauche - 10} y={y(g) + 4} textAnchor="end" fontSize="10.5" fill="#9aa0b2">
               {abrege(g)}
             </text>
           </g>
         ))}
         {libelles.map((l, i) =>
           i % pas === 0 ? (
-            <text key={`${l}-${i}`} x={x(i)} y={H_VUE - 12} textAnchor="middle" fontSize="10.5" fill="var(--color-texte-discret)">
+            <text key={`${l}-${i}`} x={x(i)} y={H_VUE - 12} textAnchor="middle" fontSize="10.5" fill="#9aa0b2">
               {l}
             </text>
           ) : null,
         )}
         {n > 0 && (
-          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="var(--color-primaire-200)" strokeDasharray="3 4" />
+          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="#b8c8f5" strokeDasharray="3 4" />
         )}
         {series.map((s, k) => {
           const points = s.valeurs.map((v, i) => [x(i), y(v)] as [number, number])
@@ -141,7 +141,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
                 />
               )}
               {n > 0 && (
-                <circle cx={x(actif)} cy={y(s.valeurs[actif] ?? 0)} r="5" fill="var(--color-surface)" stroke={s.couleur} strokeWidth="2.5" />
+                <circle cx={x(actif)} cy={y(s.valeurs[actif] ?? 0)} r="5" fill="#ffffff" stroke={s.couleur} strokeWidth="2.5" />
               )}
             </g>
           )
@@ -167,7 +167,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
           />
         ))}
       </svg>
-      <ul className="mt-2 flex flex-wrap gap-4 text-xs text-texte-doux">
+      <ul className="mt-2 flex flex-wrap gap-4 text-xs text-[#8a90a2]">
         {series.map((s) => (
           <li key={s.nom} className="flex items-center gap-1.5">
             <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: s.couleur }} />
@@ -235,7 +235,7 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
                       height: `${hauteur}%`,
                       backgroundColor: estActif ? '#1d4ed8' : '#a9bdf6',
                       backgroundImage: rayures,
-                      animation: `croissance var(--duree-lente) var(--ease-sortie) ${i * 80}ms both`,
+                      animation: `croissance 500ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 80}ms both`,
                     }}
                   >
                     {estActif && d.valeur > 0 && (

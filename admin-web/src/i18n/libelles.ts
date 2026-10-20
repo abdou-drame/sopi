@@ -22,6 +22,8 @@ export const L = {
     reinitialiser: 'Réinitialiser les filtres',
     aucuneDonnee: 'Aucune donnée à afficher.',
     erreurChargement: 'Impossible de charger ces données.',
+    erreurListe: 'Impossible de charger la liste',
+    aucunResultat: 'Aucun résultat',
     elementIntrouvable: 'Élément introuvable',
     rechercher: 'Rechercher',
     tous: 'Tous',

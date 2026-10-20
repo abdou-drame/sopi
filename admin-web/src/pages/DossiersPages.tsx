@@ -7,12 +7,11 @@ import type { DemandeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import FichierProtege from '../components/ui/FichierProtege'
-import ModaleConfirmation from '../components/ui/ModaleConfirmation'
+import { BanniereDecision } from '../design/bannieres'
+import Fenetre from '../design/Fenetre'
 import {
   Avatar,
   Badge,
-  BoutonExporter,
-  BoutonFiltre,
   Carte as CarteMq,
   DEGRADE_BLEU,
   EnteteCarte,
@@ -20,7 +19,6 @@ import {
   LigneLien,
   Onglets,
   PiedListe,
-  Recherche,
   TitreCarte,
   TitreDetail,
   TitrePage,
@@ -63,9 +61,7 @@ export function DossiersListePage() {
   }
   return (
     <div className="flex flex-col gap-4">
-      <TitrePage titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier.">
-        <BoutonExporter />
-      </TitrePage>
+      <TitrePage titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier." />
       <CarteMq className="flex flex-col gap-3.5">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
@@ -78,10 +74,6 @@ export function DossiersListePage() {
               onSelect: () => etat.definir({ statut: o.valeur }),
             }))}
           />
-          <div className="flex-1" />
-          <Recherche valeur="" onChange={() => {}} placeholder="Rechercher un prestataire" libelle="Rechercher un prestataire" />
-          <BoutonFiltre>{T.metier}</BoutonFiltre>
-          <BoutonFiltre>{T.quartier}</BoutonFiltre>
         </div>
         <div className="overflow-x-auto">
           <table className="mq-table min-w-[820px]" aria-label={T.legende}>
@@ -109,7 +101,6 @@ export function DossiersListePage() {
                         <Avatar nom={nomComplet(d)} taille={40} />
                         <span>
                           <span className="block font-semibold">{nomComplet(d)}</span>
-                          <span className="mt-px block text-[11px] text-[#9aa0b2]">—</span>
                         </span>
                       </div>
                     </td>
@@ -163,7 +154,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
       <button type="button" onClick={() => setModale('accepter')} className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
         Valider le dossier
       </button>
-      <ModaleConfirmation
+      <Fenetre
         ouverte={modale === 'accepter'}
         titre={T.accepterTitre}
         description={T.accepterTexte}
@@ -180,7 +171,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
           })
         }
       />
-      <ModaleConfirmation
+      <Fenetre
         ouverte={modale === 'refuser'}
         titre={T.refuserTitre}
         description={T.refuserTexte}
@@ -260,6 +251,8 @@ export function DossierDetailPage() {
             >
               {d.statutCompte === 'en_attente' && <ActionsDossier d={d} onFait={retour.succes} />}
             </TitreDetail>
+            {d.statutCompte === 'actif' && <BanniereDecision ton="succes">Ce dossier a déjà été accepté.</BanniereDecision>}
+            {d.statutCompte === 'refuse' && <BanniereDecision ton="danger">Ce dossier a déjà été refusé.</BanniereDecision>}
             <div className="flex flex-wrap items-start gap-3.5">
               <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
                 <CarteMq>
@@ -269,10 +262,6 @@ export function DossierDetailPage() {
                     <Tuile libelle="Téléphone">{d.telephone}</Tuile>
                     <Tuile libelle="Métier">{L.metiers[d.metier] ?? d.metier}</Tuile>
                     <Tuile libelle="Quartier">{d.quartier}</Tuile>
-                    <div className="col-span-full rounded-[20px] bg-[#f3f4f7] px-[18px] py-3.5">
-                      <div className="text-xs text-[#8a90a2]">Présentation de l'activité</div>
-                      <div className="mt-[3px] text-sm leading-[22px] font-medium text-[#3c4257]">{ABSENT}</div>
-                    </div>
                   </div>
                 </CarteMq>
                 <CarteMq>
@@ -312,7 +301,6 @@ export function DossierDetailPage() {
                     <div className="mt-1.5 text-[28px] leading-[34px] font-bold tracking-[-0.6px]">{statut}</div>
                     <div className="mt-[18px] flex items-center justify-between text-xs">
                       <span className="opacity-80">Reçu il y a {dureeMinutes(recu)}</span>
-                      <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{ABSENT}</span>
                     </div>
                   </div>
                 </CarteMq>
@@ -320,7 +308,6 @@ export function DossierDetailPage() {
                   <TitreCarte titre="Historique du dossier" />
                   <div className="mt-4 flex flex-col">
                     <EtapeChrono couleur="#1d4ed8" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
-                    <EtapeChrono couleur="#1d4ed8" titre="E-mail « Dossier bien reçu » envoyé" detail={ABSENT} />
                     {d.statutCompte === 'en_attente' ? (
                       <EtapeChrono couleur="#cdd9fb" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
                     ) : (

@@ -290,20 +290,22 @@ export function LienRond({ vers, libelle, blanc = false }: { vers: string; libel
  * Ligne de tableau dont toute la surface mène à la fiche : le lien rond ↗ étire une zone invisible sur la ligne
  * (clic, clic molette, Ctrl/Cmd+clic et clavier sont ceux d'un lien natif). Les autres liens et boutons de la ligne restent au-dessus.
  */
-export function LigneLien({ vers, libelle, children }: { vers: string; libelle: string; children: ReactNode }) {
+export function LigneLien({ vers, libelle, texte, children }: { vers: string; libelle: string; texte?: string; children: ReactNode }) {
   const { search } = useLocation()
   return (
     <tr className="relative cursor-pointer focus-within:bg-[#f6f7fa] [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10">
       {children}
-      <td>
+      <td style={texte ? { textAlign: 'right' } : undefined}>
         <Link
           to={vers}
           data-voir
           state={{ recherche: search }}
           aria-label={libelle}
-          className="mq-rond mq-lr inline-flex size-9 items-center justify-center rounded-full bg-[#f3f4f7] text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8]"
+          className={`mq-rond mq-lr inline-flex items-center justify-center bg-[#f3f4f7] text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8] ${
+            texte ? 'h-[34px] rounded-[17px] px-3.5 text-xs font-bold' : 'size-9 rounded-full'
+          }`}
         >
-          <IFlecheHautDroite />
+          {texte ?? <IFlecheHautDroite />}
         </Link>
       </td>
     </tr>
@@ -345,5 +347,37 @@ export function Tuile({ libelle, children, className = '' }: { libelle: string; 
       <div className="text-xs leading-[normal] text-[#8a90a2]">{libelle}</div>
       <div className="mt-[3px] text-sm leading-[normal] font-semibold">{children}</div>
     </div>
+  )
+}
+
+/** Statut en texte précédé d'un point de 7 px (colonne « Statut » des réservations). */
+export function PointStatut({ couleur, children }: { couleur: string; children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 font-medium">
+      <span aria-hidden="true" className="size-[7px] rounded-full" style={{ background: couleur }} />
+      {children}
+    </span>
+  )
+}
+
+/** Grille de tuiles d'information (libellé + valeur) ; une valeur absente de l'API s'affiche « — ». */
+export function GrilleTuiles({ elements, className = '' }: { elements: { libelle: string; valeur?: ReactNode; large?: boolean }[]; className?: string }) {
+  return (
+    <div className={`mt-3.5 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-2.5 ${className}`}>
+      {elements.map((e) => (
+        <Tuile key={e.libelle} libelle={e.libelle} className={e.large ? 'col-span-full' : ''}>
+          {e.valeur === undefined || e.valeur === null || e.valeur === '' ? <span className="text-[#9aa0b2]">—</span> : e.valeur}
+        </Tuile>
+      ))}
+    </div>
+  )
+}
+
+/** Lien dans le texte d'une tuile ou d'une carte. */
+export function LienTexte({ vers, children }: { vers: string; children: ReactNode }) {
+  return (
+    <Link to={vers} className="font-semibold text-[#1d4ed8] hover:underline">
+      {children}
+    </Link>
   )
 }
