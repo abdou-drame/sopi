@@ -15,11 +15,11 @@ describe('métiers', () => {
   it('liste les métiers avec leur état et leur nombre de prestataires', async () => {
     simulerApi(base)
     afficherApplication('/metiers')
-    const ligne = (await screen.findByText('Coiffure')).closest('tr') as HTMLElement
+    const ligne = (await screen.findByText('Coiffure')).closest('section') as HTMLElement
     expect(within(ligne).getByText('coiffure')).toBeInTheDocument()
     expect(within(ligne).getByText('4')).toBeInTheDocument()
     expect(within(ligne).getByText('Actif')).toBeInTheDocument()
-    expect(within(screen.getByText('Pressing').closest('tr') as HTMLElement).getByText('Désactivé')).toBeInTheDocument()
+    expect(within(screen.getByText('Pressing').closest('section') as HTMLElement).getByText('Désactivé')).toBeInTheDocument()
   })
 
   it('ajoute un métier : corps conforme, champ vidé, confirmation (appel simulé)', async () => {
