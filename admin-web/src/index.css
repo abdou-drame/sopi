@@ -93,6 +93,7 @@
   --animate-infobulle: infobulle 180ms var(--ease-sortie) both;
   --animate-pulsation: pulsation 1.6s var(--ease-standard) infinite;
   --animate-trace: trace var(--duree-trace) var(--ease-sortie) both;
+  --animate-balayage: balayage 1.4s linear infinite;
   --animate-coche: coche-entree 200ms var(--ease-sortie) both;
   --animate-modale: modale-entree 200ms var(--ease-sortie) both;
   --animate-fondu: fondu-entree 200ms var(--ease-standard) both;
@@ -131,6 +132,15 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes balayage {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
   }
 }
 
