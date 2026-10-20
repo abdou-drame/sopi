@@ -40,7 +40,7 @@ function FormulaireAjout({ onFait }: { onFait: (message: string) => void }) {
         <div className="min-w-64 flex-1">
           <Champ label={T.ajouterLibelle} aide={T.ajouterAide} value={libelle} maxLength={LIBELLE_MAX} erreur={erreur} onChange={(e) => setLibelle(e.target.value)} />
         </div>
-        <Bouton type="submit" className="mt-7" enCours={action.isPending} disabled={libelle.trim().length < LIBELLE_MIN}>
+        <Bouton type="submit" className="mt-7" enCours={action.isPending} succes={action.isSuccess} disabled={libelle.trim().length < LIBELLE_MIN}>
           {T.ajouter}
         </Bouton>
       </form>
