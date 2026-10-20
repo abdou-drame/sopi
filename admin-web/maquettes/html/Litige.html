@@ -1,0 +1,175 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Détail d'un litige</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input{font-family:inherit}
+a{text-decoration:none;color:inherit}
+.nv:hover{color:#12172b}
+.rond{transition:background .15s}
+.rond:hover{background:#e4e7ee}
+.btnbleu{transition:background .15s, transform .1s}
+.btnbleu:hover{background:#1a44bd}
+.btnbleu:active{transform:scale(0.98)}
+.btnblanc:hover{background:#f6f7fa}
+.ic:hover{background:#f3f4f7;color:#12172b}
+@media (max-width: 900px){.rail{display:none !important}}
+</style>
+</head><body>
+<div style="min-height: 100vh; box-sizing: border-box; background: #eceef2; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #12172b; -webkit-font-smoothing: antialiased; padding: 12px 14px 24px">
+<div style="max-width: none; margin: 0; display: flex; flex-direction: column; gap: 16px">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; box-sizing: border-box; padding: 10px 14px 10px 22px; background: #ffffff; border-radius: 999px">
+    <a href="Tableau.html" style="display: flex; align-items: center; gap: 10px">
+      <svg width="34" height="34" viewBox="0 0 120 120" role="img" aria-label="Sopi"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b66ea"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><rect width="120" height="120" rx="30" fill="url(#lg)"/><path d="M84 40C84 28 73 22 60 22C45 22 36 30 36 41C36 52 45 56 60 60C75 64 84 68 84 79C84 90 75 98 60 98C46 98 36 91 36 78" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><circle cx="93" cy="26" r="10" fill="#fbbf24"/></svg>
+      <span style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #1d4ed8">Sopi</span>
+    </a>
+    <nav aria-label="Navigation principale" style="flex: 1 1 auto; min-width: 0; display: flex; justify-content: center">
+      <div style="display: flex; gap: 2px; padding: 4px; background: #f3f4f7; border-radius: 999px; overflow-x: auto; max-width: 100%">
+        <a class="nv" href="Tableau.html" style="display: flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Tableau de bord</a>
+        <a class="nv" href="Dossiers.html" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Dossiers <span style="min-width: 18px; padding: 0 5px; box-sizing: border-box; height: 18px; border-radius: 9px; background: #1d4ed8; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">12</span></a>
+        <a href="Litige.html" aria-current="page" style="display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 999px; background: #ffffff; box-shadow: 0 1px 3px rgba(18,23,43,0.10); font-size: 13px; font-weight: 700; color: #12172b; white-space: nowrap">Litiges <span style="min-width: 18px; padding: 0 5px; box-sizing: border-box; height: 18px; border-radius: 9px; background: #e5484d; color: #ffffff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center">3</span></a>
+        <a class="nv" href="#" style="display: flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Avis</a>
+        <a class="nv" href="#" style="display: flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Sanctions</a>
+        <a class="nv" href="#" style="display: flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Utilisateurs</a>
+        <a class="nv" href="#" style="display: flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #6b7287; white-space: nowrap">Métiers</a>
+      </div>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <button class="rond" aria-label="Rechercher" style="width: 44px; height: 44px; border: none; border-radius: 22px; background: #f3f4f7; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="rond" aria-label="Notifications" style="position: relative; width: 44px; height: 44px; border: none; border-radius: 22px; background: #f3f4f7; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a2 2 0 0 0 3.4 0"/></svg><span style="position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 4px; background: #e5484d; border: 2px solid #f3f4f7"></span></button>
+      <span style="width: 44px; height: 44px; border-radius: 22px; background: linear-gradient(135deg, #3b66ea, #17338f); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700">AD</span>
+    </div>
+  </header>
+
+  <div style="display: flex; gap: 14px; align-items: stretch">
+
+  <!-- barre latérale d'icônes -->
+  <aside class="rail" aria-label="Raccourcis" style="flex: 0 0 68px; position: sticky; top: 16px; align-self: flex-start; height: calc(100vh - 32px); max-height: 820px; display: flex; flex-direction: column; justify-content: center; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #ffffff; border-radius: 34px">
+      <a class="ic" href="Tableau.html" aria-label="Tableau de bord" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></a>
+      <a class="ic" href="Dossiers.html" aria-label="Dossiers" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m9 15 2 2 4-4"/></svg></a>
+      <a href="Litige.html" aria-label="Litiges" aria-current="page" style="width: 48px; height: 48px; border-radius: 24px; background: #1d4ed8; color: #ffffff; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 16px rgba(29,78,216,0.28)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/></svg></a>
+      <a class="ic" href="Avis.html" aria-label="Avis" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #ffffff; border-radius: 34px">
+      <a class="ic" href="Sanctions.html" aria-label="Sanctions" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z"/></svg></a>
+      <a class="ic" href="Utilisateurs.html" aria-label="Utilisateurs" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 5"/></svg></a>
+      <a class="ic" href="Metiers.html" aria-label="Métiers" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding: 10px; background: #ffffff; border-radius: 34px">
+      <a class="ic" href="#" aria-label="Actualiser" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></a>
+      <a class="ic" href="Main.html" aria-label="Se déconnecter" style="width: 48px; height: 48px; border-radius: 24px; color: #6b7287; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></a>
+    </div>
+  </aside>
+
+  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+  <!-- titre -->
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 8px 8px 0">
+    <a href="Tableau.html" class="rond" aria-label="Retour aux litiges" style="width: 48px; height: 48px; border-radius: 24px; background: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a>
+    <div style="flex: 1 1 320px">
+      <h1 style="margin: 0; font-size: 36px; line-height: 44px; font-weight: 600; letter-spacing: -1px">Litige <span style="font-weight: 400; color: #9aa0b2">LIT-0042</span></h1>
+      <div style="margin-top: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: #8a90a2"><span style="padding: 5px 12px; border-radius: 999px; background: #fde9e9; color: #b0161b; font-size: 12px; font-weight: 700">Ouvert</span>Ouvert le 19 oct. 2026 à 15:02 · sans décision depuis 48 h</div>
+    </div>
+    <button class="btnblanc" style="height: 48px; padding: 0 22px; border: none; border-radius: 24px; background: #ffffff; font-size: 13px; font-weight: 700; color: #12172b; cursor: pointer">Rejeter le litige</button>
+    <button class="btnbleu" style="height: 48px; padding: 0 24px; border: none; border-radius: 24px; background: #1d4ed8; font-size: 13px; font-weight: 700; color: #ffffff; cursor: pointer; box-shadow: 0 8px 18px rgba(29,78,216,0.30)">Rembourser l'acompte</button>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start">
+
+    <!-- colonne principale -->
+    <div style="flex: 2 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <span style="width: 44px; height: 44px; border-radius: 22px; background: #f3f4f7; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span><span style="display: block; font-size: 15px; font-weight: 700">Motif du client</span><span style="display: block; margin-top: 2px; font-size: 12px; color: #8a90a2">Travail non conforme à la prestation réservée</span></span>
+        </div>
+        <p style="margin: 18px 0 0; padding: 18px 20px; border-radius: 22px; background: #f3f4f7; font-size: 14px; line-height: 22px; color: #3c4257">« Le diagnostic a été annoncé terminé, mais le voyant est toujours allumé au démarrage. Le mécanicien dit que ce n'est pas son travail. Je demande le remboursement de mon acompte. »</p>
+      </section>
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <span style="width: 44px; height: 44px; border-radius: 22px; background: #f3f4f7; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span><span style="display: block; font-size: 15px; font-weight: 700">Chronologie</span><span style="display: block; margin-top: 2px; font-size: 12px; color: #8a90a2">Du début de la réservation à aujourd'hui</span></span>
+        </div>
+        <div style="margin-top: 20px; display: flex; flex-direction: column">
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 7px; background: #1d4ed8; flex-shrink: 0"></span><span style="flex: 1; width: 2px; background: #e6e8ee; margin: 4px 0"></span></div>
+            <div style="padding-bottom: 20px"><div style="font-size: 14px; font-weight: 600">Réservation confirmée</div><div style="margin-top: 2px; font-size: 12px; color: #8a90a2">17 oct. 2026 · acompte payé</div></div>
+          </div>
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 7px; background: #1d4ed8; flex-shrink: 0"></span><span style="flex: 1; width: 2px; background: #e6e8ee; margin: 4px 0"></span></div>
+            <div style="padding-bottom: 20px"><div style="font-size: 14px; font-weight: 600">Prestation terminée par le prestataire</div><div style="margin-top: 2px; font-size: 12px; color: #8a90a2">19 oct. 2026 · 14:10 · code de fin saisi avec 2 photos</div></div>
+          </div>
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 7px; background: #e5484d; flex-shrink: 0"></span><span style="flex: 1; width: 2px; background: #e6e8ee; margin: 4px 0"></span></div>
+            <div style="padding-bottom: 20px"><div style="font-size: 14px; font-weight: 600">Litige ouvert par le client</div><div style="margin-top: 2px; font-size: 12px; color: #8a90a2">19 oct. 2026 · 15:02</div></div>
+          </div>
+          <div style="display: flex; gap: 16px">
+            <div style="display: flex; flex-direction: column; align-items: center"><span style="width: 14px; height: 14px; border-radius: 7px; background: #cdd9fb; flex-shrink: 0"></span></div>
+            <div><div style="font-size: 14px; font-weight: 600">En attente d'une décision</div><div style="margin-top: 2px; font-size: 12px; color: #8a90a2">Aucune réponse écrite du prestataire pour le moment</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="display: flex; align-items: center; gap: 14px">
+          <span style="width: 44px; height: 44px; border-radius: 22px; background: #f3f4f7; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></span>
+          <span><span style="display: block; font-size: 15px; font-weight: 700">Photos de fin de prestation</span><span style="display: block; margin-top: 2px; font-size: 12px; color: #8a90a2">Envoyées par le prestataire</span></span>
+        </div>
+        <div style="margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px">
+          <div style="height: 150px; border-radius: 22px; background: #e7edff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #6b84c9; font-size: 12px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>Photo 1 · [à brancher]</div>
+          <div style="height: 150px; border-radius: 22px; background: #e7edff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #6b84c9; font-size: 12px; font-weight: 600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>Photo 2 · [à brancher]</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- colonne droite -->
+    <div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="font-size: 15px; font-weight: 700">Acompte concerné</div>
+        <div style="margin-top: 2px; font-size: 12px; color: #8a90a2">Retenu en attendant la décision</div>
+        <div style="margin-top: 18px; box-sizing: border-box; padding: 20px; border-radius: 22px; background: linear-gradient(150deg, #3563e8 0%, #1d4ed8 50%, #17338f 100%); color: #ffffff">
+          <div style="font-size: 12px; font-weight: 600; opacity: 0.8">Montant de l'acompte</div>
+          <div style="margin-top: 6px; display: flex; align-items: baseline; gap: 8px"><span style="font-size: 38px; line-height: 44px; font-weight: 700; letter-spacing: -1px; font-variant-numeric: tabular-nums">9 000</span><span style="font-size: 14px; font-weight: 600; opacity: 0.85">FCFA</span></div>
+          <div style="margin-top: 18px; display: flex; align-items: center; justify-content: space-between; font-size: 12px"><span style="opacity: 0.8">Réservation R-2838</span><span style="padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.2); font-weight: 700">Payé</span></div>
+        </div>
+      </section>
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="font-size: 15px; font-weight: 700">Réservation</div>
+        <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+          <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px; background: #f3f4f7"><span style="color: #6b7287; font-weight: 500">Service</span><span style="font-weight: 600">Diagnostic électrique</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px"><span style="color: #6b7287; font-weight: 500">Métier</span><span style="font-weight: 600">Mécanique</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px; background: #f3f4f7"><span style="color: #6b7287; font-weight: 500">Date prévue</span><span style="font-weight: 600">19 oct. 2026 · 14:00</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 16px"><span style="color: #6b7287; font-weight: 500">Quartier</span><span style="font-weight: 600">Keur Massar Nord</span></div>
+        </div>
+      </section>
+
+      <section style="box-sizing: border-box; padding: 18px; background: #ffffff; border-radius: 32px">
+        <div style="font-size: 15px; font-weight: 700">Personnes concernées</div>
+        <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 22px; background: #f3f4f7">
+            <span style="width: 44px; height: 44px; border-radius: 22px; background: #dbeafe; color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">IF</span>
+            <span style="flex: 1"><span style="display: block; font-size: 14px; font-weight: 600">Ibrahima Fall</span><span style="display: block; margin-top: 1px; font-size: 12px; color: #8a90a2">Client</span></span>
+            <a href="#" class="rond" aria-label="Voir le profil du client" style="width: 36px; height: 36px; border-radius: 18px; background: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 22px; background: #f3f4f7">
+            <span style="width: 44px; height: 44px; border-radius: 22px; background: #fff0d4; color: #983705; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">AS</span>
+            <span style="flex: 1"><span style="display: block; font-size: 14px; font-weight: 600">Atelier Sall Auto</span><span style="display: block; margin-top: 1px; font-size: 12px; color: #8a90a2">Prestataire · note 4,2</span></span>
+            <a href="#" class="rond" aria-label="Voir le profil du prestataire" style="width: 36px; height: 36px; border-radius: 18px; background: #ffffff; display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#12172b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  </div>
+  </div>
+
+</div>
+</div>
+</body></html>
