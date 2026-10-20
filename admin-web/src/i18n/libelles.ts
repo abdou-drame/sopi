@@ -652,7 +652,7 @@ export const L = {
     avisATraiterTitre: 'Avis à modérer',
     dossiersTitre: 'Dossiers en attente',
     ouvrir: 'Ouvrir',
-    bienvenue: 'Bienvenue,',
+    bienvenue: 'Bonjour,',
     periodeAffichee: 'Période affichée',
     actualiser: 'Actualiser',
     litigesOuvertsSousTitre: 'À trancher',

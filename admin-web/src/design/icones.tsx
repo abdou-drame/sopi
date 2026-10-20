@@ -171,3 +171,14 @@ export function Etoiles({ note }: { note: number }) {
     </svg>
   )
 }
+export const ICalendrier = (p: P) => (
+  <Ico taille={16} trait={1.9} {...p}>
+    <rect x="3" y="5" width="18" height="16" rx="3" />
+    <path d="M3 10h18M8 3v4M16 3v4" />
+  </Ico>
+)
+export const IGraphique = (p: P) => (
+  <Ico taille={18} trait={1.9} {...p}>
+    <path d="M4 20V10M10 20V4M16 20v-8M22 20H2" />
+  </Ico>
+)

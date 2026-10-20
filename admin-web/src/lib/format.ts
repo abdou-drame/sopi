@@ -56,3 +56,10 @@ export function nombreDeJours(debut: string, fin: string): number {
   const ms = Date.parse(`${fin}T12:00:00Z`) - Date.parse(`${debut}T12:00:00Z`)
   return Math.round(ms / 86_400_000) + 1
 }
+
+const formatHeureSeule = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: FUSEAU })
+
+/** Instant ISO → « 10:30 » à Dakar. */
+export function formatHeureDuJour(iso: string): string {
+  return formatHeureSeule.format(new Date(iso))
+}
