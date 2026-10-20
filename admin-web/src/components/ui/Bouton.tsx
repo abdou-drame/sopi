@@ -48,7 +48,7 @@ export default function Bouton({
       type={type}
       disabled={disabled || enCours}
       aria-busy={enCours || undefined}
-      className={`relative inline-flex items-center justify-center gap-2 rounded-gelule font-semibold transition-[background-color,color,transform,box-shadow] duration-[180ms] ease-[var(--ease-standard)] enabled:hover:-translate-y-px enabled:active:translate-y-0 enabled:active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaire-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+      className={`relative inline-flex items-center justify-center gap-2 rounded-gelule font-semibold transition-[background-color,color,transform,box-shadow] duration-[180ms] ease-[var(--ease-standard)] enabled:hover:-translate-y-px enabled:active:translate-y-0 enabled:active:scale-[0.97] motion-reduce:enabled:hover:translate-y-0 motion-reduce:enabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primaire-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
         taille === 'm' ? 'px-5 py-2.5 text-sm' : 'px-3.5 py-1.5 text-xs'
       } ${variantes[variante]} ${className}`}
       {...reste}
