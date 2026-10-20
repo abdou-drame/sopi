@@ -67,7 +67,7 @@ describe('litiges', () => {
     const lien = await screen.findByRole('link', { name: 'Prestataire absent' })
     expect(lien).toHaveAttribute('href', `/litiges/${ID}`)
     expect(appels.find((a) => a.chemin === '/admin/litiges')?.recherche.get('statut')).toBe('ouvert')
-    await userEvent.selectOptions(screen.getByLabelText('Statut'), 'cloture')
+    await userEvent.click(screen.getByRole('tab', { name: 'Clôturés' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/litiges?statut=cloture')
   })
 

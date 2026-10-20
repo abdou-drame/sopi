@@ -55,7 +55,7 @@ export function DossiersListePage() {
       <FiltresListe
         legende={T.filtres}
         etat={etat}
-        filtres={[{ cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT }]}
+        filtres={[{ cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT, onglets: true }]}
       />
       <ListePaginee
         legende={T.legende}

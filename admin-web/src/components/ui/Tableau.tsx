@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { L } from '../../i18n/libelles'
 import Bouton from './Bouton'
-import { IconeTri } from './Icones'
+import { IconeFleche, IconeTri } from './Icones'
 import Squelette from './Squelette'
 
 export interface Colonne<T> {
@@ -47,7 +47,7 @@ function LigneAvecLien({ href, nom, style, children }: { href: string; nom: stri
   return (
     <tr
       style={style}
-      className="animate-apparition group relative cursor-pointer transition-colors hover:bg-fond focus-within:bg-fond [&>td]:first:rounded-l-[16px] [&>td]:last:rounded-r-[16px] [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10"
+      className="animate-apparition group relative cursor-pointer transition-colors even:bg-fond hover:bg-fond focus-within:bg-fond [&>td:first-child]:rounded-l-[16px] [&>td:last-child]:rounded-r-[16px] [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10"
     >
       {children}
       <td className="px-3 py-3.5 text-right">
@@ -56,9 +56,9 @@ function LigneAvecLien({ href, nom, style, children }: { href: string; nom: stri
           data-voir
           state={{ recherche: search }}
           aria-label={`${L.commun.voir} : ${nom}`}
-          className="inline-flex items-center rounded-gelule bg-fond px-3.5 py-1.5 text-xs font-semibold text-texte after:absolute after:inset-0 after:z-0 after:content-[''] group-hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
+          className="inline-grid size-9 place-items-center rounded-full bg-fond text-texte transition-transform active:scale-[0.97] group-even:bg-surface after:absolute after:inset-0 after:z-0 after:content-[''] group-hover:bg-surface group-even:group-hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
         >
-          {L.commun.voirCourt}
+          <IconeFleche width={14} height={14} aria-hidden="true" />
         </Link>
       </td>
     </tr>
@@ -147,7 +147,7 @@ export default function Tableau<T>({
                 ))
                 if (!lien) {
                   return (
-                    <tr key={cleLigne(ligne)} style={style} className="animate-apparition transition-colors hover:bg-fond [&>td:first-child]:rounded-l-[16px] [&>td:last-child]:rounded-r-[16px]">
+                    <tr key={cleLigne(ligne)} style={style} className="animate-apparition transition-colors even:bg-fond hover:bg-fond [&>td:first-child]:rounded-l-[16px] [&>td:last-child]:rounded-r-[16px]">
                       {cellules}
                     </tr>
                   )
@@ -183,7 +183,7 @@ export default function Tableau<T>({
       {onPage && !erreur && totalPages > 1 && (
         <nav
           aria-label="Pagination"
-          className="flex items-center justify-between gap-3 border-t border-bordure px-4 py-3"
+          className="flex items-center justify-between gap-3 px-1 pt-3"
         >
           <p className="text-xs text-texte-doux">
             {total !== undefined && `${L.commun.resultats(total)} · `}
