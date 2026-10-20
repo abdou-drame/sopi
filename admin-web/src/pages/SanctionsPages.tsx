@@ -1,23 +1,26 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import AvatarInitiales from '../components/ui/AvatarInitiales'
-import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
-import EnTetePage from '../components/ui/EnTetePage'
-import FiltresListe from '../components/ui/FiltresListe'
-import LienLigne from '../components/ui/LienLigne'
-import ListePaginee from '../components/ui/ListePaginee'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import type { Colonne } from '../components/ui/Tableau'
+import { Avatar, Badge, BoutonPlus, Carte as CarteMq, DEGRADE_BLEU, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
+import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
-import { formatDateHeure } from '../lib/format'
+import { formatDate } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
 const T = L.sanctions
+
+const OPTIONS_ETAT = [
+  { valeur: 'true', libelle: T.actives },
+  { valeur: 'false', libelle: T.nonActives },
+  { valeur: '', libelle: T.toutes },
+]
 
 /** État lisible d'une sanction : active, levée par un administrateur, ou arrivée à échéance. */
 export function etatSanction(s: { active: boolean; leveeLe: string | null }): { ton: 'succes' | 'neutre'; libelle: string } {
@@ -26,7 +29,7 @@ export function etatSanction(s: { active: boolean; leveeLe: string | null }): { 
 }
 
 /** Bouton « Lever » avec sa confirmation (action irréversible : la sanction ne peut pas être reposée telle quelle). */
-export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFait: (message: string) => void }) {
+export function BoutonLever({ id, nom, onFait, mq = false }: { id: string; nom: string; onFait: (message: string) => void; mq?: boolean }) {
   const [ouverte, setOuverte] = useState(false)
   const lever = useAction(() => api.leverSanction(id))
   const fermer = () => {
@@ -35,9 +38,20 @@ export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFa
   }
   return (
     <>
-      <Bouton variante="secondaire" taille="p" aria-label={T.leverLibelle(nom)} onClick={() => setOuverte(true)}>
-        {T.lever}
-      </Bouton>
+      {mq ? (
+        <button
+          type="button"
+          aria-label={T.leverLibelle(nom)}
+          onClick={() => setOuverte(true)}
+          className="mq-btn-gris h-[34px] cursor-pointer rounded-[17px] border-none bg-[#f3f4f7] px-3.5 text-xs font-bold text-[#12172b]"
+        >
+          {T.lever}
+        </button>
+      ) : (
+        <Bouton variante="secondaire" taille="p" aria-label={T.leverLibelle(nom)} onClick={() => setOuverte(true)}>
+          {T.lever}
+        </Bouton>
+      )}
       <ModaleConfirmation
         ouverte={ouverte}
         titre={T.leverTitre}
@@ -59,71 +73,118 @@ export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFa
   )
 }
 
+/** Statut du tableau : Active en rouge, Levée en vert, Terminée (arrivée à échéance) en neutre. */
+function tonStatut(s: SanctionListe): TonBadge {
+  if (s.active) return 'danger'
+  return s.leveeLe ? 'succes' : 'neutre'
+}
+
+function useCompteSanctions(actives: string) {
+  const { data } = useQuery({ queryKey: ['sanctions-compte', actives], queryFn: () => api.sanctions({ actives }), retry: false })
+  return data?.meta.total
+}
+
 export default function SanctionsListePage() {
   const etat = useFiltresUrl(['actives', 'type', 'utilisateur', 'echeanceDansHeures'], { actives: 'true' })
+  const liste = useListe('sanctions', api.sanctions, etat)
   const retour = useRetours()
-  const colonnes: Colonne<SanctionListe>[] = [
-    {
-      cle: 'utilisateur',
-      titre: T.utilisateur,
-      rendu: (s) => (
-        <div className="flex items-center gap-3">
-          <AvatarInitiales prenom={s.utilisateur.prenom} nom={s.utilisateur.nom} />
-          <div>
-            <LienLigne vers={`/utilisateurs/${s.utilisateur.id}`}>{`${s.utilisateur.prenom} ${s.utilisateur.nom}`}</LienLigne>
-            <p className="text-xs text-texte-doux">{L.roles[s.utilisateur.role] ?? s.utilisateur.role}</p>
-          </div>
-        </div>
-      ),
-    },
-    { cle: 'type', titre: T.type, rendu: (s) => T.types[s.type] ?? s.type },
-    { cle: 'motif', titre: T.motif, rendu: (s) => <span className="line-clamp-2 max-w-xs">{s.motif}</span> },
-    { cle: 'pose', titre: T.poseeLe, rendu: (s) => formatDateHeure(s.dateCreation) },
-    { cle: 'fin', titre: T.fin, rendu: (s) => (s.dateFin ? formatDateHeure(s.dateFin) : T.sansFin) },
-    {
-      cle: 'etat',
-      titre: T.etat,
-      rendu: (s) => {
-        const e = etatSanction(s)
-        return <BadgeStatut ton={e.ton} libelle={e.libelle} />
-      },
-    },
-    {
-      cle: 'action',
-      titre: T.actionsColonne,
-      alignement: 'droite',
-      rendu: (s) => (s.active ? <BoutonLever id={s.id} nom={`${s.utilisateur.prenom} ${s.utilisateur.nom}`} onFait={retour.succes} /> : null),
-    },
-  ]
+  const navigate = useNavigate()
+  const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  const comptes: Record<string, number | undefined> = { true: useCompteSanctions('true'), false: useCompteSanctions('false'), '': useCompteSanctions('') }
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      <FiltresListe
-        legende={T.filtres}
-        etat={etat}
-        filtres={[
-          {
-            cle: 'actives',
-            type: 'select',
-            label: T.etat,
-            onglets: true,
-            options: [
-              { valeur: 'true', libelle: T.actives },
-              { valeur: 'false', libelle: T.nonActives },
-              { valeur: '', libelle: T.toutes },
-            ],
-          },
-          {
-            cle: 'type',
-            type: 'select',
-            label: T.type,
-            options: [{ valeur: '', libelle: L.commun.tous }, ...Object.entries(T.types).map(([valeur, libelle]) => ({ valeur, libelle }))],
-          },
-          { cle: 'echeanceDansHeures', type: 'nombre', label: T.echeance },
-          { cle: 'utilisateur', type: 'texte', label: T.utilisateurFiltre },
-        ]}
-      />
-      <ListePaginee legende={T.legende} cle="sanctions" charger={api.sanctions} etat={etat} colonnes={colonnes} cleLigne={(s) => s.id} lien={(s) => ({ vers: `/utilisateurs/${s.utilisateur.id}`, nom: `${s.utilisateur.prenom} ${s.utilisateur.nom}` })} messageVide={T.vide} />
+    <div className="flex flex-col gap-4">
+      <TitrePage titre="Sanctions" suite="prestataires" sousTitre="Suivez les avertissements et suspensions, et levez-les quand c'est justifié.">
+        <BoutonPlus onClick={() => navigate('/utilisateurs')}>Nouvelle sanction</BoutonPlus>
+      </TitrePage>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
+        <CarteMq>
+          <div className="text-[13px] leading-normal font-medium text-[#8a90a2]">Sanctions actives</div>
+          <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">{comptes.true ?? '—'}</div>
+        </CarteMq>
+        <CarteMq>
+          <div className="text-[13px] leading-normal font-medium text-[#8a90a2]">Prestataires suspendus</div>
+          <div className="mt-2 flex items-baseline gap-2.5">
+            <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{tableau?.sanctions.suspensionsEnCours ?? '—'}</span>
+            <Badge ton="danger" gras>
+              Hors ligne
+            </Badge>
+          </div>
+        </CarteMq>
+        <CarteMq className="text-white" style={{ background: DEGRADE_BLEU }}>
+          <div className="text-[13px] leading-normal font-medium opacity-80">Levées ce mois-ci</div>
+          <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">—</div>
+        </CarteMq>
+      </div>
+      <CarteMq className="flex flex-col gap-3.5">
+        <div className="flex flex-wrap items-center gap-3">
+          <Onglets
+            libelle={T.etat}
+            onglets={OPTIONS_ETAT.map((o) => ({
+              cle: o.valeur || 'toutes',
+              libelle: o.libelle,
+              compteur: comptes[o.valeur] ?? '—',
+              actif: (etat.valeurs.actives ?? '') === o.valeur,
+              onSelect: () => etat.definir({ actives: o.valeur }),
+            }))}
+          />
+        </div>
+        <div className="overflow-x-auto">
+          <table className="mq-table min-w-[820px]" aria-label={T.legende}>
+            <thead>
+              <tr>
+                <th>Prestataire</th>
+                <th>{T.type}</th>
+                <th>{T.motif}</th>
+                <th>Début</th>
+                <th>{T.fin}</th>
+                <th>{L.commun.statut}</th>
+                <th className="relative">
+                  <span className="sr-only">{T.actionsColonne}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.lignes.map((s) => {
+                const nom = `${s.utilisateur.prenom} ${s.utilisateur.nom}`
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <Avatar nom={nom} taille={36} />
+                        <span className="font-semibold">{nom}</span>
+                      </div>
+                    </td>
+                    <td>{T.types[s.type] ?? s.type}</td>
+                    <td className="text-[#3c4257]">{s.motif}</td>
+                    <td>{formatDate(s.dateCreation)}</td>
+                    <td>{s.dateFin ? formatDate(s.dateFin) : <span className="text-[#9aa0b2]">—</span>}</td>
+                    <td>
+                      <Badge ton={tonStatut(s)}>{etatSanction(s).libelle}</Badge>
+                    </td>
+                    <td>
+                      {s.active ? (
+                        <BoutonLever mq id={s.id} nom={nom} onFait={retour.succes} />
+                      ) : (
+                        <span className="text-xs text-[#9aa0b2]">{T.etatTerminee}</span>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
+        {liste.totalPages > 1 && (
+          <PiedListe
+            resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
+            precedent={liste.page > 1}
+            suivant={liste.page < liste.totalPages}
+            onPrecedent={() => etat.allerPage(liste.page - 1)}
+            onSuivant={() => etat.allerPage(liste.page + 1)}
+          />
+        )}
+      </CarteMq>
     </div>
   )
 }
