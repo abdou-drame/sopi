@@ -8,6 +8,8 @@ import { useAction } from '../api/useAction'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
+import CarteStatutActuel from '../components/ui/CarteStatutActuel'
+import { IconeAvis, IconeDossier, IconeLitige, IconeSanction } from '../components/ui/Icones'
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import Definitions from '../components/ui/Definitions'
@@ -139,17 +141,25 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
 }
 
 function Partie({ titre, partie, entreprise }: { titre: string; partie: PartieLitige; entreprise?: boolean }) {
+  const nom = entreprise && partie.nomEntreprise ? partie.nomEntreprise : nomComplet(partie)
+  const initiales = `${partie.prenom.charAt(0)}${partie.nom.charAt(0)}`.toUpperCase()
   return (
-    <Carte titre={titre}>
-      <Definitions
-        elements={[
-          { libelle: L.dossiers.nom, valeur: nomComplet(partie) },
-          ...(entreprise ? [{ libelle: L.dossiers.entreprise, valeur: partie.nomEntreprise }] : []),
-          { libelle: L.dossiers.telephone, valeur: partie.telephone },
-          { libelle: L.dossiers.email, valeur: partie.email },
-        ]}
-      />
-    </Carte>
+    <li className="flex items-center gap-3 rounded-[22px] bg-fond px-3.5 py-3">
+      <span
+        aria-hidden="true"
+        className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${entreprise ? 'bg-[#fff0d4] text-[#983705]' : 'bg-[#dbeafe] text-[#1d4ed8]'}`}
+      >
+        {initiales}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold">{nom}</p>
+        <p className="mt-px text-xs text-texte-discret">{titre}</p>
+        <p className="flex flex-wrap gap-x-2 text-xs break-words text-texte-doux">
+          <span>{partie.telephone}</span>
+          <span>{partie.email}</span>
+        </p>
+      </div>
+    </li>
   )
 }
 
@@ -167,43 +177,69 @@ export function LitigeDetailPage() {
       actions={(l) => (l.statut === 'ouvert' ? <ActionTrancher litige={l} onFait={retour.succes} /> : null)}
     >
       {(l) => (
-        <>
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Carte titre={T.description}>
-              <p className="text-sm whitespace-pre-line text-texte">{l.description}</p>
+        <div className="flex flex-wrap items-start gap-3.5">
+          <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
+            <Carte titre={T.description} icone={<IconeLitige width={18} height={18} />}>
+              <p className="rounded-[22px] bg-fond px-5 py-[18px] text-sm leading-[22px] whitespace-pre-line text-texte">{l.description}</p>
             </Carte>
-            <Carte titre={T.reponse}>
+            <Carte titre={T.reponse} icone={<IconeAvis width={18} height={18} />}>
               {l.reponsePrestataire ? (
                 <>
-                  <p className="text-sm whitespace-pre-line text-texte">{l.reponsePrestataire}</p>
+                  <p className="rounded-[22px] bg-fond px-5 py-[18px] text-sm leading-[22px] whitespace-pre-line text-texte">{l.reponsePrestataire}</p>
                   {l.reponseLe && <p className="mt-2 text-xs text-texte-doux">{T.reponduLe(formatDateHeure(l.reponseLe))}</p>}
                 </>
               ) : (
                 <p className="text-sm text-texte-doux">{T.aucuneReponse}</p>
               )}
             </Carte>
-          </div>
-
-          <Carte titre={T.preuves}>
-            {l.preuves.length === 0 ? (
-              <p className="text-sm text-texte-doux">{T.aucunePreuve}</p>
-            ) : (
-              <ul className="flex flex-wrap gap-4">
-                {l.preuves.map((p, i) => (
-                  <li key={p.id}>
-                    <FichierProtege chemin={cheminApi(p.url)} alt={T.preuve(i + 1)} />
-                  </li>
-                ))}
-              </ul>
+            <Carte titre={T.preuves} icone={<IconeDossier width={18} height={18} />}>
+              {l.preuves.length === 0 ? (
+                <p className="text-sm text-texte-doux">{T.aucunePreuve}</p>
+              ) : (
+                <ul className="grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
+                  {l.preuves.map((p, i) => (
+                    <li key={p.id} className="grid place-items-center rounded-[22px] bg-primaire-100 p-3">
+                      <FichierProtege chemin={cheminApi(p.url)} alt={T.preuve(i + 1)} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Carte>
+            {l.decision && (
+              <Carte titre={T.decision} icone={<IconeSanction width={18} height={18} />}>
+                <Definitions
+                  elements={[
+                    { libelle: T.decisionDe, valeur: T.decisionsCourt[l.decision] ?? l.decision },
+                    { libelle: T.clotureLe, valeur: l.clotureLe ? formatDateHeure(l.clotureLe) : null },
+                    { libelle: T.motifDecision, valeur: l.motifDecision, large: true },
+                  ]}
+                />
+              </Carte>
             )}
-          </Carte>
-
-          <div className="grid gap-5 lg:grid-cols-2">
-            <Partie titre={T.client} partie={l.client} />
-            <Partie titre={T.prestataire} partie={l.prestataire} entreprise />
           </div>
 
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+            <CarteStatutActuel
+              titre={T.paiements}
+              libelleStatut={T.acompte}
+              statut={l.paiements.length === 0 ? '—' : formatMontant(l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0))}
+              note={
+                l.paiements.length === 0 ? (
+                  T.aucunPaiement
+                ) : (
+                  <ul className="flex flex-col gap-1.5">
+                    {l.paiements.map((p) => (
+                      <li key={p.id} className="flex flex-wrap items-center justify-between gap-2">
+                        <span>
+                          {T.acompte} {formatMontant(p.montantAcompte)} · {T.commission.toLowerCase()} {formatMontant(p.commission)}
+                        </span>
+                        <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{L.statuts[p.statut] ?? p.statut}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )
+              }
+            />
             <Carte titre={T.reservation}>
               <Definitions
                 elements={[
@@ -221,36 +257,14 @@ export function LitigeDetailPage() {
                 ]}
               />
             </Carte>
-            <Carte titre={T.paiements}>
-              {l.paiements.length === 0 ? (
-                <p className="text-sm text-texte-doux">{T.aucunPaiement}</p>
-              ) : (
-                <ul className="flex flex-col gap-3">
-                  {l.paiements.map((p) => (
-                    <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
-                      <span>
-                        {T.acompte} {formatMontant(p.montantAcompte)} · {T.commission.toLowerCase()} {formatMontant(p.commission)}
-                      </span>
-                      <BadgeStatut statut={p.statut} />
-                    </li>
-                  ))}
-                </ul>
-              )}
+            <Carte titre={T.parties}>
+              <ul className="flex flex-col gap-2.5">
+                <Partie titre={T.client} partie={l.client} />
+                <Partie titre={T.prestataire} partie={l.prestataire} entreprise />
+              </ul>
             </Carte>
           </div>
-
-          {l.decision && (
-            <Carte titre={T.decision}>
-              <Definitions
-                elements={[
-                  { libelle: T.decisionDe, valeur: T.decisionsCourt[l.decision] ?? l.decision },
-                  { libelle: T.clotureLe, valeur: l.clotureLe ? formatDateHeure(l.clotureLe) : null },
-                  { libelle: T.motifDecision, valeur: l.motifDecision, large: true },
-                ]}
-              />
-            </Carte>
-          )}
-        </>
+        </div>
       )}
     </PageDetail>
   )
