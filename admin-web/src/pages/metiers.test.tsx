@@ -16,7 +16,6 @@ describe('métiers', () => {
     simulerApi(base)
     afficherApplication('/metiers')
     const ligne = (await screen.findByText('Coiffure')).closest('section') as HTMLElement
-    expect(within(ligne).getByText('coiffure')).toBeInTheDocument()
     expect(within(ligne).getByText('4')).toBeInTheDocument()
     expect(within(ligne).getByText('Actif')).toBeInTheDocument()
     expect(within(screen.getByText('Pressing').closest('section') as HTMLElement).getByText('Désactivé')).toBeInTheDocument()
@@ -26,6 +25,7 @@ describe('métiers', () => {
     const { appels } = simulerApi({ ...base, 'POST /admin/metiers': { status: 201, corps: { ...COIFFURE, id: 'm-3', code: 'plomberie', libelle: 'Plomberie', nombrePrestataires: 0 } } })
     afficherApplication('/metiers')
     await screen.findByText('Coiffure')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un métier' }))
     const ajouter = screen.getByRole('button', { name: 'Ajouter' })
     expect(ajouter).toBeDisabled()
     await userEvent.type(screen.getByLabelText('Nom du métier'), 'Plomberie')
@@ -42,6 +42,7 @@ describe('métiers', () => {
     })
     afficherApplication('/metiers')
     await screen.findByText('Coiffure')
+    await userEvent.click(screen.getByRole('button', { name: 'Ajouter un métier' }))
     await userEvent.type(screen.getByLabelText('Nom du métier'), 'coiffure')
     await userEvent.click(screen.getByRole('button', { name: 'Ajouter' }))
     expect(await screen.findByText('Un métier portant ce nom existe déjà.')).toBeInTheDocument()

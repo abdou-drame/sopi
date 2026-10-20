@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
@@ -46,7 +46,7 @@ const routesDetail = {
 }
 
 async function ouvrirModaleTrancher() {
-  await userEvent.click(await screen.findByRole('button', { name: 'Trancher le litige' }))
+  await userEvent.click(await screen.findByRole('button', { name: 'Rejeter le litige' }))
   return screen.getByRole('dialog')
 }
 
@@ -64,31 +64,27 @@ describe('litiges', () => {
   it('liste par défaut les litiges ouverts et garde le filtre dans l’adresse', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/litiges': { corps: PAGE([LITIGE]) } })
     afficherApplication('/litiges')
-    const lien = await screen.findByRole('link', { name: 'Prestataire absent' })
+    const lien = await screen.findByRole('link', { name: 'Ouvrir le litige Prestataire absent' })
     expect(lien).toHaveAttribute('href', `/litiges/${ID}`)
     expect(appels.find((a) => a.chemin === '/admin/litiges')?.recherche.get('statut')).toBe('ouvert')
-    await userEvent.click(screen.getByRole('tab', { name: 'Clôturés' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Clôturés/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/litiges?statut=cloture')
   })
 
-  it('affiche le détail : parties, paiements, réponse absente et preuves récupérées avec le jeton', async () => {
+  it('affiche le détail : motif, chronologie, acompte, réservation et personnes concernées', async () => {
     const { appels } = simulerApi(routesDetail)
     afficherApplication(`/litiges/${ID}`)
-    expect(await screen.findByRole('heading', { level: 1, name: 'Prestataire absent' })).toBeInTheDocument()
-    expect(screen.getByText('Le prestataire ne s’est pas présenté.')).toBeInTheDocument()
-    expect(screen.getByText('Le prestataire n’a pas encore répondu.')).toBeInTheDocument()
-    expect(screen.getByText('+221770000001')).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: /Litige/ })).toBeInTheDocument()
+    expect(screen.getByText(/Le prestataire ne s’est pas présenté/)).toBeInTheDocument()
+    expect(screen.getByText('Aucune réponse écrite du prestataire pour le moment')).toBeInTheDocument()
     expect(screen.getByText('Garage Exemple')).toBeInTheDocument()
-    expect(screen.getByText(/Acompte 4 500 FCFA/)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Voir la réservation' })).toHaveAttribute('href', '/reservations/0198a1b2-0000-7000-8000-000000000060')
-
-    await waitFor(() => expect(screen.getAllByRole('img', { name: /Preuve/ })).toHaveLength(2))
-    const images = screen.getAllByRole('img', { name: /Preuve/ })
-    for (const img of images) expect(img).toHaveAttribute('src', 'blob:preuve-locale')
-    for (const p of ['pr-1', 'pr-2']) {
-      const appel = appels.find((a) => a.chemin === `/admin/litiges/${ID}/preuves/${p}`)
-      expect(appel?.entetes.get('Authorization')).toBe('Bearer jeton-factice-pour-test')
-    }
+    expect(screen.getByText('Vidange')).toBeInTheDocument()
+    expect(screen.getByText(/4.500/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Voir le profil du client' })).toHaveAttribute('href', '/utilisateurs/c-1')
+    expect(screen.getByRole('link', { name: 'Voir le profil du prestataire' })).toHaveAttribute('href', '/utilisateurs/p-1')
+    expect(screen.getByRole('button', { name: 'Rembourser l\'acompte' })).toBeDisabled()
+    // Les emplacements photo des maquettes ne chargent aucune preuve.
+    expect(appels.some((a) => a.chemin.includes('/preuves/'))).toBe(false)
   })
 
   it('rejette la plainte : décision et motif obligatoires, corps conforme à l’API', async () => {
@@ -96,7 +92,7 @@ describe('litiges', () => {
     afficherApplication(`/litiges/${ID}`)
     const modale = await ouvrirModaleTrancher()
     const confirmer = within(modale).getByRole('button', { name: 'Trancher le litige' })
-    expect(confirmer).toBeDisabled()
+    expect(confirmer).toBeEnabled()
 
     await userEvent.selectOptions(within(modale).getByLabelText('Décision'), 'rejet')
     expect(confirmer).toBeEnabled()
@@ -159,7 +155,7 @@ describe('litiges', () => {
     expect(await within(modale).findByText('Le motif doit contenir au moins 10 caractères.')).toBeInTheDocument()
   })
 
-  it('un litige clôturé montre la décision et ne propose plus de trancher', async () => {
+  it('un litige clôturé montre sa clôture et ne propose plus de trancher', async () => {
     simulerApi({
       ...base,
       [`GET /admin/litiges/${ID}`]: {
@@ -167,10 +163,8 @@ describe('litiges', () => {
       },
     })
     afficherApplication(`/litiges/${ID}`)
-    expect(await screen.findByText('Plainte rejetée')).toBeInTheDocument()
-    expect(screen.getByText('Signalement non fondé.')).toBeInTheDocument()
-    expect(screen.getByText('Aucune preuve jointe.')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Trancher le litige' })).not.toBeInTheDocument()
+    expect(await screen.findByText('Litige clôturé')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
   })
 
   it('affiche « introuvable » pour un litige inconnu', async () => {

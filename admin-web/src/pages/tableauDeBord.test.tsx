@@ -2,7 +2,6 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
-import { regrouperAcomptes, trierAlertes } from './TableauDeBordPage'
 
 // Réponses conformes aux exemples de openapi.yaml (valeurs fictives).
 const statutsReservation = (o: Partial<Record<string, number>> = {}) => ({
@@ -39,30 +38,18 @@ const TABLEAU = {
   sanctions: { suspensionsEnCours: 1, bannissements: 2 },
 }
 
-const alerte = (type: string, gravite: string, compteur: number, extra = {}) => ({
-  type, gravite, compteur, message: `${compteur} ${type}.`, ids: [], ageMinutes: null, echeanceDansMinutes: null, ...extra,
-})
 const ALERTES = {
   dateGeneration: '2030-01-20T10:00:00+00:00',
-  total: 3,
-  parGravite: { critique: 1, attention: 1, info: 1 },
-  // Volontairement dans le désordre : l'écran doit trier par gravité.
-  alertes: [
-    alerte('suspensions_a_echeance', 'info', 1, { echeanceDansMinutes: 600 }),
-    alerte('retraits_bloques', 'attention', 1, { ageMinutes: 90, ressource: 'retraits' }),
-    alerte('litiges_ouverts', 'critique', 2, { ageMinutes: 4500, ressource: 'litiges' }),
-  ],
+  total: 1,
+  parGravite: { critique: 0, attention: 1, info: 0 },
+  alertes: [{ type: 'dossiers_en_attente', gravite: 'attention', compteur: 2, message: '2 dossiers en attente.', ids: [], ressource: 'dossiers', ageMinutes: 4500, echeanceDansMinutes: null }],
 }
 
-const jour = (i: number) => `2030-01-${String(i + 1).padStart(2, '0')}`
-const POINTS = Array.from({ length: 30 }, (_, i) => ({
-  debut: jour(i), fin: jour(i), revenus: 100, acomptesEncaisses: 1000, remboursements: 0, retraitsVerses: 0,
-}))
 const REVENUS = {
-  periode: { debut: jour(0), fin: jour(29), regroupement: 'jour' },
-  totaux: { revenus: 3000, acomptesEncaisses: 30000, remboursements: 0, retraitsVerses: 0 },
+  periode: { debut: '2030-01-01', fin: '2030-01-30', regroupement: 'jour' },
+  totaux: { revenus: 3000, acomptesEncaisses: 30000, remboursements: 1500, retraitsVerses: 24000 },
   soldePrestataires: 50000,
-  series: POINTS,
+  series: [],
 }
 const PAIEMENT = {
   id: '0198a1b2-1111-7000-8000-000000000001',
@@ -78,11 +65,23 @@ const PAIEMENT = {
   rembourseLe: null,
   crediteLe: null,
 }
-const PAIEMENTS = {
-  data: Array.from({ length: 6 }, (_, i) => ({ ...PAIEMENT, id: `0198a1b2-1111-7000-8000-00000000000${i}` })),
-  links: {},
-  meta: { current_page: 1, last_page: 1, per_page: 20, total: 6 },
+const page = (data: unknown[]) => ({ data, links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: data.length } })
+const RESERVATION = {
+  id: PAIEMENT.reservationId,
+  statut: 'confirmee',
+  client: { id: 'c-1', prenom: 'Awa', initialeNom: 'D' },
+  prestataire: { id: 'p-1', nomEntreprise: 'Garage Exemple' },
+  prestation: { id: 's-1', nom: 'Vidange' },
+  creneau: { id: 'k-1', debut: '2030-01-20T10:30:00+00:00', fin: '2030-01-20T11:30:00+00:00' },
+  prixApplique: 15000,
+  statutPaiement: 'reussi',
+  dateCreation: '2030-01-19T10:00:00+00:00',
 }
+const PRESTATAIRE = {
+  id: 'u-1', role: 'prestataire', prenom: 'Moussa', nom: 'Diop', email: null, telephone: '+221770000002', statut: 'actif', dateCreation: '2030-01-01T00:00:00+00:00',
+  prestataire: { id: 'p-1', metier: 'mecanique', quartier: 'Malika', nomEntreprise: 'Garage Exemple' },
+}
+const METIERS = { data: ['Mécanique', 'Coiffure', 'Pressing'].map((libelle, i) => ({ id: `m-${i}`, code: libelle, libelle, actif: true, nombrePrestataires: 3, dateCreation: '2030-01-01' })) }
 
 const base = { 'GET /auth/moi': { corps: ADMIN } }
 const toutes = {
@@ -90,7 +89,10 @@ const toutes = {
   'GET /admin/alertes': { corps: ALERTES_VIDES },
   'GET /admin/tableau-de-bord': { corps: TABLEAU },
   'GET /admin/revenus': { corps: REVENUS },
-  'GET /admin/paiements': { corps: PAIEMENTS },
+  'GET /admin/paiements': { corps: page([PAIEMENT]) },
+  'GET /admin/reservations': { corps: page([RESERVATION]) },
+  'GET /admin/utilisateurs': { corps: page([PRESTATAIRE]) },
+  'GET /admin/metiers': { corps: METIERS },
 }
 
 describe('tableau de bord', () => {
@@ -100,145 +102,107 @@ describe('tableau de bord', () => {
     sessionStorage.clear()
   })
 
-  it('trie les alertes par gravité puis par nombre', () => {
-    const triees = trierAlertes(ALERTES.alertes as never)
-    expect(triees.map((a) => a.gravite)).toEqual(['critique', 'attention', 'info'])
+  it('affiche l’en-tête de bienvenue avec le prénom de l’administrateur', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/Bonjour,\s*Fatou/)
   })
 
-  it('regroupe les acomptes en au plus 7 barres', () => {
-    expect(regrouperAcomptes(POINTS.slice(-7) as never)).toHaveLength(7)
-    const trente = regrouperAcomptes(POINTS as never)
-    expect(trente.length).toBeLessThanOrEqual(7)
-    expect(trente.reduce((s, b) => s + b.valeur, 0)).toBe(30000)
+  it('compose les quatre cartes de chiffres à partir des totaux réels, pastilles en « — »', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    for (const [titre, valeur] of [
+      ['Revenus Sopi (commissions)', '3.000'],
+      ['Acomptes encaissés', '30.000'],
+      ['Acomptes remboursés', '1.500'],
+      ['Reversé aux prestataires', '24.000'],
+    ] as const) {
+      const carte = (await screen.findByText(titre)).closest('section') as HTMLElement
+      await waitFor(() => expect(carte).toHaveTextContent(new RegExp(`${valeur}\\s*FCFA`)))
+      expect(within(carte).getByText('—')).toBeInTheDocument()
+    }
   })
 
-  it('affiche les alertes triées par gravité avec un lien vers la liste concernée', async () => {
+  it('montre le nombre de dossiers en attente, le plus ancien depuis les alertes, et relie la carte à son écran', async () => {
     simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
     afficherApplication('/')
-    const bloc = await screen.findByRole('region', { name: 'Alertes' })
-    await within(bloc).findByText(/2 litiges_ouverts\./)
-    const texte = bloc.textContent ?? ''
-    const positions = ['2 litiges_ouverts.', '1 retraits_bloques.', '1 suspensions_a_echeance.'].map((m) => texte.indexOf(m))
-    expect(positions.every((p) => p >= 0)).toBe(true)
-    expect(positions).toEqual([...positions].sort((a, b) => a - b))
-    const liens = within(bloc).getAllByRole('link', { name: 'Voir la liste' })
-    expect(liens.map((l) => l.getAttribute('href'))).toEqual(['/litiges', '/retraits?bloques=true', '/sanctions?echeanceDansHeures=24'])
-    expect(within(bloc).getAllByRole('alert')).toHaveLength(1)
+    const lien = await screen.findByRole('link', { name: 'Ouvrir les dossiers' })
+    expect(lien).toHaveAttribute('href', '/dossiers-prestataires')
+    const carte = lien.closest('section, div.box-border') as HTMLElement
+    await waitFor(() => expect(screen.getByText(/Le plus ancien : (?!—)/)).toBeInTheDocument())
+    expect(carte).toBeTruthy()
+    expect(screen.getByText('dossiers')).toBeInTheDocument()
   })
 
-  it('affiche un message calme quand il n’y a aucune alerte', async () => {
+  it('montre les litiges ouverts et relie la carte à la liste des litiges', async () => {
     simulerApi(toutes)
     afficherApplication('/')
-    expect(await screen.findByText('Aucune alerte : tout est calme.')).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: 'Ouvrir les litiges' })).toHaveAttribute('href', '/litiges')
+    expect(await screen.findByText('Litiges ouverts')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText('Litiges ouverts').closest('div.box-border, section')).toHaveTextContent(/2/))
   })
 
-  it('compose les cartes à partir des données réelles et relie chaque carte à son écran', async () => {
+  it('liste l’activité récente avec l’acompte du paiement correspondant', async () => {
     simulerApi(toutes)
     afficherApplication('/')
-
-    // Carte Sopi : terminées sur 30 jours, créées sur 7 jours, paiements réussis.
-    expect(await screen.findByText('95')).toBeInTheDocument()
-    expect(screen.getByText('30')).toBeInTheDocument()
-    expect(screen.getByText('280')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Voir les réservations' })).toHaveAttribute('href', '/reservations')
-
-    // Commission retenue : somme de la série (30 × 100).
-    expect(await screen.findByRole('img', { name: /Courbe de la commission/ })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Voir les revenus' })).toHaveAttribute('href', '/revenus')
-
-    // Derniers paiements : 5 lignes au plus.
-    const table = await screen.findByRole('table', { name: 'Derniers paiements' })
-    expect(within(table).getAllByRole('row')).toHaveLength(6) // en-tête + 5
-
-    // Compteurs et liens.
-    const liens = (nom: RegExp) => screen.getAllByRole('link', { name: nom })[0]
-    expect(liens(/Litiges ouverts/)).toHaveAttribute('href', '/litiges')
-    expect(liens(/Avis à modérer/)).toHaveAttribute('href', '/avis')
-    expect(liens(/Dossiers en attente/)).toHaveAttribute('href', '/dossiers-prestataires')
+    expect(await screen.findByText('Vidange')).toBeInTheDocument()
+    expect(screen.getByText(/Garage Exemple · Awa D\./)).toBeInTheDocument()
+    expect(screen.getByText('Confirmée')).toBeInTheDocument()
+    expect(await screen.findByText(/4.500\s*FCFA/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Tout voir' })).toHaveAttribute('href', '/reservations')
   })
 
-  it('affiche l’en-tête « Bienvenue » pleine largeur et actualise en lecture seule', async () => {
+  it('montre les prestataires actifs et les métiers proposés', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    expect(await screen.findByRole('link', { name: 'Ouvrir les utilisateurs' })).toHaveAttribute('href', '/utilisateurs')
+    expect(await screen.findByText('Revenus par métier')).toBeInTheDocument()
+    for (const metier of ['Mécanique', 'Coiffure', 'Pressing']) expect(await screen.findByText(metier)).toBeInTheDocument()
+  })
+
+  it('n’invente aucune donnée absente de l’API : graphique des réservations par mois en « — »', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    expect(await screen.findByText('Nombre de réservations par mois')).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Annuel' })).toHaveAttribute('aria-selected', 'true')
+    await userEvent.click(screen.getByRole('tab', { name: 'Mensuel' }))
+    expect(screen.getByRole('tab', { name: 'Mensuel' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(6)
+  })
+
+  it('actualise en lecture seule depuis le rail', async () => {
     const { appels } = simulerApi(toutes)
     afficherApplication('/')
-    const titre = await screen.findByRole('heading', { level: 1 })
-    expect(titre).toHaveTextContent('Bienvenue, Fatou')
-    expect(screen.getByLabelText(/Période affichée :/)).toBeInTheDocument()
-    await screen.findByText('95')
+    await screen.findByText('Vidange')
     const avant = appels.length
     await userEvent.click(screen.getByRole('button', { name: 'Actualiser' }))
     await waitFor(() => expect(appels.length).toBeGreaterThan(avant))
     expect(appels.every((a) => a.methode === 'GET')).toBe(true)
   })
 
-  it('bascule le graphique entre 7 et 30 jours', async () => {
-    simulerApi(toutes)
-    afficherApplication('/')
-    const sept = await screen.findByRole('button', { name: '7 jours' })
-    const trente = screen.getByRole('button', { name: '30 jours' })
-    await screen.findByRole('img', { name: /Acomptes encaissés par période/ })
-    expect(sept).toHaveAttribute('aria-pressed', 'true')
-    const compter = () => (screen.getByRole('img', { name: /Acomptes encaissés par période/ }).getAttribute('aria-label') ?? '').split(', ').length
-
-    expect(compter()).toBe(7)
-    await userEvent.click(trente)
-    expect(trente).toHaveAttribute('aria-pressed', 'true')
-    expect(sept).toHaveAttribute('aria-pressed', 'false')
-    expect(compter()).toBeLessThanOrEqual(7)
-    expect(screen.getByRole('img', { name: /30 000 FCFA|6 000 FCFA|5 000 FCFA/ })).toBeInTheDocument()
-  })
-
-  it('affiche les états vides des cartes sans donnée', async () => {
-    const vides = POINTS.map((p) => ({ ...p, acomptesEncaisses: 0, revenus: 0 }))
-    simulerApi({
-      ...toutes,
-      'GET /admin/revenus': { corps: { ...REVENUS, series: vides } },
-      'GET /admin/paiements': { corps: { ...PAIEMENTS, data: [] } },
-    })
-    afficherApplication('/')
-    expect(await screen.findByText('Aucun acompte encaissé sur cette période.')).toBeInTheDocument()
-    expect(await screen.findByText(/Aucun paiement/)).toBeInTheDocument()
-  })
-
-  it('affiche les états de chargement', async () => {
+  it('affiche « — » en attendant les données (chargement)', async () => {
     vi.stubGlobal('fetch', vi.fn((entree: RequestInfo | URL) => {
       if (String(entree).endsWith('/auth/moi')) return Promise.resolve(new Response(JSON.stringify(ADMIN)))
       return new Promise(() => {})
     }))
     afficherApplication('/')
-    expect(await screen.findByRole('status', { name: 'Chargement… Alertes' })).toBeInTheDocument()
-    expect(await screen.findByRole('status', { name: 'Chargement… Acomptes encaissés' })).toBeInTheDocument()
-    expect(screen.getByRole('status', { name: 'Chargement… Commission retenue' })).toBeInTheDocument()
+    const carte = (await screen.findByText('Acomptes encaissés')).closest('section') as HTMLElement
+    expect(carte).toHaveTextContent('— FCFA')
   })
 
-  it('affiche une erreur par carte avec « Réessayer », sans casser les autres', async () => {
-    let echec = true
-    simulerApi({
-      ...toutes,
-      'GET /admin/revenus': () => (echec ? { status: 500, corps: { message: 'SQLSTATE secret' } } : { corps: REVENUS }),
-    })
+  it('garde la page entière quand une requête échoue : valeurs en « — », sans message technique', async () => {
+    simulerApi({ ...toutes, 'GET /admin/tableau-de-bord': { status: 500, corps: { message: 'SQLSTATE secret' } }, 'GET /admin/revenus': { status: 500, corps: { message: 'SQLSTATE secret' } } })
     afficherApplication('/')
-    await waitFor(() => expect(screen.getAllByRole('alert').length).toBeGreaterThan(0))
+    const carte = (await screen.findByText('Acomptes encaissés')).closest('section') as HTMLElement
+    await waitFor(() => expect(carte).toHaveTextContent('— FCFA'))
+    expect(await screen.findByText('Vidange')).toBeInTheDocument()
     expect(screen.queryByText(/SQLSTATE/)).not.toBeInTheDocument()
-    // Les autres cartes restent affichées.
-    expect(await screen.findByText('95')).toBeInTheDocument()
-
-    echec = false
-    await userEvent.click(screen.getAllByRole('button', { name: 'Réessayer' })[0])
-    expect(await screen.findByRole('img', { name: /Acomptes encaissés par période/ })).toBeInTheDocument()
-  })
-
-  it('affiche l’erreur du tableau de bord sans casser les alertes ni les graphiques', async () => {
-    simulerApi({ ...toutes, 'GET /admin/tableau-de-bord': { status: 500, corps: {} } })
-    afficherApplication('/')
-    await waitFor(() => expect(screen.getAllByRole('alert').length).toBeGreaterThan(0))
-    expect(screen.getByText('Aucune alerte : tout est calme.')).toBeInTheDocument()
-    expect(await screen.findByRole('img', { name: /Courbe de la commission/ })).toBeInTheDocument()
   })
 
   it('ne montre aucune donnée sensible (code de réservation, référence DexPay, jeton)', async () => {
     simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
     afficherApplication('/')
-    await screen.findByRole('table', { name: 'Derniers paiements' })
+    await screen.findByText('Vidange')
     const texte = document.body.textContent ?? ''
     expect(texte).not.toMatch(/jeton-factice|mot de passe|code de réservation|dexpay|\+221/i)
   })

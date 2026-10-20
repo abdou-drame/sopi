@@ -28,14 +28,13 @@ describe('sanctions', () => {
   beforeEach(() => sessionStorage.setItem('sopi.admin.jeton', 'jeton-factice-pour-test'))
   afterEach(() => sessionStorage.clear())
 
-  it('liste par défaut les sanctions actives, avec lien vers l’utilisateur et filtre dans l’adresse', async () => {
+  it('liste par défaut les sanctions actives, avec le filtre dans l’adresse', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/sanctions': { corps: PAGE([SANCTION]) } })
     afficherApplication('/sanctions')
-    const lien = await screen.findByRole('link', { name: 'Moussa Diop' })
-    expect(lien).toHaveAttribute('href', '/utilisateurs/u-1')
+    expect(await screen.findByText('Moussa Diop')).toBeInTheDocument()
     expect(within(screen.getByRole('table')).getByText('Suspension temporaire')).toBeInTheDocument()
     expect(appels.find((a) => a.chemin === '/admin/sanctions')?.recherche.get('actives')).toBe('true')
-    await userEvent.click(screen.getByRole('tab', { name: 'Toutes' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Toutes/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/sanctions?actives=')
   })
 

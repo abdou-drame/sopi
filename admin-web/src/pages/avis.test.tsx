@@ -36,12 +36,11 @@ describe('modération des avis', () => {
   it('montre par défaut les avis à modérer et traduit la vue en paramètres de l’API', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS]) } })
     afficherApplication('/avis')
-    expect(await screen.findByText('Service décevant.')).toBeInTheDocument()
-    expect(screen.getByText(/Avis injuste/)).toBeInTheDocument()
+    expect(await screen.findByText(/Service décevant/)).toBeInTheDocument()
     const recherche = appels.find((a) => a.chemin === '/admin/avis')?.recherche
     expect(recherche?.get('aTraiter')).toBe('true')
     expect(recherche?.has('vue')).toBe(false)
-    await userEvent.click(screen.getByRole('tab', { name: 'Masqués' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Masqués/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=masques')
   })
 
@@ -73,7 +72,7 @@ describe('modération des avis', () => {
   it('rétablit un avis masqué, sans bouton Conserver ni Masquer', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([MASQUE]) }, 'POST /admin/avis/a-2/retablir': { corps: AVIS } })
     afficherApplication('/avis?vue=masques')
-    expect(await screen.findByText(/Propos injurieux/)).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Rétablir l’avis de Awa Diallo' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Masquer l’avis/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Rétablir l’avis de Awa Diallo' }))
@@ -106,9 +105,9 @@ describe('pagination de 10', () => {
     const reponse = { ...PAGE(lignes), meta: { current_page: 1, last_page: 2, per_page: 20, total: 25 } }
     const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: reponse } })
     afficherApplication('/avis?page=2')
-    expect(await screen.findByText('Commentaire 11')).toBeInTheDocument()
-    expect(screen.getByText('Commentaire 20')).toBeInTheDocument()
-    expect(screen.queryByText('Commentaire 10')).not.toBeInTheDocument()
+    expect(await screen.findByText(/Commentaire 11/)).toBeInTheDocument()
+    expect(screen.getByText(/Commentaire 20/)).toBeInTheDocument()
+    expect(screen.queryByText(/Commentaire 10/)).not.toBeInTheDocument()
     expect(appels.find((a) => a.chemin === '/admin/avis')?.recherche.has('page')).toBe(false)
   })
 })

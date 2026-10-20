@@ -52,10 +52,10 @@ describe('utilisateurs', () => {
   it('liste les utilisateurs et garde les filtres dans l’adresse', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/utilisateurs': { corps: PAGE([UTILISATEUR]) } })
     afficherApplication('/utilisateurs')
-    const lien = await screen.findByRole('link', { name: 'Moussa Diop' })
+    const lien = await screen.findByRole('link', { name: 'Voir le profil de Garage Exemple' })
     expect(lien).toHaveAttribute('href', `/utilisateurs/${ID}`)
     expect(screen.getByText('Garage Exemple')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('tab', { name: 'Client' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Clients/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/utilisateurs?role=client')
     expect(appels.some((a) => a.chemin === '/admin/utilisateurs' && a.recherche.get('role') === 'client')).toBe(true)
   })

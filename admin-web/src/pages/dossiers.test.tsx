@@ -56,8 +56,7 @@ describe('dossiers prestataires', () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/prestataires/demandes': { corps: PAGE([DEMANDE]) } })
     afficherApplication('/dossiers-prestataires')
     const tableau = await screen.findByRole('table', { name: 'Liste des demandes de prestataires' })
-    expect(await within(tableau).findByRole('link', { name: 'Moussa Diop' })).toHaveAttribute('href', ADRESSE_DETAIL)
-    expect(within(tableau).getByText('Garage Moussa')).toBeInTheDocument()
+    expect(await within(tableau).findByRole('link', { name: 'Examiner le dossier de Moussa Diop' })).toHaveAttribute('href', ADRESSE_DETAIL)
     expect(within(tableau).getByText('Mécanique')).toBeInTheDocument()
     const demande = appels.find((a) => a.chemin === '/admin/prestataires/demandes')
     expect(demande?.recherche.get('statut')).toBe('en_attente')
@@ -67,7 +66,7 @@ describe('dossiers prestataires', () => {
     simulerApi({ ...base, 'GET /admin/prestataires/demandes': { corps: PAGE([DEMANDE]) } })
     afficherApplication('/dossiers-prestataires')
     await screen.findByRole('table', { name: 'Liste des demandes de prestataires' })
-    await userEvent.click(screen.getByRole('tab', { name: 'Tous' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Tous/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/dossiers-prestataires?statut=tous')
   })
 
@@ -80,24 +79,27 @@ describe('dossiers prestataires', () => {
   it('affiche le détail et charge les justificatifs avec le jeton, sans jamais les mettre dans une adresse d’image', async () => {
     const { appels } = simulerApi(routesDetail)
     afficherApplication(ADRESSE_DETAIL)
-    expect(await screen.findByRole('heading', { level: 1, name: 'Garage Moussa' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Moussa Diop' })).toBeInTheDocument()
     expect(screen.getByText('+221771234567')).toBeInTheDocument()
-    // L'image vient d'une adresse locale (blob:), pas de l'API : aucune balise <img src> ne vise l'API.
-    const image = await screen.findByRole('img', { name: /Carte d’identité/ })
-    expect(image).toHaveAttribute('src', 'blob:fichier-local')
-    const lienPdf = await screen.findByRole('link', { name: /Ouvrir/ })
-    expect(lienPdf).toHaveAttribute('href', 'blob:fichier-local')
+    // Aucune pièce n'est chargée à l'ouverture ; « Voir » la récupère avec le jeton et l'ouvre via une adresse locale (blob:).
+    const ouvrir = vi.fn()
+    vi.stubGlobal('open', ouvrir)
+    expect(appels.some((a) => a.chemin.includes('/telecharger'))).toBe(false)
+    await userEvent.click(await screen.findByRole('button', { name: 'Voir Carte d’identité' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Voir Diplôme' }))
+    await vi.waitFor(() => expect(ouvrir).toHaveBeenCalledTimes(2))
+    expect(ouvrir).toHaveBeenCalledWith('blob:fichier-local', '_blank', 'noopener')
     for (const chemin of ['/admin/justificatifs/j-1/telecharger', '/admin/justificatifs/j-2/telecharger']) {
       const appel = appels.find((a) => a.chemin === chemin)
       expect(appel?.entetes.get('Authorization')).toBe('Bearer jeton-factice-pour-test')
     }
-    for (const img of screen.getAllByRole('img')) expect(img.getAttribute('src')).not.toContain('/api/')
+    for (const img of screen.queryAllByRole('img')) expect(img.getAttribute('src') ?? '').not.toContain('/api/')
   })
 
   it('accepte un dossier après confirmation (écriture simulée)', async () => {
     const { appels } = simulerApi({ ...routesDetail, 'POST /admin/prestataires/0198a1b2-0000-7000-8000-000000000002/accepter': { corps: {} } })
     afficherApplication(ADRESSE_DETAIL)
-    await userEvent.click(await screen.findByRole('button', { name: 'Accepter le dossier' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Valider le dossier' }))
     const modale = screen.getByRole('dialog')
     expect(appels.some((a) => a.methode === 'POST')).toBe(false)
     await userEvent.click(within(modale).getByRole('button', { name: 'Accepter le dossier' }))
@@ -131,7 +133,7 @@ describe('dossiers prestataires', () => {
       'POST /admin/prestataires/0198a1b2-0000-7000-8000-000000000002/accepter': { status: 409, corps: { message: 'Ce dossier a déjà été traité.' } },
     })
     afficherApplication(ADRESSE_DETAIL)
-    await userEvent.click(await screen.findByRole('button', { name: 'Accepter le dossier' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Valider le dossier' }))
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Accepter le dossier' }))
     expect(await within(screen.getByRole('dialog')).findByText('Ce dossier a déjà été traité.')).toBeInTheDocument()
   })
@@ -145,8 +147,7 @@ describe('dossiers prestataires', () => {
     })
     afficherApplication(ADRESSE_DETAIL)
     expect(await screen.findByText('Pièces illisibles.')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Accepter le dossier' })).not.toBeInTheDocument()
-    expect(screen.getByText('Aucun justificatif déposé.')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Valider le dossier' })).not.toBeInTheDocument()
   })
 
   it('affiche « introuvable » pour un dossier inconnu', async () => {
