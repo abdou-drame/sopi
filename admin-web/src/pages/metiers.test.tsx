@@ -21,7 +21,7 @@ describe('métiers', () => {
     expect(within(screen.getByText('Pressing').closest('section') as HTMLElement).getByText('Désactivé')).toBeInTheDocument()
   })
 
-  it('ajoute un métier : corps conforme, champ vidé, confirmation (appel simulé)', async () => {
+  it('ajoute un métier : corps conforme, fenêtre fermée, confirmation (appel simulé)', async () => {
     const { appels } = simulerApi({ ...base, 'POST /admin/metiers': { status: 201, corps: { ...COIFFURE, id: 'm-3', code: 'plomberie', libelle: 'Plomberie', nombrePrestataires: 0 } } })
     afficherApplication('/metiers')
     await screen.findByText('Coiffure')
@@ -32,7 +32,7 @@ describe('métiers', () => {
     await userEvent.click(ajouter)
     expect(await screen.findByText('Le métier a été ajouté.')).toBeInTheDocument()
     expect(appels.find((a) => a.methode === 'POST')?.corps).toEqual({ libelle: 'Plomberie' })
-    expect(screen.getByLabelText('Nom du métier')).toHaveValue('')
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('affiche l’erreur du serveur quand le nom existe déjà (422 simulé)', async () => {
