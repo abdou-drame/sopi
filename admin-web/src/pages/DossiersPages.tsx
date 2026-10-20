@@ -6,6 +6,7 @@ import { api } from '../api/endpoints'
 import type { DemandeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
+import FichierProtege from '../components/ui/FichierProtege'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
 import {
   Avatar,
@@ -26,7 +27,7 @@ import {
   Tuile,
   type TonBadge,
 } from '../design/composants'
-import { IDocument, IImage, IUtilisateur } from '../design/icones'
+import { IDocument, IUtilisateur } from '../design/icones'
 import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
@@ -290,8 +291,8 @@ export function DossierDetailPage() {
                       const nom = T.documents[j.typeDocument] ?? j.typeDocument
                       return (
                         <div key={j.id} className="rounded-[22px] bg-[#f3f4f7] p-2.5">
-                          <div className="flex h-[120px] items-center justify-center rounded-2xl bg-[#e7edff] text-[#6b84c9]">
-                            <IImage />
+                          <div className="flex h-[120px] items-center justify-center overflow-hidden rounded-2xl bg-[#e7edff]">
+                            <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={nom} className="h-[120px] w-full rounded-2xl!" />
                           </div>
                           <div className="flex items-center justify-between px-1.5 pt-2.5 pb-1">
                             <span className="text-[13px] font-semibold">{nom}</span>

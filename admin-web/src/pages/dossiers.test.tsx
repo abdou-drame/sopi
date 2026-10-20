@@ -76,15 +76,16 @@ describe('dossiers prestataires', () => {
     expect(await screen.findByText('Aucune demande ne correspond.')).toBeInTheDocument()
   })
 
-  it('affiche le détail et charge les justificatifs avec le jeton, sans jamais les mettre dans une adresse d’image', async () => {
+  it('affiche le détail, montre l’aperçu de chaque pièce chargé avec le jeton, sans jamais les mettre dans une adresse d’image', async () => {
     const { appels } = simulerApi(routesDetail)
     afficherApplication(ADRESSE_DETAIL)
     expect(await screen.findByRole('heading', { level: 1, name: 'Moussa Diop' })).toBeInTheDocument()
     expect(screen.getByText('+221771234567')).toBeInTheDocument()
-    // Aucune pièce n'est chargée à l'ouverture ; « Voir » la récupère avec le jeton et l'ouvre via une adresse locale (blob:).
+    // L'aperçu de chaque pièce est récupéré avec le jeton (adresse locale blob:) ; « Voir » l'ouvre dans un nouvel onglet.
     const ouvrir = vi.fn()
     vi.stubGlobal('open', ouvrir)
-    expect(appels.some((a) => a.chemin.includes('/telecharger'))).toBe(false)
+    expect(await screen.findByRole('button', { name: /Agrandir l’image : Carte d’identité/ })).toBeInTheDocument()
+    expect(await screen.findByRole('link', { name: /Diplôme/ })).toBeInTheDocument()
     await userEvent.click(await screen.findByRole('button', { name: 'Voir Carte d’identité' }))
     await userEvent.click(screen.getByRole('button', { name: 'Voir Diplôme' }))
     await vi.waitFor(() => expect(ouvrir).toHaveBeenCalledTimes(2))
