@@ -3,25 +3,22 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
-import type { TypeSanction, UtilisateurDetail, UtilisateurListe } from '../api/typesAdmin'
+import type { TypeSanction, UtilisateurDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import AvatarInitiales from '../components/ui/AvatarInitiales'
 import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
 import Bouton from '../components/ui/Bouton'
 import Carte from '../components/ui/Carte'
 import { ChampDate, Selecteur } from '../components/ui/Champs'
 import Definitions from '../components/ui/Definitions'
-import EnTetePage from '../components/ui/EnTetePage'
-import FiltresListe from '../components/ui/FiltresListe'
-import LienLigne from '../components/ui/LienLigne'
-import ListePaginee from '../components/ui/ListePaginee'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
 import PageDetail from '../components/ui/PageDetail'
-import type { Colonne } from '../components/ui/Tableau'
 import { L } from '../i18n/libelles'
 import { aujourdhui, formatDate, formatDateHeure, formatMontant } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
+import { Avatar, Badge, BoutonExporter, BoutonFiltre, Carte as CarteMq, LigneLien, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
+import { EtoilePleine } from '../design/icones'
+import { EtatsListe, useListe } from '../design/useListe'
 import { BoutonLever, etatSanction } from './SanctionsPages'
 
 const T = L.utilisateurs
@@ -29,51 +26,98 @@ const S = L.sanctions
 const MOTIF_MIN = 10
 const MOTIF_MAX = 1000
 
+const TON_STATUT: Record<string, TonBadge> = { actif: 'succes', suspendu: 'danger', banni: 'danger', refuse: 'danger', en_attente: 'attention' }
+
 const OPTIONS_ROLE = [
-  { valeur: '', libelle: L.commun.tous },
-  { valeur: 'client', libelle: L.roles.client },
-  { valeur: 'prestataire', libelle: L.roles.prestataire },
-]
-const OPTIONS_STATUT = [
-  { valeur: '', libelle: L.commun.tous },
-  ...(['en_attente', 'actif', 'refuse', 'suspendu', 'banni'] as const).map((valeur) => ({ valeur, libelle: L.statuts[valeur] })),
+  { valeur: 'prestataire', libelle: 'Prestataires' },
+  { valeur: 'client', libelle: 'Clients' },
 ]
 
 export function UtilisateursListePage() {
-  const etat = useFiltresUrl(['role', 'statut', 'q'])
-  const colonnes: Colonne<UtilisateurListe>[] = [
-    {
-      cle: 'nom',
-      titre: T.utilisateur,
-      rendu: (u) => (
-        <div className="flex items-center gap-3">
-          <AvatarInitiales prenom={u.prenom} nom={u.nom} />
-          <div>
-            <LienLigne vers={`/utilisateurs/${u.id}`}>{`${u.prenom} ${u.nom}`}</LienLigne>
-            {u.prestataire && <p className="text-xs text-texte-doux">{u.prestataire.nomEntreprise}</p>}
-          </div>
-        </div>
-      ),
-    },
-    { cle: 'role', titre: T.role, rendu: (u) => L.roles[u.role] ?? u.role },
-    { cle: 'telephone', titre: T.telephone, rendu: (u) => u.telephone },
-    { cle: 'email', titre: T.email, rendu: (u) => u.email ?? '—' },
-    { cle: 'cree', titre: T.creeLe, rendu: (u) => formatDate(u.dateCreation) },
-    { cle: 'statut', titre: L.commun.statut, rendu: (u) => <BadgeStatut statut={u.statut} /> },
-  ]
+  const etat = useFiltresUrl(['role', 'statut', 'q'], { role: 'prestataire' })
+  const liste = useListe('utilisateurs', api.utilisateurs, etat)
+  const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  const compteurs: Record<string, number | undefined> = { prestataire: tableau?.comptes.prestataires.total, client: tableau?.comptes.clients.total }
+  const prestataires = etat.valeurs.role !== 'client'
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      <FiltresListe
-        legende={T.filtres}
-        etat={etat}
-        filtres={[
-          { cle: 'role', type: 'select', label: T.role, options: OPTIONS_ROLE, onglets: true },
-          { cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT },
-          { cle: 'q', type: 'texte', label: T.recherche, placeholder: T.recherchePlaceholder },
-        ]}
-      />
-      <ListePaginee legende={T.legende} cle="utilisateurs" charger={api.utilisateurs} etat={etat} colonnes={colonnes} cleLigne={(u) => u.id} lien={(u) => ({ vers: `/utilisateurs/${u.id}`, nom: `${u.prenom} ${u.nom}` })} messageVide={T.vide} />
+    <div className="flex flex-col gap-4">
+      <TitrePage titre="Utilisateurs" suite="de Sopi" sousTitre="Prestataires et clients inscrits sur la plateforme.">
+        <BoutonExporter />
+      </TitrePage>
+      <CarteMq className="flex flex-col gap-3.5">
+        <div className="flex flex-wrap items-center gap-3">
+          <Onglets
+            libelle={T.role}
+            onglets={OPTIONS_ROLE.map((o) => ({
+              cle: o.valeur,
+              libelle: o.libelle,
+              compteur: compteurs[o.valeur] ?? '—',
+              actif: (etat.valeurs.role || 'prestataire') === o.valeur,
+              onSelect: () => etat.definir({ role: o.valeur }),
+            }))}
+          />
+          <div className="flex-1" />
+          <Recherche valeur={etat.valeurs.q ?? ''} onChange={(v) => etat.definir({ q: v })} placeholder="Rechercher par nom ou téléphone" libelle="Rechercher un utilisateur" />
+          <BoutonFiltre>Métier</BoutonFiltre>
+          <BoutonFiltre>Statut</BoutonFiltre>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="mq-table min-w-[860px]" aria-label={T.legende}>
+            <thead>
+              <tr>
+                <th>{prestataires ? 'Prestataire' : 'Client'}</th>
+                <th>Métier</th>
+                <th>Quartier</th>
+                <th>Note</th>
+                <th style={{ textAlign: 'right' }}>Réservations</th>
+                <th>{L.commun.statut}</th>
+                <th className="relative">
+                  <span className="sr-only">Action</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.lignes.map((u) => {
+                const nom = u.prestataire?.nomEntreprise ?? `${u.prenom} ${u.nom}`
+                return (
+                  <LigneLien key={u.id} vers={`/utilisateurs/${u.id}`} libelle={`Voir le profil de ${nom}`}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <Avatar nom={nom} taille={40} />
+                        <span>
+                          <span className="block font-semibold">{nom}</span>
+                          <span className="mt-px block text-[11px] text-[#9aa0b2]">{u.telephone}</span>
+                        </span>
+                      </div>
+                    </td>
+                    <td>{u.prestataire ? (L.metiers[u.prestataire.metier] ?? u.prestataire.metier) : '—'}</td>
+                    <td>{u.prestataire?.quartier ?? '—'}</td>
+                    <td>
+                      <span className="inline-flex items-center gap-1 font-semibold">
+                        <EtoilePleine />—
+                      </span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <span className="font-semibold tabular-nums">—</span>
+                    </td>
+                    <td>
+                      <Badge ton={TON_STATUT[u.statut] ?? 'neutre'}>{L.statuts[u.statut] ?? u.statut}</Badge>
+                    </td>
+                  </LigneLien>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
+        <PiedListe
+          resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
+          precedent={liste.page > 1}
+          suivant={liste.page < liste.totalPages}
+          onPrecedent={() => etat.allerPage(liste.page - 1)}
+          onSuivant={() => etat.allerPage(liste.page + 1)}
+        />
+      </CarteMq>
     </div>
   )
 }

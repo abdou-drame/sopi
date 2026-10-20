@@ -123,14 +123,14 @@ export default function ModaleConfirmation({
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
-        className="animate-apparition max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-carte bg-surface p-6 shadow-eleve sm:p-8"
+        className="animate-apparition max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-carte border border-[#e4e7ee] bg-surface p-7 shadow-eleve"
       >
         <form onSubmit={soumettre} noValidate className="flex flex-col gap-4">
-          <h2 id={idTitre} className="text-2xl font-semibold tracking-tight">
+          <h2 id={idTitre} className="text-xl font-bold">
             {titre}
           </h2>
           {description && (
-            <div id={idDescription} className="text-sm text-texte-doux">
+            <div id={idDescription} className="text-[13px] leading-5 text-texte-doux">
               {description}
             </div>
           )}

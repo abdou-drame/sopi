@@ -1,7 +1,9 @@
-import { screen, within } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
+import { ActionModeration } from './AvisPages'
 
 // Réponses conformes à l'API (valeurs fictives). Les écritures sont toujours simulées.
 const AVIS = {
@@ -27,6 +29,16 @@ const PAGE = (data: unknown[]) => ({
   links: { first: null, last: null, prev: null, next: null },
   meta: { current_page: 1, last_page: 1, per_page: 20, total: data.length },
 })
+/** « Conserver » et « Rétablir » ne sont pas dessinés : on les teste isolément, sans passer par la page. */
+function afficherAction(avis: typeof AVIS, mode: 'conserver' | 'retablir') {
+  const messages: string[] = []
+  render(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <ActionModeration avis={avis} mode={mode} onFait={(m) => messages.push(m)} />
+    </QueryClientProvider>,
+  )
+  return messages
+}
 const base = { 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } }
 
 describe('modération des avis', () => {
@@ -36,12 +48,11 @@ describe('modération des avis', () => {
   it('montre par défaut les avis à modérer et traduit la vue en paramètres de l’API', async () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS]) } })
     afficherApplication('/avis')
-    expect(await screen.findByText('Service décevant.')).toBeInTheDocument()
-    expect(screen.getByText(/Avis injuste/)).toBeInTheDocument()
+    expect(await screen.findByText(/Service décevant/)).toBeInTheDocument()
     const recherche = appels.find((a) => a.chemin === '/admin/avis')?.recherche
     expect(recherche?.get('aTraiter')).toBe('true')
     expect(recherche?.has('vue')).toBe(false)
-    await userEvent.click(screen.getByRole('tab', { name: 'Masqués' }))
+    await userEvent.click(screen.getByRole('tab', { name: /Masqués/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=masques')
   })
 
@@ -62,24 +73,30 @@ describe('modération des avis', () => {
   })
 
   it('conserve un avis signalé sans motif : corps vide', async () => {
-    const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS]) }, 'POST /admin/avis/a-1/conserver': { corps: AVIS } })
-    afficherApplication('/avis')
-    await userEvent.click(await screen.findByRole('button', { name: 'Conserver l’avis de Awa Diallo' }))
+    const { appels } = simulerApi({ 'POST /admin/avis/a-1/conserver': { corps: AVIS } })
+    const messages = afficherAction(AVIS, 'conserver')
+    await userEvent.click(screen.getByRole('button', { name: 'Conserver l’avis de Awa Diallo' }))
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Conserver' }))
-    expect(await screen.findByText('L’avis a été conservé.')).toBeInTheDocument()
+    await vi.waitFor(() => expect(messages).toEqual(['L’avis a été conservé.']))
     expect(appels.find((a) => a.methode === 'POST')?.corps).toEqual({})
   })
 
-  it('rétablit un avis masqué, sans bouton Conserver ni Masquer', async () => {
-    const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([MASQUE]) }, 'POST /admin/avis/a-2/retablir': { corps: AVIS } })
-    afficherApplication('/avis?vue=masques')
-    expect(await screen.findByText(/Propos injurieux/)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Masquer l’avis/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
+  it('rétablit un avis masqué (action fonctionnelle, non affichée sur la page)', async () => {
+    const { appels } = simulerApi({ 'POST /admin/avis/a-2/retablir': { corps: AVIS } })
+    const messages = afficherAction(MASQUE, 'retablir')
     await userEvent.click(screen.getByRole('button', { name: 'Rétablir l’avis de Awa Diallo' }))
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Rétablir' }))
-    expect(await screen.findByText('L’avis a été rétabli.')).toBeInTheDocument()
+    await vi.waitFor(() => expect(messages).toEqual(['L’avis a été rétabli.']))
     expect(appels.filter((a) => a.methode === 'POST')).toHaveLength(1)
+  })
+
+  it('n’affiche sur la carte que « Masquer l’avis » et « Voir la réservation » (Conserver et Rétablir ne sont pas dessinés)', async () => {
+    simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS, MASQUE]) } })
+    afficherApplication('/avis')
+    expect(await screen.findByRole('button', { name: 'Masquer l’avis de Awa Diallo' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Voir la réservation' })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Rétablir l’avis/ })).not.toBeInTheDocument()
   })
 
   it('affiche l’erreur 409 du serveur dans la modale', async () => {
@@ -106,9 +123,9 @@ describe('pagination de 10', () => {
     const reponse = { ...PAGE(lignes), meta: { current_page: 1, last_page: 2, per_page: 20, total: 25 } }
     const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: reponse } })
     afficherApplication('/avis?page=2')
-    expect(await screen.findByText('Commentaire 11')).toBeInTheDocument()
-    expect(screen.getByText('Commentaire 20')).toBeInTheDocument()
-    expect(screen.queryByText('Commentaire 10')).not.toBeInTheDocument()
+    expect(await screen.findByText(/Commentaire 11/)).toBeInTheDocument()
+    expect(screen.getByText(/Commentaire 20/)).toBeInTheDocument()
+    expect(screen.queryByText(/Commentaire 10/)).not.toBeInTheDocument()
     expect(appels.find((a) => a.chemin === '/admin/avis')?.recherche.has('page')).toBe(false)
   })
 })

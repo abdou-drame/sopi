@@ -1,383 +1,356 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api/endpoints'
-import { messageDErreur } from '../api/client'
-import type { Alerte, Gravite, PointRevenus, TableauDeBord } from '../api/types'
-import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
-import BasculeGelules from '../components/ui/BasculeGelules'
-import Bloc from '../components/ui/Bloc'
-import Bouton from '../components/ui/Bouton'
-import BoutonRond from '../components/ui/BoutonRond'
-import Carte from '../components/ui/Carte'
-import CarteSopi from '../components/ui/CarteSopi'
-import DerniersPaiements from '../components/ui/DerniersPaiements'
+import { useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
-import EnTeteLarge from '../layout/EnTeteLarge'
-import { GraphiqueBarres, GraphiqueCourbe } from '../components/ui/Graphiques'
-import { IconeAvis, IconeCalendrier, IconeDossier, IconeFleche, IconeGraphique, IconeLitige } from '../components/ui/Icones'
-import LienGelule from '../components/ui/LienGelule'
-import NombreAnime from '../components/ui/NombreAnime'
-import Squelette from '../components/ui/Squelette'
-import { L } from '../i18n/libelles'
-import { ajouterJours, aujourdhui, formatJourCalendaire, formatMontant, formatNombre } from '../lib/format'
+import { Avatar, Carte, DEGRADE_BLEU, TitrePage } from '../design/composants'
+import { ICalendrier, IChevronBas, IFlecheHautDroite, IGraphique, ILitiges, IPlus } from '../design/icones'
+import { L, dureeMinutes } from '../i18n/libelles'
+import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
 const LR = L.revenus
-const ORDRE_GRAVITE: Record<Gravite, number> = { critique: 0, attention: 1, info: 2 }
-const NOMBRE_BARRES_MAX = 7
+const ABSENT = '—'
 
-/** Alertes de la plus grave à la moins grave, puis les plus nombreuses d'abord. */
-export function trierAlertes(alertes: Alerte[]): Alerte[] {
-  return [...alertes].sort((a, b) => ORDRE_GRAVITE[a.gravite] - ORDRE_GRAVITE[b.gravite] || b.compteur - a.compteur)
+/** Couleur du point de statut d'une réservation (statuts du backend). */
+const POINT_STATUT: Record<string, string> = {
+  en_attente: '#f59e0b',
+  acceptee: '#1d4ed8',
+  confirmee: '#1d4ed8',
+  en_cours: '#1d4ed8',
+  terminee: '#16a34a',
+  refusee: '#e5484d',
+  annulee: '#9aa0b2',
 }
 
-function detailAlerte(a: Alerte): string | undefined {
-  if (a.echeanceDansMinutes !== null) return T.echeanceMinutes(a.echeanceDansMinutes)
-  if (a.ageMinutes !== null) return T.ancienneteMinutes(a.ageMinutes)
-  return undefined
-}
+const COULEURS_METIER = ['#1d4ed8', '#5b83ef', '#a9bdf6']
 
-/**
- * Regroupe les points journaliers pour garder au plus 7 barres lisibles : 7 jours = une barre par jour,
- * 30 jours = une barre par tranche de 5 jours (somme des acomptes encaissés, étiquetée par le dernier jour).
- */
-export function regrouperAcomptes(series: PointRevenus[]): { libelle: string; valeur: number }[] {
-  const taille = Math.max(1, Math.ceil(series.length / NOMBRE_BARRES_MAX))
-  const barres: { libelle: string; valeur: number }[] = []
-  for (let i = 0; i < series.length; i += taille) {
-    const groupe = series.slice(i, i + taille)
-    barres.push({
-      libelle: formatJourCalendaire(groupe[groupe.length - 1].fin, true),
-      valeur: groupe.reduce((somme, p) => somme + p.acomptesEncaisses, 0),
-    })
-  }
-  return barres
-}
-
-function BlocAlertes() {
-  const { data, isPending, isError, error, refetch } = useAlertes()
-  const alertes = data ? trierAlertes(data.alertes) : []
+function LienFleche({ vers, libelle }: { vers: string; libelle: string }) {
   return (
-    <Bloc
-      titre={T.alertes}
-      chargement={isPending}
-      erreur={isError ? messageDErreur(error) : null}
-      onReessayer={() => void refetch()}
-      hauteur="h-20"
-    >
-      {alertes.length === 0 ? (
-        <p role="status" className="rounded-grand bg-primaire-50 px-5 py-4 text-sm font-medium text-primaire-700">
-          {T.aucuneAlerte}
-        </p>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {alertes.map((a, i) => (
-            <BanniereAlerte
-              key={a.type}
-              gravite={a.gravite}
-              titre={a.message}
-              detail={detailAlerte(a)}
-              vers={lienDeLAlerte(a)}
-              delai={i * 70}
-            />
-          ))}
-        </div>
-      )}
-    </Bloc>
+    <Link to={vers} aria-label={libelle} className="mq-rond grid size-11 shrink-0 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
+      <IFlecheHautDroite taille={16} trait={2} />
+    </Link>
   )
 }
 
-/** Message d'erreur d'une carte, avec « Réessayer » (ne révèle rien de technique : le message vient du client d'API). */
-function ErreurCarte({ message, onReessayer }: { message: string; onReessayer: () => void }) {
+function EnTeteSimple({ titre, sousTitre, vers, libelle, icone }: { titre: string; sousTitre: string; vers: string; libelle: string; icone?: React.ReactNode }) {
   return (
-    <div role="alert" className="flex flex-col items-start gap-3 rounded-grand bg-erreur-fond p-5 text-erreur-texte">
-      <p className="text-sm font-medium">{message}</p>
-      <Bouton variante="secondaire" taille="p" onClick={onReessayer}>
-        {L.commun.reessayer}
-      </Bouton>
+    <div className="flex items-center gap-3">
+      {icone}
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-bold">{titre}</span>
+        <span className="mt-0.5 block text-xs text-[#8a90a2]">{sousTitre}</span>
+      </span>
+      <LienFleche vers={vers} libelle={libelle} />
     </div>
   )
 }
 
-function CarteReservations({ d, erreur, chargement, onReessayer }: { d?: TableauDeBord; erreur: string | null; chargement: boolean; onReessayer: () => void }) {
-  const activite = d?.reservations.activiteRecente
+function CarteChiffre({
+  degrade = false,
+  titre,
+  valeur,
+  note,
+  pastille,
+}: {
+  degrade?: boolean
+  titre: string
+  valeur?: number
+  note: string
+  pastille: string
+}) {
+  const clair = degrade ? 'opacity-80' : 'text-[#9aa0b2]'
   return (
-    <Carte
-      titre={T.carteReservationsTitre}
-      sousTitre={T.carteReservationsSousTitre}
-      action={<BoutonRond libelle={T.ouvrirReservations} icone={<IconeFleche />} vers="/reservations" />}
+    <section
+      className={`box-border rounded-[28px] px-5 py-[18px] ${degrade ? 'text-white' : 'bg-white'}`}
+      style={degrade ? { background: DEGRADE_BLEU } : undefined}
     >
-      <CarteSopi
-        libelle={T.carteTerminees30}
-        montant={activite ? formatNombre(activite.derniers30Jours.terminees) : ''}
-        lignes={[
-          { libelle: T.carteCreees7, valeur: activite ? formatNombre(activite.derniers7Jours.creees) : '' },
-          { libelle: T.cartePaiementsReussis, valeur: d ? formatNombre(d.paiements.parStatut.reussi.nombre) : '' },
-        ]}
-        chargement={chargement}
-        erreur={erreur}
-        onReessayer={onReessayer}
-      />
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-micro text-texte-doux">{T.creeesSur30}</p>
-          <p className="mt-0.5 text-xl font-bold text-texte">{activite ? <NombreAnime valeur={activite.derniers30Jours.creees} /> : '—'}</p>
-        </div>
-        <LienGelule vers="/reservations">{T.voirReservations}</LienGelule>
+      <div className="flex items-center justify-between">
+        <span className={`text-xs font-semibold ${degrade ? 'opacity-85' : 'text-[#8a90a2]'}`}>{titre}</span>
+        <span className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${degrade ? 'bg-white/20' : 'bg-[#f3f4f7] text-[#9aa0b2]'}`}>{pastille}</span>
       </div>
-    </Carte>
+      <div className="mt-2 text-[30px] leading-[34px] font-bold tracking-[-0.8px] tabular-nums">
+        {valeur === undefined ? ABSENT : formatNombre(valeur)} <span className={`text-sm font-medium ${clair}`}>FCFA</span>
+      </div>
+      <div className={`mt-1.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>
+    </section>
   )
 }
 
-type Periode = '7' | '30'
-
-function CarteBarres() {
-  const [periode, setPeriode] = useState<Periode>('7')
-  const { data, isPending, isError, error, refetch } = useRevenus30Jours()
-  const barres = useMemo(() => {
-    const serie = data?.series ?? []
-    return regrouperAcomptes(periode === '7' ? serie.slice(-7) : serie)
-  }, [data, periode])
-  const vide = !!data && barres.every((b) => b.valeur === 0)
-
-  return (
-    <Carte
-      titre={T.barresTitre}
-      icone={<IconeGraphique width={16} height={16} />}
-      sousTitre={T.barresSousTitre}
-      action={
-        <div className="flex items-center gap-2">
-          <BasculeGelules
-            legende={T.basculePeriode}
-            valeur={periode}
-            onChange={setPeriode}
-            options={[
-              { valeur: '7', libelle: T.sept30.sept },
-              { valeur: '30', libelle: T.sept30.trente },
-            ]}
-          />
-          <BoutonRond libelle={T.ouvrirPaiements} icone={<IconeFleche />} vers="/paiements" />
-        </div>
-      }
-    >
-      {isPending ? (
-        <div role="status" aria-label={`${L.commun.chargement} ${T.barresTitre}`}>
-          <Squelette className="h-64 w-full rounded-grand" />
-        </div>
-      ) : isError ? (
-        <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
-      ) : vide ? (
-        <p className="py-16 text-center text-sm text-texte-doux">{T.barresVide}</p>
-      ) : (
-        <GraphiqueBarres key={periode} description={T.barresDescription} donnees={barres} formatValeur={formatMontant} />
-      )}
-    </Carte>
-  )
-}
-
-function CarteCommission() {
-  const { data, isPending, isError, error, refetch } = useRevenus30Jours()
-  const serie = data?.series ?? []
-  const total = serie.reduce((somme, p) => somme + p.revenus, 0)
-  return (
-    <Carte
-      titre={T.commissionTitre}
-      sousTitre={T.commissionSousTitre}
-      action={<BoutonRond libelle={T.ouvrirRevenus} icone={<IconeFleche />} vers="/revenus" />}
-    >
-      {isPending ? (
-        <div role="status" aria-label={`${L.commun.chargement} ${T.commissionTitre}`}>
-          <Squelette className="h-10 w-48" />
-          <Squelette className="mt-4 h-32 w-full rounded-grand" />
-        </div>
-      ) : isError ? (
-        <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
-      ) : (
-        <>
-          <p className="text-center text-micro text-texte-discret">{T.commissionLibelle}</p>
-          <p className="text-center text-chiffre font-bold tracking-tight text-texte">
-            <NombreAnime valeur={total} format={formatNombre} />
-            <span className="ml-1 text-sm font-medium text-texte-discret">FCFA</span>
-          </p>
-          <div className="mt-2">
-            <GraphiqueCourbe
-              description={T.courbeDescription}
-              libelles={serie.map((p) => formatJourCalendaire(p.debut, true))}
-              series={[{ nom: T.commissionTitre, couleur: 'var(--color-primaire-500)', valeurs: serie.map((p) => p.revenus) }]}
-              formatValeur={formatMontant}
-            />
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <LienGelule vers="/revenus">{T.voirRevenus}</LienGelule>
-            <LienGelule vers="/paiements" variante="claire">
-              {T.voirPaiements}
-            </LienGelule>
-          </div>
-        </>
-      )}
-    </Carte>
-  )
-}
-
-function CarteDerniersPaiements() {
-  const { data, isPending, isError, error, refetch } = useQuery({ queryKey: ['derniers-paiements'], queryFn: api.derniersPaiements, retry: false })
-  return (
-    <Carte
-      titre={L.derniersPaiements.titre}
-      sousTitre={L.derniersPaiements.sousTitre}
-      action={<BoutonRond libelle={T.ouvrirPaiements} icone={<IconeFleche />} vers="/paiements" />}
-    >
-      <DerniersPaiements
-        paiements={(data?.data ?? []).slice(0, 5)}
-        chargement={isPending}
-        erreur={isError ? messageDErreur(error) : null}
-        onReessayer={() => void refetch()}
-      />
-    </Carte>
-  )
-}
-
-function useRevenus30Jours() {
-  const fin = aujourdhui()
-  const debut = ajouterJours(fin, -29)
-  return useQuery({
-    queryKey: ['tableau-de-bord-revenus', debut, fin],
-    queryFn: () => api.revenus({ debut, fin, regroupement: 'jour' }),
-    retry: false,
+/** Six derniers mois (libellés du calendrier) : aucune donnée par mois n'existe dans l'API, les valeurs restent à « — ». */
+function derniersMois(): string[] {
+  const maintenant = new Date()
+  const format = new Intl.DateTimeFormat('fr-FR', { month: 'short' })
+  return Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(maintenant.getFullYear(), maintenant.getMonth() - (5 - i), 1)
+    const m = format.format(d)
+    return m.charAt(0).toUpperCase() + m.slice(1)
   })
 }
 
-function CarteRevenu({ titre, valeur, vers, degrade, chargement }: { titre: string; valeur?: number; vers: string; degrade?: boolean; chargement: boolean }) {
+function CarteReservations() {
+  const [annuel, setAnnuel] = useState(true)
+  const mois = derniersMois()
   return (
-    <div
-      className={`animate-apparition flex min-h-[132px] flex-col justify-between rounded-carte p-[18px] ${degrade ? "text-white" : "bg-surface text-texte"}`}
-      style={degrade ? { backgroundImage: "linear-gradient(150deg, #3563e8, #1d4ed8 55%, #17338f)" } : undefined}
-      aria-busy={chargement || undefined}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <p className={`text-[13px] font-semibold ${degrade ? "text-white/85" : "text-texte-doux"}`}>{titre}</p>
-        <BoutonRond libelle={`${T.ouvrir} · ${titre}`} icone={<IconeFleche />} vers={vers} />
+    <section className="box-border flex min-h-[435px] min-w-0 flex-[2_1_560px] flex-col rounded-[32px] bg-white p-[18px]">
+      <div className="flex flex-wrap items-center gap-3.5">
+        <span className="grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
+          <IGraphique />
+        </span>
+        <span className="min-w-[140px] flex-1">
+          <span className="block text-[15px] font-bold">{T.reservations}</span>
+          <span className="mt-0.5 block text-xs text-[#8a90a2]">Nombre de réservations par mois</span>
+        </span>
+        <div role="tablist" aria-label="Période du graphique" className="flex rounded-full bg-[#f3f4f7] p-1">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!annuel}
+            onClick={() => setAnnuel(false)}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-4 text-xs font-semibold ${annuel ? 'bg-transparent text-[#8a90a2]' : 'bg-[#1d4ed8] text-white'}`}
+          >
+            Mensuel
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={annuel}
+            onClick={() => setAnnuel(true)}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-[18px] text-xs font-semibold ${annuel ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
+          >
+            Annuel
+          </button>
+        </div>
+        <LienFleche vers="/reservations" libelle="Ouvrir" />
       </div>
-      {chargement ? (
-        <Squelette className="h-9 w-32" />
-      ) : (
-        <p className="text-[28px] leading-9 font-bold tracking-tight">
-          {valeur === undefined ? "—" : <NombreAnime valeur={valeur} format={formatNombre} />}
-          <span className={`ml-1 text-sm font-medium ${degrade ? "text-white/75" : "text-texte-discret"}`}>FCFA</span>
-        </p>
-      )}
-    </div>
+      <div className="mt-[18px] flex min-h-[230px] flex-1 gap-3">
+        <div className="flex flex-col justify-between pb-[26px] text-right text-[11px] text-[#9aa0b2] tabular-nums" aria-hidden="true">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <span key={i}>{ABSENT}</span>
+          ))}
+        </div>
+        <div className="relative min-w-0 flex-1">
+          <div className="absolute inset-x-0 top-1.5 bottom-8 flex flex-col justify-between" aria-hidden="true">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="border-t border-dashed border-[#e6e8ee]" />
+            ))}
+          </div>
+          <div className="relative box-border flex h-full justify-around gap-[clamp(8px,2.5vw,36px)] px-2 pt-11">
+            {mois.map((m) => (
+              <div key={m} className="flex h-full max-w-[84px] min-w-0 flex-[1_1_0] flex-col items-center">
+                <div className="flex w-full flex-1 items-end">
+                  <div className="grid h-full w-full place-items-center rounded-full bg-[#f3f4f7] text-[11px] text-[#9aa0b2]">{ABSENT}</div>
+                </div>
+                <div className="flex h-[26px] items-end text-[11px] font-medium text-[#9aa0b2]">{m}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
-/** Quatre chiffres de revenus des 30 derniers jours (totaux déjà fournis par l'API des revenus). */
-function RangeeRevenus() {
-  const { data, isPending } = useRevenus30Jours()
-  const t = data?.totaux
+function CarteDossiers() {
+  const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  const { data: alertes } = useAlertes()
+  const nombre = tableau?.comptes.prestataires.dossiersEnAttente
+  const age = alertes?.alertes.find((a) => a.type === 'dossiers_en_attente')?.ageMinutes
   return (
-    <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
-      <CarteRevenu degrade titre={LR.revenus} valeur={t?.revenus} vers="/revenus" chargement={isPending} />
-      <CarteRevenu titre={LR.acomptesEncaisses} valeur={t?.acomptesEncaisses} vers="/paiements" chargement={isPending} />
-      <CarteRevenu titre={LR.remboursements} valeur={t?.remboursements} vers="/paiements" chargement={isPending} />
-      <CarteRevenu titre={LR.retraitsVerses} valeur={t?.retraitsVerses} vers="/retraits" chargement={isPending} />
-    </div>
-  )
-}
-
-function CarteCompteur({
-  titre,
-  sousTitre,
-  valeur,
-  vers,
-  icone,
-  chargement,
-  delai,
-}: {
-  titre: string
-  sousTitre: string
-  valeur?: number
-  vers: string
-  icone: React.ReactNode
-  chargement: boolean
-  delai: number
-}) {
-  return (
-    <Carte titre={titre} sousTitre={sousTitre} icone={icone} delai={delai} className="flex-1">
-      <div className="flex items-end justify-between gap-3" aria-busy={chargement || undefined}>
-        {chargement ? (
-          <Squelette className="h-9 w-20" />
-        ) : (
-          <p className="text-chiffre font-bold tracking-tight text-texte">{valeur === undefined ? '—' : <NombreAnime valeur={valeur} />}</p>
-        )}
-        <LienGelule vers={vers}>
-          <span aria-hidden="true">{T.ouvrir}</span>
-          <span className="sr-only">{`${T.ouvrir} · ${titre}`}</span>
-        </LienGelule>
+    <Carte>
+      <EnTeteSimple titre="Dossiers à traiter" sousTitre="Demandes d'inscription" vers="/dossiers-prestataires" libelle="Ouvrir les dossiers" />
+      <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+        <div className="text-xs font-semibold opacity-80">En attente de décision</div>
+        <div className="mt-1.5 flex items-baseline gap-2">
+          <span className="text-[44px] leading-[48px] font-bold tracking-[-1px]">{nombre === undefined ? ABSENT : nombre}</span>
+          <span className="text-sm font-semibold opacity-85">{nombre === 1 ? 'dossier' : 'dossiers'}</span>
+        </div>
+        <div className="mt-[22px] flex items-center justify-between text-xs">
+          <span className="opacity-80">Le plus ancien : {age == null ? ABSENT : dureeMinutes(age)}</span>
+          <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{ABSENT} prioritaires</span>
+        </div>
       </div>
     </Carte>
   )
 }
 
-/** En-tête pleine largeur : « Bienvenue, prénom », période affichée et bouton d'actualisation (lectures seulement). */
-function EnTeteAccueil() {
-  const { utilisateur } = useAuth()
-  const fin = aujourdhui()
-  const debut = ajouterJours(fin, -29)
+function CarteMetiers() {
+  const { data } = useQuery({ queryKey: ['metiers'], queryFn: api.metiers, retry: false })
+  const metiers = (data?.data ?? []).filter((m) => m.actif).slice(0, 3)
   return (
-    <EnTeteLarge>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-[clamp(28px,4vw,42px)] leading-[1.15] font-semibold tracking-tight text-texte">
-          <span className="sr-only">{T.titre} — </span>
-          {T.bienvenue} <span className="font-normal text-[#9aa0b2]">{utilisateur?.prenom}</span>
-        </h1>
-        <div className="flex flex-wrap items-center gap-3">
-          <p
-            aria-label={`${T.periodeAffichee} : ${formatJourCalendaire(debut, true)} – ${formatJourCalendaire(fin, true)}`}
-            className="flex items-center gap-2.5 rounded-gelule bg-surface px-5 py-2.5 text-sm font-medium text-texte shadow-carte"
-          >
-            <IconeCalendrier width={18} height={18} className="text-texte-doux" />
-            {formatJourCalendaire(debut, true)} – {formatJourCalendaire(fin, true)}
-          </p>
+    <Carte>
+      <div className="text-[15px] leading-[normal] font-bold">Revenus par métier</div>
+      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Commissions Sopi, 30 derniers jours</div>
+      {metiers.map((m, i) => (
+        <div key={m.id} className="mt-3">
+          <div className="flex justify-between text-xs leading-[normal]">
+            <span className="font-semibold">{m.libelle}</span>
+            <span className="text-[#6b7287] tabular-nums">{ABSENT}</span>
+          </div>
+          <div className="mt-1.5 h-2.5 rounded-full bg-[#f3f4f7]">
+            <div className="h-full rounded-full" style={{ width: 0, background: COULEURS_METIER[i] }} />
+          </div>
         </div>
+      ))}
+    </Carte>
+  )
+}
+
+function CarteActivite() {
+  const { data } = useQuery({ queryKey: ['activite-reservations'], queryFn: () => api.reservations({ page: 1 }), retry: false })
+  const { data: paiements } = useQuery({ queryKey: ['derniers-paiements'], queryFn: api.derniersPaiements, retry: false })
+  const acomptes = new Map((paiements?.data ?? []).map((p) => [p.reservationId, p.montantAcompte]))
+  const lignes = (data?.data ?? []).slice(0, 4)
+  return (
+    <section className="box-border min-w-0 flex-[2_1_560px] rounded-[32px] bg-white p-[18px]">
+      <EnTeteSimple titre="Activité récente" sousTitre="Dernières réservations de la plateforme" vers="/reservations" libelle="Tout voir" />
+      <div className="mt-3.5 overflow-x-auto">
+        <table className="mq-table min-w-[620px]">
+          <thead>
+            <tr className="text-left text-xs text-[#9aa0b2]">
+              <th>Réservation</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>Statut</th>
+              <th style={{ textAlign: "right" }}>Acompte</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lignes.map((r) => {
+              const acompte = acomptes.get(r.id)
+              return (
+                <tr key={r.id} className="rang">
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <Avatar nom={r.prestataire.nomEntreprise} taille={36} />
+                      <span>
+                        <span className="block font-semibold">{r.prestation.nom}</span>
+                        <span className="mt-px block text-[11px] text-[#9aa0b2]">
+                          {r.prestataire.nomEntreprise} · {r.client.prenom} {r.client.initialeNom}.
+                        </span>
+                      </span>
+                    </div>
+                  </td>
+                  <td>{formatDate(r.creneau.debut)}</td>
+                  <td className="tabular-nums">{formatHeureDuJour(r.creneau.debut)}</td>
+                  <td>
+                    <span className="inline-flex items-center gap-1.5 font-medium">
+                      <span className="size-1.5 rounded-full" style={{ background: POINT_STATUT[r.statut] ?? '#9aa0b2' }} />
+                      {L.statuts[r.statut as keyof typeof L.statuts] ?? r.statut}
+                    </span>
+                  </td>
+                  <td><span className="font-semibold tabular-nums">{acompte === undefined ? ABSENT : `${formatNombre(acompte)} FCFA`}</span></td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
-    </EnTeteLarge>
+    </section>
+  )
+}
+
+function CarteLitiges() {
+  const { data } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  return (
+    <Carte>
+      <EnTeteSimple
+        titre="Litiges ouverts"
+        sousTitre="Décisions à rendre"
+        vers="/litiges"
+        libelle="Ouvrir les litiges"
+        icone={
+          <span className="grid size-11 place-items-center rounded-[22px] bg-[#fde9e9] text-[#b0161b]">
+            <ILitiges taille={18} trait={1.9} />
+          </span>
+        }
+      />
+      <div className="mt-[18px] flex items-baseline gap-2.5">
+        <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{data ? data.litiges.ouverts : ABSENT}</span>
+        <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] font-bold text-[#b0161b]">{ABSENT} sans réponse depuis 48 h</span>
+      </div>
+    </Carte>
+  )
+}
+
+const COULEURS_PASTILLE = ['bg-[#dbeafe] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#d7f7e4] text-[#0e6245]', 'bg-[#fff0d4] text-[#983705]']
+
+function CartePrestataires() {
+  const { data } = useQuery({
+    queryKey: ['prestataires-actifs'],
+    queryFn: () => api.utilisateurs({ role: 'prestataire', statut: 'actif' }),
+    retry: false,
+  })
+  const visibles = (data?.data ?? []).slice(0, 4)
+  const reste = data ? Math.max(0, data.meta.total - visibles.length) : 0
+  const rond = 'box-border grid size-11 place-items-center rounded-[22px] border-[3px] border-[#f3f4f7] text-xs font-bold'
+  return (
+    <Carte className="flex-1">
+      <EnTeteSimple titre="Prestataires actifs" sousTitre="Inscrits et validés" vers="/utilisateurs" libelle="Ouvrir les utilisateurs" />
+      <div className="mt-[18px] flex items-center rounded-[22px] bg-[#f3f4f7] px-4 py-3.5">
+        {data === undefined && <span className="text-sm text-[#9aa0b2]">{ABSENT}</span>}
+        {visibles.map((u, i) => (
+          <span key={u.id} aria-hidden="true" className={`${rond} ${i > 0 ? '-ml-2.5' : ''} ${COULEURS_PASTILLE[i % 4]}`}>
+            {`${u.prenom.charAt(0)}${u.nom.charAt(0)}`.toUpperCase()}
+          </span>
+        ))}
+        {reste > 0 && (
+          <span className={`${rond} -ml-2.5 bg-[#1d4ed8] text-white`}>+{reste}</span>
+        )}
+      </div>
+    </Carte>
   )
 }
 
 export default function TableauDeBordPage() {
-  const requete = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
-  const { data, isPending, isError, error, refetch } = requete
-  const erreur = isError ? messageDErreur(error) : null
+  const { utilisateur } = useAuth()
+  const fin = aujourdhui()
+  const debut = ajouterJours(fin, -29)
+  const { data } = useQuery({
+    queryKey: ['tableau-de-bord-revenus', debut, fin],
+    queryFn: () => api.revenus({ debut, fin, regroupement: 'jour' }),
+    retry: false,
+  })
+  const t = data?.totaux
+  const periode = `${formatJourCalendaire(debut, true)} – ${formatJourCalendaire(fin)}`
 
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTeteAccueil />
+    <div className="flex flex-col gap-4">
+      <TitrePage titre={`${T.bienvenue}`} suite={utilisateur?.prenom}>
+        <button type="button" className="mq-btn-blanc flex h-12 cursor-pointer items-center gap-2.5 rounded-3xl border-none pr-[18px] pl-4 text-[13px] font-semibold text-[#12172b]">
+          <ICalendrier />
+          {periode}
+          <span className="text-[#8a90a2]">
+            <IChevronBas />
+          </span>
+        </button>
+        <button type="button" className="mq-btn-blanc flex h-12 cursor-pointer items-center gap-2 rounded-3xl border-none pr-5 pl-4 text-[13px] font-semibold text-[#12172b]">
+          <IPlus taille={16} trait={2.2} />
+          Exporter
+        </button>
+      </TitrePage>
 
-      <BlocAlertes />
+      <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+        <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} pastille={ABSENT} note="30 derniers jours" />
+        <CarteChiffre titre={LR.acomptesEncaisses} valeur={t?.acomptesEncaisses} pastille={ABSENT} note="30 derniers jours" />
+        <CarteChiffre titre="Acomptes remboursés" valeur={t?.remboursements} pastille={ABSENT} note="Refus, annulations, litiges" />
+        <CarteChiffre titre="Reversé aux prestataires" valeur={t?.retraitsVerses} pastille={ABSENT} note="Acomptes − remboursés − commissions" />
+      </div>
 
-      <RangeeRevenus />
-
-      <div className="grid grid-flow-dense gap-3.5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
-        <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
-        <div className="md:col-span-2 xl:col-span-1 [&>*]:h-full">
-          <CarteBarres />
+      <div className="flex flex-wrap items-stretch gap-3.5">
+        <CarteReservations />
+        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+          <CarteDossiers />
+          <CarteMetiers />
         </div>
-        <CarteCommission />
+      </div>
 
-        <div className="md:col-span-2 xl:col-span-2 [&>*]:h-full">
-          <CarteDerniersPaiements />
-        </div>
-        <div className="grid gap-3.5 md:col-span-2 md:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
-          {erreur && !isPending ? (
-            <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
-          ) : (
-            <>
-              <CarteCompteur titre={T.litigesOuvertsTitre} sousTitre={T.litigesOuvertsSousTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige width={16} height={16} />} chargement={isPending} delai={0} />
-              <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
-              <CarteCompteur titre={T.dossiersTitre} sousTitre={T.dossiersSousTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier width={16} height={16} />} chargement={isPending} delai={140} />
-            </>
-          )}
+      <div className="flex flex-wrap items-stretch gap-3.5">
+        <CarteActivite />
+        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+          <CarteLitiges />
+          <CartePrestataires />
         </div>
       </div>
     </div>

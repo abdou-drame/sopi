@@ -1,19 +1,17 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { AvisAdmin } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import BadgeStatut from '../components/ui/BadgeStatut'
 import { useRetours } from '../components/ui/Alertes'
-import Bouton from '../components/ui/Bouton'
-import EnTetePage from '../components/ui/EnTetePage'
-import FiltresListe from '../components/ui/FiltresListe'
-import ListePaginee from '../components/ui/ListePaginee'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import type { Colonne } from '../components/ui/Tableau'
+import { Badge, Carte as CarteMq, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
+import { IDocument } from '../design/icones'
+import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
-import { formatDate, formatDateHeure } from '../lib/format'
+import { formatDate } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
 const T = L.avisModeration
@@ -28,7 +26,7 @@ const OPTIONS_VUE = [
   { valeur: 'masques', libelle: T.masques },
   { valeur: 'tous', libelle: T.tous },
 ]
-const OPTIONS_NOTE = [{ valeur: '', libelle: L.commun.tous }, ...[5, 4, 3, 2, 1].map((n) => ({ valeur: String(n), libelle: T.sur5(n) }))]
+export const OPTIONS_NOTE = [{ valeur: '', libelle: L.commun.tous }, ...[5, 4, 3, 2, 1].map((n) => ({ valeur: String(n), libelle: T.sur5(n) }))]
 
 /** La vue choisie (une seule clé dans l'adresse) se traduit en paramètres de l'API. */
 function chargerAvis(params: Record<string, string | number>) {
@@ -42,8 +40,12 @@ function chargerAvis(params: Record<string, string | number>) {
 
 type Mode = 'masquer' | 'conserver' | 'retablir'
 
-/** Une action de modération avec sa confirmation. Masquer exige un motif, conserver le propose, rétablir n'en a pas. */
-function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode; onFait: (message: string) => void }) {
+/**
+ * Une action de modération avec sa confirmation. Masquer exige un motif, conserver le propose, rétablir n'en a pas.
+ * « Conserver » et « Rétablir » restent fonctionnels mais ne sont pas affichés : la maquette ne les dessine pas encore
+ * (voir maquettes/A-DESSINER.md).
+ */
+export function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode; onFait: (message: string) => void }) {
   const [ouverte, setOuverte] = useState(false)
   const nom = `${avis.client.prenom} ${avis.client.nom}`
   const action = useAction((motif: string) => {
@@ -56,15 +58,38 @@ function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode;
     action.reset()
   }
   const textes = {
-    masquer: { bouton: T.masquer, titre: T.masquerTitre, texte: T.masquerTexte, fait: T.masquerFait, libelle: T.masquerLibelle(nom) },
-    conserver: { bouton: T.conserver, titre: T.conserverTitre, texte: T.conserverTexte, fait: T.conserverFait, libelle: T.conserverLibelle(nom) },
-    retablir: { bouton: T.retablir, titre: T.retablirTitre, texte: T.retablirTexte, fait: T.retablirFait, libelle: T.retablirLibelle(nom) },
+    masquer: {
+      bouton: T.masquer,
+      titre: T.masquerTitre,
+      texte: T.masquerTexte,
+      fait: T.masquerFait,
+      libelle: T.masquerLibelle(nom),
+    },
+    conserver: {
+      bouton: T.conserver,
+      titre: T.conserverTitre,
+      texte: T.conserverTexte,
+      fait: T.conserverFait,
+      libelle: T.conserverLibelle(nom),
+    },
+    retablir: {
+      bouton: T.retablir,
+      titre: T.retablirTitre,
+      texte: T.retablirTexte,
+      fait: T.retablirFait,
+      libelle: T.retablirLibelle(nom),
+    },
   }[mode]
   return (
     <>
-      <Bouton variante={mode === 'masquer' ? 'danger' : 'secondaire'} taille="p" aria-label={textes.libelle} onClick={() => setOuverte(true)}>
-        {textes.bouton}
-      </Bouton>
+      <button
+        type="button"
+        aria-label={textes.libelle}
+        onClick={() => setOuverte(true)}
+        className={`h-11 min-w-0 flex-1 cursor-pointer rounded-[22px] border-none px-3 text-[13px] font-bold ${mode === 'masquer' ? 'mq-btn-rouge bg-[#fde9e9] text-[#b0161b]' : 'mq-btn-gris bg-[#eef1f6] text-[#4f566b]'}`}
+      >
+        {mode === 'masquer' ? "Masquer l'avis" : textes.bouton}
+      </button>
       <ModaleConfirmation
         ouverte={ouverte}
         titre={textes.titre}
@@ -103,46 +128,46 @@ function Etoiles({ note }: { note: number }) {
 }
 
 const COULEURS_AVATAR = ['bg-[#dbeafe] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#fff0d4] text-[#983705]', 'bg-[#d7f7e4] text-[#0e6245]']
+const TON_STATUT: Record<string, TonBadge> = {
+  publie: 'succes',
+  signale: 'attention',
+  supprime: 'neutre',
+}
 
 function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useRetours> }) {
   const initiales = `${a.client.prenom.charAt(0)}${a.client.nom.charAt(0)}`.toUpperCase()
   const couleur = COULEURS_AVATAR[(a.client.nom.length + a.client.prenom.length) % COULEURS_AVATAR.length]
   return (
-    <article className="flex h-full flex-col gap-3.5 rounded-[26px] bg-fond p-5">
+    <article className="box-border flex flex-col gap-3.5 rounded-[26px] bg-[#f3f4f7] p-5">
       <div className="flex items-center gap-3">
         <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${couleur}`}>
           {initiales}
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{a.client.prenom} {a.client.nom}</p>
-          <p className="mt-px text-xs text-texte-discret">
-            {a.prestataire.nomEntreprise} · {formatDate(a.dateCreation)}
-          </p>
-        </div>
-        <BadgeStatut statut={a.statut} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-semibold">
+            {a.client.prenom} {a.client.nom}
+          </span>
+          <span className="mt-px block text-xs text-[#8a90a2]">
+            sur {a.prestataire.nomEntreprise} · {formatDate(a.dateCreation)}
+          </span>
+        </span>
+        <Badge ton={TON_STATUT[a.statut] ?? 'neutre'} gras>
+          {L.statuts[a.statut] ?? a.statut}
+        </Badge>
       </div>
       <Etoiles note={a.note} />
-      <p className="text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">{a.commentaire ?? <span className="text-texte-doux">{T.sansCommentaire}</span>}</p>
-      {a.signaleLe && (
-        <p className="text-xs text-texte-doux">
-          {T.signaleLe(formatDateHeure(a.signaleLe))}
-          {a.motifSignalement ? ` : « ${a.motifSignalement} »` : ''}
-        </p>
-      )}
-      {a.modereLe && (
-        <p className="text-xs text-texte-doux">
-          {T.modereLe(formatDateHeure(a.modereLe))}
-          {a.motifModeration ? ` : « ${a.motifModeration} »` : ''}
-        </p>
-      )}
-      <div className="mt-auto flex flex-wrap gap-2 pt-0.5">
-        {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
-        {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={retour.succes} /> : <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
+      <p className="m-0 text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">{a.commentaire ? `« ${a.commentaire} »` : '—'}</p>
+      <div className="flex items-center gap-2 text-xs text-[#6b7287]">
+        <IDocument taille={14} trait={2} />
+        Réservation — · —
+      </div>
+      <div className="mt-0.5 flex flex-wrap gap-2">
+        {!a.masque && <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
         <Link
           to={`/reservations/${a.reservationId}`}
-          className="inline-flex h-10 items-center rounded-gelule bg-primaire-600 px-5 text-xs font-bold text-white shadow-bouton transition-transform active:scale-[0.97]"
+          className="mq-btn-bleu inline-flex h-11 min-w-0 flex-1 items-center justify-center rounded-[22px] bg-[#1d4ed8] px-3 text-[13px] font-bold whitespace-nowrap text-white"
         >
-          {T.reservation}
+          Voir la réservation
         </Link>
       </div>
     </article>
@@ -150,63 +175,61 @@ function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useR
 }
 
 export default function AvisListePage() {
-  const etat = useFiltresUrl(['vue', 'note', 'prestataire'], { vue: 'a_traiter' })
+  const etat = useFiltresUrl(['vue', 'note', 'prestataire'], {
+    vue: 'a_traiter',
+  })
   const retour = useRetours()
-  const colonnes: Colonne<AvisAdmin>[] = [
-    {
-      cle: 'avis',
-      titre: T.avis,
-      rendu: (a) => (
-        <div className="max-w-md">
-          <p className="text-sm font-semibold text-texte">{T.sur5(a.note)}</p>
-          <p className="mt-0.5 line-clamp-3 text-sm whitespace-pre-line text-texte">{a.commentaire ?? <span className="text-texte-doux">{T.sansCommentaire}</span>}</p>
-          {a.signaleLe && (
-            <p className="mt-1 text-xs text-texte-doux">
-              {T.signaleLe(formatDateHeure(a.signaleLe))}
-              {a.motifSignalement ? ` : « ${a.motifSignalement} »` : ''}
-            </p>
-          )}
-          {a.modereLe && (
-            <p className="mt-1 text-xs text-texte-doux">
-              {T.modereLe(formatDateHeure(a.modereLe))}
-              {a.motifModeration ? ` : « ${a.motifModeration} »` : ''}
-            </p>
-          )}
-        </div>
-      ),
-    },
-    { cle: 'client', titre: T.client, rendu: (a) => `${a.client.prenom} ${a.client.nom}` },
-    { cle: 'prestataire', titre: T.prestataireCol, rendu: (a) => a.prestataire.nomEntreprise },
-    { cle: 'date', titre: T.dateCol, rendu: (a) => formatDate(a.dateCreation) },
-    { cle: 'statut', titre: L.commun.statut, rendu: (a) => <BadgeStatut statut={a.statut} /> },
-    {
-      cle: 'actions',
-      titre: T.actionsColonne,
-      alignement: 'droite',
-      rendu: (a) => (
-        <div className="flex flex-wrap justify-end gap-2">
-          <Link to={`/reservations/${a.reservationId}`} className="self-center text-xs font-semibold text-primaire-700 hover:underline">
-            {T.reservation}
-          </Link>
-          {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
-          {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={retour.succes} /> : <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
-        </div>
-      ),
-    },
-  ]
+  const liste = useListe('avis', chargerAvis, etat)
+  const { data: tableau } = useQuery({
+    queryKey: ['tableau-de-bord'],
+    queryFn: api.tableauDeBord,
+    retry: false,
+  })
+  const compteurs: Record<string, number | undefined> = {
+    signales: tableau?.avis.signales,
+    masques: tableau?.avis.masques,
+    tous: tableau?.avis.total,
+  }
   return (
-    <div className="flex flex-col gap-3.5">
-      <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
-      <FiltresListe
-        legende={T.filtres}
-        etat={etat}
-        filtres={[
-          { cle: 'vue', type: 'select', label: T.vue, options: OPTIONS_VUE, onglets: true },
-          { cle: 'note', type: 'select', label: T.note, options: OPTIONS_NOTE },
-          { cle: 'prestataire', type: 'texte', label: T.prestataire },
-        ]}
-      />
-      <ListePaginee legende={T.legende} cle="avis" charger={chargerAvis} etat={etat} colonnes={colonnes} cleLigne={(a) => a.id} carte={(a) => <CarteAvis a={a} retour={retour} />} messageVide={T.vide} />
+    <div className="flex flex-col gap-4">
+      <TitrePage titre="Avis" suite="des clients" sousTitre="Consultez les avis publiés et masquez ceux qui enfreignent les règles." />
+      <CarteMq className="flex flex-col gap-3.5">
+        <div className="flex flex-wrap items-center gap-3">
+          <Onglets
+            libelle={T.vue}
+            onglets={OPTIONS_VUE.map((o) => ({
+              cle: o.valeur,
+              libelle: o.libelle,
+              compteur: compteurs[o.valeur] ?? '—',
+              actif: etat.valeurs.vue === o.valeur,
+              onSelect: () => etat.definir({ vue: o.valeur }),
+            }))}
+          />
+          <div className="flex-1" />
+          <Recherche valeur="" onChange={() => {}} placeholder="Rechercher dans les avis" libelle="Rechercher dans les avis" />
+        </div>
+        <div className="grid grid-cols-2 gap-4" aria-label={T.legende}>
+          {liste.lignes.map((a) => (
+            <CarteAvis key={a.id} a={a} retour={retour} />
+          ))}
+        </div>
+        <EtatsListe
+          chargement={liste.chargement}
+          erreur={liste.erreur}
+          vide={liste.donneesPresentes && liste.lignes.length === 0}
+          messageVide={T.vide}
+          onReessayer={liste.recharger}
+        />
+        {liste.totalPages > 1 && (
+          <PiedListe
+            resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
+            precedent={liste.page > 1}
+            suivant={liste.page < liste.totalPages}
+            onPrecedent={() => etat.allerPage(liste.page - 1)}
+            onSuivant={() => etat.allerPage(liste.page + 1)}
+          />
+        )}
+      </CarteMq>
     </div>
   )
 }
