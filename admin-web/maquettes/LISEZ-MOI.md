@@ -7,3 +7,8 @@
 
 Valeurs, noms, dates, numéros, compteurs et variations en % sont des EXEMPLES. Les statuts réels viennent du backend.
 Si une donnée n'existe pas dans l'API, on ne l'invente pas : on retire seulement cet élément, le reste de la mise en page reste identique.
+
+## Écrans ajoutés (v3)
+Utilisateur, NouvelleSanction, Trancher, MetierFormulaires, Revenus, Reservations, Paiements, Retraits, NotificationsEchec, Plus (menu), BannieresDossier, AlertesTableau, Etats.
+Pour ces écrans, les COLONNES, CHAMPS et LIBELLÉS exacts sont ceux déjà présents dans l'application : la maquette fixe le style et la mise en page, pas le contenu. Un champ ou une colonne de la maquette qui n'existe pas dans l'application est retiré ; un champ existant absent de la maquette est conservé (même style).
+Le menu de navigation a un nouvel item « Plus » (liste déroulante : Revenus, Réservations, Paiements, Retraits, Notifications en échec).
