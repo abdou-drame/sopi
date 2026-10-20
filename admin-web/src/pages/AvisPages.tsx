@@ -40,8 +40,12 @@ function chargerAvis(params: Record<string, string | number>) {
 
 type Mode = 'masquer' | 'conserver' | 'retablir'
 
-/** Une action de modération avec sa confirmation. Masquer exige un motif, conserver le propose, rétablir n'en a pas. */
-function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode; onFait: (message: string) => void }) {
+/**
+ * Une action de modération avec sa confirmation. Masquer exige un motif, conserver le propose, rétablir n'en a pas.
+ * « Conserver » et « Rétablir » restent fonctionnels mais ne sont pas affichés : la maquette ne les dessine pas encore
+ * (voir maquettes/A-DESSINER.md).
+ */
+export function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode; onFait: (message: string) => void }) {
   const [ouverte, setOuverte] = useState(false)
   const nom = `${avis.client.prenom} ${avis.client.nom}`
   const action = useAction((motif: string) => {
@@ -158,11 +162,10 @@ function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useR
         Réservation — · —
       </div>
       <div className="mt-0.5 flex flex-wrap gap-2">
-        {a.signaleLe && !a.modereLe && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
-        {a.masque ? <ActionModeration avis={a} mode="retablir" onFait={retour.succes} /> : <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
+        {!a.masque && <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
         <Link
           to={`/reservations/${a.reservationId}`}
-          className="mq-btn-bleu inline-flex h-11 min-w-0 flex-1 items-center justify-center rounded-[22px] bg-[#1d4ed8] px-3 text-[13px] font-bold text-white"
+          className="mq-btn-bleu inline-flex h-11 min-w-0 flex-1 items-center justify-center rounded-[22px] bg-[#1d4ed8] px-3 text-[13px] font-bold whitespace-nowrap text-white"
         >
           Voir la réservation
         </Link>
@@ -205,7 +208,7 @@ export default function AvisListePage() {
           <div className="flex-1" />
           <Recherche valeur="" onChange={() => {}} placeholder="Rechercher dans les avis" libelle="Rechercher dans les avis" />
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-4" aria-label={T.legende}>
+        <div className="grid grid-cols-2 gap-4" aria-label={T.legende}>
           {liste.lignes.map((a) => (
             <CarteAvis key={a.id} a={a} retour={retour} />
           ))}
