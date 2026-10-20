@@ -1,24 +1,35 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { messageDErreur } from '../api/client'
+import { messageDErreur, telecharger } from '../api/client'
 import { api } from '../api/endpoints'
 import type { DemandeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
-import BadgeStatut from '../components/ui/BadgeStatut'
-import BanniereAlerte from '../components/ui/BanniereAlerte'
 import { useRetours } from '../components/ui/Alertes'
-import Bouton from '../components/ui/Bouton'
-import CarteStatutActuel from '../components/ui/CarteStatutActuel'
-import { IconeDossier, IconeUtilisateurs } from '../components/ui/Icones'
-import Carte from '../components/ui/Carte'
-import { Avatar, Badge, BoutonExporter, BoutonFiltre, Carte as CarteMq, LigneLien, Onglets, PiedListe, Recherche, TitrePage, type TonBadge } from '../design/composants'
-import { EtatsListe, useListe } from '../design/useListe'
-import Definitions from '../components/ui/Definitions'
-import FichierProtege from '../components/ui/FichierProtege'
 import ModaleConfirmation from '../components/ui/ModaleConfirmation'
-import PageDetail from '../components/ui/PageDetail'
-import { L } from '../i18n/libelles'
+import {
+  Avatar,
+  Badge,
+  BoutonExporter,
+  BoutonFiltre,
+  Carte as CarteMq,
+  DEGRADE_BLEU,
+  EnteteCarte,
+  EtapeChrono,
+  LigneLien,
+  Onglets,
+  PiedListe,
+  Recherche,
+  TitreCarte,
+  TitreDetail,
+  TitrePage,
+  Tuile,
+  type TonBadge,
+} from '../design/composants'
+import { IDocument, IImage, IUtilisateur } from '../design/icones'
+import PageDetailMq from '../design/PageDetailMq'
+import { EtatsListe, useListe } from '../design/useListe'
+import { L, dureeMinutes } from '../i18n/libelles'
 import { formatDate, formatDateHeure } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
@@ -145,12 +156,12 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
   }
   return (
     <>
-      <Bouton variante="primaire" onClick={() => setModale('accepter')}>
-        {T.accepter}
-      </Bouton>
-      <Bouton variante="danger" onClick={() => setModale('refuser')}>
+      <button type="button" onClick={() => setModale('refuser')} className="mq-btn-blanc h-12 cursor-pointer rounded-3xl border-none bg-white px-[22px] text-[13px] font-bold text-[#b0161b]">
         {T.refuser}
-      </Bouton>
+      </button>
+      <button type="button" onClick={() => setModale('accepter')} className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
+        Valider le dossier
+      </button>
       <ModaleConfirmation
         ouverte={modale === 'accepter'}
         titre={T.accepterTitre}
@@ -193,72 +204,134 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
     </>
   )
 }
+/** Ouvre une pièce protégée dans un nouvel onglet : le fichier est récupéré avec le jeton, puis montré via une adresse locale. */
+function LienVoirPiece({ chemin, nom }: { chemin: string; nom: string }) {
+  const [enCours, setEnCours] = useState(false)
+  const ouvrir = async () => {
+    setEnCours(true)
+    try {
+      const fichier = await telecharger(chemin)
+      window.open(URL.createObjectURL(fichier), '_blank', 'noopener')
+    } finally {
+      setEnCours(false)
+    }
+  }
+  return (
+    <button
+      type="button"
+      aria-label={`Voir ${nom}`}
+      disabled={enCours}
+      onClick={() => void ouvrir()}
+      className="cursor-pointer border-none bg-transparent p-0 text-xs font-bold text-[#1d4ed8]"
+    >
+      Voir
+    </button>
+  )
+}
+
+const ABSENT = '—'
 
 export function DossierDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['demande', id], queryFn: () => api.demande(id) })
   const retour = useRetours()
+  const [maintenant] = useState(() => Date.now())
   return (
-    <PageDetail
-      requete={requete}
-      retour={{ vers: '/dossiers-prestataires', libelle: T.retour }}
-      titre={(d) => d.nomEntreprise}
-      sousTitre={(d) => `${nomComplet(d)} · ${L.metiers[d.metier] ?? d.metier} · ${d.quartier}`}
-      badge={(d) => <BadgeStatut statut={d.statutCompte} />}
-      actions={(d) => (d.statutCompte === 'en_attente' ? <ActionsDossier d={d} onFait={retour.succes} /> : null)}
-    >
-      {(d) => (
-        <>
-          {d.statutCompte === 'refuse' && <BanniereAlerte gravite="attention" titre={T.dejaRefuse} detail={d.motifRefus ?? undefined} />}
-          {d.statutCompte === 'actif' && <BanniereAlerte gravite="info" titre={T.dejaAccepte} />}
-          <div className="flex flex-wrap items-start gap-3.5">
-            <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
-              <Carte titre={T.identite} icone={<IconeUtilisateurs width={18} height={18} />}>
-                <Definitions
-                  elements={[
-                    { libelle: T.nom, valeur: nomComplet(d) },
-                    { libelle: T.entreprise, valeur: d.nomEntreprise },
-                    { libelle: T.telephone, valeur: d.telephone },
-                    { libelle: T.email, valeur: d.email },
-                    { libelle: T.metier, valeur: L.metiers[d.metier] ?? d.metier },
-                    { libelle: T.quartier, valeur: d.quartier },
-                    { libelle: T.adresse, valeur: d.adresse, large: true },
-                    { libelle: T.soumisLe, valeur: formatDateHeure(d.dateSoumission) },
-                  ]}
-                />
-              </Carte>
-              <Carte titre={T.justificatifs} icone={<IconeDossier width={18} height={18} />}>
-                {d.justificatifs.length === 0 ? (
-                  <p className="text-sm text-texte-doux">{T.aucunJustificatif}</p>
-                ) : (
-                  <ul className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
+    <PageDetailMq requete={requete} retour="/dossiers-prestataires" libelleRetour="Retour aux dossiers">
+      {(d) => {
+        const recu = Math.max(0, (maintenant - new Date(d.dateSoumission).getTime()) / 60000)
+        const complet = d.justificatifs.length >= PIECES_ATTENDUES
+        const statut = L.statuts[d.statutCompte] ?? d.statutCompte
+        const pluriel = d.justificatifs.length > 1 ? 's' : ''
+        return (
+          <>
+            <TitreDetail
+              retour="/dossiers-prestataires"
+              libelleRetour="Retour aux dossiers"
+              titre={d.prenom}
+              suite={d.nom}
+              badge={
+                <Badge ton={TON_STATUT[d.statutCompte] ?? 'neutre'} gras>
+                  {statut}
+                </Badge>
+              }
+              infos={`Dossier reçu le ${formatDate(d.dateSoumission)} · ${L.metiers[d.metier] ?? d.metier} · ${d.quartier}`}
+            >
+              {d.statutCompte === 'en_attente' && <ActionsDossier d={d} onFait={retour.succes} />}
+            </TitreDetail>
+            <div className="flex flex-wrap items-start gap-3.5">
+              <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
+                <CarteMq>
+                  <EnteteCarte icone={<IUtilisateur />} titre="Informations du prestataire" sousTitre="Saisies lors de l'inscription" />
+                  <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2">
+                    <Tuile libelle="Nom complet">{nomComplet(d)}</Tuile>
+                    <Tuile libelle="Téléphone">{d.telephone}</Tuile>
+                    <Tuile libelle="Métier">{L.metiers[d.metier] ?? d.metier}</Tuile>
+                    <Tuile libelle="Quartier">{d.quartier}</Tuile>
+                    <div className="col-span-full rounded-[20px] bg-[#f3f4f7] px-[18px] py-3.5">
+                      <div className="text-xs text-[#8a90a2]">Présentation de l'activité</div>
+                      <div className="mt-[3px] text-sm leading-[22px] font-medium text-[#3c4257]">{ABSENT}</div>
+                    </div>
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte
+                    icone={<IDocument />}
+                    titre="Pièces justificatives"
+                    sousTitre={`${d.justificatifs.length} pièce${pluriel} reçue${pluriel} sur ${PIECES_ATTENDUES}`}
+                    droite={
+                      <Badge ton={complet ? 'succes' : 'attention'} gras>
+                        {complet ? 'Complet' : 'Incomplet'}
+                      </Badge>
+                    }
+                  />
+                  <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
                     {d.justificatifs.map((j) => {
                       const nom = T.documents[j.typeDocument] ?? j.typeDocument
                       return (
-                        <li key={j.id} className="flex flex-col items-center gap-2 rounded-[22px] bg-fond p-2.5 text-center">
-                          <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={`${nom} (${j.nomOriginal})`} typeMime={j.typeMime} />
-                          <div className="flex w-full items-center justify-between gap-2 px-1.5 pt-1 pb-1">
-                            <p className="text-[13px] font-semibold">{nom}</p>
-                            <BadgeStatut statut={j.statut} />
+                        <div key={j.id} className="rounded-[22px] bg-[#f3f4f7] p-2.5">
+                          <div className="flex h-[120px] items-center justify-center rounded-2xl bg-[#e7edff] text-[#6b84c9]">
+                            <IImage />
                           </div>
-                        </li>
+                          <div className="flex items-center justify-between px-1.5 pt-2.5 pb-1">
+                            <span className="text-[13px] font-semibold">{nom}</span>
+                            <LienVoirPiece chemin={`/admin/justificatifs/${j.id}/telecharger`} nom={nom} />
+                          </div>
+                        </div>
                       )
                     })}
-                  </ul>
-                )}
-              </Carte>
+                  </div>
+                </CarteMq>
+              </div>
+              <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+                <CarteMq>
+                  <TitreCarte titre="Décision" sousTitre="Le prestataire est prévenu par e-mail et notification" />
+                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+                    <div className="text-xs font-semibold opacity-80">Statut actuel</div>
+                    <div className="mt-1.5 text-[28px] leading-[34px] font-bold tracking-[-0.6px]">{statut}</div>
+                    <div className="mt-[18px] flex items-center justify-between text-xs">
+                      <span className="opacity-80">Reçu il y a {dureeMinutes(recu)}</span>
+                      <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{ABSENT}</span>
+                    </div>
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <TitreCarte titre="Historique du dossier" />
+                  <div className="mt-4 flex flex-col">
+                    <EtapeChrono couleur="#1d4ed8" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
+                    <EtapeChrono couleur="#1d4ed8" titre="E-mail « Dossier bien reçu » envoyé" detail={ABSENT} />
+                    {d.statutCompte === 'en_attente' ? (
+                      <EtapeChrono couleur="#cdd9fb" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
+                    ) : (
+                      <EtapeChrono couleur="#1d4ed8" titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
+                    )}
+                  </div>
+                </CarteMq>
+              </div>
             </div>
-            <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
-              <CarteStatutActuel
-                titre={T.decision}
-                libelleStatut={L.commun.statut}
-                statut={L.statuts[d.statutCompte] ?? d.statutCompte}
-                note={formatDateHeure(d.dateSoumission)}
-              />
-            </div>
-          </div>
-        </>
-      )}
-    </PageDetail>
+          </>
+        )
+      }}
+    </PageDetailMq>
   )
 }
