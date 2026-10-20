@@ -54,7 +54,7 @@ export function RetraitsListePage() {
     },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FiltresListe
         legende={T.filtres}

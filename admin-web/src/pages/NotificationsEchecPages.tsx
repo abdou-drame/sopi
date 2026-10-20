@@ -41,7 +41,7 @@ export function NotificationsEchecListePage() {
     { cle: 'date', titre: T.colDate, rendu: (n) => formatDateHeure(n.dateCreation) },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FiltresListe
         legende={T.filtres}

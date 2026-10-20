@@ -151,7 +151,7 @@ export default function MetiersPage() {
     },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FormulaireAjout onFait={retour.succes} />
       <Tableau

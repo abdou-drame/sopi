@@ -41,7 +41,7 @@ export function ReservationsListePage() {
     { cle: 'statut', titre: L.commun.statut, rendu: (r) => <BadgeStatut statut={r.statut} /> },
   ]
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       <EnTetePage titre={T.titre} sousTitre={T.sousTitre} />
       <FiltresListe
         legende={T.filtres}

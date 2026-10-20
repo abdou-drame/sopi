@@ -29,7 +29,7 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   const lienRetour = (
     <Link
       to={`${retour.vers}${recherche}`}
-      className="inline-flex w-fit items-center gap-2 rounded-gelule text-sm font-medium text-sous-titre hover:text-titre"
+      className="inline-flex h-10 w-fit items-center gap-2 rounded-gelule bg-surface px-4 text-[13px] font-semibold text-texte-doux transition-colors hover:text-texte"
     >
       <IconeRetour width={16} height={16} />
       {retour.libelle}
@@ -38,7 +38,7 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
 
   if (requete.isPending) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3.5">
         {lienRetour}
         <div role="status" aria-label={L.commun.chargement}>
           <Squelette className="h-10 w-72" />
@@ -51,7 +51,7 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
   if (requete.isError) {
     const introuvable = requete.error instanceof ApiError && requete.error.status === 404
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3.5">
         {lienRetour}
         <Carte>
           <div role="alert" className="flex flex-col items-start gap-3">
@@ -70,15 +70,15 @@ export default function PageDetail<T>({ requete, retour, titre, sousTitre, badge
 
   const d = requete.data
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-3.5">
       {lienRetour}
       <header className="animate-apparition flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-titre-page font-bold text-titre">{titre(d)}</h1>
+            <h1 className="text-[clamp(28px,4vw,42px)] leading-[1.15] font-semibold tracking-tight text-titre">{titre(d)}</h1>
             {badge?.(d)}
           </div>
-          {sousTitre?.(d) && <p className="mt-1 text-sm text-sous-titre">{sousTitre(d)}</p>}
+          {sousTitre?.(d) && <p className="mt-1 text-[13px] text-[#9aa0b2]">{sousTitre(d)}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions(d)}</div>}
       </header>
