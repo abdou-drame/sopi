@@ -44,7 +44,9 @@ html.maquette {
   --color-info-texte: #1d4ed8;
 }
 
-html.maquette:not([data-theme="dark"]) {
+html.maquette,
+html.maquette[data-theme="dark"] {
+  color-scheme: light;
   --color-fond: #f3f4f7;
   --color-surface: #ffffff;
   --color-bordure: #e4e7ee;
@@ -63,4 +65,169 @@ html.maquette body {
 /* Fond plat : plus de taches animées */
 html.maquette .fond-sopi {
   display: none;
+}
+
+/* ---------- Composants des maquettes (classes mq-*) ---------- */
+
+/* Rond de 44 px, bouton secondaire, lien rond des tableaux */
+.mq-rond {
+  transition: background-color 0.15s;
+}
+.mq-rond:hover {
+  background-color: #e4e7ee;
+}
+
+/* Boutons des pages : bleu (principal), blanc, rouge doux, gris */
+.mq-btn-bleu {
+  background: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 8px 18px rgb(29 78 216 / 0.3);
+  transition: background-color 0.15s, transform 0.1s;
+}
+.mq-btn-bleu:hover:not(:disabled) {
+  background: #1a44bd;
+}
+.mq-btn-bleu:active:not(:disabled) {
+  transform: scale(0.98);
+}
+.mq-btn-blanc {
+  background: #fff;
+  transition: background-color 0.15s;
+}
+.mq-btn-blanc:hover:not(:disabled) {
+  background: #f6f7fa;
+}
+.mq-btn-rouge {
+  background: #fde9e9;
+  color: #b0161b;
+  transition: background-color 0.15s;
+}
+.mq-btn-rouge:hover:not(:disabled) {
+  background: #fbd6d6;
+}
+.mq-btn-gris {
+  background: #f3f4f7;
+  color: #12172b;
+  transition: background-color 0.15s;
+}
+.mq-btn-gris:hover:not(:disabled) {
+  background: #e4e7ee;
+}
+.mq-btn-bleu:disabled,
+.mq-btn-blanc:disabled,
+.mq-btn-rouge:disabled,
+.mq-btn-gris:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Barre du haut et rail */
+.mq-nvi {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7287;
+  white-space: nowrap;
+}
+.mq-nvi:hover {
+  color: #12172b;
+}
+.mq-nvi[aria-current="page"] {
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(18 23 43 / 0.1);
+  color: #12172b;
+  font-weight: 700;
+}
+.mq-ric {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  color: #6b7287;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.mq-ric:hover {
+  background: #f3f4f7;
+  color: #12172b;
+}
+.mq-ric[aria-current="page"],
+.mq-ric[aria-current="page"]:hover {
+  background: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 8px 16px rgb(29 78 216 / 0.28);
+}
+.mq-ric[aria-current="page"] svg {
+  stroke-width: 1.9;
+}
+
+/* Champs de recherche */
+.mq-champ:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(29 78 216 / 0.2);
+}
+
+/* Tableaux : lignes impaires .rang (survol #f6f7fa), lignes paires sur fond #f3f4f7 */
+:where(.mq-table) {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 13px;
+}
+:where(.mq-table) th {
+  padding: 6px 12px;
+  font-weight: 500;
+  text-align: left;
+  color: #9aa0b2;
+  font-size: 12px;
+}
+:where(.mq-table) th:first-child,
+:where(.mq-table) th:last-child {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+:where(.mq-table) td {
+  padding: 12px;
+  font-weight: 500;
+}
+:where(.mq-table) td:first-child {
+  padding: 12px 16px;
+  border-radius: 16px 0 0 16px;
+}
+:where(.mq-table) td:last-child {
+  padding: 12px 16px;
+  border-radius: 0 16px 16px 0;
+  text-align: right;
+}
+.mq-table tbody tr:nth-child(even) {
+  background: #f3f4f7;
+}
+.mq-table tbody tr:nth-child(odd):hover {
+  background: #f6f7fa;
+}
+.mq-table tbody tr:nth-child(even) .mq-lr {
+  background: #fff;
+}
+.mq-table tbody tr:nth-child(even) .mq-lr:hover {
+  background: #e4e7ee;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.maquette *,
+  html.maquette *::before,
+  html.maquette *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

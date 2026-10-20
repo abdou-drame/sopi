@@ -48,7 +48,7 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
       onMouseLeave={() => setEnPause(false)}
       onFocus={() => setEnPause(true)}
       onBlur={() => setEnPause(false)}
-      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-surface px-5 py-3.5 text-[13px] font-semibold text-texte shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
+      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-surface px-4 py-3.5 text-[13px] font-semibold text-texte shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
     >
       <span className="min-w-0 flex-1">{retour.texte}</span>
       <button
