@@ -182,3 +182,14 @@ export const IGraphique = (p: P) => (
     <path d="M4 20V10M10 20V4M16 20v-8M22 20H2" />
   </Ico>
 )
+export const IPaiement = (p: P) => (
+  <Ico taille={18} trait={1.8} {...p}>
+    <rect x="2" y="5" width="20" height="14" rx="3" />
+    <path d="M2 10h20" />
+  </Ico>
+)
+export const IRetrait = (p: P) => (
+  <Ico taille={18} trait={1.8} {...p}>
+    <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+  </Ico>
+)
