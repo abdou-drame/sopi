@@ -46,7 +46,7 @@ describe('tableau : lignes cliquables', () => {
     afficher()
     expect(screen.getByRole('link', { name: 'Voir le détail : Garage Moussa' })).toHaveAttribute('href', '/fiche/a-1')
     expect(screen.getByRole('link', { name: 'Voir le détail : Salon Awa' })).toHaveAttribute('href', '/fiche/a-2')
-    expect(screen.getAllByRole('link', { name: /Voir/ })[0]).toHaveTextContent('Voir')
+    expect(screen.getAllByRole('link', { name: /Voir/ })[0]).toHaveAttribute('data-voir')
   })
 
   it('étire le lien sur toute la ligne (zone cliquable native, clic molette inclus)', () => {

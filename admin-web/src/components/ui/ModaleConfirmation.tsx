@@ -123,10 +123,10 @@ export default function ModaleConfirmation({
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
-        className="animate-apparition w-full max-w-md rounded-carte border border-bordure bg-surface p-7 shadow-eleve"
+        className="animate-apparition max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-carte bg-surface p-6 shadow-eleve sm:p-8"
       >
         <form onSubmit={soumettre} noValidate className="flex flex-col gap-4">
-          <h2 id={idTitre} className="text-xl font-bold">
+          <h2 id={idTitre} className="text-2xl font-semibold tracking-tight">
             {titre}
           </h2>
           {description && (
@@ -150,7 +150,7 @@ export default function ModaleConfirmation({
               {erreur}
             </p>
           )}
-          <div className="flex justify-end gap-2">
+          <div className="flex flex-wrap justify-end gap-2 pt-1">
             <Bouton variante="secondaire" onClick={onAnnuler} disabled={enCours}>
               {L.commun.annuler}
             </Bouton>

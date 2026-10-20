@@ -178,7 +178,7 @@ export default function Tableau<T>({
       {chargement && <p className="sr-only" role="status">{L.commun.chargement}</p>}
 
       {erreur && !chargement && (
-        <div role="alert" className="flex flex-col items-center gap-3 px-4 py-10 text-center">
+        <div role="alert" className="mx-auto my-4 flex max-w-md flex-col items-center gap-3 rounded-carte bg-erreur-fond px-6 py-8 text-center">
           <p className="text-sm font-medium text-erreur-texte">{erreur}</p>
           {onReessayer && (
             <Bouton variante="secondaire" taille="p" onClick={onReessayer}>
@@ -189,7 +189,7 @@ export default function Tableau<T>({
       )}
 
       {!chargement && !erreur && lignes.length === 0 && (
-        <p className="px-4 py-10 text-center text-sm text-texte-doux">{messageVide}</p>
+        <p className="mx-auto my-4 max-w-md rounded-carte bg-fond px-6 py-10 text-center text-sm text-texte-doux">{messageVide}</p>
       )}
 
       {onPage && !erreur && totalPages > 1 && (
