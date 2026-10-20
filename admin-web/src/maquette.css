@@ -231,3 +231,7 @@ html.maquette .fond-sopi {
     scroll-behavior: auto !important;
   }
 }
+
+html.maquette body {
+  background: #eceef2;
+}
