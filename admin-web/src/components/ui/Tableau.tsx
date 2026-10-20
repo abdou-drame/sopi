@@ -47,16 +47,16 @@ function LigneAvecLien({ href, nom, style, children }: { href: string; nom: stri
   return (
     <tr
       style={style}
-      className="animate-apparition relative cursor-pointer border-t border-bordure/60 transition-colors hover:bg-primaire-50 focus-within:bg-primaire-50 [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10"
+      className="animate-apparition group relative cursor-pointer transition-colors hover:bg-fond focus-within:bg-fond [&>td]:first:rounded-l-[16px] [&>td]:last:rounded-r-[16px] [&_a:not([data-voir])]:relative [&_a:not([data-voir])]:z-10 [&_button]:relative [&_button]:z-10"
     >
       {children}
-      <td className="px-5 py-4 text-right">
+      <td className="px-3 py-3.5 text-right">
         <Link
           to={href}
           data-voir
           state={{ recherche: search }}
           aria-label={`${L.commun.voir} : ${nom}`}
-          className="inline-flex items-center rounded-gelule border border-bordure bg-surface px-3 py-1 text-xs font-semibold text-primaire-700 after:absolute after:inset-0 after:z-0 after:content-[''] hover:bg-fond focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
+          className="inline-flex items-center rounded-gelule bg-fond px-3.5 py-1.5 text-xs font-semibold text-texte after:absolute after:inset-0 after:z-0 after:content-[''] group-hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaire-600"
         >
           {L.commun.voirCourt}
         </Link>
@@ -86,9 +86,9 @@ export default function Tableau<T>({
   const aligne = (c: Colonne<T>) => (c.alignement === 'droite' ? 'text-right' : 'text-left')
 
   return (
-    <div className="overflow-hidden rounded-carte bg-surface p-2 shadow-carte">
+    <div className="overflow-hidden rounded-carte bg-surface p-[18px] shadow-carte">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-sm" aria-busy={chargement || undefined}>
+        <table className="w-full min-w-[640px] border-separate border-spacing-y-1 text-[13px]" aria-busy={chargement || undefined}>
           <caption className="sr-only">{legende}</caption>
           <thead>
             <tr>
@@ -99,14 +99,14 @@ export default function Tableau<T>({
                     key={c.cle}
                     scope="col"
                     aria-sort={actif ? (tri?.sens === 'asc' ? 'ascending' : 'descending') : undefined}
-                    className={`px-5 py-3 text-micro font-semibold tracking-wider text-texte-discret uppercase ${aligne(c)}`}
+                    className={`px-3 py-1.5 text-xs font-medium text-[#9aa0b2] first:px-4 ${aligne(c)}`}
                   >
                     {c.triable && onTri ? (
                       <button
                         type="button"
                         onClick={() => onTri(c.cle)}
                         aria-label={L.commun.trierPar(c.titre)}
-                        className="inline-flex items-center gap-1 rounded-petit uppercase hover:text-primaire-700"
+                        className="inline-flex items-center gap-1 rounded-petit hover:text-primaire-700"
                       >
                         {c.titre}
                         <IconeTri className={actif ? 'text-primaire-600' : 'opacity-40'} />
@@ -129,11 +129,11 @@ export default function Tableau<T>({
               Array.from({ length: 5 }, (_, i) => (
                 <tr key={`sq-${i}`} className="border-b border-bordure last:border-0">
                   {colonnes.map((c) => (
-                    <td key={c.cle} className="px-5 py-4">
+                    <td key={c.cle} className="px-3 py-3.5 first:px-4">
                       <Squelette className="h-4 w-full max-w-40" />
                     </td>
                   ))}
-                  {lien && <td className="px-5 py-4" />}
+                  {lien && <td className="px-3 py-3.5 first:px-4" />}
                 </tr>
               ))}
             {!chargement &&
@@ -141,13 +141,13 @@ export default function Tableau<T>({
               lignes.map((ligne, i) => {
                 const style = { animationDelay: `${Math.min(i * 25, 250)}ms` }
                 const cellules = colonnes.map((c) => (
-                  <td key={c.cle} className={`px-5 py-4 text-texte ${aligne(c)}`}>
+                  <td key={c.cle} className={`px-3 py-3.5 first:px-4 text-texte ${aligne(c)}`}>
                     {c.rendu(ligne)}
                   </td>
                 ))
                 if (!lien) {
                   return (
-                    <tr key={cleLigne(ligne)} style={style} className="animate-apparition border-t border-bordure/60 transition-colors hover:bg-fond">
+                    <tr key={cleLigne(ligne)} style={style} className="animate-apparition transition-colors hover:bg-fond [&>td:first-child]:rounded-l-[16px] [&>td:last-child]:rounded-r-[16px]">
                       {cellules}
                     </tr>
                   )
