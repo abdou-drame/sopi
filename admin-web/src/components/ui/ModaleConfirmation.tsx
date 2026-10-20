@@ -116,14 +116,14 @@ export default function ModaleConfirmation({
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 grid place-items-center bg-primaire-900/50 p-4 backdrop-blur-[2px]" onKeyDown={surClavier}>
+    <div className="animate-fondu fixed inset-0 z-50 grid place-items-center bg-primaire-900/50 p-4 backdrop-blur-[2px]" onKeyDown={surClavier}>
       <div
         ref={boite}
         role="dialog"
         aria-modal="true"
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
-        className="animate-apparition w-full max-w-md rounded-carte bg-surface p-7 shadow-eleve"
+        className="animate-modale w-full max-w-md rounded-carte bg-surface p-7 shadow-eleve"
       >
         <form onSubmit={soumettre} noValidate className="flex flex-col gap-4">
           <h2 id={idTitre} className="text-lg font-semibold">
