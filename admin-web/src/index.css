@@ -452,3 +452,61 @@ body {
     0 0 0 1px rgb(255 255 255 / 0.14) inset,
     0 18px 40px rgb(0 0 0 / 0.45);
 }
+
+/* Entrée des pages : la page se fond, puis ses blocs montent l'un après l'autre ; les lignes des tableaux suivent. */
+@keyframes entree-douce {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entree-ligne {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-entree {
+  animation: flou-entree-page 250ms var(--ease-sortie) both;
+}
+
+@keyframes flou-entree-page {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.page-entree > * > * {
+  animation: entree-douce 520ms var(--ease-sortie) both;
+}
+.page-entree > * > *:nth-child(2) { animation-delay: 60ms; }
+.page-entree > * > *:nth-child(3) { animation-delay: 120ms; }
+.page-entree > * > *:nth-child(4) { animation-delay: 180ms; }
+.page-entree > * > *:nth-child(5) { animation-delay: 240ms; }
+.page-entree > * > *:nth-child(n + 6) { animation-delay: 300ms; }
+
+.mq-table tbody tr {
+  animation: entree-ligne 380ms var(--ease-sortie) both;
+}
+.mq-table tbody tr:nth-child(2) { animation-delay: 40ms; }
+.mq-table tbody tr:nth-child(3) { animation-delay: 80ms; }
+.mq-table tbody tr:nth-child(4) { animation-delay: 120ms; }
+.mq-table tbody tr:nth-child(5) { animation-delay: 160ms; }
+.mq-table tbody tr:nth-child(6) { animation-delay: 200ms; }
+.mq-table tbody tr:nth-child(7) { animation-delay: 240ms; }
+.mq-table tbody tr:nth-child(8) { animation-delay: 280ms; }
+.mq-table tbody tr:nth-child(9) { animation-delay: 320ms; }
+.mq-table tbody tr:nth-child(n + 10) { animation-delay: 360ms; }

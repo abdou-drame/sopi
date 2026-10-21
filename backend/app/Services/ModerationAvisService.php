@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use App\Support\RechercheTexte;
 
 /**
  * Signalement d'un avis par le prestataire noté, puis modération par l'administrateur (RF20) : supprimer (= masquer, la ligne est
@@ -60,7 +61,10 @@ class ModerationAvisService
         $requete = Avis::query()->with(['client:id,nom,prenom', 'prestataire:id,nom_entreprise']);
 
         if (! empty($filtres['prestataire'])) {
-            $requete->where('prestataire_id', $filtres['prestataire']);
+            // Identifiant du prestataire ou nom de l'entreprise (recherche partielle).
+            Str::isUuid($filtres['prestataire'])
+                ? $requete->where('prestataire_id', $filtres['prestataire'])
+                : $requete->whereHas('prestataire', fn ($q) => $q->whereRaw(RechercheTexte::clause('nom_entreprise'), [RechercheTexte::motif($filtres['prestataire'])]));
         }
         if (isset($filtres['note'])) {
             $requete->where('note', $filtres['note']);

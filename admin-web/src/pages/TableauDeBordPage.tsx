@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useQueries, useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/endpoints'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
+import { GraphiqueBarres } from '../components/ui/Graphiques'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, DEGRADE_BLEU, TitrePage } from '../design/composants'
 import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
@@ -82,29 +83,59 @@ function CarteChiffre({
   )
 }
 
-/** Six derniers mois (libellés du calendrier) : aucune donnée par mois n'existe dans l'API, les valeurs restent à « — ». */
-function derniersMois(): string[] {
+interface Tranche {
+  libelle: string
+  debut: string
+  fin: string
+}
+
+const MOIS_COURTS = new Intl.DateTimeFormat('fr-FR', { month: 'short' })
+const deuxChiffres = (n: number) => String(n).padStart(2, '0')
+
+/** Six derniers mois civils (du premier au dernier jour de chaque mois), le mois en cours en dernier. */
+function derniersMois(): Tranche[] {
   const maintenant = new Date()
-  const format = new Intl.DateTimeFormat('fr-FR', { month: 'short' })
   return Array.from({ length: 6 }, (_, i) => {
     const d = new Date(maintenant.getFullYear(), maintenant.getMonth() - (5 - i), 1)
-    const m = format.format(d)
-    return m.charAt(0).toUpperCase() + m.slice(1)
+    const a = d.getFullYear()
+    const m = d.getMonth() + 1
+    const m3 = MOIS_COURTS.format(d)
+    return { libelle: m3.charAt(0).toUpperCase() + m3.slice(1), debut: `${a}-${deuxChiffres(m)}-01`, fin: `${a}-${deuxChiffres(m)}-${deuxChiffres(new Date(a, m, 0).getDate())}` }
   })
 }
 
+/** Six dernières semaines de 7 jours, la semaine en cours (qui finit aujourd'hui) en dernier. */
+function dernieresSemaines(): Tranche[] {
+  const fin = aujourdhui()
+  return Array.from({ length: 6 }, (_, i) => {
+    const finSemaine = ajouterJours(fin, -7 * (5 - i))
+    const debut = ajouterJours(finSemaine, -6)
+    return { libelle: formatJourCalendaire(debut, true), debut, fin: finSemaine }
+  })
+}
+
+/** Réservations par période : le total de la pagination de chaque tranche (créneaux commençant dans la tranche). */
 function CarteReservations() {
   const [annuel, setAnnuel] = useState(true)
-  const mois = derniersMois()
+  const tranches = useMemo(() => (annuel ? derniersMois() : dernieresSemaines()), [annuel])
+  const resultats = useQueries({
+    queries: tranches.map((t) => ({
+      queryKey: ['reservations-tranche', t.debut, t.fin],
+      queryFn: () => api.reservations({ debut: t.debut, fin: t.fin }),
+      retry: false,
+      staleTime: 60_000,
+    })),
+  })
+  const donnees = tranches.map((t, i) => ({ libelle: t.libelle, valeur: resultats[i].data?.meta.total ?? 0 }))
   return (
-    <section className="box-border flex min-h-[435px] min-w-0 flex-[2_1_560px] flex-col rounded-[32px] bg-white p-[18px]">
+    <section className="box-border flex min-h-[435px] min-w-0 flex-[3_1_460px] flex-col rounded-[32px] bg-white p-[18px]">
       <div className="flex flex-wrap items-center gap-3.5">
         <span className="grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
           <IGraphique />
         </span>
         <span className="min-w-[140px] flex-1">
           <span className="block text-[15px] font-bold">{T.reservations}</span>
-          <span className="mt-0.5 block text-xs text-[#8a90a2]">Nombre de réservations par mois</span>
+          <span className="mt-0.5 block text-xs text-[#8a90a2]">{annuel ? 'Nombre de réservations par mois' : 'Nombre de réservations par semaine'}</span>
         </span>
         <div role="tablist" aria-label="Période du graphique" className="flex rounded-full bg-[#f3f4f7] p-1">
           <button
@@ -112,7 +143,7 @@ function CarteReservations() {
             role="tab"
             aria-selected={!annuel}
             onClick={() => setAnnuel(false)}
-            className={`h-[34px] cursor-pointer rounded-full border-none px-4 text-xs font-semibold ${annuel ? 'bg-transparent text-[#8a90a2]' : 'bg-[#1d4ed8] text-white'}`}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-4 text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-transparent text-[#8a90a2]' : 'bg-[#1d4ed8] text-white'}`}
           >
             Mensuel
           </button>
@@ -121,36 +152,16 @@ function CarteReservations() {
             role="tab"
             aria-selected={annuel}
             onClick={() => setAnnuel(true)}
-            className={`h-[34px] cursor-pointer rounded-full border-none px-[18px] text-xs font-semibold ${annuel ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-[18px] text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
           >
             Annuel
           </button>
         </div>
         <LienFleche vers="/reservations" libelle="Ouvrir" />
       </div>
-      <div className="mt-[18px] flex min-h-[230px] flex-1 gap-3">
-        <div className="flex flex-col justify-between pb-[26px] text-right text-[11px] text-[#9aa0b2] tabular-nums" aria-hidden="true">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
-            <span key={i}>{ABSENT}</span>
-          ))}
-        </div>
-        <div className="relative min-w-0 flex-1">
-          <div className="absolute inset-x-0 top-1.5 bottom-8 flex flex-col justify-between" aria-hidden="true">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="border-t border-dashed border-[#e6e8ee]" />
-            ))}
-          </div>
-          <div className="relative box-border flex h-full justify-around gap-[clamp(8px,2.5vw,36px)] px-2 pt-11">
-            {mois.map((m) => (
-              <div key={m} className="flex h-full max-w-[84px] min-w-0 flex-[1_1_0] flex-col items-center">
-                <div className="flex w-full flex-1 items-end">
-                  <div className="grid h-full w-full place-items-center rounded-full bg-[#f3f4f7] text-[11px] text-[#9aa0b2]">{ABSENT}</div>
-                </div>
-                <div className="flex h-[26px] items-end text-[11px] font-medium text-[#9aa0b2]">{m}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="mt-[18px] flex-1">
+        {/* La clé relance l'animation de croissance quand on change de période. */}
+        <GraphiqueBarres key={annuel ? 'mois' : 'semaines'} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
       </div>
     </section>
   )
@@ -342,6 +353,7 @@ export default function TableauDeBordPage() {
     retry: false,
   })
   const t = data?.totaux
+  const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
   // Effectifs : le total de la pagination suffit, aucune route supplémentaire.
   const { data: clients } = useQuery({ queryKey: ['clients-actifs'], queryFn: () => api.utilisateurs({ role: 'client', statut: 'actif' }), retry: false })
   const { data: artisans } = useQuery({ queryKey: ['prestataires-actifs'], queryFn: () => api.utilisateurs({ role: 'prestataire', statut: 'actif' }), retry: false })
@@ -359,9 +371,15 @@ export default function TableauDeBordPage() {
       <AlertesTableau />
 
       <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-        <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} unite="FCFA" pastille={ABSENT} note="30 derniers jours" />
-        <CarteChiffre titre="Utilisateurs" valeur={clients?.meta.total} note="Clients actifs" />
-        <CarteChiffre titre="Artisans" valeur={artisans?.meta.total} note="Prestataires actifs" />
+        <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} unite="FCFA" pastille="30 j" note="30 derniers jours" />
+        <CarteChiffre titre="Utilisateurs" valeur={clients?.meta.total} pastille="Clients" note="Clients actifs" />
+        <CarteChiffre titre="Artisans" valeur={artisans?.meta.total} pastille="Prestataires" note="Prestataires actifs" />
+        <CarteChiffre
+          titre="Réservations"
+          valeur={tableau?.reservations.total}
+          pastille="30 j"
+          note={tableau ? `${formatNombre(tableau.reservations.activiteRecente.derniers30Jours.creees)} créées, ${formatNombre(tableau.reservations.activiteRecente.derniers30Jours.terminees)} terminées` : '30 derniers jours'}
+        />
       </div>
 
       <div className="flex flex-wrap items-stretch gap-3.5">

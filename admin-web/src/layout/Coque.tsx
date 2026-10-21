@@ -179,7 +179,9 @@ export default function Coque() {
             <Rail />
             <main id="contenu" tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-4 outline-none">
               <div ref={setHote} className="empty:hidden px-2" />
-              <Outlet />
+              <div key={lieu.pathname} className="page-entree flex flex-col gap-4">
+                <Outlet />
+              </div>
             </main>
           </div>
         </div>

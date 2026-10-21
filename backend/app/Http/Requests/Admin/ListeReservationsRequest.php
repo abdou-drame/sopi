@@ -22,8 +22,8 @@ class ListeReservationsRequest extends FormRequest
     {
         return [
             'statut' => ['nullable', 'string', Rule::in(array_column(StatutReservation::cases(), 'value'))],
-            'prestataire' => ['nullable', 'uuid'],
-            'client' => ['nullable', 'uuid'],
+            'prestataire' => ['nullable', 'string', 'max:100'],
+            'client' => ['nullable', 'string', 'max:100'],
             'q' => ['nullable', 'string', 'max:20'],
         ] + $this->reglesCommunes();
     }
@@ -32,8 +32,8 @@ class ListeReservationsRequest extends FormRequest
     {
         return [
             'statut.in' => 'Le statut doit être en_attente, acceptee, confirmee, en_cours, terminee, refusee ou annulee.',
-            'prestataire.uuid' => 'Le prestataire doit être un identifiant valide.',
-            'client.uuid' => 'Le client doit être un identifiant valide.',
+            'prestataire.max' => 'Le nom du prestataire ne peut pas dépasser 100 caractères.',
+            'client.max' => 'Le nom du client ne peut pas dépasser 100 caractères.',
             'q.max' => 'La recherche ne peut pas dépasser 20 caractères.',
             'q.string' => 'La recherche doit être un texte.',
             'debut.date_format' => 'La date de début du créneau doit être au format AAAA-MM-JJ.',

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use App\Support\RechercheTexte;
 
 /**
  * Consultation des retraits par l'administrateur (M12.2) : lecture seule. « Bloqué » a la même définition que l'alerte
@@ -31,7 +32,10 @@ class RetraitsAdminService
             $requete->where('statut', $filtres['statut']);
         }
         if (filled($filtres['prestataire'] ?? null)) {
-            $requete->where('prestataire_id', $filtres['prestataire']);
+            // Identifiant du prestataire ou nom de l'entreprise (recherche partielle).
+            Str::isUuid($filtres['prestataire'])
+                ? $requete->where('prestataire_id', $filtres['prestataire'])
+                : $requete->whereHas('prestataire', fn ($q) => $q->whereRaw(RechercheTexte::clause('nom_entreprise'), [RechercheTexte::motif($filtres['prestataire'])]));
         }
         if (($filtres['bloques'] ?? null) === true) {
             $requete->where('statut', StatutRetrait::EnCours->value)->where('created_at', '<=', self::limiteBlocage());

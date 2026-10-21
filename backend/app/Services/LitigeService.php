@@ -211,8 +211,8 @@ class LitigeService
             $requete->where('statut', $statut);
         }
 
-        // Les plus anciens d'abord : ce sont ceux qui attendent depuis le plus longtemps.
-        return $requete->oldest()->oldest('id')->paginate(20);
+        // Du plus récent au plus ancien, comme toutes les listes du back-office.
+        return $requete->latest()->latest('id')->paginate(20);
     }
 
     public function trouverPourClient(User $client, string $id): ?Litige

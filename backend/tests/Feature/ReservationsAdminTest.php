@@ -166,8 +166,8 @@ describe('réservations — liste', function () {
         $this->getJson(URL_RESERVATIONS_ADMIN.$requete)->assertUnprocessable()->assertJsonPath("errors.$champ.0", $message);
     })->with([
         'statut' => ['?statut=inconnu', 'statut', 'Le statut doit être en_attente, acceptee, confirmee, en_cours, terminee, refusee ou annulee.'],
-        'prestataire' => ['?prestataire=abc', 'prestataire', 'Le prestataire doit être un identifiant valide.'],
-        'client' => ['?client=abc', 'client', 'Le client doit être un identifiant valide.'],
+        'prestataire' => ['?prestataire=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'prestataire', 'Le nom du prestataire ne peut pas dépasser 100 caractères.'],
+        'client' => ['?client=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'client', 'Le nom du client ne peut pas dépasser 100 caractères.'],
         'début' => ['?debut=hier', 'debut', 'La date de début du créneau doit être au format AAAA-MM-JJ.'],
         'fin' => ['?fin=10/01/2030', 'fin', 'La date de fin du créneau doit être au format AAAA-MM-JJ.'],
         'période inversée' => ['?debut=2030-02-01&fin=2030-01-01', 'fin', 'La date de fin doit être postérieure ou égale à la date de début.'],
@@ -291,5 +291,23 @@ describe('réservations — détail', function () {
         $grand = nombreDeRequetes(fn () => $this->getJson(URL_RESERVATIONS_ADMIN.'/'.$reservation->id)->assertOk());
 
         expect($grand)->toBe($petit);
+    });
+});
+
+describe('réservations — filtres par nom', function () {
+    it('filtre par nom du client ou du prestataire (recherche partielle), ou par identifiant', function () {
+        adminConnecte();
+        $garage = Prestataire::factory()->create(['nom_entreprise' => 'Garage Soleil']);
+        $salon = Prestataire::factory()->create(['nom_entreprise' => 'Salon Lune']);
+        $awa = User::factory()->create(['prenom' => 'Awa', 'nom' => 'Diallo']);
+        $moussa = User::factory()->create(['prenom' => 'Moussa', 'nom' => 'Ba']);
+        $r1 = reservationPourAdmin($garage, 'enAttente', ['client_id' => $awa->id]);
+        $r2 = reservationPourAdmin($salon, 'enAttente', ['client_id' => $moussa->id]);
+
+        expect(idsReservationsAdmin('?prestataire=soleil'))->toBe([$r1->id])
+            ->and(idsReservationsAdmin('?client=Moussa'))->toBe([$r2->id])
+            ->and(idsReservationsAdmin('?client=awa%20dial'))->toBe([$r1->id])
+            ->and(idsReservationsAdmin('?prestataire='.$salon->id))->toBe([$r2->id])
+            ->and(idsReservationsAdmin('?client=inconnu'))->toBe([]);
     });
 });

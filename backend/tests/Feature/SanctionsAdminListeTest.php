@@ -146,7 +146,7 @@ describe('sanctions — liste admin', function () {
     })->with([
         'actives' => ['?actives=peut-etre', 'actives', 'Le filtre « actives » doit être vrai ou faux.'],
         'type' => ['?type=autre', 'type', 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.'],
-        'utilisateur' => ['?utilisateur=abc', 'utilisateur', 'L\'utilisateur doit être un identifiant valide.'],
+        'utilisateur' => ['?utilisateur=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'utilisateur', 'Le nom du compte ne peut pas dépasser 100 caractères.'],
         'échéance texte' => ['?echeanceDansHeures=abc', 'echeanceDansHeures', 'L\'échéance doit être un nombre entier d\'heures.'],
         'échéance trop grande' => ['?echeanceDansHeures=9000', 'echeanceDansHeures', 'L\'échéance doit être comprise entre 1 et 8760 heures.'],
         'échéance nulle' => ['?echeanceDansHeures=0', 'echeanceDansHeures', 'L\'échéance doit être comprise entre 1 et 8760 heures.'],
@@ -172,5 +172,19 @@ describe('sanctions — liste admin', function () {
         $grand = nombreDeRequetes(fn () => $this->getJson(URL_SANCTIONS_ADMIN)->assertOk());
 
         expect($grand)->toBe($petit);
+    });
+});
+
+describe('sanctions — filtre par nom', function () {
+    it('filtre par nom de l\'utilisateur (recherche partielle) ou par identifiant', function () {
+        adminConnecte();
+        $awa = User::factory()->create(['prenom' => 'Awa', 'nom' => 'Diallo']);
+        $moussa = User::factory()->create(['prenom' => 'Moussa', 'nom' => 'Ba']);
+        $s1 = Sanction::factory()->create(['user_id' => $awa->id]);
+        $s2 = Sanction::factory()->create(['user_id' => $moussa->id]);
+
+        expect(idsSanctionsAdmin('?utilisateur=diallo'))->toBe([$s1->id])
+            ->and(idsSanctionsAdmin('?utilisateur=Moussa'))->toBe([$s2->id])
+            ->and(idsSanctionsAdmin('?utilisateur='.$awa->id))->toBe([$s1->id]);
     });
 });

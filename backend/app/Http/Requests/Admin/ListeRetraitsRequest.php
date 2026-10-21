@@ -26,7 +26,7 @@ class ListeRetraitsRequest extends FormRequest
     {
         return [
             'statut' => ['nullable', 'string', Rule::in(array_column(StatutRetrait::cases(), 'value'))],
-            'prestataire' => ['nullable', 'uuid'],
+            'prestataire' => ['nullable', 'string', 'max:100'],
             'bloques' => ['nullable', 'boolean'],
         ] + $this->reglesCommunes(false);
     }
@@ -35,7 +35,7 @@ class ListeRetraitsRequest extends FormRequest
     {
         return [
             'statut.in' => 'Le statut doit être en_cours, reussi ou echoue.',
-            'prestataire.uuid' => 'Le prestataire doit être un identifiant valide.',
+            'prestataire.max' => 'Le nom du prestataire ne peut pas dépasser 100 caractères.',
             'bloques.boolean' => 'Le filtre « bloques » doit être vrai ou faux.',
         ] + $this->messagesCommuns();
     }

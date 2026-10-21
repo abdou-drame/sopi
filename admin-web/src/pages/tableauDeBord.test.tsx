@@ -108,7 +108,7 @@ describe('tableau de bord', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/Bonjour,\s*Fatou/)
   })
 
-  it('garde la carte commission en FCFA (pastille « — ») et montre les effectifs d’utilisateurs et d’artisans', async () => {
+  it('garde la carte commission en FCFA et montre les effectifs d’utilisateurs, d’artisans et de réservations', async () => {
     simulerApi({
       ...toutes,
       'GET /admin/utilisateurs': ({ url }) => ({
@@ -118,12 +118,15 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     const commission = (await screen.findByText('Revenus Sopi (commissions)')).closest('section') as HTMLElement
     await waitFor(() => expect(commission).toHaveTextContent(/3\D000\s*FCFA/))
-    expect(within(commission).getByText('—')).toBeInTheDocument()
+    expect(within(commission).getByText('30 j')).toBeInTheDocument()
     const clients = screen.getAllByText('Utilisateurs').find((e) => e.closest('section'))!.closest('section') as HTMLElement
     await waitFor(() => expect(clients).toHaveTextContent('120'))
     expect(clients).not.toHaveTextContent('FCFA')
     const artisans = screen.getByText('Artisans').closest('section') as HTMLElement
     await waitFor(() => expect(artisans).toHaveTextContent('14'))
+    const reservations = screen.getByText('Réservations', { selector: 'span.text-xs' }).closest('section') as HTMLElement
+    await waitFor(() => expect(reservations).toHaveTextContent('340'))
+    expect(reservations).toHaveTextContent('110 créées')
     expect(screen.queryByText('Acomptes remboursés')).not.toBeInTheDocument()
     expect(screen.queryByText('Reversé aux prestataires')).not.toBeInTheDocument()
   })
@@ -193,14 +196,18 @@ describe('tableau de bord', () => {
     expect(appel?.recherche.get('statut')).toBe('actif')
   })
 
-  it('n’invente aucune donnée absente de l’API : graphique des réservations par mois en « — »', async () => {
-    simulerApi(toutes)
+  it('trace le graphique des réservations avec les totaux réels par mois, puis par semaine', async () => {
+    simulerApi({
+      ...toutes,
+      'GET /admin/reservations': () => ({ corps: { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 42 } } }),
+    })
     afficherApplication('/')
     expect(await screen.findByText('Nombre de réservations par mois')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Annuel' })).toHaveAttribute('aria-selected', 'true')
+    await waitFor(() => expect(screen.getAllByRole('img').some((e) => (e.getAttribute('aria-label') ?? '').startsWith('Réservations : ') && (e.getAttribute('aria-label') ?? '').includes(' 42'))).toBe(true))
     await userEvent.click(screen.getByRole('tab', { name: 'Mensuel' }))
     expect(screen.getByRole('tab', { name: 'Mensuel' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(6)
+    expect(await screen.findByText('Nombre de réservations par semaine')).toBeInTheDocument()
   })
 
   it('actualise en lecture seule depuis le rail', async () => {
