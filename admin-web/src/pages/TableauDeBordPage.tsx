@@ -2,6 +2,7 @@ import { useQueries, useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/endpoints'
+import type { Revenus } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
 import { GraphiqueBarres } from '../components/ui/Graphiques'
@@ -183,16 +184,21 @@ function CarteDossiers() {
         </div>
         <div className="mt-[22px] flex items-center justify-between text-xs">
           <span className="opacity-80">Le plus ancien : {age == null ? ABSENT : dureeMinutes(age)}</span>
-          <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{ABSENT} prioritaires</span>
         </div>
       </div>
     </Carte>
   )
 }
 
-function CarteMetiers() {
+function CarteMetiers({ parMetier }: { parMetier: Revenus['parMetier'] | undefined }) {
   const { data } = useQuery({ queryKey: ['metiers'], queryFn: api.metiers, retry: false })
-  const metiers = (data?.data ?? []).filter((m) => m.actif).slice(0, 3)
+  const montants = new Map((parMetier ?? []).map((l) => [l.metier, l.revenus]))
+  const metiers = (data?.data ?? [])
+    .filter((m) => m.actif || montants.has(m.code))
+    .map((m) => ({ ...m, revenus: parMetier === undefined ? undefined : (montants.get(m.code) ?? 0) }))
+    .sort((a, b) => (b.revenus ?? 0) - (a.revenus ?? 0))
+    .slice(0, 3)
+  const maximum = Math.max(1, ...metiers.map((m) => m.revenus ?? 0))
   return (
     <Carte>
       <div className="text-[15px] leading-[normal] font-bold">Revenus par métier</div>
@@ -201,10 +207,13 @@ function CarteMetiers() {
         <div key={m.id} className="mt-3">
           <div className="flex justify-between text-xs leading-[normal]">
             <span className="font-semibold">{m.libelle}</span>
-            <span className="text-[#6b7287] tabular-nums">{ABSENT}</span>
+            <span className="text-[#6b7287] tabular-nums">{m.revenus === undefined ? ABSENT : `${formatNombre(m.revenus)} FCFA`}</span>
           </div>
           <div className="mt-1.5 h-2.5 rounded-full bg-[#f3f4f7]">
-            <div className="h-full rounded-full" style={{ width: 0, background: COULEURS_METIER[i] }} />
+            <div
+              className="barre-metier h-full rounded-full"
+              style={{ width: `${Math.round(((m.revenus ?? 0) / maximum) * 100)}%`, background: COULEURS_METIER[i] }}
+            />
           </div>
         </div>
       ))}
@@ -268,6 +277,8 @@ function CarteActivite() {
 
 function CarteLitiges() {
   const { data } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
+  const { data: alertes } = useAlertes()
+  const ageLitige = alertes?.alertes.find((a) => a.type === 'litiges_ouverts')?.ageMinutes
   return (
     <Carte>
       <EnTeteSimple
@@ -283,7 +294,9 @@ function CarteLitiges() {
       />
       <div className="mt-[18px] flex items-baseline gap-2.5">
         <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{data ? data.litiges.ouverts : ABSENT}</span>
-        <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] font-bold text-[#b0161b]">{ABSENT} sans réponse depuis 48 h</span>
+        {ageLitige != null && (
+          <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] font-bold text-[#b0161b]">Le plus ancien : {dureeMinutes(ageLitige)}</span>
+        )}
       </div>
     </Carte>
   )
@@ -386,7 +399,7 @@ export default function TableauDeBordPage() {
         <CarteReservations />
         <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
           <CarteDossiers />
-          <CarteMetiers />
+          <CarteMetiers parMetier={data?.parMetier} />
         </div>
       </div>
 

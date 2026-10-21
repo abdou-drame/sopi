@@ -63,7 +63,28 @@ class RevenusAdminService
             'totaux' => $totaux,
             'soldePrestataires' => $this->montant(DB::table('prestataires')->sum('solde')),
             'series' => $series,
+            'parMetier' => $this->parMetier($borneBasse, $borneHaute),
         ];
+    }
+
+    /** Commissions de la période par métier du prestataire (mêmes règles que « revenus »), du plus élevé au plus bas. */
+    private function parMetier(Carbon $borneBasse, Carbon $borneHaute): array
+    {
+        return DB::table('paiements')
+            ->join('reservations', 'reservations.id', '=', 'paiements.reservation_id')
+            ->join('creneaux', 'creneaux.id', '=', 'reservations.creneau_id')
+            ->join('prestataires', 'prestataires.id', '=', 'creneaux.prestataire_id')
+            ->where('paiements.statut', StatutPaiement::Reussi->value)
+            ->whereNotNull('paiements.credite_le')
+            ->where('paiements.credite_le', '>=', $borneBasse)
+            ->where('paiements.credite_le', '<', $borneHaute)
+            ->selectRaw('prestataires.metier AS metier, SUM(paiements.commission) AS montant')
+            ->groupBy('prestataires.metier')
+            ->get()
+            ->map(fn ($l) => ['metier' => (string) $l->metier, 'revenus' => $this->montant($l->montant)])
+            ->sortByDesc('revenus')
+            ->values()
+            ->all();
     }
 
     /** @return array<string, int> FCFA entiers par jour (AAAA-MM-JJ) */

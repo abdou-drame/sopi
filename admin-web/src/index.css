@@ -510,3 +510,12 @@ body {
 .mq-table tbody tr:nth-child(8) { animation-delay: 280ms; }
 .mq-table tbody tr:nth-child(9) { animation-delay: 320ms; }
 .mq-table tbody tr:nth-child(n + 10) { animation-delay: 360ms; }
+
+@keyframes barre-metier-entree {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.barre-metier {
+  transform-origin: left;
+  animation: barre-metier-entree 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

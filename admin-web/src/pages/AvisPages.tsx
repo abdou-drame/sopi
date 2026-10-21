@@ -8,7 +8,7 @@ import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import Filtres from '../design/Filtres'
 import Fenetre from '../design/Fenetre'
-import { Badge, Carte as CarteMq, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
+import { Avatar, Badge, Carte as CarteMq, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate } from '../lib/format'
@@ -127,46 +127,47 @@ function Etoiles({ note }: { note: number }) {
   )
 }
 
-const COULEURS_AVATAR = ['bg-[#dbeafe] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#fff0d4] text-[#983705]', 'bg-[#d7f7e4] text-[#0e6245]']
 const TON_STATUT: Record<string, TonBadge> = {
   publie: 'succes',
   signale: 'attention',
   supprime: 'neutre',
 }
 
-function CarteAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useRetours> }) {
-  const initiales = `${a.client.prenom.charAt(0)}${a.client.nom.charAt(0)}`.toUpperCase()
-  const couleur = COULEURS_AVATAR[(a.client.nom.length + a.client.prenom.length) % COULEURS_AVATAR.length]
+function LigneAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useRetours> }) {
+  const nom = `${a.client.prenom} ${a.client.nom}`
   return (
-    <article className="box-border flex flex-col gap-3.5 rounded-[26px] bg-[#f3f4f7] p-5">
-      <div className="flex items-center gap-3">
-        <span aria-hidden="true" className={`grid size-11 shrink-0 place-items-center rounded-full text-[13px] font-bold ${couleur}`}>
-          {initiales}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-semibold">
-            {a.client.prenom} {a.client.nom}
-          </span>
-          <span className="mt-px block text-xs text-[#8a90a2]">
-            sur {a.prestataire.nomEntreprise} · {formatDate(a.dateCreation)}
-          </span>
-        </span>
+    <tr>
+      <td>
+        <div className="flex items-center gap-3">
+          <Avatar nom={nom} taille={36} />
+          <span className="font-semibold whitespace-nowrap">{nom}</span>
+        </div>
+      </td>
+      <td className="whitespace-nowrap">{a.prestataire.nomEntreprise}</td>
+      <td>
+        <Etoiles note={a.note} />
+      </td>
+      <td className="max-w-[340px] text-[#3c4257]">
+        <span className="line-clamp-2">{a.commentaire ? `« ${a.commentaire} »` : '—'}</span>
+      </td>
+      <td className="whitespace-nowrap">{formatDate(a.dateCreation)}</td>
+      <td>
         <Badge ton={TON_STATUT[a.statut] ?? 'neutre'} gras>
           {L.statuts[a.statut] ?? a.statut}
         </Badge>
-      </div>
-      <Etoiles note={a.note} />
-      <p className="m-0 text-sm leading-[22px] whitespace-pre-line text-[#3c4257]">{a.commentaire ? `« ${a.commentaire} »` : '—'}</p>
-      <div className="mt-0.5 flex flex-wrap gap-2">
-        {!a.masque && <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
-        <Link
-          to={`/reservations/${a.reservationId}`}
-          className="mq-btn-bleu inline-flex h-11 min-w-0 flex-1 items-center justify-center rounded-[22px] bg-[#1d4ed8] px-3 text-[13px] font-bold whitespace-nowrap text-white"
-        >
-          Voir la réservation
-        </Link>
-      </div>
-    </article>
+      </td>
+      <td>
+        <div className="flex gap-2">
+          {!a.masque && <ActionModeration avis={a} mode="masquer" onFait={retour.succes} />}
+          <Link
+            to={`/reservations/${a.reservationId}`}
+            className="mq-btn-bleu inline-flex h-11 items-center justify-center rounded-[22px] bg-[#1d4ed8] px-4 text-[13px] font-bold whitespace-nowrap text-white"
+          >
+            Voir la réservation
+          </Link>
+        </div>
+      </td>
+    </tr>
   )
 }
 
@@ -209,10 +210,27 @@ export default function AvisListePage() {
             { cle: 'prestataire', type: 'recherche', label: T.prestataire, placeholder: T.prestataire },
           ]}
         />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4" aria-label={T.legende}>
-          {liste.lignes.map((a) => (
-            <CarteAvis key={a.id} a={a} retour={retour} />
-          ))}
+        <div className="overflow-x-auto">
+          <table className="mq-table min-w-[980px]" aria-label={T.legende}>
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Prestataire</th>
+                <th>{T.note}</th>
+                <th>Commentaire</th>
+                <th>Date</th>
+                <th>{L.commun.statut}</th>
+                <th>
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.lignes.map((a) => (
+                <LigneAvis key={a.id} a={a} retour={retour} />
+              ))}
+            </tbody>
+          </table>
         </div>
         <EtatsListe
           chargement={liste.chargement}
@@ -221,7 +239,7 @@ export default function AvisListePage() {
           messageVide={T.vide}
           onReessayer={liste.recharger}
         />
-        {liste.totalPages > 1 && (
+        {liste.total > 0 && (
           <PiedListe
             resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
             precedent={liste.page > 1}
