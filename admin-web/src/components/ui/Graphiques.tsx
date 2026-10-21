@@ -1,8 +1,11 @@
 import { useId, useState } from 'react'
 
-const L_VUE = 640
-const H_VUE = 280
-const MARGE = { haut: 40, droite: 16, bas: 36, gauche: 56 }
+/** Dimensions du dessin : la variante compacte (tableau de bord) est étroite, sans axe vertical chiffré. */
+function dimensions(compact: boolean) {
+  return compact
+    ? { L: 360, H: 190, marge: { haut: 36, droite: 10, bas: 28, gauche: 10 } }
+    : { L: 640, H: 280, marge: { haut: 40, droite: 16, bas: 36, gauche: 56 } }
+}
 
 export interface SerieCourbe {
   nom: string
@@ -15,6 +18,7 @@ interface PropsCourbe {
   libelles: string[]
   series: SerieCourbe[]
   formatValeur?: (v: number) => string
+  compact?: boolean
 }
 
 /** Arrondit le maximum à une valeur « ronde » pour graduer l'axe vertical. */
@@ -58,9 +62,9 @@ function traceLisse(points: [number, number][]): string {
 }
 
 /** Pastille sombre d'infobulle (texte blanc) centrée sur x, posée au-dessus de y. */
-function Pastille({ x, y, texte }: { x: number; y: number; texte: string }) {
+function Pastille({ x, y, texte, vue }: { x: number; y: number; texte: string; vue: number }) {
   const largeur = Math.max(44, texte.length * 6.4 + 18)
-  const gauche = Math.max(2, Math.min(L_VUE - largeur - 2, x - largeur / 2))
+  const gauche = Math.max(2, Math.min(vue - largeur - 2, x - largeur / 2))
   return (
     <g className="animate-infobulle" style={{ pointerEvents: 'none' }}>
       <rect x={gauche} y={y - 30} width={largeur} height={22} rx={11} fill="var(--color-primaire-900)" />
@@ -75,7 +79,8 @@ function Pastille({ x, y, texte }: { x: number; y: number; texte: string }) {
  * Courbe(s) lissée(s) en SVG, sans dépendance : tracé animé à l'apparition, dégradé sous la première série,
  * point et pastille d'infobulle qui suivent le survol (par défaut sur la valeur la plus haute).
  */
-export function GraphiqueCourbe({ description, libelles, series, formatValeur = (v) => String(v) }: PropsCourbe) {
+export function GraphiqueCourbe({ description, libelles, series, formatValeur = (v) => String(v), compact = false }: PropsCourbe) {
+  const { L: L_VUE, H: H_VUE, marge: MARGE } = dimensions(compact)
   const id = useId().replace(/:/g, '')
   const n = libelles.length
   const max = maximumRond(Math.max(0, ...series.flatMap((s) => s.valeurs)))
@@ -104,9 +109,11 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
         {graduations(max).map((g) => (
           <g key={g}>
             <line x1={MARGE.gauche} x2={L_VUE - MARGE.droite} y1={y(g)} y2={y(g)} stroke="var(--color-bordure)" strokeDasharray="2 6" />
-            <text x={MARGE.gauche - 10} y={y(g) + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
-              {abrege(g)}
-            </text>
+            {!compact && (
+              <text x={MARGE.gauche - 10} y={y(g) + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
+                {abrege(g)}
+              </text>
+            )}
           </g>
         ))}
         {libelles.map((l, i) =>
@@ -148,6 +155,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
         })}
         {n > 0 && series[0] && (
           <Pastille
+            vue={L_VUE}
             key={actif}
             x={x(actif)}
             y={y(series[0].valeurs[actif] ?? 0) - 4}
@@ -184,6 +192,7 @@ interface PropsBarres {
   donnees: { libelle: string; valeur: number }[]
   couleur?: string
   formatValeur?: (v: number) => string
+  compact?: boolean
 }
 
 /**
@@ -195,14 +204,16 @@ export function GraphiqueBarres({
   donnees,
   couleur = 'var(--color-primaire-500)',
   formatValeur = (v) => String(v),
+  compact = false,
 }: PropsBarres) {
+  const { L: L_VUE, H: H_VUE, marge: MARGE } = dimensions(compact)
   const id = useId().replace(/:/g, '')
   const n = donnees.length
   const max = maximumRond(Math.max(0, ...donnees.map((d) => d.valeur)))
   const largeur = L_VUE - MARGE.gauche - MARGE.droite
   const hauteur = H_VUE - MARGE.haut - MARGE.bas
   const pasX = largeur / Math.max(1, n)
-  const l = Math.min(44, pasX * 0.55)
+  const l = Math.min(compact ? 26 : 44, pasX * (compact ? 0.5 : 0.55))
   const parDefaut = n ? donnees.findIndex((d) => d.valeur === Math.max(...donnees.map((e) => e.valeur))) : 0
   const [choix, setChoix] = useState<number | null>(null)
   const actif = choix ?? parDefaut
@@ -215,15 +226,22 @@ export function GraphiqueBarres({
           <rect width="7" height="7" fill={couleur} fillOpacity="0.22" />
           <rect width="3" height="7" fill={couleur} fillOpacity="0.55" />
         </pattern>
+        <radialGradient id={`${id}-halo`} cx="50%" cy="60%" r="55%">
+          <stop offset="0%" stopColor={couleur} stopOpacity="0.22" />
+          <stop offset="100%" stopColor={couleur} stopOpacity="0" />
+        </radialGradient>
       </defs>
+      {compact && <ellipse cx={L_VUE / 2} cy={MARGE.haut + hauteur * 0.6} rx={L_VUE * 0.48} ry={hauteur * 0.62} fill={`url(#${id}-halo)`} className="animate-apparition" />}
       {graduations(max).map((g) => {
         const yy = MARGE.haut + hauteur - (g / max) * hauteur
         return (
           <g key={g}>
             <line x1={MARGE.gauche} x2={L_VUE - MARGE.droite} y1={yy} y2={yy} stroke="var(--color-bordure)" strokeDasharray="2 6" />
-            <text x={MARGE.gauche - 10} y={yy + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
-              {abrege(g)}
-            </text>
+            {!compact && (
+              <text x={MARGE.gauche - 10} y={yy + 4} textAnchor="end" fontSize="10.5" fill="var(--color-texte-discret)">
+                {abrege(g)}
+              </text>
+            )}
           </g>
         )
       })}
@@ -249,18 +267,19 @@ export function GraphiqueBarres({
               width={l}
               height={h}
               rx={l / 2}
-              fill={estActif ? 'var(--color-primaire-800)' : `url(#${id}-h)`}
+              fill={estActif ? (compact ? couleur : 'var(--color-primaire-800)') : `url(#${id}-h)`}
               style={{
                 transformBox: 'fill-box',
                 transformOrigin: 'bottom',
-                transition: 'fill var(--duree-normale) var(--ease-standard)',
+                transition: 'fill var(--duree-normale) var(--ease-standard), filter var(--duree-normale) var(--ease-standard)',
+                filter: estActif && compact ? `drop-shadow(0 6px 10px color-mix(in srgb, ${couleur} 45%, transparent))` : undefined,
                 animation: `croissance var(--duree-lente) var(--ease-sortie) ${i * 80}ms both`,
               }}
             />
             <text x={cx} y={H_VUE - 12} textAnchor="middle" fontSize="10.5" fill="var(--color-texte-discret)">
               {d.libelle}
             </text>
-            {estActif && <Pastille key={`${i}-${choix}`} x={cx} y={yy - 2} texte={formatValeur(d.valeur)} />}
+            {estActif && <Pastille vue={L_VUE} key={`${i}-${choix}`} x={cx} y={yy - 2} texte={formatValeur(d.valeur)} />}
           </g>
         )
       })}

@@ -203,9 +203,9 @@ export default function Coque() {
         </a>
         <BarreDuHaut />
         {/* Le contenu défile sous la barre du haut, jamais derrière elle. */}
-        <div ref={defilement} className="defilement-fin -mx-4 mt-4 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pt-3 pb-10">
-        <div ref={setHote} className="empty:hidden mb-6 px-2" />
-        <div className="flex flex-col gap-5 lg:flex-row">
+        <div ref={defilement} className="defilement-fin -mx-4 mt-3 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 pt-2 pb-6">
+        <div ref={setHote} className="empty:hidden mb-3 px-2" />
+        <div className="flex flex-col gap-4 lg:flex-row">
           <ColonneIcones />
           <main id="contenu" tabIndex={-1} className="min-w-0 flex-1">
             <div key={lieu.pathname} className="animate-flou">

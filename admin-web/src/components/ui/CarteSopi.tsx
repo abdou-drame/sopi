@@ -40,7 +40,7 @@ function LogoRond() {
 export default function CarteSopi({ libelle, montant, lignes, note, chargement, erreur, onReessayer, delai = 0 }: Props) {
   return (
     <div
-      className="carte-sopi animate-apparition relative isolate flex aspect-[1.586] w-full max-w-md min-w-60 flex-col justify-between overflow-hidden rounded-[2rem] p-6 text-white transition-transform duration-[var(--duree-normale)] ease-[var(--ease-sortie)] motion-safe:hover:-translate-y-1"
+      className="carte-sopi animate-apparition relative isolate flex min-h-36 w-full min-w-0 flex-col justify-between overflow-hidden rounded-[1.5rem] p-4 text-white transition-transform duration-[var(--duree-normale)] ease-[var(--ease-sortie)] motion-safe:hover:-translate-y-1"
       style={{ animationDelay: `${delai}ms` }}
       aria-busy={chargement || undefined}
     >
@@ -69,7 +69,7 @@ export default function CarteSopi({ libelle, montant, lignes, note, chargement, 
       ) : (
         <div>
           <p className="text-xs font-medium text-white/80">{libelle}</p>
-          <p className="mt-1 text-3xl leading-tight font-bold tracking-tight break-words">{montant}</p>
+          <p className="mt-1 text-2xl leading-tight font-bold tracking-tight break-words">{montant}</p>
         </div>
       )}
 

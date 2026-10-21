@@ -17,11 +17,11 @@ interface Props {
 export default function Carte({ titre, icone, sousTitre, action, delai = 0, className = '', children }: Props) {
   return (
     <div
-      className={`animate-apparition rounded-carte bg-surface p-6 shadow-carte transition-[transform,box-shadow] duration-[var(--duree-normale)] ease-[var(--ease-sortie)] motion-safe:hover:-translate-y-0.5 ${className}`}
+      className={`animate-apparition rounded-carte bg-surface p-4 shadow-carte transition-[transform,box-shadow] duration-[var(--duree-normale)] ease-[var(--ease-sortie)] motion-safe:hover:-translate-y-0.5 ${className}`}
       style={{ animationDelay: `${delai}ms` }}
     >
       {(titre || action) && (
-        <header className="mb-4 flex items-start justify-between gap-3">
+        <header className="mb-2.5 flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             {icone && <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-moyen bg-fond text-texte-doux">{icone}</span>}
             <div>

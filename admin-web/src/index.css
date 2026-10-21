@@ -72,9 +72,9 @@
   --shadow-infobulle: 0 6px 18px rgb(17 46 90 / 0.25);
 
   /* Tailles de texte propres au back-office */
-  --text-titre-page: 1.875rem;
+  --text-titre-page: 1.5rem;
   --text-titre-page--line-height: 1.2;
-  --text-chiffre: 1.75rem;
+  --text-chiffre: 1.5rem;
   --text-chiffre--line-height: 1.15;
   --text-micro: 0.6875rem;
   --text-micro--line-height: 1rem;

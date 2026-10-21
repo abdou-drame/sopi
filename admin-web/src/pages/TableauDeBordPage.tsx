@@ -102,30 +102,22 @@ function ErreurCarte({ message, onReessayer }: { message: string; onReessayer: (
 function CarteReservations({ d, erreur, chargement, onReessayer }: { d?: TableauDeBord; erreur: string | null; chargement: boolean; onReessayer: () => void }) {
   const activite = d?.reservations.activiteRecente
   return (
-    <Carte
-      titre={T.carteReservationsTitre}
-      sousTitre={T.carteReservationsSousTitre}
-      action={<BoutonRond libelle={T.ouvrirReservations} icone={<IconeFleche />} vers="/reservations" />}
-    >
-      <CarteSopi
-        libelle={T.carteTerminees30}
-        montant={activite ? formatNombre(activite.derniers30Jours.terminees) : ''}
-        lignes={[
-          { libelle: T.carteCreees7, valeur: activite ? formatNombre(activite.derniers7Jours.creees) : '' },
-          { libelle: T.cartePaiementsReussis, valeur: d ? formatNombre(d.paiements.parStatut.reussi.nombre) : '' },
-        ]}
-        chargement={chargement}
-        erreur={erreur}
-        onReessayer={onReessayer}
-      />
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div>
-          <p className="text-micro text-texte-doux">{T.creeesSur30}</p>
-          <p className="mt-0.5 text-xl font-bold text-texte">{activite ? <NombreAnime valeur={activite.derniers30Jours.creees} /> : '—'}</p>
-        </div>
-        <LienGelule vers="/reservations">{T.voirReservations}</LienGelule>
-      </div>
-    </Carte>
+    <div className="relative">
+    <CarteSopi
+      libelle={T.carteTerminees30}
+      montant={activite ? formatNombre(activite.derniers30Jours.terminees) : ''}
+      lignes={[
+        { libelle: T.carteCreees7, valeur: activite ? formatNombre(activite.derniers7Jours.creees) : '' },
+        { libelle: T.cartePaiementsReussis, valeur: d ? formatNombre(d.paiements.parStatut.reussi.nombre) : '' },
+      ]}
+      chargement={chargement}
+      erreur={erreur}
+      onReessayer={onReessayer}
+    />
+    <div className="absolute top-3 right-3">
+      <BoutonRond libelle={T.voirReservations} icone={<IconeFleche />} vers="/reservations" />
+    </div>
+    </div>
   )
 }
 
@@ -162,14 +154,14 @@ function CarteBarres() {
     >
       {isPending ? (
         <div role="status" aria-label={`${L.commun.chargement} ${T.barresTitre}`}>
-          <Squelette className="h-64 w-full rounded-grand" />
+          <Squelette className="h-44 w-full rounded-grand" />
         </div>
       ) : isError ? (
         <ErreurCarte message={messageDErreur(error)} onReessayer={() => void refetch()} />
       ) : vide ? (
         <p className="py-16 text-center text-sm text-texte-doux">{T.barresVide}</p>
       ) : (
-        <GraphiqueBarres key={periode} description={T.barresDescription} donnees={barres} formatValeur={formatMontant} />
+        <GraphiqueBarres key={periode} compact description={T.barresDescription} donnees={barres} formatValeur={formatMontant} />
       )}
     </Carte>
   )
@@ -201,6 +193,7 @@ function CarteCommission() {
           </p>
           <div className="mt-2">
             <GraphiqueCourbe
+              compact
               description={T.courbeDescription}
               libelles={serie.map((p) => formatJourCalendaire(p.debut, true))}
               series={[{ nom: T.commissionTitre, couleur: 'var(--color-primaire-500)', valeurs: serie.map((p) => p.revenus) }]}
@@ -297,7 +290,7 @@ function EnTeteAccueil() {
         <div className="flex flex-wrap items-center gap-3">
           <p
             aria-label={`${T.periodeAffichee} : ${formatJourCalendaire(debut, true)} – ${formatJourCalendaire(fin, true)}`}
-            className="flex items-center gap-2.5 rounded-gelule bg-surface px-5 py-2.5 text-sm font-medium text-texte shadow-carte"
+            className="flex items-center gap-2.5 rounded-gelule bg-surface px-4 py-1.5 text-sm font-medium text-texte shadow-carte"
           >
             <IconeCalendrier width={18} height={18} className="text-texte-doux" />
             {formatJourCalendaire(debut, true)} – {formatJourCalendaire(fin, true)}
@@ -305,7 +298,7 @@ function EnTeteAccueil() {
           <button
             type="button"
             onClick={() => void client.invalidateQueries()}
-            className="flex items-center gap-2 rounded-gelule bg-surface px-5 py-2.5 text-sm font-semibold text-texte shadow-carte transition-colors hover:text-primaire-700"
+            className="flex items-center gap-2 rounded-gelule bg-surface px-4 py-1.5 text-sm font-semibold text-texte shadow-carte transition-colors hover:text-primaire-700"
           >
             <IconeActualiser width={16} height={16} />
             {T.actualiser}
@@ -322,31 +315,35 @@ export default function TableauDeBordPage() {
   const erreur = isError ? messageDErreur(error) : null
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <EnTeteAccueil />
 
       <BlocAlertes />
 
-      <div className="grid grid-flow-dense gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.75fr)_minmax(0,1fr)]">
-        <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
-        <div className="md:col-span-2 xl:col-span-1 [&>*]:h-full">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {erreur && !isPending ? (
+          <div className="sm:col-span-2 xl:col-span-4">
+            <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
+          </div>
+        ) : (
+          <>
+            <CarteReservations d={data} chargement={isPending} erreur={erreur} onReessayer={() => void refetch()} />
+            <CarteCompteur titre={T.litigesOuvertsTitre} sousTitre={T.litigesOuvertsSousTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige width={16} height={16} />} chargement={isPending} delai={0} />
+            <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
+            <CarteCompteur titre={T.dossiersTitre} sousTitre={T.dossiersSousTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier width={16} height={16} />} chargement={isPending} delai={140} />
+          </>
+        )}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)]">
+        <div className="[&>*]:h-full">
           <CarteBarres />
         </div>
-        <CarteCommission />
-
-        <div className="md:col-span-2 xl:col-span-2 [&>*]:h-full">
-          <CarteDerniersPaiements />
+        <div className="[&>*]:h-full">
+          <CarteCommission />
         </div>
-        <div className="grid gap-5 md:col-span-2 md:grid-cols-3 xl:col-span-1 xl:grid-cols-1">
-          {erreur && !isPending ? (
-            <ErreurCarte message={erreur} onReessayer={() => void refetch()} />
-          ) : (
-            <>
-              <CarteCompteur titre={T.litigesOuvertsTitre} sousTitre={T.litigesOuvertsSousTitre} valeur={data?.litiges.ouverts} vers="/litiges" icone={<IconeLitige width={16} height={16} />} chargement={isPending} delai={0} />
-              <CarteCompteur titre={T.avisATraiterTitre} sousTitre={T.avisATraiterSousTitre} valeur={data?.avis.signales} vers="/avis" icone={<IconeAvis width={16} height={16} />} chargement={isPending} delai={70} />
-              <CarteCompteur titre={T.dossiersTitre} sousTitre={T.dossiersSousTitre} valeur={data?.comptes.prestataires.dossiersEnAttente} vers="/dossiers-prestataires" icone={<IconeDossier width={16} height={16} />} chargement={isPending} delai={140} />
-            </>
-          )}
+        <div className="md:col-span-2 xl:col-span-1 [&>*]:h-full">
+          <CarteDerniersPaiements />
         </div>
       </div>
     </div>
