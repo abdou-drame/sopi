@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { AlertesProvider } from './components/ui/Alertes'
 import { AuthProvider } from './auth/AuthContext'
+import EchelleEcran from './lib/echelle'
 import Routage from './Routage'
 import { ThemeProvider } from './theme/ThemeContext'
 
@@ -16,6 +17,7 @@ export default function App() {
     <ThemeProvider>
       <QueryClientProvider client={client}>
         <BrowserRouter>
+          <EchelleEcran />
           <AlertesProvider>
 <AuthProvider>
             <Routage />

@@ -80,7 +80,7 @@ export function AlertesProvider({ children }: { children: ReactNode }) {
   return (
     <ContexteRetours.Provider value={notifieur}>
       {children}
-      <div className="pointer-events-none fixed right-4 top-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">
+      <div className="pointer-events-none fixed right-4 top-4 z-50 flex w-[min(24rem,calc((100vw-2rem)/var(--echelle)))] flex-col gap-2">
         {retours.map((r) => (
           <div key={r.id} className="pointer-events-auto">
             <AlerteFlottante retour={r} onFin={retirer} />

@@ -126,7 +126,7 @@ function Rail() {
   return (
     <aside
       aria-label={L.coque.raccourcis}
-      className="sticky top-4 hidden h-[calc(100vh-32px)] max-h-[820px] flex-[0_0_68px] flex-col justify-center gap-4 self-start min-[900px]:flex"
+      className="sticky top-4 hidden h-[calc(100vh/var(--echelle)-32px)] max-h-[820px] flex-[0_0_68px] flex-col justify-center gap-4 self-start min-[900px]:flex"
     >
       {RAIL.map((groupe, g) => (
         <div key={g} className={CAPSULE}>
@@ -166,7 +166,7 @@ export default function Coque() {
 
   return (
     <HoteEnTete.Provider value={hote}>
-      <div className="box-border min-h-screen bg-[#eceef2] px-3.5 pt-3 pb-6 text-[#12172b]">
+      <div className="box-border min-h-[calc(100vh/var(--echelle))] bg-[#eceef2] px-3.5 pt-3 pb-6 text-[#12172b]">
         <a
           href="#contenu"
           className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-[20px] focus:bg-white focus:px-4 focus:py-2"

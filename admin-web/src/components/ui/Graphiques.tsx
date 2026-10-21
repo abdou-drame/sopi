@@ -1,6 +1,6 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 
-const L_VUE = 640
+const L_VUE_DEFAUT = 640 // largeur de repli (avant mesure, ou hors navigateur)
 const H_VUE = 280
 const MARGE = { haut: 40, droite: 16, bas: 36, gauche: 56 }
 
@@ -58,9 +58,9 @@ function traceLisse(points: [number, number][]): string {
 }
 
 /** Pastille sombre d'infobulle (texte blanc) centrée sur x, posée au-dessus de y. */
-function Pastille({ x, y, texte }: { x: number; y: number; texte: string }) {
+function Pastille({ x, y, texte, vue }: { x: number; y: number; texte: string; vue: number }) {
   const largeur = Math.max(44, texte.length * 6.4 + 18)
-  const gauche = Math.max(2, Math.min(L_VUE - largeur - 2, x - largeur / 2))
+  const gauche = Math.max(2, Math.min(vue - largeur - 2, x - largeur / 2))
   return (
     <g className="animate-infobulle" style={{ pointerEvents: 'none' }}>
       <rect x={gauche} y={y - 30} width={largeur} height={22} rx={11} fill="#12172b" />
@@ -77,6 +77,19 @@ function Pastille({ x, y, texte }: { x: number; y: number; texte: string }) {
  */
 export function GraphiqueCourbe({ description, libelles, series, formatValeur = (v) => String(v) }: PropsCourbe) {
   const id = useId().replace(/:/g, '')
+  // Le tracé est fait à la largeur réelle de la carte (1 unité = 1 pixel) : les textes gardent leur taille, comme dans la maquette.
+  const boite = useRef<HTMLDivElement>(null)
+  const [L_VUE, setLargeur] = useState(L_VUE_DEFAUT)
+  useEffect(() => {
+    const el = boite.current
+    if (!el) return
+    const mesurer = () => el.clientWidth > 0 && setLargeur(Math.round(el.clientWidth))
+    mesurer()
+    if (typeof ResizeObserver === 'undefined') return
+    const o = new ResizeObserver(mesurer)
+    o.observe(el)
+    return () => o.disconnect()
+  }, [])
   const n = libelles.length
   const max = maximumRond(Math.max(0, ...series.flatMap((s) => s.valeurs)))
   const largeur = L_VUE - MARGE.gauche - MARGE.droite
@@ -91,8 +104,8 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
   const colonne = n > 1 ? largeur / (n - 1) : largeur
 
   return (
-    <div>
-      <svg viewBox={`0 0 ${L_VUE} ${H_VUE}`} role="img" aria-label={description} className="h-auto w-full">
+    <div ref={boite}>
+      <svg viewBox={`0 0 ${L_VUE} ${H_VUE}`} width={L_VUE} height={H_VUE} role="img" aria-label={description} className="block max-w-full">
         <defs>
           {series.map((s, k) => (
             <linearGradient key={s.nom} id={`${id}-d${k}`} x1="0" x2="0" y1="0" y2="1">
@@ -151,6 +164,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
             key={actif}
             x={x(actif)}
             y={y(series[0].valeurs[actif] ?? 0) - 4}
+            vue={L_VUE}
             texte={`${libelles[actif]} · ${formatValeur(series[0].valeurs[actif] ?? 0)}`}
           />
         )}

@@ -108,19 +108,24 @@ describe('tableau de bord', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/Bonjour,\s*Fatou/)
   })
 
-  it('compose les quatre cartes de chiffres à partir des totaux réels, pastilles en « — »', async () => {
-    simulerApi(toutes)
+  it('garde la carte commission en FCFA (pastille « — ») et montre les effectifs d’utilisateurs et d’artisans', async () => {
+    simulerApi({
+      ...toutes,
+      'GET /admin/utilisateurs': ({ url }) => ({
+        corps: { data: [PRESTATAIRE], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: url.searchParams.get('role') === 'client' ? 120 : 14 } },
+      }),
+    })
     afficherApplication('/')
-    for (const [titre, valeur] of [
-      ['Revenus Sopi (commissions)', '3.000'],
-      ['Acomptes encaissés', '30.000'],
-      ['Acomptes remboursés', '1.500'],
-      ['Reversé aux prestataires', '24.000'],
-    ] as const) {
-      const carte = (await screen.findByText(titre)).closest('section') as HTMLElement
-      await waitFor(() => expect(carte).toHaveTextContent(new RegExp(`${valeur}\\s*FCFA`)))
-      expect(within(carte).getByText('—')).toBeInTheDocument()
-    }
+    const commission = (await screen.findByText('Revenus Sopi (commissions)')).closest('section') as HTMLElement
+    await waitFor(() => expect(commission).toHaveTextContent(/3\D000\s*FCFA/))
+    expect(within(commission).getByText('—')).toBeInTheDocument()
+    const clients = screen.getAllByText('Utilisateurs').find((e) => e.closest('section'))!.closest('section') as HTMLElement
+    await waitFor(() => expect(clients).toHaveTextContent('120'))
+    expect(clients).not.toHaveTextContent('FCFA')
+    const artisans = screen.getByText('Artisans').closest('section') as HTMLElement
+    await waitFor(() => expect(artisans).toHaveTextContent('14'))
+    expect(screen.queryByText('Acomptes remboursés')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reversé aux prestataires')).not.toBeInTheDocument()
   })
 
   it('montre le nombre de dossiers en attente, le plus ancien depuis les alertes, et relie la carte à son écran', async () => {
@@ -214,17 +219,25 @@ describe('tableau de bord', () => {
       return new Promise(() => {})
     }))
     afficherApplication('/')
-    const carte = (await screen.findByText('Acomptes encaissés')).closest('section') as HTMLElement
+    const carte = (await screen.findByText('Revenus Sopi (commissions)')).closest('section') as HTMLElement
     expect(carte).toHaveTextContent('— FCFA')
   })
 
   it('garde la page entière quand une requête échoue : valeurs en « — », sans message technique', async () => {
     simulerApi({ ...toutes, 'GET /admin/tableau-de-bord': { status: 500, corps: { message: 'SQLSTATE secret' } }, 'GET /admin/revenus': { status: 500, corps: { message: 'SQLSTATE secret' } } })
     afficherApplication('/')
-    const carte = (await screen.findByText('Acomptes encaissés')).closest('section') as HTMLElement
+    const carte = (await screen.findByText('Revenus Sopi (commissions)')).closest('section') as HTMLElement
     await waitFor(() => expect(carte).toHaveTextContent('— FCFA'))
     expect(await screen.findByText('Vidange')).toBeInTheDocument()
     expect(screen.queryByText(/SQLSTATE/)).not.toBeInTheDocument()
+  })
+
+  it('la croix d’une bannière d’alerte la retire de l’affichage', async () => {
+    simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
+    afficherApplication('/')
+    expect(await screen.findByText('2 dossiers en attente.')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Masquer l’alerte' }))
+    expect(screen.queryByText('2 dossiers en attente.')).not.toBeInTheDocument()
   })
 
   it('ne montre aucune donnée sensible (code de réservation, référence DexPay, jeton)', async () => {
