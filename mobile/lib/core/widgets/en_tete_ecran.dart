@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../animation/apparition.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
+import '../theme/disposition.dart';
 
 /// Bouton rond du haut (maquettes) : 44×44, blanc, ombre légère, icône #12172b.
 class BoutonRond extends StatelessWidget {
@@ -96,7 +97,10 @@ class EnTeteEcran extends StatelessWidget {
     this.avecRetour = true,
     this.onRetour,
     this.action,
+    this.centre,
     this.enfant,
+    this.ecartEnfant = 18,
+    this.margeBasse = 24,
     this.tailleTitre = DimensionsSopi.tailleTitreEcran,
     this.interligneTitre = DimensionsSopi.interligneTitreEcran,
   });
@@ -109,8 +113,15 @@ class EnTeteEcran extends StatelessWidget {
   /// Widget à droite du bouton retour (par exemple une pastille).
   final Widget? action;
 
+  /// Texte centré entre le bouton retour et le bord droit (maquettes Creneau, Prestataires…).
+  final Widget? centre;
+
   /// Contenu sous le titre (champ de recherche, onglets…).
   final Widget? enfant;
+
+  /// Espace entre le titre et [enfant], puis sous l'en-tête.
+  final double ecartEnfant;
+  final double margeBasse;
 
   final double tailleTitre;
   final double interligneTitre;
@@ -120,55 +131,74 @@ class EnTeteEcran extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        DimensionsSopi.margeEcran,
-        haut + 12,
-        DimensionsSopi.margeEcran,
-        24,
+        0,
+        // Sans bouton retour, le titre monte à 40 dp (maquettes Reservations, Profil…).
+        avecRetour || action != null || centre != null
+            ? hautEcran(context)
+            : hautEcran(context) + 16,
+        0,
+        margeBasse,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (avecRetour || action != null)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (avecRetour)
-                  BoutonRetour(onPressed: onRetour)
-                else
-                  const SizedBox.shrink(),
-                ?action,
-              ],
+          if (avecRetour || action != null || centre != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (avecRetour)
+                    BoutonRetour(onPressed: onRetour)
+                  else
+                    const SizedBox.shrink(),
+                  if (centre != null) ...[
+                    Expanded(child: Center(child: centre)),
+                    const SizedBox(width: 64),
+                  ],
+                  ?action,
+                ],
+              ),
             ),
-          if (avecRetour || action != null) const SizedBox(height: 18),
+          if (avecRetour || action != null || centre != null)
+            const SizedBox(height: 24),
           Apparition(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  titreLigne1,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontSize: tailleTitre,
-                    fontWeight: FontWeight.w400,
-                    height: interligneTitre / tailleTitre,
-                  ),
-                ),
-                if (titreLigne2 != null)
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    titreLigne2!,
+                    titreLigne1,
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontSize: tailleTitre,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w400,
                       height: interligneTitre / tailleTitre,
                     ),
                   ),
-              ],
+                  if (titreLigne2 != null)
+                    Text(
+                      titreLigne2!,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: tailleTitre,
+                        fontWeight: FontWeight.w800,
+                        height: interligneTitre / tailleTitre,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
-          if (enfant != null) ...[const SizedBox(height: 18), enfant!],
+          if (enfant != null) ...[
+            SizedBox(height: ecartEnfant),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: enfant!,
+            ),
+          ],
         ],
       ),
     );

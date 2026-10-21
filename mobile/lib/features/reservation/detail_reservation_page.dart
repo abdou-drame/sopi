@@ -11,7 +11,7 @@ import '../../core/config/support.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
-import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
@@ -134,31 +134,11 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
     final async = ref.watch(detailReservationProvider(widget.reservationId));
     final r = async.value;
     return Scaffold(
-      body: Stack(
+      backgroundColor: CouleursSopi.fond,
+      body: Column(
         children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 250,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEntete),
-                ),
-                child: const FondDegrade(child: SizedBox.expand()),
-              ),
-            ),
-          ),
-          SafeArea(
-            bottom: false,
-            child: Column(
-              children: [
-                const _BarreHaute(),
-                Expanded(child: _corps(async, r)),
-              ],
-            ),
-          ),
+          const _BarreHaute(),
+          Expanded(child: _corps(async, r)),
         ],
       ),
     );
@@ -182,7 +162,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
             onRefresh: _actualiser,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -463,7 +443,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
 BoxDecoration _decorationCarte() => BoxDecoration(
   color: CouleursSopi.blanc,
   borderRadius: BorderRadius.circular(26),
-  border: Border.all(color: CouleursSopi.bordure),
+  boxShadow: OmbresSopi.carte,
 );
 
 class _BarreHaute extends StatelessWidget {
@@ -471,12 +451,7 @@ class _BarreHaute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(
-      DimensionsSopi.margeEcran,
-      24,
-      DimensionsSopi.margeEcran,
-      0,
-    ),
+    padding: EdgeInsets.fromLTRB(20, hautEcran(context), 20, 0),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -490,12 +465,13 @@ class _BarreHaute extends StatelessWidget {
             'Réservation',
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
-        const SizedBox(width: DimensionsSopi.largeurRetour),
+        const SizedBox(width: 64),
       ],
     ),
   );
@@ -681,7 +657,7 @@ class _BlocCode extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: CouleursSopi.texte,
+        color: CouleursSopi.bleu,
         borderRadius: BorderRadius.circular(26),
       ),
       child: Column(
@@ -860,7 +836,7 @@ class _Etape extends StatelessWidget {
       _EtatEtape.aVenir => DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: CouleursSopi.bordureForte, width: 2),
+          border: Border.all(color: CouleursSopi.iconeInactive, width: 2),
         ),
       ),
     };

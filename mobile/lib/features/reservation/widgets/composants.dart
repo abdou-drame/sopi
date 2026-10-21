@@ -161,7 +161,7 @@ class SqueletteCartePrestataire extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(rayon),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         children: [

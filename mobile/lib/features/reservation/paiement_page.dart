@@ -12,6 +12,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
@@ -215,7 +216,7 @@ class _EtatPaiement extends ConsumerState<PaiementPage>
 BoxDecoration _decorationCarte() => BoxDecoration(
   color: CouleursSopi.blanc,
   borderRadius: BorderRadius.circular(26),
-  border: Border.all(color: CouleursSopi.bordure),
+  boxShadow: OmbresSopi.carte,
 );
 
 class _LigneRecap extends StatelessWidget {
@@ -257,28 +258,6 @@ class _LigneRecap extends StatelessWidget {
   }
 }
 
-/// Fond dégradé arrondi en haut de l'écran (maquettes Paiement, PaiementOk, PaiementEchec).
-class _FondHaut extends StatelessWidget {
-  const _FondHaut({required this.hauteur, required this.rayon});
-
-  final double hauteur;
-  final double rayon;
-
-  @override
-  Widget build(BuildContext context) => Positioned(
-    left: 0,
-    right: 0,
-    top: 0,
-    height: hauteur,
-    child: DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(rayon)),
-        child: const FondDegrade(child: SizedBox.expand()),
-      ),
-    ),
-  );
-}
-
 class _Recapitulatif extends ConsumerWidget {
   const _Recapitulatif({
     required this.reservationId,
@@ -299,15 +278,15 @@ class _Recapitulatif extends ConsumerWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const _FondHaut(hauteur: 200, rayon: DimensionsSopi.rayonEntete),
           SafeArea(
+            top: false,
             bottom: false,
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
+                  padding: EdgeInsets.fromLTRB(
                     DimensionsSopi.margeEcran,
-                    24,
+                    hautEcran(context),
                     DimensionsSopi.margeEcran,
                     0,
                   ),
@@ -397,7 +376,7 @@ class _Contenu extends ConsumerWidget {
       children: [
         Expanded(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -423,7 +402,7 @@ class _Contenu extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 56),
               Apparition(
                 child: Container(
                   padding: const EdgeInsets.all(18),
@@ -436,7 +415,7 @@ class _Contenu extends ConsumerWidget {
                       const SizedBox(height: 12),
                       _LigneRecap('Date', formaterDate(r.debut)),
                       const SizedBox(height: 12),
-                      const Divider(height: 1, color: CouleursSopi.bordure),
+                      const Divider(height: 1, color: CouleursSopi.separateur),
                       const SizedBox(height: 12),
                       _LigneRecap('Tarif du service', formaterArgent(r.prix)),
                       const SizedBox(height: 12),
@@ -448,14 +427,12 @@ class _Contenu extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 65),
               Apparition.indexee(
                 index: 1,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 22,
-                    vertical: 16,
-                  ),
+                  constraints: const BoxConstraints(minHeight: 92),
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
                   decoration: BoxDecoration(
                     color: CouleursSopi.bleu,
                     borderRadius: BorderRadius.circular(26),
@@ -502,7 +479,7 @@ class _Contenu extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 20),
               Apparition.indexee(
                 index: 2,
                 child: Container(
@@ -513,7 +490,7 @@ class _Contenu extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: CouleursSopi.blanc,
                     borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: CouleursSopi.bordure),
+                    boxShadow: OmbresSopi.carte,
                   ),
                   child: Row(
                     children: [
@@ -534,7 +511,7 @@ class _Contenu extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 22),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
@@ -565,6 +542,7 @@ class _Contenu extends ConsumerWidget {
               else
                 BoutonPrimaire(
                   libelle: 'Payer ${formaterArgent(montant)}',
+                  hauteur: 56,
                   onPressed: chargement ? null : onPayer,
                   chargement: chargement,
                 ),
@@ -630,7 +608,6 @@ class _Verification extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          const _FondHaut(hauteur: 200, rayon: DimensionsSopi.rayonEntete),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -641,7 +618,7 @@ class _Verification extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: CouleursSopi.blanc,
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: CouleursSopi.bordure),
+                    boxShadow: OmbresSopi.carte,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -669,7 +646,7 @@ class _Verification extends StatelessWidget {
                         height: 96,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: CouleursSopi.enteteFond,
+                          color: CouleursSopi.bleuPale,
                           borderRadius: BorderRadius.circular(28),
                           border: Border.all(
                             color: CouleursSopi.bleu,
@@ -711,12 +688,16 @@ class _EnTeteResultat extends StatelessWidget {
   const _EnTeteResultat({
     required this.fond,
     required this.icone,
+    required this.couleurIcone,
+    this.tailleIcone = 52,
     required this.ligne2,
     required this.message,
   });
 
   final Color fond;
   final IconData icone;
+  final Color couleurIcone;
+  final double tailleIcone;
   final String ligne2;
   final String message;
 
@@ -729,7 +710,7 @@ class _EnTeteResultat extends StatelessWidget {
           width: 112,
           height: 112,
           decoration: BoxDecoration(color: fond, shape: BoxShape.circle),
-          child: Icon(icone, size: 52, color: CouleursSopi.blanc),
+          child: Icon(icone, size: tailleIcone, color: couleurIcone),
         ),
         const SizedBox(height: 22),
         Text(
@@ -752,7 +733,7 @@ class _EnTeteResultat extends StatelessWidget {
         ),
         const SizedBox(height: 22),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 40),
           child: Text(
             message,
             textAlign: TextAlign.center,
@@ -782,26 +763,22 @@ class _MiseEnPageResultat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context) - hautMaquette;
     final bas = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
       body: Stack(
         children: [
-          const _FondHaut(
-            hauteur: 420,
-            rayon: DimensionsSopi.rayonEnteteRestreint,
-          ),
           LayoutBuilder(
             builder: (context, contraintes) => SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: contraintes.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, haut + 56, 16, bas + 24),
+                    padding: EdgeInsets.fromLTRB(16, haut + 130, 16, bas + 24),
                     child: Column(
                       children: [
                         Apparition(child: entete),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 58),
                         Apparition.indexee(index: 1, child: carte),
                         const Spacer(),
                         const SizedBox(height: 24),
@@ -840,6 +817,7 @@ class _Succes extends StatelessWidget {
     return _MiseEnPageResultat(
       entete: const _EnTeteResultat(
         fond: CouleursSopi.bleu,
+        couleurIcone: CouleursSopi.blanc,
         icone: Icons.check_rounded,
         ligne2: 'réussi !',
         message:
@@ -895,7 +873,9 @@ class _Echec extends StatelessWidget {
   @override
   Widget build(BuildContext context) => _MiseEnPageResultat(
     entete: const _EnTeteResultat(
-      fond: CouleursSopi.texte,
+      fond: CouleursSopi.erreurPale,
+      couleurIcone: CouleursSopi.erreurIcone,
+      tailleIcone: 48,
       icone: Icons.close_rounded,
       ligne2: 'non abouti',
       message:

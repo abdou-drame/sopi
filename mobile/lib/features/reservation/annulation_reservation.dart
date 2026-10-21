@@ -109,7 +109,7 @@ class _EtatFeuille extends ConsumerState<_FeuilleAnnulation> {
                     width: 44,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: CouleursSopi.bordureForte,
+                      color: const Color(0xFFD5DDF0),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),

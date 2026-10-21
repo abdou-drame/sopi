@@ -8,7 +8,9 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
+import '../../core/widgets/carte_sopi.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
@@ -175,174 +177,127 @@ class _EnteteAccueil extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
     final initiale = (prenom ?? '').trim().isEmpty
         ? ''
         : prenom!.trim()[0].toUpperCase();
 
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEntete),
-        ),
-        child: FondDegrade(
-          tacheBasse: true,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, haut + 12, 20, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Padding(
+      padding: EdgeInsets.only(top: hautEcran(context)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                BoutonRond(
+                  libelle: 'Menu',
+                  icone: Icons.menu_rounded,
+                  onPressed: () => context.go(Chemins.profil),
+                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _PilulePleine(
-                      libelle: 'Menu',
-                      icone: Icons.menu_rounded,
-                      onTap: () => context.go(Chemins.profil),
+                    _RondBlanc(
+                      libelle: 'Notifications',
+                      icone: Icons.notifications_none_rounded,
+                      pastille:
+                          (ref.watch(notificationsNonLuesProvider).value ?? 0) >
+                          0,
+                      onTap: () => context.push(Chemins.notifications),
                     ),
-                    Row(
-                      children: [
-                        _RondBlanc(
-                          libelle: 'Notifications',
-                          icone: Icons.notifications_none_rounded,
-                          pastille:
-                              (ref.watch(notificationsNonLuesProvider).value ??
-                                  0) >
-                              0,
-                          onTap: () => context.push(Chemins.notifications),
-                        ),
-                        const SizedBox(width: 10),
-                        Semantics(
-                          button: true,
-                          label: 'Mon profil',
-                          child: GestureDetector(
-                            onTap: () => context.go(Chemins.profil),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: CouleursSopi.bleu,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(
-                                initiale,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: CouleursSopi.blanc,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                    const SizedBox(width: 10),
+                    Semantics(
+                      button: true,
+                      label: 'Mon profil',
+                      child: GestureDetector(
+                        onTap: () => context.go(Chemins.profil),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: CouleursSopi.bleu,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            initiale,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: CouleursSopi.blanc,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 4),
-                        child: Apparition(
-                          delai: apresEntete(0),
-                          child: chargement
-                              ? const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Squelette(largeur: 120, hauteur: 28),
-                                    SizedBox(height: 8),
-                                    Squelette(largeur: 170, hauteur: 28),
-                                  ],
-                                )
-                              : Text.rich(
-                                  TextSpan(
-                                    text: 'Bonjour\n',
-                                    children: [
-                                      TextSpan(
-                                        text: prenom == null || prenom!.isEmpty
-                                            ? '!'
-                                            : '$prenom !',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  style: theme.textTheme.headlineMedium
-                                      ?.copyWith(
-                                        fontSize:
-                                            DimensionsSopi.tailleTitreEcran,
-                                        height:
-                                            DimensionsSopi
-                                                .interligneTitreEcran /
-                                            DimensionsSopi.tailleTitreEcran,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                ),
-                        ),
                       ),
                     ),
-                    _PilulePleine(
-                      libelle: 'Rechercher',
-                      icone: Icons.search_rounded,
-                      onTap: () => context.push(Chemins.prestataires),
-                    ),
                   ],
                 ),
-                if (prochaine != null) ...[
-                  const SizedBox(height: 26),
-                  ApparitionApresEntete(
-                    rang: 1,
-                    child: _CarteProchaine(
-                      reservation: prochaine!,
-                      metier: metierProchaine,
-                      maintenant: ref.read(horlogeProvider)(),
-                    ),
-                  ),
-                ] else
-                  const SizedBox(height: 12),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PilulePleine extends StatelessWidget {
-  const _PilulePleine({
-    required this.libelle,
-    required this.icone,
-    required this.onTap,
-  });
-
-  final String libelle;
-  final IconData icone;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: libelle,
-      child: Material(
-        color: CouleursSopi.texte,
-        borderRadius: BorderRadius.circular(22),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: SizedBox(
-            width: DimensionsSopi.largeurRetour,
-            height: DimensionsSopi.hauteurRetour,
-            child: Icon(icone, size: 22, color: CouleursSopi.blanc),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: chargement
+                      ? const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Squelette(largeur: 120, hauteur: 28),
+                            SizedBox(height: 8),
+                            Squelette(largeur: 170, hauteur: 28),
+                          ],
+                        )
+                      : Text.rich(
+                          TextSpan(
+                            text: 'Bonjour\n',
+                            children: [
+                              TextSpan(
+                                text: prenom == null || prenom!.isEmpty
+                                    ? '!'
+                                    : '$prenom !',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontSize: DimensionsSopi.tailleTitreEcran,
+                            height:
+                                DimensionsSopi.interligneTitreEcran /
+                                DimensionsSopi.tailleTitreEcran,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                ),
+                BoutonRond(
+                  libelle: 'Rechercher',
+                  icone: Icons.search_rounded,
+                  onPressed: () => context.push(Chemins.prestataires),
+                ),
+              ],
+            ),
           ),
-        ),
+          if (prochaine != null) ...[
+            const SizedBox(height: 26),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: _CarteProchaine(
+                reservation: prochaine!,
+                metier: metierProchaine,
+                maintenant: ref.read(horlogeProvider)(),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ] else
+            const SizedBox(height: 12),
+        ],
       ),
     );
   }
@@ -365,45 +320,28 @@ class _RondBlanc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: libelle,
-      child: Material(
-        color: CouleursSopi.blanc,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onTap,
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Icon(icone, size: 20, color: CouleursSopi.texte),
-                if (pastille)
-                  Positioned(
-                    top: 11,
-                    right: 12,
-                    child: Container(
-                      key: const ValueKey('pastille-notifications'),
-                      width: 9,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.bleu,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: CouleursSopi.blanc,
-                          width: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        BoutonRond(libelle: libelle, icone: icone, onPressed: onTap),
+        if (pastille)
+          Positioned(
+            top: 10,
+            right: 11,
+            child: IgnorePointer(
+              child: Container(
+                key: const ValueKey('pastille-notifications'),
+                width: 9,
+                height: 9,
+                decoration: BoxDecoration(
+                  color: CouleursSopi.bleu,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: CouleursSopi.blanc, width: 2),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+      ],
     );
   }
 }
@@ -586,52 +524,42 @@ class _TuileMetier extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: const BorderSide(color: CouleursSopi.bordure),
+    return CarteSopi(
+      rayon: 22,
+      padding: EdgeInsets.zero,
+      onTap: () => context.push(
+        Uri(
+          path: Chemins.prestataires,
+          queryParameters: {'metier': metier.code},
+        ).toString(),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push(
-          Uri(
-            path: Chemins.prestataires,
-            queryParameters: {'metier': metier.code},
-          ).toString(),
-        ),
-        child: Container(
-          height: 112,
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                iconeMetier(metier.code),
-                size: 24,
-                color: CouleursSopi.bleu,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Réserver',
-                    style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+      child: Container(
+        height: 112,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(iconeMetier(metier.code), size: 24, color: CouleursSopi.bleu),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Réserver',
+                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                ),
+                Text(
+                  metier.nom,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
-                  Text(
-                    metier.nom,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -647,48 +575,39 @@ class _CarteDecouverte extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-        side: const BorderSide(color: CouleursSopi.bordure),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () => context.push(Chemins.fichePrestataire(prestataire.id)),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              PastilleMetier(code: prestataire.metierCode),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      prestataire.nomEntreprise,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '$metier · ${prestataire.quartier}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
-                    ),
-                  ],
+    return CarteSopi(
+      rayon: 22,
+      padding: const EdgeInsets.all(12),
+      onTap: () => context.push(Chemins.fichePrestataire(prestataire.id)),
+      child: Row(
+        children: [
+          PastilleMetier(code: prestataire.metierCode),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  prestataire.nomEntreprise,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              NotePrestataire(prestataire: prestataire),
-            ],
+                Text(
+                  '$metier · ${prestataire.quartier}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(fontSize: 12),
+                ),
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: 8),
+          NotePrestataire(prestataire: prestataire),
+        ],
       ),
     );
   }

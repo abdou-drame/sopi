@@ -302,8 +302,12 @@ void main() {
             }),
           },
         );
+        await tester.ensureVisible(find.byType(InterrupteurSopi));
+        await tester.pumpAndSettle();
         await tester.tap(find.byType(InterrupteurSopi));
         await tester.pump();
+        await tester.ensureVisible(find.text('Enregistrer'));
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Enregistrer'));
         await passerTransition(tester);
         final envoi = _ecritures(serveur).single;

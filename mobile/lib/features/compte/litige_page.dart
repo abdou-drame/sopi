@@ -7,6 +7,7 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
@@ -171,145 +172,123 @@ class _EtatLitige extends ConsumerState<LitigePage> {
     final r = async.value;
     final theme = Theme.of(context);
     final bas = MediaQuery.viewInsetsOf(context).bottom;
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
 
     return Scaffold(
-      body: Stack(
+      backgroundColor: CouleursSopi.fond,
+      body: Column(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 230,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEntete),
-                ),
-                child: FondDegrade(child: SizedBox.expand()),
+          Expanded(
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(
+                DimensionsSopi.margeCarte,
+                haut,
+                DimensionsSopi.margeCarte,
+                DimensionsSopi.espace,
               ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: BoutonRetour(onPressed: _enCours ? null : _retour),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text.rich(
+                    TextSpan(
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: DimensionsSopi.tailleTitreEcran,
+                        height:
+                            DimensionsSopi.interligneTitreEcran /
+                            DimensionsSopi.tailleTitreEcran,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      children: const [
+                        TextSpan(text: 'Signaler un\n'),
+                        TextSpan(
+                          text: 'problème',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                if (r == null)
+                  async.hasError
+                      ? SizedBox(
+                          height: 260,
+                          child: EtatErreur(
+                            message: ErreurApi.depuis(async.error!).message,
+                            onReessayer: () => ref.invalidate(
+                              detailReservationProvider(widget.reservationId),
+                            ),
+                          ),
+                        )
+                      : const SizedBox(height: 260, child: EtatChargement())
+                else
+                  _CarteLitige(
+                    reservation: r,
+                    motif: _motif,
+                    description: _description,
+                    photos: _photos,
+                    enCours: _enCours,
+                    erreurMotif: _erreurMotif,
+                    erreurDescription: _erreurDescription,
+                    erreurPhotos: _erreurPhotos,
+                    onMotif: (m) => setState(() {
+                      _motif = m;
+                      _erreurMotif = null;
+                    }),
+                    onDescription: () =>
+                        setState(() => _erreurDescription = null),
+                    onAjouter: _ajouterPhoto,
+                    onRetirer: (i) => setState(() {
+                      _photos.removeAt(i);
+                      _erreurPhotos = null;
+                    }),
+                  ),
+                if (_erreur != null) ...[
+                  const SizedBox(height: 14),
+                  BandeauErreur(message: _erreur!),
+                ],
+              ],
             ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.fromLTRB(
-                    DimensionsSopi.margeCarte,
-                    haut + 24,
-                    DimensionsSopi.margeCarte,
-                    DimensionsSopi.espace,
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              DimensionsSopi.margeCarte,
+              8,
+              DimensionsSopi.margeCarte,
+              bas > 0 ? 8 : 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BoutonPrimaire(
+                  libelle: 'Envoyer le signalement',
+                  chargement: _enCours,
+                  onPressed: r == null || _enCours ? null : _envoyer,
+                ),
+                if (bas == 0) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Un administrateur examinera votre dossier.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
                   ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: BoutonRetour(
-                          onPressed: _enCours ? null : _retour,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text.rich(
-                        TextSpan(
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: DimensionsSopi.tailleTitreEcran,
-                            height:
-                                DimensionsSopi.interligneTitreEcran /
-                                DimensionsSopi.tailleTitreEcran,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          children: const [
-                            TextSpan(text: 'Signaler un\n'),
-                            TextSpan(
-                              text: 'problème',
-                              style: TextStyle(fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    if (r == null)
-                      async.hasError
-                          ? SizedBox(
-                              height: 260,
-                              child: EtatErreur(
-                                message: ErreurApi.depuis(async.error!).message,
-                                onReessayer: () => ref.invalidate(
-                                  detailReservationProvider(
-                                    widget.reservationId,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : const SizedBox(height: 260, child: EtatChargement())
-                    else
-                      _CarteLitige(
-                        reservation: r,
-                        motif: _motif,
-                        description: _description,
-                        photos: _photos,
-                        enCours: _enCours,
-                        erreurMotif: _erreurMotif,
-                        erreurDescription: _erreurDescription,
-                        erreurPhotos: _erreurPhotos,
-                        onMotif: (m) => setState(() {
-                          _motif = m;
-                          _erreurMotif = null;
-                        }),
-                        onDescription: () =>
-                            setState(() => _erreurDescription = null),
-                        onAjouter: _ajouterPhoto,
-                        onRetirer: (i) => setState(() {
-                          _photos.removeAt(i);
-                          _erreurPhotos = null;
-                        }),
-                      ),
-                    if (_erreur != null) ...[
-                      const SizedBox(height: 14),
-                      BandeauErreur(message: _erreur!),
-                    ],
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  DimensionsSopi.margeCarte,
-                  8,
-                  DimensionsSopi.margeCarte,
-                  bas > 0 ? 8 : 24,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    BoutonPrimaire(
-                      libelle: 'Envoyer le signalement',
-                      chargement: _enCours,
-                      onPressed: r == null || _enCours ? null : _envoyer,
-                    ),
-                    if (bas == 0) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        'Un administrateur examinera votre dossier.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          color: CouleursSopi.texteSecondaire,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(height: bas),
-            ],
+                ],
+              ],
+            ),
           ),
+          SizedBox(height: bas),
         ],
       ),
     );
@@ -357,9 +336,9 @@ class _CarteLitige extends StatelessWidget {
     final aErreur = erreurDescription != null;
     final bordure = OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
-      borderSide: BorderSide(
-        color: aErreur ? CouleursSopi.erreurTexte : CouleursSopi.bordureForte,
-      ),
+      borderSide: aErreur
+          ? const BorderSide(color: CouleursSopi.erreurTexte)
+          : BorderSide.none,
     );
     return Container(
       padding: const EdgeInsets.all(20),
@@ -368,7 +347,7 @@ class _CarteLitige extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           DimensionsSopi.rayonCarteFormulaire,
         ),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -426,12 +405,7 @@ class _CarteLitige extends StatelessWidget {
               contentPadding: const EdgeInsets.all(14),
               enabledBorder: bordure,
               disabledBorder: bordure,
-              focusedBorder: bordure.copyWith(
-                borderSide: BorderSide(
-                  color: aErreur ? CouleursSopi.erreurTexte : CouleursSopi.bleu,
-                  width: 1.5,
-                ),
-              ),
+              focusedBorder: bordure,
               errorText: erreurDescription,
               counterStyle: theme.textTheme.bodySmall?.copyWith(
                 color: CouleursSopi.texteSecondaire,
@@ -486,12 +460,8 @@ class _Pastille extends StatelessWidget {
     button: true,
     selected: choisie,
     child: Material(
-      color: choisie ? CouleursSopi.texte : CouleursSopi.blanc,
-      shape: StadiumBorder(
-        side: choisie
-            ? BorderSide.none
-            : const BorderSide(color: CouleursSopi.bordureForte),
-      ),
+      color: choisie ? CouleursSopi.bleu : CouleursSopi.fondSecondaire,
+      shape: const StadiumBorder(),
       child: InkWell(
         customBorder: const StadiumBorder(),
         onTap: onTap,
@@ -537,7 +507,7 @@ class _BoutonAjouter extends StatelessWidget {
   );
 }
 
-/// Cadre en pointillés de 2 px, arrondi à 18 (maquette : « dashed #b8c4e6 »).
+/// Cadre en pointillés de 2 px, arrondi à 18 (maquette : « dashed #8a90a2 »).
 class _TraitsPointilles extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -547,7 +517,7 @@ class _TraitsPointilles extends CustomPainter {
     );
     canvas.drawRRect(fond, Paint()..color = CouleursSopi.champ);
     final trait = Paint()
-      ..color = CouleursSopi.texteSurMarine
+      ..color = CouleursSopi.iconeInactive
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
     final chemin = Path()..addRRect(fond.deflate(1));
@@ -609,7 +579,7 @@ class _Vignette extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: CouleursSopi.texte,
+                  color: CouleursSopi.bleu,
                   shape: BoxShape.circle,
                   border: Border.all(color: CouleursSopi.blanc, width: 2),
                 ),
@@ -663,7 +633,7 @@ class ChoixSourcePhoto extends StatelessWidget {
               width: 44,
               height: 5,
               decoration: BoxDecoration(
-                color: CouleursSopi.bordureForte,
+                color: const Color(0xFFD5DDF0),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
@@ -690,24 +660,11 @@ class _Confirmation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
     return Scaffold(
+      backgroundColor: CouleursSopi.fond,
       body: Stack(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 380,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(44),
-                ),
-                child: FondDegrade(child: SizedBox.expand()),
-              ),
-            ),
-          ),
           Padding(
             padding: EdgeInsets.only(top: haut + 56),
             child: Align(
@@ -719,13 +676,13 @@ class _Confirmation extends StatelessWidget {
                     width: 104,
                     height: 104,
                     decoration: const BoxDecoration(
-                      color: CouleursSopi.texte,
+                      color: CouleursSopi.bleuPale,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.check_rounded,
                       size: 46,
-                      color: CouleursSopi.blanc,
+                      color: CouleursSopi.bleu,
                     ),
                   ),
                   const SizedBox(height: 20),

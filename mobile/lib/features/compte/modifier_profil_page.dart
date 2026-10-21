@@ -121,8 +121,7 @@ class _EtatModifierProfil extends ConsumerState<ModifierProfilPage> {
               child: ChampFormulaire(
                 libelle: 'Prénom',
                 controleur: _prenom,
-                hauteur: 50,
-                margeInterne: 14,
+                hauteur: 52,
                 actionClavier: TextInputAction.next,
                 erreur: _erreurs['prenom'],
                 onChanged: (_) => _effacer('prenom'),
@@ -133,8 +132,7 @@ class _EtatModifierProfil extends ConsumerState<ModifierProfilPage> {
               child: ChampFormulaire(
                 libelle: 'Nom',
                 controleur: _nom,
-                hauteur: 50,
-                margeInterne: 14,
+                hauteur: 52,
                 actionClavier: TextInputAction.next,
                 erreur: _erreurs['nom'],
                 onChanged: (_) => _effacer('nom'),
@@ -145,8 +143,7 @@ class _EtatModifierProfil extends ConsumerState<ModifierProfilPage> {
         ChampFormulaire(
           libelle: 'Téléphone',
           controleur: _telephone,
-          hauteur: 50,
-          margeInterne: 14,
+          hauteur: 52,
           clavier: TextInputType.phone,
           actionClavier: TextInputAction.done,
           erreur: _erreurs['telephone'],

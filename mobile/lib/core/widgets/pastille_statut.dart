@@ -32,16 +32,19 @@ class PastilleStatut extends StatelessWidget {
       ),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      height: 26,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: fond,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(13),
       ),
       child: Text(
         libelle,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
           color: texte,
-          fontWeight: FontWeight.w800,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );

@@ -103,6 +103,7 @@ class BoutonPrimaire extends StatelessWidget {
     this.chargement = false,
     this.icone,
     this.pleineLargeur = true,
+    this.hauteur = DimensionsSopi.hauteurBouton,
   });
 
   final String libelle;
@@ -110,12 +111,14 @@ class BoutonPrimaire extends StatelessWidget {
   final bool chargement;
   final IconData? icone;
   final bool pleineLargeur;
+  final double hauteur;
 
   @override
   Widget build(BuildContext context) => _BoutonPilule(
     libelle: libelle,
     onPressed: onPressed,
     chargement: chargement,
+    hauteur: hauteur,
     fond: CouleursSopi.bleu,
     texte: CouleursSopi.blanc,
     icone: icone,

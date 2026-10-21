@@ -9,6 +9,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/onglets_segmentes.dart';
 import '../../core/widgets/boutons.dart';
+import '../../core/widgets/carte_sopi.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
@@ -85,6 +86,8 @@ class _MesReservationsPageState extends ConsumerState<MesReservationsPage> {
                   titreLigne1: 'Mes',
                   titreLigne2: 'réservations',
                   avecRetour: false,
+                  ecartEnfant: 38,
+                  margeBasse: 26,
                   enfant: OngletsSegmentes<GroupeReservations>(
                     valeurs: GroupeReservations.values,
                     libelle: (g) => g.libelle,
@@ -116,7 +119,7 @@ class _CorpsSquelette extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +134,7 @@ class _CorpsSquelette extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(children: [carte(), const SizedBox(height: 12), carte()]),
     );
   }
@@ -146,7 +149,7 @@ class _CorpsListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         children: [
           for (var i = 0; i < etat.elements.length; i++)
@@ -202,52 +205,41 @@ class CarteReservation extends ConsumerWidget {
     final r = reservation;
     final theme = Theme.of(context);
 
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
-        onTap: () => context.push(Chemins.detailReservation(r.id)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return CarteSopi(
+      onTap: () => context.push(Chemins.detailReservation(r.id)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      r.prestataireNom,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+              Expanded(
+                child: Text(
+                  r.prestataireNom,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(width: 8),
-                  PastilleStatut(
-                    libelle: r.statut.libelle,
-                    ton: tonDuStatut(r.statut),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${r.prestationNom} · ${formaterDate(r.debut)}',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 13,
-                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
-              _PiedCarte(reservation: r),
+              const SizedBox(width: 8),
+              PastilleStatut(
+                libelle: r.statut.libelle,
+                ton: tonDuStatut(r.statut),
+              ),
             ],
           ),
-        ),
+          const SizedBox(height: 4),
+          Text(
+            '${r.prestationNom} · ${formaterDate(r.debut)}',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 13,
+              color: CouleursSopi.texteSecondaire,
+            ),
+          ),
+          _PiedCarte(reservation: r),
+        ],
       ),
     );
   }

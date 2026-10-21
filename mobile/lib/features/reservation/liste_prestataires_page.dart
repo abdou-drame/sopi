@@ -9,7 +9,9 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
+import '../../core/widgets/carte_sopi.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
@@ -253,135 +255,108 @@ class _Entete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEntete),
-        ),
-        child: FondDegrade(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, haut + 24, 16, 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    const SizedBox(width: 4),
-                    if (avecRetour)
-                      BoutonRetour(onPressed: () => context.pop())
-                    else
-                      const SizedBox(width: DimensionsSopi.largeurRetour),
-                    Expanded(
-                      child: Text(
-                        titre,
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    Semantics(
-                      button: true,
-                      label: 'Trier',
-                      child: Material(
-                        color: CouleursSopi.blanc,
-                        shape: const CircleBorder(),
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: onTri,
-                          child: const SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: Icon(
-                              Icons.filter_list_rounded,
-                              color: CouleursSopi.texte,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  height: 52,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: CouleursSopi.blanc,
-                    borderRadius: BorderRadius.circular(26),
-                    border: Border.all(color: CouleursSopi.bordure),
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, hautEcran(context), 16, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const SizedBox(width: 4),
+              if (avecRetour)
+                BoutonRetour(onPressed: () => context.pop())
+              else
+                const SizedBox(width: DimensionsSopi.largeurRetour),
+              Expanded(
+                child: Text(
+                  titre,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.search_rounded,
-                        size: 20,
+                ),
+              ),
+              BoutonRond(
+                libelle: 'Trier',
+                icone: Icons.filter_list_rounded,
+                avecOmbre: false,
+                onPressed: onTri,
+              ),
+              const SizedBox(width: 4),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Container(
+            height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: CouleursSopi.blanc,
+              borderRadius: BorderRadius.circular(26),
+              boxShadow: OmbresSopi.carte,
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.search_rounded,
+                  size: 20,
+                  color: CouleursSopi.texteSecondaire,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: recherche,
+                    onChanged: onRecherche,
+                    textInputAction: TextInputAction.search,
+                    style: theme.textTheme.bodyMedium?.copyWith(fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Rechercher un salon, un service…',
+                      hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
                         color: CouleursSopi.texteSecondaire,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: recherche,
-                          onChanged: onRecherche,
-                          textInputAction: TextInputAction.search,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Rechercher un salon, un service…',
-                            hintStyle: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 14,
-                              color: CouleursSopi.texteSecondaire,
-                            ),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            filled: false,
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _Pilule(
-                        libelle: filtres.quartier == null
-                            ? 'Quartier'
-                            : 'Quartier : ${filtres.quartier}',
-                        active: filtres.quartier != null,
-                        onTap: onQuartier,
-                      ),
-                      const SizedBox(width: 8),
-                      _Pilule(
-                        libelle: _libelleNote,
-                        active: filtres.noteMin != null,
-                        onTap: onNote,
-                      ),
-                      const SizedBox(width: 8),
-                      _Pilule(
-                        libelle: _libellePrix,
-                        active:
-                            filtres.prixMin != null || filtres.prixMax != null,
-                        onTap: onPrix,
-                      ),
-                    ],
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: false,
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-        ),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _Pilule(
+                  libelle: filtres.quartier == null
+                      ? 'Quartier'
+                      : 'Quartier : ${filtres.quartier}',
+                  active: filtres.quartier != null,
+                  onTap: onQuartier,
+                ),
+                const SizedBox(width: 8),
+                _Pilule(
+                  libelle: _libelleNote,
+                  active: filtres.noteMin != null,
+                  onTap: onNote,
+                ),
+                const SizedBox(width: 8),
+                _Pilule(
+                  libelle: _libellePrix,
+                  active: filtres.prixMin != null || filtres.prixMax != null,
+                  onTap: onPrix,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -404,12 +379,8 @@ class _Pilule extends StatelessWidget {
       button: true,
       selected: active,
       child: Material(
-        color: active ? CouleursSopi.bleu : CouleursSopi.blanc,
-        shape: StadiumBorder(
-          side: active
-              ? BorderSide.none
-              : const BorderSide(color: CouleursSopi.bordureForte),
-        ),
+        color: active ? CouleursSopi.bleu : CouleursSopi.fondSecondaire,
+        shape: const StadiumBorder(),
         child: InkWell(
           customBorder: const StadiumBorder(),
           onTap: onTap,
@@ -515,105 +486,93 @@ class _CartePrestataire extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     void ouvrir() => context.push(Chemins.fichePrestataire(prestataire.id));
-    return Material(
-      color: CouleursSopi.blanc,
-      borderRadius: BorderRadius.circular(26),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
-        onTap: ouvrir,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: CouleursSopi.bordure),
-          ),
-          child: Column(
+    return CarteSopi(
+      onTap: ouvrir,
+      child: Column(
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  PastilleMetier(
-                    code: prestataire.metierCode,
-                    taille: 56,
-                    rayon: 18,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              PastilleMetier(
+                code: prestataire.metierCode,
+                taille: 56,
+                rayon: 18,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      prestataire.nomEntreprise,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
-                        Text(
-                          prestataire.nomEntreprise,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: CouleursSopi.texteSecondaire,
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              size: 14,
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            prestataire.quartier,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 12,
                               color: CouleursSopi.texteSecondaire,
                             ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                prestataire.quartier,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  fontSize: 12,
-                                  color: CouleursSopi.texteSecondaire,
-                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              NotePrestataire(prestataire: prestataire, taille: 14),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: prestataire.prixMin == null
+                    ? const SizedBox.shrink()
+                    : Text.rich(
+                        TextSpan(
+                          text: 'À partir de ',
+                          children: [
+                            TextSpan(
+                              text: formaterArgent(prestataire.prixMin!),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: CouleursSopi.texte,
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  NotePrestataire(prestataire: prestataire, taille: 14),
-                ],
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                          color: CouleursSopi.texteSecondaire,
+                        ),
+                      ),
               ),
-              const SizedBox(height: 14),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: prestataire.prixMin == null
-                        ? const SizedBox.shrink()
-                        : Text.rich(
-                            TextSpan(
-                              text: 'À partir de ',
-                              children: [
-                                TextSpan(
-                                  text: formaterArgent(prestataire.prixMin!),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: CouleursSopi.texte,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 13,
-                              color: CouleursSopi.texteSecondaire,
-                            ),
-                          ),
-                  ),
-                  const SizedBox(width: 8),
-                  BoutonCompact(libelle: 'Réserver', onPressed: ouvrir),
-                ],
-              ),
+              const SizedBox(width: 8),
+              BoutonCompact(libelle: 'Réserver', onPressed: ouvrir),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

@@ -78,7 +78,7 @@ class AidePage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: CouleursSopi.blanc,
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
+                        boxShadow: OmbresSopi.carte,
                       ),
                       child: Column(
                         children: [
@@ -91,7 +91,7 @@ class AidePage extends ConsumerWidget {
                                     ? null
                                     : const Border(
                                         top: BorderSide(
-                                          color: CouleursSopi.bordure,
+                                          color: Color(0xFFE3E7EF),
                                         ),
                                       ),
                               ),

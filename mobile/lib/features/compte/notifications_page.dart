@@ -86,6 +86,7 @@ class _EtatNotifications extends ConsumerState<NotificationsPage> {
             child: BoutonCompact(
               libelle: 'Tout marquer comme lu',
               ton: TonBoutonCompact.clair,
+              margeHorizontale: 16,
               chargement: _toutEnCours,
               onPressed: _toutEnCours ? null : _toutMarquer,
             ),
@@ -122,13 +123,12 @@ class _CarteNotification extends StatelessWidget {
         : fortIcone
         ? (CouleursSopi.bleu, CouleursSopi.blanc)
         : (CouleursSopi.bleuPastel, CouleursSopi.bleu);
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(22),
-        side: BorderSide(
-          color: n.lue ? CouleursSopi.bordure : CouleursSopi.enteteTacheBleue,
-        ),
+        border: n.lue ? null : Border.all(color: const Color(0xFFBFDBFE)),
+        boxShadow: n.lue ? OmbresSopi.carte : null,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
@@ -160,7 +160,7 @@ class _CarteNotification extends StatelessWidget {
                       n.titre,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontSize: 14,
-                        fontWeight: n.lue ? FontWeight.w500 : FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(height: 2),

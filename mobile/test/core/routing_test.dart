@@ -183,6 +183,8 @@ void main() {
       await lancer(tester, serveur, jeton: 'abc');
       await tester.tap(find.bySemanticsLabel('Profil'));
       await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Se déconnecter'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Se déconnecter'));
       await tester.pumpAndSettle();
       // Confirmation demandée avant la déconnexion.
