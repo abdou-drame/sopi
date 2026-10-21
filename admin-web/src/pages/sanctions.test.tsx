@@ -32,10 +32,28 @@ describe('sanctions', () => {
     const { appels } = simulerApi({ ...base, 'GET /admin/sanctions': { corps: PAGE([SANCTION]) } })
     afficherApplication('/sanctions')
     expect(await screen.findByText('Moussa Diop')).toBeInTheDocument()
-    expect(within(screen.getByRole('table')).getByText('Suspension temporaire')).toBeInTheDocument()
+    expect(within(screen.getByRole('table')).getByText('Suspension 31 j')).toBeInTheDocument()
     expect(appels.find((a) => a.chemin === '/admin/sanctions')?.recherche.get('actives')).toBe('true')
     await userEvent.click(screen.getByRole('tab', { name: /Toutes/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/sanctions?actives=')
+  })
+
+  it('calcule les 4 cartes depuis les totaux de l’API et le tableau de bord, et filtre par prestataire', async () => {
+    simulerApi({
+      ...base,
+      'GET /admin/tableau-de-bord': { corps: { sanctions: { suspensionsEnCours: 2, bannissements: 0 } } },
+      'GET /admin/sanctions': { corps: PAGE([SANCTION]) },
+    })
+    afficherApplication('/sanctions')
+    await screen.findByRole('table')
+    const carte = (nom: string) => within(screen.getByRole('region', { name: nom }))
+    expect(await carte('Prestataires suspendus').findByText('2')).toBeInTheDocument()
+    expect(carte('Sanctions actives').getByText('sur 1')).toBeInTheDocument()
+    expect(carte('Avertissements').getByText('1')).toBeInTheDocument()
+    expect(carte('Bannissements').getByText('1')).toBeInTheDocument()
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Rechercher un prestataire' }), 'zzz')
+    expect(screen.queryByText('Moussa Diop')).not.toBeInTheDocument()
+    expect(screen.getByText(/ne correspond/)).toBeInTheDocument()
   })
 
   it('une sanction levée est signalée et n’a plus de bouton Lever', async () => {

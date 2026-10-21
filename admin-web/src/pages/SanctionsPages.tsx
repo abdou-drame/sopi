@@ -1,16 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { SanctionListe } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import Fenetre from '../design/Fenetre'
-import { Avatar, Badge, BoutonPlus, Carte as CarteMq, DEGRADE_BLEU, Onglets, PiedListe, TitrePage, type TonBadge } from '../design/composants'
+import { Avatar, BoutonPlus, Carte as CarteMq, Onglets, PaginationRonde, TitrePage } from '../design/composants'
+import { IRecherche } from '../design/icones'
+import { CarteBleue, CarteStat, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
-import { formatDate } from '../lib/format'
+import { formatDate, nombreDeJours } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 
 const T = L.sanctions
@@ -41,8 +44,9 @@ export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFa
         type="button"
         aria-label={T.leverLibelle(nom)}
         onClick={() => setOuverte(true)}
-        className="mq-btn-gris h-[34px] cursor-pointer rounded-[17px] border-none bg-[#f3f4f7] px-3.5 text-xs font-bold text-[#12172b]"
+        className="mq-btn-gris inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border border-[#e6e8ee] bg-white px-3.5 text-xs font-bold text-[#12172b]"
       >
+        <IDeverrouille />
         {T.lever}
       </button>
       <Fenetre
@@ -66,16 +70,73 @@ export function BoutonLever({ id, nom, onFait }: { id: string; nom: string; onFa
   )
 }
 
-/** Statut du tableau : Active en rouge, Levée en vert, Terminée (arrivée à échéance) en neutre. */
-function tonStatut(s: SanctionListe): TonBadge {
-  if (s.active) return 'danger'
-  return s.leveeLe ? 'succes' : 'neutre'
+const ICO = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
+const IBouclier = () => (
+  <svg {...ICO}>
+    <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" />
+  </svg>
+)
+const IAlerte = () => (
+  <svg {...ICO}>
+    <path d="M12 4L2.5 20h19L12 4zM12 10v4M12 17v.01" />
+  </svg>
+)
+const IInterdit = () => (
+  <svg {...ICO}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M5.7 5.7l12.6 12.6" />
+  </svg>
+)
+const IPause = () => (
+  <svg {...ICO}>
+    <rect x="6" y="5" width="4" height="14" rx="1" />
+    <rect x="14" y="5" width="4" height="14" rx="1" />
+  </svg>
+)
+const IChevron = () => (
+  <svg {...ICO} width={14} height={14}>
+    <path d="M9 6l6 6-6 6" />
+  </svg>
+)
+const IDeverrouille = () => (
+  <svg {...ICO} width={14} height={14}>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V8a4 4 0 017.5-2" />
+  </svg>
+)
+
+/** Pastille de statut du tableau : Active en rouge, Levée en vert, Terminée (arrivée à échéance) en neutre. */
+const PASTILLE_ETAT = {
+  active: { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' },
+  levee: { fond: 'bg-[#d7f7e4] text-[#0e6245]', point: '#16a34a' },
+  terminee: { fond: 'bg-[#eef1f6] text-[#4f566b]', point: '#6b7287' },
+}
+function pastilleEtat(s: SanctionListe) {
+  if (s.active) return PASTILLE_ETAT.active
+  return s.leveeLe ? PASTILLE_ETAT.levee : PASTILLE_ETAT.terminee
 }
 
-function useCompteSanctions(actives: string) {
-  const { data } = useQuery({ queryKey: ['sanctions-compte', actives], queryFn: () => api.sanctions({ actives }), retry: false })
+const TYPE_STYLE: Record<string, { fond: string; icone: ReactNode }> = {
+  avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', icone: <IAlerte /> },
+  suspension_temporaire: { fond: 'bg-[#e7edff] text-[#1d4ed8]', icone: <IPause /> },
+  bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', icone: <IInterdit /> },
+}
+
+/** « Suspension 7 j » : la durée d'une suspension est calculée entre le début et la fin ; les autres types gardent leur libellé. */
+function libelleType(s: SanctionListe): string {
+  if (s.type === 'suspension_temporaire' && s.dateFin) {
+    const jours = Math.max(1, nombreDeJours(s.dateCreation.slice(0, 10), s.dateFin.slice(0, 10)) - 1)
+    return `Suspension ${jours} j`
+  }
+  return T.types[s.type] ?? s.type
+}
+
+function useCompteSanctions(params: Record<string, string>) {
+  const { data } = useQuery({ queryKey: ['sanctions-compte', params], queryFn: () => api.sanctions(params), retry: false })
   return data?.meta.total
 }
+
+const OPTIONS_TYPE = Object.entries(T.types)
 
 export default function SanctionsListePage() {
   const etat = useFiltresUrl(['actives', 'type', 'utilisateur', 'echeanceDansHeures'], { actives: 'true' })
@@ -83,32 +144,70 @@ export default function SanctionsListePage() {
   const retour = useRetours()
   const navigate = useNavigate()
   const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
-  const comptes: Record<string, number | undefined> = { true: useCompteSanctions('true'), false: useCompteSanctions('false'), '': useCompteSanctions('') }
+  const [recherche, setRecherche] = useState('')
+  const actives = useCompteSanctions({ actives: 'true' })
+  const terminees = useCompteSanctions({ actives: 'false' })
+  const toutes = useCompteSanctions({ actives: '' })
+  const avertissements = useCompteSanctions({ actives: 'true', type: 'avertissement' })
+  const bannissements = useCompteSanctions({ actives: 'true', type: 'bannissement_definitif' })
+  const comptes: Record<string, number | undefined> = { true: actives, false: terminees, '': toutes }
+  const suspendus = tableau?.sanctions.suspensionsEnCours
+  const detail =
+    actives === undefined || avertissements === undefined || bannissements === undefined || suspendus === undefined
+      ? '—'
+      : actives === 0
+        ? 'Aucune sanction en cours'
+        : [
+            bannissements > 0 && `${bannissements} bannissement${bannissements > 1 ? 's' : ''}`,
+            suspendus > 0 && `${suspendus} suspension${suspendus > 1 ? 's' : ''}`,
+            avertissements > 0 && `${avertissements} avertissement${avertissements > 1 ? 's' : ''}`,
+          ]
+            .filter(Boolean)
+            .join(' · ')
+
+  const lignes = liste.lignes.filter((s) => sansAccent(`${s.utilisateur.prenom} ${s.utilisateur.nom}`).includes(sansAccent(recherche.trim())))
+
   return (
-    <div className="flex flex-col gap-4">
-      <TitrePage titre="Sanctions" suite="prestataires" sousTitre="Suivez les avertissements et suspensions, et levez-les quand c'est justifié.">
+    <div className="flex flex-col gap-3">
+      <TitrePage compact titre="Sanctions" suite="prestataires" sousTitre="Suivez les avertissements et suspensions, et levez-les quand c'est justifié.">
         <BoutonPlus onClick={() => navigate('/utilisateurs')}>Nouvelle sanction</BoutonPlus>
       </TitrePage>
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3.5">
-        <CarteMq>
-          <div className="text-[13px] leading-[normal] font-medium text-[#8a90a2]">Sanctions actives</div>
-          <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">{comptes.true ?? '—'}</div>
-        </CarteMq>
-        <CarteMq>
-          <div className="text-[13px] leading-[normal] font-medium text-[#8a90a2]">Prestataires suspendus</div>
-          <div className="mt-2 flex items-baseline gap-2.5">
-            <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{tableau?.sanctions.suspensionsEnCours ?? '—'}</span>
-            <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] leading-[normal] font-bold text-[#b0161b]">Hors ligne</span>
-          </div>
-        </CarteMq>
-        <CarteMq className="text-white" style={{ background: DEGRADE_BLEU }}>
-          <div className="text-[13px] leading-[normal] font-medium opacity-80">Levées ce mois-ci</div>
-          <div className="mt-2 text-[40px] leading-[44px] font-bold tracking-[-1px]">—</div>
-        </CarteMq>
+
+      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+        <CarteBleue icone={<IBouclier />} titre="Sanctions actives" valeur={actives} unite={toutes === undefined ? '' : `sur ${toutes}`} note={detail} />
+        <CarteStat
+          icone={<IAlerte />}
+          teinte="bg-[#fff0d4] text-[#d97706]"
+          badge="Actif"
+          badgeTeinte="bg-[#fff0d4] text-[#983705]"
+          titre="Avertissements"
+          valeur={avertissements}
+          note={avertissements === undefined ? undefined : avertissements === 0 ? 'Aucun avertissement actif' : `Prestataire${avertissements > 1 ? 's' : ''} toujours en ligne`}
+        />
+        <CarteStat
+          icone={<IInterdit />}
+          teinte="bg-[#fde9e9] text-[#e5484d]"
+          badge="Définitif"
+          badgeTeinte="bg-[#fde9e9] text-[#b0161b]"
+          titre="Bannissements"
+          valeur={bannissements}
+          note={bannissements === undefined ? undefined : bannissements === 0 ? 'Aucun bannissement actif' : 'Compte fermé à vie'}
+        />
+        <CarteStat
+          icone={<IPause />}
+          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          badge="Hors ligne"
+          badgeTeinte="bg-[#eef1f6] text-[#4f566b]"
+          titre="Prestataires suspendus"
+          valeur={suspendus}
+          note={terminees === undefined ? undefined : `${terminees} sanction${terminees > 1 ? 's' : ''} terminée${terminees > 1 ? 's' : ''} ou levée${terminees > 1 ? 's' : ''}`}
+        />
       </div>
-      <CarteMq className="flex flex-col gap-3.5">
+
+      <CarteMq className="flex flex-col gap-2 !p-3 !rounded-[24px]">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
+            pastille
             libelle={T.etat}
             onglets={OPTIONS_ETAT.map((o) => ({
               cle: o.valeur || 'toutes',
@@ -118,46 +217,84 @@ export default function SanctionsListePage() {
               onSelect: () => etat.definir({ actives: o.valeur }),
             }))}
           />
+          <div className="ml-auto flex flex-wrap items-center gap-2.5">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+              <IRecherche taille={16} />
+              <input
+                type="search"
+                value={recherche}
+                onChange={(e) => setRecherche(e.target.value)}
+                placeholder="Rechercher un prestataire…"
+                aria-label="Rechercher un prestataire"
+                className="min-w-0 flex-1 border-none bg-transparent text-[13px] text-[#12172b] outline-none placeholder:text-[#9aa0b2]"
+              />
+            </label>
+            <label className="relative flex h-8 items-center gap-2 rounded-[18px] border border-[#e6e8ee] bg-white pr-4 pl-4 text-[13px] font-semibold text-[#12172b]">
+              <IFiltre />
+              <select value={etat.valeurs.type} onChange={(e) => etat.definir({ type: e.target.value })} aria-label="Filtrer par type" className="cursor-pointer appearance-none border-none bg-transparent pr-1 text-[13px] font-semibold outline-none">
+                <option value="">{T.type}</option>
+                {OPTIONS_TYPE.map(([code, libelle]) => (
+                  <option key={code} value={code}>
+                    {libelle}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="mq-table min-w-[820px]" aria-label={T.legende}>
+          <table
+            className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
+            aria-label={T.legende}
+          >
             <thead>
-              <tr>
+              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
                 <th>Prestataire</th>
                 <th>{T.type}</th>
                 <th>{T.motif}</th>
                 <th>Début</th>
                 <th>{T.fin}</th>
                 <th>{L.commun.statut}</th>
-                <th className="relative">
+                <th className="text-right">
                   <span className="sr-only">{T.actionsColonne}</span>
+                  <span aria-hidden="true">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {liste.lignes.map((s) => {
+              {lignes.map((s) => {
                 const nom = `${s.utilisateur.prenom} ${s.utilisateur.nom}`
+                const type = TYPE_STYLE[s.type] ?? TYPE_STYLE.avertissement
+                const etatStyle = pastilleEtat(s)
                 return (
                   <tr key={s.id}>
                     <td>
-                      <div className="flex items-center gap-3">
-                        <Avatar nom={nom} taille={36} />
-                        <span className="font-semibold">{nom}</span>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar nom={nom} taille={30} />
+                        <span className="font-semibold whitespace-nowrap text-[#12172b]">{nom}</span>
                       </div>
                     </td>
-                    <td>{T.types[s.type] ?? s.type}</td>
-                    <td className="text-[#3c4257]">{s.motif}</td>
-                    <td>{formatDate(s.dateCreation)}</td>
-                    <td>{s.dateFin ? formatDate(s.dateFin) : <span className="text-[#9aa0b2]">—</span>}</td>
                     <td>
-                      <Badge ton={tonStatut(s)}>{etatSanction(s).libelle}</Badge>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${type.fond}`}>
+                        <span className="[&>svg]:size-3.5">{type.icone}</span>
+                        {libelleType(s)}
+                      </span>
+                    </td>
+                    <td className="max-w-[280px] text-[#3c4257]">
+                      <span className="line-clamp-1">{s.motif}</span>
+                    </td>
+                    <td className="whitespace-nowrap text-[#6b7287]">{formatDate(s.dateCreation)}</td>
+                    <td className="whitespace-nowrap text-[#6b7287]">{s.dateFin ? formatDate(s.dateFin) : 'Aucune'}</td>
+                    <td>
+                      <Pastille fond={etatStyle.fond} point={etatStyle.point} libelle={etatSanction(s).libelle} />
                     </td>
                     <td>
-                      {s.active ? (
-                        <BoutonLever id={s.id} nom={nom} onFait={retour.succes} />
-                      ) : (
-                        <span className="text-xs text-[#9aa0b2]">{T.etatTerminee}</span>
-                      )}
+                      <div className="flex items-center justify-end gap-2">
+                        {s.active && <BoutonLever id={s.id} nom={nom} onFait={retour.succes} />}
+                        <Link to={`/utilisateurs/${s.utilisateur.id}`} aria-label={`Voir le détail de ${nom}`} title="Voir le détail" className="mq-rond grid size-8 shrink-0 place-items-center rounded-full border border-[#e6e8ee] bg-white text-[#12172b]">
+                          <IChevron />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 )
@@ -165,14 +302,23 @@ export default function SanctionsListePage() {
             </tbody>
           </table>
         </div>
-        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
-        {liste.totalPages > 1 && (
-          <PiedListe
-            resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
-            precedent={liste.page > 1}
-            suivant={liste.page < liste.totalPages}
-            onPrecedent={() => etat.allerPage(liste.page - 1)}
-            onSuivant={() => etat.allerPage(liste.page + 1)}
+        <EtatsListe
+          chargement={liste.chargement}
+          erreur={liste.erreur}
+          vide={liste.donneesPresentes && lignes.length === 0}
+          messageVide={recherche.trim() !== '' && liste.lignes.length > 0 ? 'Aucune sanction de cette page ne correspond à la recherche.' : T.vide}
+          onReessayer={liste.recharger}
+        />
+        {liste.total > 0 && (
+          <PaginationRonde
+            resume={
+              <>
+                Affichage de <strong className="font-semibold text-[#12172b]">{liste.premier}–{liste.dernier}</strong> sur {liste.total} {liste.total > 1 ? 'sanctions' : 'sanction'}
+              </>
+            }
+            page={liste.page}
+            totalPages={liste.totalPages}
+            onPage={etat.allerPage}
           />
         )}
       </CarteMq>
