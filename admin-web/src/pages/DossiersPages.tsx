@@ -5,6 +5,7 @@ import { messageDErreur, telecharger } from '../api/client'
 import { api } from '../api/endpoints'
 import type { DemandeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
+import { useAlertes } from '../api/useAlertes'
 import { useRetours } from '../components/ui/Alertes'
 import FichierProtege from '../components/ui/FichierProtege'
 import { BanniereDecision } from '../design/bannieres'
@@ -18,14 +19,14 @@ import {
   EtapeChrono,
   LigneLien,
   Onglets,
-  PiedListe,
+  PaginationRonde,
   TitreCarte,
   TitreDetail,
   TitrePage,
   Tuile,
   type TonBadge,
 } from '../design/composants'
-import { IDocument, IUtilisateur } from '../design/icones'
+import { IDocument, IHorloge, IRecherche, IUtilisateur } from '../design/icones'
 import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
@@ -48,23 +49,174 @@ const nomComplet = (d: { prenom: string; nom: string }) => `${d.prenom} ${d.nom}
 const PIECES_ATTENDUES = Object.keys(T.documents).length
 const TON_STATUT: Record<string, TonBadge> = { en_attente: 'attention', actif: 'succes', refuse: 'danger' }
 
+const sansAccent = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
+const PASTILLE_STATUT: Record<string, { fond: string; point: string }> = {
+  en_attente: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
+  actif: { fond: 'bg-[#d7f7e4] text-[#0e6245]', point: '#16a34a' },
+  refuse: { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' },
+}
+
+function PastilleStatut({ code, libelle, alerte }: { code: string; libelle: string; alerte: boolean }) {
+  const style = alerte ? { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' } : (PASTILLE_STATUT[code] ?? { fond: 'bg-[#eef1f6] text-[#4f566b]', point: '#9aa0b2' })
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs font-semibold ${style.fond}`}>
+      <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: style.point }} />
+      {libelle}
+    </span>
+  )
+}
+
+const ICO = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
+const ICoche = () => (
+  <svg {...ICO}>
+    <path d="M5 12.5l4.5 4.5L19 7.5" />
+  </svg>
+)
+const ICroix = () => (
+  <svg {...ICO}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+)
+const IFiltre = () => (
+  <svg {...ICO} width={16} height={16}>
+    <path d="M4 7h16M7 12h10M10 17h4" />
+  </svg>
+)
+
+/** Carte de synthèse blanche : rond d'icône coloré, badge, grand chiffre et barre de progression fine (si un pourcentage existe). */
+function CarteStat({
+  icone,
+  teinte,
+  badge,
+  badgeTeinte,
+  titre,
+  valeur,
+  pourcentage,
+  couleurBarre,
+  note,
+}: {
+  icone: React.ReactNode
+  teinte: string
+  badge: string
+  badgeTeinte: string
+  titre: string
+  valeur: number | undefined
+  pourcentage?: number
+  couleurBarre?: string
+  note?: string
+}) {
+  return (
+    <section aria-label={titre} className="box-border flex flex-col rounded-[32px] bg-white p-[22px]">
+      <div className="flex items-center justify-between">
+        <span className={`grid size-11 place-items-center rounded-[22px] ${teinte}`}>{icone}</span>
+        <span className={`rounded-full px-3 py-1 text-xs font-bold ${badgeTeinte}`}>{badge}</span>
+      </div>
+      <div className="mt-5 text-[13px] font-medium text-[#8a90a2]">{titre}</div>
+      <div className="mt-1 text-[44px] leading-[50px] font-bold tracking-[-1.2px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : valeur}</div>
+      {pourcentage !== undefined ? (
+        <div className="mt-3.5 h-1.5 overflow-hidden rounded-full bg-[#eceef2]" role="presentation">
+          <div className="barre-metier h-full rounded-full" style={{ width: `${pourcentage}%`, background: couleurBarre }} />
+        </div>
+      ) : (
+        <div className="mt-3.5 text-[13px] text-[#8a90a2]">{note}</div>
+      )}
+    </section>
+  )
+}
+
 export function DossiersListePage() {
   const etat = useFiltresUrl(['statut'], { statut: 'en_attente' })
   const liste = useListe('demandes', api.demandes, etat)
   const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
-  const parStatut = tableau?.comptes.prestataires.parStatut
+  const { data: alertes } = useAlertes()
+  const { data: metiers } = useQuery({ queryKey: ['metiers'], queryFn: api.metiers, retry: false })
+  // Recherche et filtre de métier : l'API ne les propose pas, ils s'appliquent aux lignes de la page affichée.
+  const [recherche, setRecherche] = useState('')
+  const [metier, setMetier] = useState('')
+
+  const prestataires = tableau?.comptes.prestataires
+  const parStatut = prestataires?.parStatut
+  const total = prestataires?.total
   const compteurs: Record<string, number | undefined> = {
     en_attente: parStatut?.en_attente,
     actif: parStatut?.actif,
     refuse: parStatut?.refuse,
-    tous: tableau?.comptes.prestataires.total,
+    tous: total,
   }
+  const part = (n: number | undefined) => (n === undefined || !total ? undefined : Math.round((n / total) * 100))
+  const partAcceptes = part(parStatut?.actif)
+  const partRefuses = part(parStatut?.refuse)
+  const ageMax = alertes?.alertes.find((a) => a.type === 'dossiers_en_attente')?.ageMinutes
+  const enAttente = parStatut?.en_attente
+
+  const lignes = liste.lignes.filter(
+    (d) => (!metier || d.metier === metier) && sansAccent(`${d.nomEntreprise} ${nomComplet(d)} ${d.quartier}`).includes(sansAccent(recherche.trim())),
+  )
+  const filtre = recherche.trim() !== '' || metier !== ''
+
   return (
     <div className="flex flex-col gap-4">
       <TitrePage titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier." />
-      <CarteMq className="flex flex-col gap-3.5">
+
+      <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(230px,1fr))]">
+        <section aria-label="En attente de décision" className="box-border flex flex-col rounded-[32px] p-[22px] text-white shadow-[0_18px_36px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
+          <div className="flex items-center justify-between">
+            <span className="grid size-11 place-items-center rounded-[22px] bg-white/20">
+              <IHorloge />
+            </span>
+            {enAttente === 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-bold">
+                <span className="[&>svg]:size-3.5">
+                  <ICoche />
+                </span>
+                À jour
+              </span>
+            )}
+          </div>
+          <div className="mt-5 text-[13px] font-semibold opacity-90">En attente de décision</div>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-[44px] leading-[50px] font-bold tracking-[-1.2px] tabular-nums">{enAttente === undefined ? '—' : enAttente}</span>
+            <span className="text-sm font-semibold opacity-90">{enAttente === 1 ? 'dossier' : 'dossiers'}</span>
+          </div>
+          <div className="mt-3.5 text-[13px] opacity-85">Plus ancien : {ageMax == null ? 'aucun dossier en retard' : dureeMinutes(ageMax)}</div>
+        </section>
+
+        <CarteStat
+          icone={<ICoche />}
+          teinte="bg-[#d7f7e4] text-[#16a34a]"
+          badge={partAcceptes === undefined ? '—' : `${partAcceptes} %`}
+          badgeTeinte="bg-[#d7f7e4] text-[#0e6245]"
+          titre="Acceptés"
+          valeur={parStatut?.actif}
+          pourcentage={partAcceptes ?? 0}
+          couleurBarre="#16a34a"
+        />
+        <CarteStat
+          icone={<ICroix />}
+          teinte="bg-[#fde9e9] text-[#e5484d]"
+          badge={partRefuses === undefined ? '—' : `${partRefuses} %`}
+          badgeTeinte="bg-[#fde9e9] text-[#b0161b]"
+          titre="Refusés"
+          valeur={parStatut?.refuse}
+          pourcentage={partRefuses ?? 0}
+          couleurBarre="#e5484d"
+        />
+        <CarteStat
+          icone={<IDocument />}
+          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          badge="Total"
+          badgeTeinte="bg-[#eef1f6] text-[#4f566b]"
+          titre="Dossiers reçus"
+          valeur={total}
+          note="Depuis le lancement"
+        />
+      </div>
+
+      <CarteMq className="flex flex-col gap-3.5 !p-5">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
+            pastille
             libelle={T.statut}
             onglets={OPTIONS_STATUT.map((o) => ({
               cle: o.valeur,
@@ -74,49 +226,82 @@ export function DossiersListePage() {
               onSelect: () => etat.definir({ statut: o.valeur }),
             }))}
           />
+          <div className="ml-auto flex flex-wrap items-center gap-2.5">
+            <label className="flex h-11 w-[300px] max-w-full items-center gap-2.5 rounded-[22px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+              <IRecherche taille={16} />
+              <input
+                type="search"
+                value={recherche}
+                onChange={(e) => setRecherche(e.target.value)}
+                placeholder="Rechercher un prestataire…"
+                aria-label="Rechercher un prestataire"
+                className="min-w-0 flex-1 border-none bg-transparent text-[13px] text-[#12172b] outline-none placeholder:text-[#9aa0b2]"
+              />
+            </label>
+            <label className="relative flex h-11 items-center gap-2 rounded-[22px] border border-[#e6e8ee] bg-white pr-4 pl-4 text-[13px] font-semibold text-[#12172b]">
+              <IFiltre />
+              <select
+                value={metier}
+                onChange={(e) => setMetier(e.target.value)}
+                aria-label="Filtrer par métier"
+                className="cursor-pointer appearance-none border-none bg-transparent pr-1 text-[13px] font-semibold outline-none"
+              >
+                <option value="">{T.metier}</option>
+                {(metiers?.data ?? []).map((m) => (
+                  <option key={m.id} value={m.code}>
+                    {m.libelle}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="mq-table min-w-[820px]" aria-label={T.legende}>
+          <table
+            className="w-full min-w-[820px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-3.5 [&_td]:align-middle [&_td]:font-medium"
+            aria-label={T.legende}
+          >
             <thead>
-              <tr>
+              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-3 [&_th]:font-semibold">
                 <th>{T.prestataire}</th>
                 <th>{T.metier}</th>
                 <th>{T.quartier}</th>
                 <th>Pièces</th>
                 <th>Reçu le</th>
                 <th>{L.commun.statut}</th>
-                <th className="relative">
+                <th className="relative text-right">
                   <span className="sr-only">Action</span>
+                  <span aria-hidden="true">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {liste.lignes.map((d) => {
+              {lignes.map((d) => {
                 const complet = d.nombreJustificatifs >= PIECES_ATTENDUES
                 const manquante = d.statutCompte === 'en_attente' && !complet
                 return (
-                  <LigneLien key={d.id} vers={`/dossiers-prestataires/${d.id}`} libelle={`Examiner le dossier de ${nomComplet(d)}`}>
+                  <LigneLien key={d.id} vers={`/dossiers-prestataires/${d.id}`} libelle={`Examiner le dossier de ${nomComplet(d)}`} texte="Ouvrir le dossier" discret>
                     <td>
                       <div className="flex items-center gap-3">
-                        <Avatar nom={nomComplet(d)} taille={40} />
-                        <span>
-                          <span className="block font-semibold">{nomComplet(d)}</span>
+                        <Avatar nom={d.nomEntreprise || nomComplet(d)} taille={36} />
+                        <span className="min-w-0">
+                          <span className="block font-semibold text-[#12172b]">{d.nomEntreprise || nomComplet(d)}</span>
+                          <span className="mt-0.5 block text-xs font-normal text-[#9aa0b2]">{nomComplet(d)}</span>
                         </span>
                       </div>
                     </td>
-                    <td>{L.metiers[d.metier] ?? d.metier}</td>
-                    <td>{d.quartier}</td>
                     <td>
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="size-1.5 rounded-full" style={{ background: complet ? '#16a34a' : '#e5484d' }} />
-                        {d.nombreJustificatifs} / {PIECES_ATTENDUES}
+                      <span className="inline-block rounded-full bg-[#e7edff] px-3 py-1 text-xs font-semibold text-[#1d4ed8]">{L.metiers[d.metier] ?? d.metier}</span>
+                    </td>
+                    <td className="text-[#6b7287]">{d.quartier}</td>
+                    <td>
+                      <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${complet ? 'bg-[#eef1f6] text-[#4f566b]' : 'bg-[#fff0d4] text-[#983705]'}`}>
+                        {d.nombreJustificatifs}/{PIECES_ATTENDUES} pièces
                       </span>
                     </td>
-                    <td>{formatDate(d.dateSoumission)}</td>
+                    <td className="text-[#6b7287]">{formatDate(d.dateSoumission)}</td>
                     <td>
-                      <Badge ton={manquante ? 'danger' : (TON_STATUT[d.statutCompte] ?? 'neutre')}>
-                        {manquante ? 'Pièce manquante' : (L.statuts[d.statutCompte] ?? d.statutCompte)}
-                      </Badge>
+                      <PastilleStatut code={d.statutCompte} alerte={manquante} libelle={manquante ? 'Pièce manquante' : (L.statuts[d.statutCompte] ?? d.statutCompte)} />
                     </td>
                   </LigneLien>
                 )
@@ -124,13 +309,22 @@ export function DossiersListePage() {
             </tbody>
           </table>
         </div>
-        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
-        <PiedListe
-          resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
-          precedent={liste.page > 1}
-          suivant={liste.page < liste.totalPages}
-          onPrecedent={() => etat.allerPage(liste.page - 1)}
-          onSuivant={() => etat.allerPage(liste.page + 1)}
+        <EtatsListe
+          chargement={liste.chargement}
+          erreur={liste.erreur}
+          vide={liste.donneesPresentes && lignes.length === 0}
+          messageVide={filtre && liste.lignes.length > 0 ? 'Aucun dossier de cette page ne correspond à la recherche.' : T.vide}
+          onReessayer={liste.recharger}
+        />
+        <PaginationRonde
+          resume={
+            <>
+              Affichage de <strong className="font-semibold text-[#12172b]">{liste.premier}–{liste.dernier}</strong> sur {liste.total} {liste.total > 1 ? 'dossiers' : 'dossier'}
+            </>
+          }
+          page={liste.page}
+          totalPages={liste.totalPages}
+          onPage={etat.allerPage}
         />
       </CarteMq>
     </div>

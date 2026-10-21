@@ -62,6 +62,34 @@ describe('dossiers prestataires', () => {
     expect(demande?.recherche.get('statut')).toBe('en_attente')
   })
 
+  it('calcule les 4 cartes à partir du tableau de bord et filtre la page par recherche et par métier', async () => {
+    const tableau = { comptes: { prestataires: { total: 20, parStatut: { en_attente: 3, actif: 15, refuse: 2, suspendu: 0, banni: 0 }, dossiersEnAttente: 3 } } }
+    const autre = { ...DEMANDE, id: '0198a1b2-0000-7000-8000-000000000003', nom: 'Fall', prenom: 'Awa', nomEntreprise: 'Salon Awa', metier: 'coiffure', quartier: 'Pikine' }
+    simulerApi({
+      ...base,
+      'GET /admin/tableau-de-bord': { corps: tableau },
+      'GET /admin/metiers': { corps: { data: [{ id: 'm1', code: 'mecanique', libelle: 'Mécanique', actif: true }, { id: 'm2', code: 'coiffure', libelle: 'Coiffure', actif: true }] } },
+      'GET /admin/prestataires/demandes': { corps: PAGE([DEMANDE, autre]) },
+    })
+    afficherApplication('/dossiers-prestataires')
+    const tableauListe = await screen.findByRole('table', { name: 'Liste des demandes de prestataires' })
+    // Carte bleue : en attente. Cartes 2 à 4 : acceptés 15/20 = 75 %, refusés 2/20 = 10 %, total 20.
+    const carte = (nom: string) => within(screen.getByRole('region', { name: nom }))
+    expect(await carte('En attente de décision').findByText('3')).toBeInTheDocument()
+    expect(carte('Acceptés').getByText('15')).toBeInTheDocument()
+    expect(carte('Acceptés').getByText('75 %')).toBeInTheDocument()
+    expect(carte('Refusés').getByText('2')).toBeInTheDocument()
+    expect(carte('Refusés').getByText('10 %')).toBeInTheDocument()
+    expect(carte('Dossiers reçus').getByText('20')).toBeInTheDocument()
+    expect(within(tableauListe).getAllByRole('link', { name: /Examiner le dossier/ })).toHaveLength(2)
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Rechercher un prestataire' }), 'awa')
+    expect(within(tableauListe).getAllByRole('link', { name: /Examiner le dossier/ })).toHaveLength(1)
+    await userEvent.clear(screen.getByRole('searchbox', { name: 'Rechercher un prestataire' }))
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Filtrer par métier' }), 'mecanique')
+    expect(within(tableauListe).getByRole('link', { name: 'Examiner le dossier de Moussa Diop' })).toBeInTheDocument()
+    expect(within(tableauListe).queryByRole('link', { name: 'Examiner le dossier de Awa Fall' })).not.toBeInTheDocument()
+  })
+
   it('met le filtre de statut dans l’adresse', async () => {
     simulerApi({ ...base, 'GET /admin/prestataires/demandes': { corps: PAGE([DEMANDE]) } })
     afficherApplication('/dossiers-prestataires')
