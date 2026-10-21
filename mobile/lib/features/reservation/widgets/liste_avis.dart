@@ -12,7 +12,7 @@ import '../fiche_prestataire_page.dart';
 import '../formats.dart';
 import '../modeles.dart';
 
-/// Écran « liste d'avis » commun au client (Avis sur {entreprise}) et au prestataire (Mes avis) : carte marine
+/// Écran « liste d'avis » commun au client (Avis sur {entreprise}) et au prestataire (Mes avis) : carte blanche
 /// (note moyenne, nombre d'avis), avis du plus récent au plus ancien, bouton « Voir plus d'avis » pour la page suivante.
 class ListeAvisPage extends ConsumerStatefulWidget {
   const ListeAvisPage({

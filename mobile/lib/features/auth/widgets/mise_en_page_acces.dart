@@ -18,8 +18,7 @@ void retourOuConnexion(BuildContext context) {
 }
 
 /// Délai d'une apparition en cascade, après la descente de l'en-tête.
-Duration delaiApresEntete(int rang) =>
-    DescenteDepuisLeHaut.duree + delaiCascade(rang);
+Duration delaiApresEntete(int rang) => delaiCascade(rang);
 
 /// Fait apparaître [child] en fondu et glissement, après la descente de l'en-tête, au rang [rang].
 class ApparitionAcces extends StatelessWidget {
@@ -174,7 +173,7 @@ class EnteteFormulaire extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Apparition(
-            delai: DescenteDepuisLeHaut.duree,
+            delai: Duration.zero,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

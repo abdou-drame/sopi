@@ -51,15 +51,6 @@ abstract final class CouleursSopi {
   // Squelettes de chargement
   static const squelette = Color(0xFFE9ECF3);
   static const squeletteClair = Color(0xFFF1F3F8);
-
-  // --- Transitoire : anciens jetons, retirés écran par écran (étapes 3 à 6 de la refonte). ---
-  static const bordure = Color(0xFFE9ECF3);
-  static const bordureForte = Color(0xFFE9ECF3);
-  static const enteteFond = Color(0xFFF5F6FA);
-  static const enteteTacheBleue = Color(0xFFDBEAFE);
-  static const enteteTacheIndigo = Color(0xFFE0E7FF);
-  static const separateurLigne = Color(0xFFE9ECF3);
-  static const texteSurMarine = Color(0xFF6B7287);
 }
 
 /// Ombres des maquettes.

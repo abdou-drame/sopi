@@ -45,11 +45,11 @@ class _CarteSignalement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(26),
@@ -224,7 +224,7 @@ class _Bloc extends StatelessWidget {
     decoration: BoxDecoration(
       color: CouleursSopi.blanc,
       borderRadius: BorderRadius.circular(26),
-      border: Border.all(color: CouleursSopi.bordure),
+      boxShadow: OmbresSopi.carte,
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,

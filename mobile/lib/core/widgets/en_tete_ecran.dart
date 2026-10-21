@@ -64,30 +64,6 @@ class BoutonRetour extends StatelessWidget {
   );
 }
 
-/// Fond d'écran uni #f5f6fa (aucun dégradé).
-class FondDegrade extends StatelessWidget {
-  const FondDegrade({super.key, this.child, this.tacheBasse = false});
-
-  final Widget? child;
-  final bool tacheBasse;
-
-  @override
-  Widget build(BuildContext context) =>
-      ColoredBox(color: CouleursSopi.fond, child: child);
-}
-
-/// Ancien effet de descente de l'en-tête, supprimé : les maquettes sont statiques.
-class DescenteDepuisLeHaut extends StatelessWidget {
-  const DescenteDepuisLeHaut({super.key, required this.child});
-
-  final Widget child;
-
-  static const duree = Duration.zero;
-
-  @override
-  Widget build(BuildContext context) => child;
-}
-
 /// En-tête d'écran sur fond uni : bouton retour rond, titre en deux lignes (400 puis 800), contenu optionnel dessous.
 class EnTeteEcran extends StatelessWidget {
   const EnTeteEcran({

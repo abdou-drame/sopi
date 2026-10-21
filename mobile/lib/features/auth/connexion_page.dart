@@ -14,7 +14,6 @@ import '../../core/widgets/champ_formulaire.dart';
 import '../../core/widgets/compte_a_rebours.dart';
 import '../../core/widgets/sopi_logo.dart';
 import '../../core/widgets/decompte.dart';
-import '../../core/widgets/en_tete_ecran.dart';
 import '../inscription_prestataire/stockage_jeton_suivi.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
@@ -230,7 +229,7 @@ class _EnteteConnexion extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28),
             child: Apparition(
-              delai: DescenteDepuisLeHaut.duree,
+              delai: Duration.zero,
               child: Row(
                 children: [
                   const SopiLogo(taille: 52),

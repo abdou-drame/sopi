@@ -363,7 +363,9 @@ class _PuceMetier extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selectionnee ? CouleursSopi.bleu : CouleursSopi.bordure,
+            color: selectionnee
+                ? CouleursSopi.bleu
+                : CouleursSopi.fondSecondaire,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
