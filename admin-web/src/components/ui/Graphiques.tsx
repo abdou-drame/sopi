@@ -198,6 +198,8 @@ interface PropsBarres {
   donnees: { libelle: string; valeur: number }[]
   couleur?: string
   formatValeur?: (v: number) => string
+  /** Variante étroite (tableau de bord) : sans échelle ni grille, halo doux, barre active lumineuse. */
+  compact?: boolean
 }
 
 /**
@@ -205,7 +207,7 @@ interface PropsBarres {
  * barre mise en avant (la plus haute, puis celle survolée ou ayant le focus) avec point blanc et bulle de valeur.
  * Hauteur fixe de 230 px, largeur fluide.
  */
-export function GraphiqueBarres({ description, donnees, formatValeur = (v) => String(v) }: PropsBarres) {
+export function GraphiqueBarres({ description, donnees, formatValeur = (v) => String(v), compact = false }: PropsBarres) {
   const max = maximumRond(Math.max(0, ...donnees.map((d) => d.valeur)))
   const maxValeur = Math.max(0, ...donnees.map((d) => d.valeur))
   const parDefaut = donnees.findIndex((d) => d.valeur === maxValeur)
@@ -216,19 +218,28 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
   const rayures = 'repeating-linear-gradient(135deg, rgba(255,255,255,0.45) 0 1.5px, transparent 1.5px 5px)'
 
   return (
-    <div role="img" aria-label={`${description} : ${resume}`} className="mt-1 flex h-[230px] gap-3">
-      <div aria-hidden="true" className="flex flex-col justify-between pb-[26px] text-right text-[11px] text-[#9aa0b2] tabular-nums">
-        {echelle.map((g) => (
-          <span key={g}>{abrege(g)}</span>
-        ))}
-      </div>
+    <div role="img" aria-label={`${description} : ${resume}`} className={`mt-1 flex gap-3 ${compact ? 'h-[150px]' : 'h-[230px]'}`}>
+      {!compact && (
+        <div aria-hidden="true" className="flex flex-col justify-between pb-[26px] text-right text-[11px] text-[#9aa0b2] tabular-nums">
+          {echelle.map((g) => (
+            <span key={g}>{abrege(g)}</span>
+          ))}
+        </div>
+      )}
       <div className="relative min-w-0 flex-1">
-        <div aria-hidden="true" className="absolute inset-x-0 top-1.5 bottom-8 flex flex-col justify-between">
+        {compact && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
+            style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(29,78,216,0.16), transparent 70%)', animation: 'apparition 600ms ease-out both' }}
+          />
+        )}
+        <div aria-hidden="true" className={`absolute inset-x-0 top-1.5 bottom-8 flex-col justify-between ${compact ? 'hidden' : 'flex'}`}>
           {echelle.map((g) => (
             <div key={g} className="border-t border-dashed border-[#e6e8ee]" />
           ))}
         </div>
-        <div className="relative box-border flex h-full justify-around gap-[clamp(8px,2.5vw,36px)] px-2 pt-11">
+        <div className={`relative box-border flex h-full justify-around px-2 ${compact ? 'gap-2 pt-9' : 'gap-[clamp(8px,2.5vw,36px)] pt-11'}`}>
           {donnees.map((d, i) => {
             const estActif = i === actif
             const hauteur = d.valeur > 0 ? Math.max((d.valeur / max) * 100, 4) : 0
@@ -240,15 +251,16 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
                 onMouseLeave={() => setChoix(null)}
                 onFocus={() => setChoix(i)}
                 onBlur={() => setChoix(null)}
-                className="flex h-full max-w-[84px] min-w-0 flex-1 flex-col items-center outline-none"
+                className={`flex h-full min-w-0 flex-1 flex-col items-center outline-none ${compact ? 'max-w-[34px]' : 'max-w-[84px]'}`}
               >
                 <div className="flex w-full flex-1 items-end">
                   <div
-                    className="relative w-full origin-bottom rounded-full transition-colors duration-200"
+                    className="relative w-full origin-bottom rounded-full transition-[background-color,box-shadow] duration-200"
                     style={{
                       height: `${hauteur}%`,
                       backgroundColor: estActif ? '#1d4ed8' : '#a9bdf6',
                       backgroundImage: rayures,
+                      boxShadow: compact && estActif ? '0 8px 14px rgba(29,78,216,0.35)' : undefined,
                       animation: `croissance 500ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 80}ms both`,
                     }}
                   >

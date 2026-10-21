@@ -5,11 +5,11 @@ import { IChevronBas, IFlecheHautDroite, IPlus, IRecherche, IRetour } from './ic
 /* Composants du Guide (admin-web/maquettes/html/Guide.html) et des écrans dessinés. Valeurs exactes des maquettes. */
 
 /** Titre de page : « Litiges <à trancher> », sous-titre, actions à droite (rangée de titre des maquettes). */
-export function TitrePage({ titre, suite, sousTitre, children }: { titre: string; suite?: string; sousTitre?: string; children?: ReactNode }) {
+export function TitrePage({ titre, suite, sousTitre, children, compact = false }: { titre: string; suite?: string; sousTitre?: string; children?: ReactNode; compact?: boolean }) {
   return (
-    <div className="flex flex-wrap items-center gap-4 px-2 pt-2">
+    <div className={`flex flex-wrap items-center gap-4 px-2 ${compact ? '' : 'pt-2'}`}>
       <div className="min-w-0 flex-[1_1_360px]">
-        <h1 className="m-0 text-[42px] leading-[50px] font-semibold tracking-[-1.2px] text-[#12172b]">
+        <h1 className={`m-0 font-semibold text-[#12172b] ${compact ? 'text-[28px] leading-9 tracking-[-0.8px]' : 'text-[42px] leading-[50px] tracking-[-1.2px]'}`}>
           {titre}
           {suite && <> <span className="font-normal text-[#9aa0b2]">{suite}</span></>}
         </h1>

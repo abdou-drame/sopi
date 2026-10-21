@@ -68,18 +68,18 @@ function CarteChiffre({
   const clair = degrade ? 'opacity-80' : 'text-[#9aa0b2]'
   return (
     <section
-      className={`box-border rounded-[28px] px-5 py-[18px] ${degrade ? 'text-white' : 'bg-white'}`}
+      className={`box-border rounded-[24px] px-5 py-3 ${degrade ? 'text-white' : 'bg-white'}`}
       style={degrade ? { background: DEGRADE_BLEU } : undefined}
     >
       <div className="flex items-center justify-between">
         <span className={`text-xs font-semibold ${degrade ? 'opacity-85' : 'text-[#8a90a2]'}`}>{titre}</span>
         {pastille && <span className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${degrade ? 'bg-white/20' : 'bg-[#f3f4f7] text-[#9aa0b2]'}`}>{pastille}</span>}
       </div>
-      <div className="mt-2 text-[30px] leading-[34px] font-bold tracking-[-0.8px] tabular-nums">
+      <div className="mt-1 text-[26px] leading-[30px] font-bold tracking-[-0.8px] tabular-nums">
         {valeur === undefined ? ABSENT : formatNombre(valeur)}
         {unite && <span className={`text-sm font-medium ${clair}`}> {unite}</span>}
       </div>
-      <div className={`mt-1.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>
+      <div className={`mt-0.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>
     </section>
   )
 }
@@ -129,7 +129,7 @@ function CarteReservations() {
   })
   const donnees = tranches.map((t, i) => ({ libelle: t.libelle, valeur: resultats[i].data?.meta.total ?? 0 }))
   return (
-    <section className="box-border flex min-h-[435px] min-w-0 flex-[3_1_460px] flex-col rounded-[32px] bg-white p-[18px]">
+    <section className="box-border flex min-w-0 flex-[1_1_340px] flex-col rounded-[32px] bg-white p-[18px]">
       <div className="flex flex-wrap items-center gap-3.5">
         <span className="grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
           <IGraphique />
@@ -162,7 +162,7 @@ function CarteReservations() {
       </div>
       <div className="mt-[18px] flex-1">
         {/* La clé relance l'animation de croissance quand on change de période. */}
-        <GraphiqueBarres key={annuel ? 'mois' : 'semaines'} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
+        <GraphiqueBarres compact key={annuel ? 'mois' : 'semaines'} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
       </div>
     </section>
   )
@@ -176,13 +176,13 @@ function CarteDossiers() {
   return (
     <Carte>
       <EnTeteSimple titre="Dossiers à traiter" sousTitre="Demandes d'inscription" vers="/dossiers-prestataires" libelle="Ouvrir les dossiers" />
-      <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+      <div className="mt-3 box-border rounded-[22px] p-4 text-white" style={{ background: DEGRADE_BLEU }}>
         <div className="text-xs font-semibold opacity-80">En attente de décision</div>
         <div className="mt-1.5 flex items-baseline gap-2">
-          <span className="text-[44px] leading-[48px] font-bold tracking-[-1px]">{nombre === undefined ? ABSENT : nombre}</span>
+          <span className="text-[34px] leading-[38px] font-bold tracking-[-1px]">{nombre === undefined ? ABSENT : nombre}</span>
           <span className="text-sm font-semibold opacity-85">{nombre === 1 ? 'dossier' : 'dossiers'}</span>
         </div>
-        <div className="mt-[22px] flex items-center justify-between text-xs">
+        <div className="mt-3 flex items-center justify-between text-xs">
           <span className="opacity-80">Le plus ancien : {age == null ? ABSENT : dureeMinutes(age)}</span>
         </div>
       </div>
@@ -292,8 +292,8 @@ function CarteLitiges() {
           </span>
         }
       />
-      <div className="mt-[18px] flex items-baseline gap-2.5">
-        <span className="text-[40px] leading-[44px] font-bold tracking-[-1px]">{data ? data.litiges.ouverts : ABSENT}</span>
+      <div className="mt-3 flex items-baseline gap-2.5">
+        <span className="text-[32px] leading-[36px] font-bold tracking-[-1px]">{data ? data.litiges.ouverts : ABSENT}</span>
         {ageLitige != null && (
           <span className="rounded-full bg-[#fde9e9] px-2.5 py-1 text-[11px] font-bold text-[#b0161b]">Le plus ancien : {dureeMinutes(ageLitige)}</span>
         )}
@@ -316,7 +316,7 @@ function CartePrestataires() {
   return (
     <Carte className="flex-1">
       <EnTeteSimple titre="Prestataires actifs" sousTitre="Inscrits et validés" vers="/utilisateurs" libelle="Ouvrir les utilisateurs" />
-      <div className="mt-[18px] flex items-center rounded-[22px] bg-[#f3f4f7] px-4 py-3.5">
+      <div className="mt-3 flex items-center rounded-[22px] bg-[#f3f4f7] px-4 py-2.5">
         {data === undefined && <span className="text-sm text-[#9aa0b2]">{ABSENT}</span>}
         {visibles.map((u, i) => (
           <span key={u.id} aria-hidden="true" className={`${rond} ${i > 0 ? '-ml-2.5' : ''} ${COULEURS_PASTILLE[i % 4]}`}>
@@ -374,8 +374,8 @@ export default function TableauDeBordPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <TitrePage titre={`${T.bienvenue}`} suite={utilisateur?.prenom}>
-        <span className="flex h-12 items-center gap-2.5 rounded-3xl bg-white pr-5 pl-4 text-[13px] font-semibold text-[#12172b]">
+      <TitrePage compact titre={`${T.bienvenue}`} suite={utilisateur?.prenom}>
+        <span className="flex h-10 items-center gap-2.5 rounded-3xl bg-white pr-5 pl-4 text-[13px] font-semibold text-[#12172b]">
           <ICalendrier />
           {periode}
         </span>
@@ -397,18 +397,18 @@ export default function TableauDeBordPage() {
 
       <div className="flex flex-wrap items-stretch gap-3.5">
         <CarteReservations />
-        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3.5">
           <CarteDossiers />
+          <CarteLitiges />
+        </div>
+        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3.5">
           <CarteMetiers parMetier={data?.parMetier} />
+          <CartePrestataires />
         </div>
       </div>
 
       <div className="flex flex-wrap items-stretch gap-3.5">
         <CarteActivite />
-        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
-          <CarteLitiges />
-          <CartePrestataires />
-        </div>
       </div>
     </div>
   )
