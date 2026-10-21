@@ -96,6 +96,8 @@ export interface Revenus {
   totaux: { revenus: number; acomptesEncaisses: number; remboursements: number; retraitsVerses: number }
   soldePrestataires: number
   series: PointRevenus[]
+  /** Commissions de la période par code de métier, du plus élevé au plus bas. */
+  parMetier: { metier: string; revenus: number }[]
 }
 
 /** Page de résultats d'une liste (pagination Laravel : 20 éléments par page). */

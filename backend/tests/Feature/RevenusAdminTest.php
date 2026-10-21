@@ -223,3 +223,20 @@ describe('revenus — performance et confidentialité', function () {
             ->not->toContain((string) $paiement->reference_dexpay);
     });
 });
+
+describe('revenus — par métier', function () {
+    it('ventile les commissions de la période par métier du prestataire, du plus élevé au plus bas', function () {
+        $p1 = paiementCredite('1000.00', '2030-01-10 10:00:00');
+        $p2 = paiementCredite('2500.00', '2030-01-11 10:00:00');
+        $p3 = paiementCredite('700.00', '2030-03-01 10:00:00'); // hors période
+        DB::table('prestataires')->whereIn('id', [$p1->reservation->creneau->prestataire_id])->update(['metier' => 'coiffure']);
+        DB::table('prestataires')->whereIn('id', [$p2->reservation->creneau->prestataire_id])->update(['metier' => 'pressing']);
+
+        $reponse = revenus('?debut=2030-01-01&fin=2030-01-31')->assertOk();
+
+        expect($reponse->json('parMetier'))->toBe([
+            ['metier' => 'pressing', 'revenus' => 2500],
+            ['metier' => 'coiffure', 'revenus' => 1000],
+        ]);
+    });
+});

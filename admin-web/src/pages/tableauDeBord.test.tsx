@@ -50,6 +50,10 @@ const REVENUS = {
   totaux: { revenus: 3000, acomptesEncaisses: 30000, remboursements: 1500, retraitsVerses: 24000 },
   soldePrestataires: 50000,
   series: [],
+  parMetier: [
+    { metier: 'Coiffure', revenus: 2000 },
+    { metier: 'Mécanique', revenus: 1000 },
+  ],
 }
 const PAIEMENT = {
   id: '0198a1b2-1111-7000-8000-000000000001',
@@ -100,6 +104,15 @@ describe('tableau de bord', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
     sessionStorage.clear()
+  })
+
+  it('montre les revenus par métier réels, du plus élevé au plus bas', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    const carte = (await screen.findByText('Revenus par métier')).closest('section') as HTMLElement
+    await waitFor(() => expect(carte).toHaveTextContent(/Coiffure\s*2\D000 FCFA/))
+    expect(carte).toHaveTextContent(/Mécanique\s*1\D000 FCFA/)
+    expect(carte).toHaveTextContent(/Pressing\s*0 FCFA/)
   })
 
   it('affiche l’en-tête de bienvenue avec le prénom de l’administrateur', async () => {
