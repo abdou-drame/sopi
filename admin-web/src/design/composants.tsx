@@ -255,14 +255,14 @@ function numerosDePage(page: number, total: number): number[] {
 
 /** Pied de liste à numéros de page ronds (précédent, 1 2 3…, suivant) avec le résumé « Affichage de … » à gauche. */
 export function PaginationRonde({ resume, page, totalPages, onPage }: { resume: ReactNode; page: number; totalPages: number; onPage: (page: number) => void }) {
-  const rond = 'grid size-9 place-items-center rounded-full border text-[13px] font-semibold transition-colors'
+  const rond = 'grid size-8 place-items-center rounded-full border text-[13px] font-semibold transition-colors'
   const fleche = (d: string) => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={d} />
     </svg>
   )
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eceef2] pt-4 text-[13px] text-[#8a90a2]">
+    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#eceef2] pt-2.5 text-[13px] text-[#8a90a2]">
       <span>{resume}</span>
       <nav aria-label="Pagination" className="flex items-center gap-2">
         <button type="button" aria-label="Précédent" disabled={page <= 1} onClick={() => onPage(page - 1)} className={`${rond} border-[#e6e8ee] bg-white ${page > 1 ? 'mq-rond cursor-pointer text-[#12172b]' : 'cursor-default text-[#c3c7d3]'}`}>
