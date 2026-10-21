@@ -22,6 +22,11 @@ abstract final class CouleursSopi {
   static const champ = Color(0xFFF1F3F8);
 
   static const bleuPastel = Color(0xFFDBEAFE);
+  static const bleuPale = Color(0xFFE8EEFC);
+  static const segmentInactif = Color(0xFFC7D2FE);
+  static const erreurPale = Color(0xFFFDE9E9);
+  static const erreurIcone = Color(0xFFB0161B);
+  static const separateur = Color(0xFFE3E7EF);
 
   /// Texte sur fond bleu pastel (bandeaux d'information, encadré du motif).
   static const bleuProfond = Color(0xFF1E3A8A);

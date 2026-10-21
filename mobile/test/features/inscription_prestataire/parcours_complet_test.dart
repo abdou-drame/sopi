@@ -98,7 +98,7 @@ void main() {
           tester,
           find.descendant(
             of: find.byKey(ValueKey('ligne-${type.valeurApi}')),
-            matching: find.byType(OutlinedButton),
+            matching: find.byType(TextButton),
           ),
         );
         await passerTransition(tester);

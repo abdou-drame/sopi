@@ -227,89 +227,91 @@ class _LigneJustificatif extends StatelessWidget {
         : facultatif
         ? 'Photo de votre local ou registre (facultatif)'
         : 'À ajouter';
+    final pointille = facultatif && !ajoute;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          key: ValueKey('ligne-${type.valeurApi}'),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: facultatif && !ajoute
-                ? CouleursSopi.champ
-                : CouleursSopi.blanc,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: erreur != null
-                  ? CouleursSopi.erreurTexte
-                  : facultatif && !ajoute
-                  ? const Color(0xFFB8C4E6)
-                  : CouleursSopi.bordure,
-              width: facultatif && !ajoute ? 2 : 1,
+        CustomPaint(
+          foregroundPainter: pointille ? const _BordureTiretee() : null,
+          child: Container(
+            key: ValueKey('ligne-${type.valeurApi}'),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: pointille ? CouleursSopi.champ : CouleursSopi.blanc,
+              borderRadius: BorderRadius.circular(24),
+              border: erreur != null
+                  ? Border.all(color: CouleursSopi.erreurTexte, width: 1.5)
+                  : null,
+              boxShadow: pointille ? null : OmbresSopi.carte,
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: CouleursSopi.bleuPastel,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Icon(switch (type) {
-                  TypeJustificatif.cni => Icons.badge_outlined,
-                  TypeJustificatif.diplome => Icons.school_outlined,
-                  TypeJustificatif.attestation => Icons.storefront_outlined,
-                }, color: CouleursSopi.bleu),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      type.libelle,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: CouleursSopi.texte,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      sousTitre,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: 12,
-                        fontWeight: ajoute ? FontWeight.w600 : FontWeight.w400,
-                        color: ajoute
-                            ? CouleursSopi.bleu
-                            : CouleursSopi.texteSecondaire,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 36,
-                child: OutlinedButton(
-                  onPressed: desactive ? null : onTap,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    side: const BorderSide(color: CouleursSopi.bordureForte),
-                    shape: const StadiumBorder(),
-                    foregroundColor: CouleursSopi.texte,
-                    textStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: pointille
+                        ? CouleursSopi.blanc
+                        : CouleursSopi.bleuPastel,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Text(ajoute ? 'Changer' : 'Ajouter'),
+                  child: Icon(switch (type) {
+                    TypeJustificatif.cni => Icons.badge_outlined,
+                    TypeJustificatif.diplome => Icons.school_outlined,
+                    TypeJustificatif.attestation => Icons.storefront_outlined,
+                  }, color: CouleursSopi.bleu),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        type.libelle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: CouleursSopi.texte,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        sousTitre,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontSize: 12,
+                          fontWeight: ajoute
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          color: ajoute
+                              ? CouleursSopi.bleu
+                              : CouleursSopi.texteSecondaire,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 36,
+                  child: TextButton(
+                    onPressed: desactive ? null : onTap,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      backgroundColor: CouleursSopi.fondSecondaire,
+                      shape: const StadiumBorder(),
+                      foregroundColor: CouleursSopi.texte,
+                      textStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    child: Text(ajoute ? 'Changer' : 'Ajouter'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         if (erreur != null)
@@ -378,4 +380,32 @@ class _ChoixSource extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Bordure en tirets de 2 px (#8a90a2), rayon 24 : le justificatif facultatif encore vide.
+class _BordureTiretee extends CustomPainter {
+  const _BordureTiretee();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final trace = Paint()
+      ..color = const Color(0xFF8A90A2)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    final chemin = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(24),
+        ).deflate(1),
+      );
+    for (final mesure in chemin.computeMetrics()) {
+      for (var d = 0.0; d < mesure.length; d += 8) {
+        canvas.drawPath(mesure.extractPath(d, d + 4), trace);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter ancien) => false;
 }

@@ -7,9 +7,8 @@ import '../../core/config/support.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
-import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/session.dart';
 import '../auth/widgets/mise_en_page_acces.dart';
 import '../reservation/depot_reservation.dart';
@@ -164,6 +163,7 @@ class _DossierRefuse extends ConsumerWidget {
     final aSupport = ref.watch(supportEmailProvider).isNotEmpty;
     return _EcranDossier(
       icone: Icons.close_rounded,
+      erreurIcone: true,
       titre1: 'Dossier',
       titre2: 'non retenu',
       texte: "Votre demande d'inscription n'a pas été acceptée.",
@@ -197,17 +197,11 @@ class _BoutonRetour extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => BoutonCompact(
-    libelle: 'Retour à la connexion',
-    ton: TonBoutonCompact.contour,
-    hauteur: 50,
-    taille: 14,
-    pleineLargeur: true,
-    onPressed: onPressed,
-  );
+  Widget build(BuildContext context) =>
+      BoutonSecondaire(libelle: 'Retour à la connexion', onPressed: onPressed);
 }
 
-/// Mise en page commune : grand dégradé, pastille marine, titre centré, texte, contenu, boutons en bas.
+/// Mise en page commune : pastille d'icône, titre centré, texte, contenu, boutons en bas.
 class _EcranDossier extends StatelessWidget {
   const _EcranDossier({
     required this.icone,
@@ -217,6 +211,7 @@ class _EcranDossier extends StatelessWidget {
     required this.boutons,
     this.motif,
     this.carte,
+    this.erreurIcone = false,
   });
 
   final IconData icone;
@@ -225,42 +220,39 @@ class _EcranDossier extends StatelessWidget {
   final String texte;
   final String? motif;
   final Widget? carte;
+  final bool erreurIcone;
   final List<Widget> boutons;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context) - hautMaquette;
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 380,
-            child: ClipRRect(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(DimensionsSopi.rayonEnteteRestreint),
-              ),
-              child: FondDegrade(child: SizedBox.expand()),
-            ),
-          ),
           Column(
             children: [
               Expanded(
                 child: ListView(
-                  padding: EdgeInsets.only(top: haut + 56, bottom: 16),
+                  padding: EdgeInsets.only(top: haut + 80, bottom: 16),
                   children: [
                     Center(
                       child: Container(
                         width: 104,
                         height: 104,
-                        decoration: const BoxDecoration(
-                          color: CouleursSopi.texte,
+                        decoration: BoxDecoration(
+                          color: erreurIcone
+                              ? CouleursSopi.erreurPale
+                              : CouleursSopi.bleuPale,
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(icone, size: 46, color: CouleursSopi.blanc),
+                        child: Icon(
+                          icone,
+                          size: erreurIcone ? 44 : 46,
+                          color: erreurIcone
+                              ? CouleursSopi.erreurIcone
+                              : CouleursSopi.bleu,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -284,10 +276,10 @@ class _EcranDossier extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 76),
                     if (motif != null)
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                         child: Container(
                           key: const ValueKey('motif-refus'),
                           padding: const EdgeInsets.all(18),
@@ -395,7 +387,7 @@ class _CarteDetails extends StatelessWidget {
       if (avecDetails && date != null)
         ligne('Déposé le', formaterDateCourte(date)),
       if (avecDetails && dossier.justificatifs.isNotEmpty)
-        const Divider(height: 1, color: CouleursSopi.bordure),
+        const Divider(height: 1, color: CouleursSopi.separateur),
       for (final j in dossier.justificatifs)
         Row(
           key: ValueKey('document-${j.type?.valeurApi ?? 'autre'}'),
@@ -420,7 +412,7 @@ class _CarteDetails extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -448,7 +440,7 @@ class _PastilleStatut extends StatelessWidget {
         CouleursSopi.ardoiseTexte,
       ),
       StatutJustificatif.valide => (CouleursSopi.bleuPastel, CouleursSopi.bleu),
-      StatutJustificatif.rejete => (CouleursSopi.texte, CouleursSopi.blanc),
+      StatutJustificatif.rejete => (CouleursSopi.bleu, CouleursSopi.blanc),
     };
     return Container(
       height: 26,

@@ -101,7 +101,7 @@ Finder _ligne(TypeJustificatif t) =>
     find.byKey(ValueKey('ligne-${t.valeurApi}'));
 
 Finder _boutonLigne(TypeJustificatif t) =>
-    find.descendant(of: _ligne(t), matching: find.byType(OutlinedButton));
+    find.descendant(of: _ligne(t), matching: find.byType(TextButton));
 
 Finder _envoyer() => find.widgetWithText(FilledButton, 'Envoyer mon dossier');
 

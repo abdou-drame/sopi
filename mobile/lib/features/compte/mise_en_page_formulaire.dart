@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 
-/// Mise en page commune des formulaires du profil : dégradé, retour, titre en deux lignes, carte blanche
+/// Mise en page commune des formulaires du profil : retour, titre en deux lignes, carte blanche
 /// et bouton « Enregistrer » épinglé en bas (maquettes ModifierProfil et ChangerMotDePasse).
 class MiseEnPageFormulaire extends StatelessWidget {
   const MiseEnPageFormulaire({
@@ -34,24 +35,10 @@ class MiseEnPageFormulaire extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bas = MediaQuery.viewInsetsOf(context).bottom;
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 230,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEntete),
-                ),
-                child: FondDegrade(child: SizedBox.expand()),
-              ),
-            ),
-          ),
           Column(
             children: [
               Expanded(
@@ -60,7 +47,7 @@ class MiseEnPageFormulaire extends StatelessWidget {
                       ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: EdgeInsets.fromLTRB(
                     DimensionsSopi.margeCarte,
-                    haut + 24,
+                    haut,
                     DimensionsSopi.margeCarte,
                     DimensionsSopi.espace,
                   ),
@@ -100,13 +87,13 @@ class MiseEnPageFormulaire extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 50),
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: CouleursSopi.blanc,
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
+                        boxShadow: OmbresSopi.carte,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,

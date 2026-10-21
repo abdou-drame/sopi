@@ -162,7 +162,7 @@ class _MotDePasseOubliePageState extends ConsumerState<MotDePasseOubliePage> {
           titre2: 'oublié ?',
           sousTitre:
               "Saisissez l'adresse e-mail de votre compte. Nous vous envoyons un lien valable 60 minutes.",
-          basEntete: 66,
+          basEntete: 50,
         ),
         corps: [
           ApparitionAcces(
@@ -183,17 +183,6 @@ class _MotDePasseOubliePageState extends ConsumerState<MotDePasseOubliePage> {
                   },
                   onSubmitted: (_) => _envoyer(),
                 ),
-                if (_confirmation != null) ...[
-                  BandeauInfo.confirmation(message: _confirmation!),
-                  Text(
-                    messageLienOuvreNavigateur,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 13,
-                      height: 18 / 13,
-                      color: CouleursSopi.texteSecondaire,
-                    ),
-                  ),
-                ],
                 if (_attente != null && _attenteServeur)
                   CompteARebours(
                     key: ValueKey('bandeau$_numeroAttente'),
@@ -217,6 +206,25 @@ class _MotDePasseOubliePageState extends ConsumerState<MotDePasseOubliePage> {
               ],
             ),
           ),
+          if (_confirmation != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  BandeauInfo.confirmation(message: _confirmation!),
+                  const SizedBox(height: 14),
+                  Text(
+                    messageLienOuvreNavigateur,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      height: 18 / 13,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
         pied: ApparitionAcces(
           rang: 1,

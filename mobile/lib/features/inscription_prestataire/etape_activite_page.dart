@@ -245,19 +245,17 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
           libelle('Quartier'),
           InkWell(
             key: const ValueKey('champ-quartier'),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             onTap: () => _choisirQuartier(quartiers.requireValue),
             child: Container(
               height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 color: CouleursSopi.champ,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _erreurs['quartier'] != null && !d.quartierAutre
-                      ? CouleursSopi.erreurTexte
-                      : CouleursSopi.bordureForte,
-                ),
+                borderRadius: BorderRadius.circular(18),
+                border: _erreurs['quartier'] != null && !d.quartierAutre
+                    ? Border.all(color: CouleursSopi.erreurTexte, width: 1.5)
+                    : null,
               ),
               child: Row(
                 children: [
@@ -365,11 +363,8 @@ class _PuceMetier extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selectionnee ? CouleursSopi.texte : CouleursSopi.blanc,
+            color: selectionnee ? CouleursSopi.bleu : CouleursSopi.bordure,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selectionnee ? CouleursSopi.texte : CouleursSopi.bordure,
-            ),
           ),
           child: Text(
             libelle,

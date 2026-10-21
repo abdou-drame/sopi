@@ -31,7 +31,7 @@ abstract final class DimensionsSopi {
   static const rayonEntete = 0.0;
   static const rayonEnteteConnexion = 0.0;
   static const rayonEnteteRestreint = 0.0;
-  static const rayonCarteFormulaire = 26.0;
+  static const rayonCarteFormulaire = 30.0;
   static const largeurRetour = 44.0;
   static const hauteurRetour = 44.0;
 

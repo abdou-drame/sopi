@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/widgets/mise_en_page_acces.dart';
 
 /// Mise en page des trois étapes de l'inscription prestataire (maquettes PrestaInscription1, PrestaCompte et
-/// PrestaInscription2) : dégradé, retour, « Étape X sur 3 », trois segments de progression, titre en deux
+/// PrestaInscription2) : retour, « Étape X sur 3 », trois segments de progression, titre en deux
 /// lignes, contenu, bouton épinglé en bas.
 class MiseEnPageEtape extends StatelessWidget {
   const MiseEnPageEtape({
@@ -39,31 +40,17 @@ class MiseEnPageEtape extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final bas = MediaQuery.viewInsetsOf(context).bottom;
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
     return Scaffold(
       body: Stack(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 230,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEntete),
-                ),
-                child: FondDegrade(child: SizedBox.expand()),
-              ),
-            ),
-          ),
           Column(
             children: [
               Expanded(
                 child: ListView(
                   keyboardDismissBehavior:
                       ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.only(top: haut + 24, bottom: 16),
+                  padding: EdgeInsets.only(top: haut, bottom: 16),
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -96,7 +83,7 @@ class MiseEnPageEtape extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: i <= etape
                                       ? CouleursSopi.bleu
-                                      : CouleursSopi.enteteTacheIndigo,
+                                      : CouleursSopi.segmentInactif,
                                   borderRadius: BorderRadius.circular(3),
                                 ),
                               ),
@@ -170,7 +157,7 @@ class CarteEtape extends StatelessWidget {
           borderRadius: BorderRadius.circular(
             DimensionsSopi.rayonCarteFormulaire,
           ),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
