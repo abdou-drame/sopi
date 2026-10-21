@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { L } from '../i18n/libelles'
 
 /* Bannières des maquettes AlertesTableau.html et BannieresDossier.html. */
 
@@ -35,7 +36,18 @@ const GRAVITES = {
 } as const
 
 /** Bannière d'alerte : carte blanche, trait de 6 px à gauche, pastille d'icône, texte et lien d'action facultatif. */
-export function BanniereAlerteMq({ gravite, children, action }: { gravite: keyof typeof GRAVITES; children: ReactNode; action?: { libelle: string; vers: string } }) {
+export function BanniereAlerteMq({
+  gravite,
+  children,
+  action,
+  onFermer,
+}: {
+  gravite: keyof typeof GRAVITES
+  children: ReactNode
+  action?: { libelle: string; vers: string }
+  /** Si fourni, une croix retire la bannière de l'affichage. */
+  onFermer?: () => void
+}) {
   const g = GRAVITES[gravite]
   return (
     <div role="alert" className={`flex flex-wrap items-center gap-3.5 rounded-3xl border-l-[6px] bg-white px-[18px] py-3.5 ${g.trait}`}>
@@ -47,6 +59,18 @@ export function BanniereAlerteMq({ gravite, children, action }: { gravite: keyof
         <Link to={action.vers} className="mq-btn-gris inline-flex h-[34px] items-center rounded-[17px] bg-[#f3f4f7] px-3.5 text-xs font-bold text-[#12172b]">
           {action.libelle}
         </Link>
+      )}
+      {onFermer && (
+        <button
+          type="button"
+          onClick={onFermer}
+          aria-label={L.commun.masquerAlerte}
+          className="mq-rond grid size-[34px] shrink-0 cursor-pointer place-items-center rounded-full border-none bg-transparent text-[#6b7287]"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
       )}
     </div>
   )

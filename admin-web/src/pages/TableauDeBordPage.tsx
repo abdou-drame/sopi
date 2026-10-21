@@ -11,7 +11,6 @@ import { L, dureeMinutes } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
-const LR = L.revenus
 const ABSENT = '—'
 
 /** Couleur du point de statut d'une réservation (statuts du backend). */
@@ -54,12 +53,15 @@ function CarteChiffre({
   valeur,
   note,
   pastille,
+  unite,
 }: {
   degrade?: boolean
   titre: string
   valeur?: number
   note: string
-  pastille: string
+  pastille?: string
+  /** Unité affichée après la valeur (« FCFA » pour un montant, rien pour un effectif). */
+  unite?: string
 }) {
   const clair = degrade ? 'opacity-80' : 'text-[#9aa0b2]'
   return (
@@ -69,10 +71,11 @@ function CarteChiffre({
     >
       <div className="flex items-center justify-between">
         <span className={`text-xs font-semibold ${degrade ? 'opacity-85' : 'text-[#8a90a2]'}`}>{titre}</span>
-        <span className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${degrade ? 'bg-white/20' : 'bg-[#f3f4f7] text-[#9aa0b2]'}`}>{pastille}</span>
+        {pastille && <span className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${degrade ? 'bg-white/20' : 'bg-[#f3f4f7] text-[#9aa0b2]'}`}>{pastille}</span>}
       </div>
       <div className="mt-2 text-[30px] leading-[34px] font-bold tracking-[-0.8px] tabular-nums">
-        {valeur === undefined ? ABSENT : formatNombre(valeur)} <span className={`text-sm font-medium ${clair}`}>FCFA</span>
+        {valeur === undefined ? ABSENT : formatNombre(valeur)}
+        {unite && <span className={`text-sm font-medium ${clair}`}> {unite}</span>}
       </div>
       <div className={`mt-1.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>
     </section>
@@ -309,12 +312,19 @@ const GRAVITE_BANNIERE = { critique: 'danger', attention: 'attention', info: 'in
 /** Bannières d'alerte de l'administrateur : une par alerte réelle de l'API, avec le lien de l'écran concerné. */
 function AlertesTableau() {
   const { data } = useAlertes()
-  const alertes = data?.alertes ?? []
+  // La croix masque la bannière pour cette visite seulement : l'alerte revient au rechargement tant que le problème existe.
+  const [masquees, setMasquees] = useState<string[]>([])
+  const alertes = (data?.alertes ?? []).filter((a) => !masquees.includes(a.type))
   if (alertes.length === 0) return null
   return (
     <div className="flex flex-col gap-2.5" aria-label={T.alertes}>
       {alertes.map((a) => (
-        <BanniereAlerteMq key={a.type} gravite={GRAVITE_BANNIERE[a.gravite]} action={{ libelle: L.commun.voirCourt, vers: lienDeLAlerte(a) }}>
+        <BanniereAlerteMq
+          key={a.type}
+          gravite={GRAVITE_BANNIERE[a.gravite]}
+          action={{ libelle: L.commun.voirCourt, vers: lienDeLAlerte(a) }}
+          onFermer={() => setMasquees((m) => [...m, a.type])}
+        >
           {a.message}
         </BanniereAlerteMq>
       ))}
@@ -332,6 +342,9 @@ export default function TableauDeBordPage() {
     retry: false,
   })
   const t = data?.totaux
+  // Effectifs : le total de la pagination suffit, aucune route supplémentaire.
+  const { data: clients } = useQuery({ queryKey: ['clients-actifs'], queryFn: () => api.utilisateurs({ role: 'client', statut: 'actif' }), retry: false })
+  const { data: artisans } = useQuery({ queryKey: ['prestataires-actifs'], queryFn: () => api.utilisateurs({ role: 'prestataire', statut: 'actif' }), retry: false })
   const periode = `${formatJourCalendaire(debut, true)} – ${formatJourCalendaire(fin)}`
 
   return (
@@ -346,10 +359,9 @@ export default function TableauDeBordPage() {
       <AlertesTableau />
 
       <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
-        <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} pastille={ABSENT} note="30 derniers jours" />
-        <CarteChiffre titre={LR.acomptesEncaisses} valeur={t?.acomptesEncaisses} pastille={ABSENT} note="30 derniers jours" />
-        <CarteChiffre titre="Acomptes remboursés" valeur={t?.remboursements} pastille={ABSENT} note="Refus, annulations, litiges" />
-        <CarteChiffre titre="Reversé aux prestataires" valeur={t?.retraitsVerses} pastille={ABSENT} note="Acomptes − remboursés − commissions" />
+        <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} unite="FCFA" pastille={ABSENT} note="30 derniers jours" />
+        <CarteChiffre titre="Utilisateurs" valeur={clients?.meta.total} note="Clients actifs" />
+        <CarteChiffre titre="Artisans" valeur={artisans?.meta.total} note="Prestataires actifs" />
       </div>
 
       <div className="flex flex-wrap items-stretch gap-3.5">

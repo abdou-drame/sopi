@@ -9,7 +9,7 @@ export default function RouteProtegee() {
 
   if (initialisation) {
     return (
-      <div role="status" className="grid min-h-screen place-items-center text-sous-titre">
+      <div role="status" className="grid min-h-[calc(100vh/var(--echelle))] place-items-center text-sous-titre">
         {L.commun.chargement}
       </div>
     )

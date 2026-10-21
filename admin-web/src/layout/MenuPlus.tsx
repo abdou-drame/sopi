@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
 import { L } from '../i18n/libelles'
+import { echelleActuelle } from '../lib/echelle'
 import { ICalendrier, ICloche, IChevronBas, IGraphique, IPaiement, IRetrait } from '../design/icones'
 
 interface Page {
@@ -38,7 +39,9 @@ export default function MenuPlus() {
     if (!ouvert) return
     const placer = () => {
       const r = declencheur.current?.getBoundingClientRect()
-      if (r) setPosition({ haut: r.bottom + 10, gauche: Math.max(8, Math.min(r.left + r.width / 2 - 130, window.innerWidth - 268)) })
+      // getBoundingClientRect donne des pixels d'écran ; la position fixe du menu est exprimée dans l'échelle (zoom) de la page.
+      const e = echelleActuelle()
+      if (r) setPosition({ haut: r.bottom / e + 10, gauche: Math.max(8, Math.min((r.left + r.width / 2) / e - 130, window.innerWidth / e - 268)) })
     }
     placer()
     window.addEventListener('resize', placer)

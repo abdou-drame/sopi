@@ -19,6 +19,7 @@ export const L = {
     annuler: 'Annuler',
     confirmer: 'Confirmer',
     fermer: 'Fermer',
+    masquerAlerte: 'Masquer l’alerte',
     reinitialiser: 'Réinitialiser les filtres',
     aucuneDonnee: 'Aucune donnée à afficher.',
     erreurChargement: 'Impossible de charger ces données.',
