@@ -109,7 +109,7 @@ class _TerminerPrestationPageState
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       height: 17 / 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),

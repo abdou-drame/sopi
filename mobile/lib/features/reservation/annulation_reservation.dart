@@ -27,7 +27,7 @@ Future<bool> ouvrirAnnulation(
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+    barrierColor: CouleursSopi.texte.withValues(alpha: .6),
     builder: (_) => _FeuilleAnnulation(reservation: reservation),
   );
   if (annulee != true) return false;

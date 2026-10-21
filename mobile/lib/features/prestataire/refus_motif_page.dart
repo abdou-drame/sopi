@@ -7,7 +7,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/bandeaux.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import 'actions_demande.dart';
 import 'depot_prestataire.dart';
 
@@ -80,7 +80,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: widget.annulation ? 'Annuler' : 'Refuser',
                   titreLigne2: widget.annulation
                       ? 'la prestation'
@@ -118,7 +118,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                                 formaterDate(demande.debut),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
-                                  color: CouleursSopi.texteDiscret,
+                                  color: CouleursSopi.texteSecondaire,
                                 ),
                               ),
                             ],
@@ -218,7 +218,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                                 '$motifMin caractères minimum',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
-                                  color: CouleursSopi.texteDiscret,
+                                  color: CouleursSopi.texteSecondaire,
                                 ),
                               ),
                             ),
@@ -227,7 +227,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                               key: const ValueKey('compteur-motif'),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
-                                color: CouleursSopi.texteDiscret,
+                                color: CouleursSopi.texteSecondaire,
                               ),
                             ),
                           ],
@@ -257,7 +257,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BoutonMarine(
+                BoutonPrimaire(
                   libelle: widget.annulation
                       ? "Confirmer l'annulation"
                       : 'Confirmer le refus',

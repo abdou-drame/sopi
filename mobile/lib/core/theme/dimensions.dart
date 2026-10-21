@@ -1,17 +1,13 @@
-/// Rayons, hauteurs et espacements communs.
+/// Rayons, hauteurs et espacements communs (valeurs des maquettes).
 abstract final class DimensionsSopi {
   static const rayonBouton = 27.0;
   static const hauteurBouton = 54.0;
   static const rayonChamp = 18.0;
   static const hauteurChamp = 54.0;
-  static const rayonCarte = 24.0;
-  static const rayonEntete = 36.0;
+  static const rayonCarte = 26.0;
   static const rayonBandeau = 18.0;
 
   // Écrans d'accès (maquettes Connexion, Inscription, MotDePasse, Suspendu)
-  static const rayonCarteFormulaire = 30.0;
-  static const rayonEnteteConnexion = 40.0;
-  static const rayonEnteteRestreint = 44.0;
   static const rayonBandeauAlerte = 20.0;
   static const rayonBandeauConfirmation = 24.0;
   static const rayonEncadreMotif = 26.0;
@@ -27,11 +23,18 @@ abstract final class DimensionsSopi {
   static const espace = 16.0;
   static const espacePetit = 8.0;
 
-  // Barre d'onglets flottante
+  // Barre du bas flottante
   static const hauteurBarreOnglets = 68.0;
   static const rayonBarreOnglets = 34.0;
 
-  // Bouton retour
-  static const largeurRetour = 64.0;
+  // Transitoire : anciens en-têtes arrondis, retirés avec leurs écrans (étapes 3 à 5).
+  static const rayonEntete = 0.0;
+  static const rayonEnteteConnexion = 0.0;
+  static const rayonEnteteRestreint = 0.0;
+  static const rayonCarteFormulaire = 26.0;
+  static const largeurRetour = 44.0;
   static const hauteurRetour = 44.0;
+
+  // Bouton rond du haut
+  static const tailleBoutonRond = 44.0;
 }

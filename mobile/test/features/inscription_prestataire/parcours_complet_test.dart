@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/format/formateurs.dart';
 import 'package:sopi/core/routing/chemins.dart';
-import 'package:sopi/core/widgets/en_tete_degrade.dart';
+import 'package:sopi/core/widgets/en_tete_ecran.dart';
 import 'package:sopi/features/inscription_prestataire/formulaire_inscription.dart';
 import 'package:sopi/features/inscription_prestataire/modeles.dart';
 import 'package:sopi/features/inscription_prestataire/selecteur_justificatif.dart';

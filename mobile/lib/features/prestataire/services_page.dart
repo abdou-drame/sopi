@@ -7,7 +7,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../reservation/formats.dart';
 import 'depot_prestataire.dart';
@@ -31,7 +31,7 @@ class ServicesPage extends ConsumerWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Mes services',
                   titreLigne2: 'et tarifs',
                   onRetour: () => _retour(context),
@@ -120,8 +120,8 @@ class _CarteService extends StatelessWidget {
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: actif
-                        ? CouleursSopi.marine
-                        : CouleursSopi.texteDiscret,
+                        ? CouleursSopi.texte
+                        : CouleursSopi.texteSecondaire,
                   ),
                 ),
                 Text(
@@ -129,8 +129,8 @@ class _CarteService extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: actif
-                        ? CouleursSopi.texteDiscret
-                        : CouleursSopi.texteDiscret,
+                        ? CouleursSopi.texteSecondaire
+                        : CouleursSopi.texteSecondaire,
                   ),
                 ),
               ],
@@ -142,7 +142,7 @@ class _CarteService extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: actif ? CouleursSopi.marine : CouleursSopi.texteDiscret,
+              color: actif ? CouleursSopi.texte : CouleursSopi.texteSecondaire,
             ),
           ),
           const SizedBox(width: 12),
@@ -164,7 +164,7 @@ class _CarteService extends StatelessWidget {
                     size: 18,
                     color: actif
                         ? CouleursSopi.bleu
-                        : CouleursSopi.texteDiscret,
+                        : CouleursSopi.texteSecondaire,
                   ),
                 ),
               ),

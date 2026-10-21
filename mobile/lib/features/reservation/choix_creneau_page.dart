@@ -8,7 +8,7 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/decompte.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'fiche_prestataire_page.dart';
@@ -261,7 +261,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
-                  child: EnTeteDegrade(
+                  child: EnTeteEcran(
                     titreLigne1: 'Choisissez un',
                     titreLigne2: 'créneau',
                     tailleTitre: 28,
@@ -338,7 +338,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),
@@ -375,7 +375,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               child: Text(
                 'Aucun créneau libre ce jour-là.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             )
@@ -456,7 +456,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 12,
               height: 17 / 12,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
         ],
@@ -479,7 +479,7 @@ class _TuileJour extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final couleur = choisi ? CouleursSopi.blanc : CouleursSopi.marine;
+    final couleur = choisi ? CouleursSopi.blanc : CouleursSopi.texte;
     return Semantics(
       button: true,
       selected: choisi,
@@ -504,7 +504,7 @@ class _TuileJour extends StatelessWidget {
                   fontSize: 11,
                   color: choisi
                       ? couleur.withValues(alpha: 0.85)
-                      : CouleursSopi.texteDiscret,
+                      : CouleursSopi.texteSecondaire,
                 ),
               ),
               const SizedBox(height: 4),
@@ -547,10 +547,10 @@ class _BoutonHeure extends StatelessWidget {
           height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: choisi ? CouleursSopi.marine : CouleursSopi.blanc,
+            color: choisi ? CouleursSopi.texte : CouleursSopi.blanc,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: choisi ? CouleursSopi.marine : CouleursSopi.bordure,
+              color: choisi ? CouleursSopi.texte : CouleursSopi.bordure,
             ),
           ),
           child: Text(
@@ -558,7 +558,7 @@ class _BoutonHeure extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: choisi ? FontWeight.w700 : FontWeight.w600,
-              color: choisi ? CouleursSopi.blanc : CouleursSopi.marine,
+              color: choisi ? CouleursSopi.blanc : CouleursSopi.texte,
             ),
           ),
         ),

@@ -21,7 +21,10 @@ class PastilleStatut extends StatelessWidget {
       TonStatut.info => (CouleursSopi.bleuPastel, CouleursSopi.bleu),
       TonStatut.succes => (CouleursSopi.succesFond, CouleursSopi.succesTexte),
       TonStatut.erreur => (CouleursSopi.erreurFond, CouleursSopi.erreurTexte),
-      TonStatut.neutre => (CouleursSopi.bordure, CouleursSopi.texteSecondaire),
+      TonStatut.neutre => (
+        CouleursSopi.fondSecondaire,
+        CouleursSopi.texteSecondaire,
+      ),
       TonStatut.indigo => (CouleursSopi.indigoPastel, CouleursSopi.indigoTexte),
       TonStatut.ardoise => (
         CouleursSopi.ardoisePastel,

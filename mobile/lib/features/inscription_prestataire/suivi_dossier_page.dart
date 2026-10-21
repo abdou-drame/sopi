@@ -9,7 +9,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/session.dart';
 import '../auth/widgets/mise_en_page_acces.dart';
 import '../reservation/depot_reservation.dart';
@@ -257,7 +257,7 @@ class _EcranDossier extends StatelessWidget {
                         width: 104,
                         height: 104,
                         decoration: const BoxDecoration(
-                          color: CouleursSopi.marine,
+                          color: CouleursSopi.texte,
                           shape: BoxShape.circle,
                         ),
                         child: Icon(icone, size: 46, color: CouleursSopi.blanc),
@@ -370,7 +370,7 @@ class _CarteDetails extends StatelessWidget {
           libelle,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
         const SizedBox(width: 12),
@@ -381,7 +381,7 @@ class _CarteDetails extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: CouleursSopi.marine,
+              color: CouleursSopi.texte,
             ),
           ),
         ),
@@ -406,7 +406,7 @@ class _CarteDetails extends StatelessWidget {
                 j.type?.libelle ?? 'Document',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 14,
-                  color: CouleursSopi.marine,
+                  color: CouleursSopi.texte,
                 ),
               ),
             ),
@@ -448,7 +448,7 @@ class _PastilleStatut extends StatelessWidget {
         CouleursSopi.ardoiseTexte,
       ),
       StatutJustificatif.valide => (CouleursSopi.bleuPastel, CouleursSopi.bleu),
-      StatutJustificatif.rejete => (CouleursSopi.marine, CouleursSopi.blanc),
+      StatutJustificatif.rejete => (CouleursSopi.texte, CouleursSopi.blanc),
     };
     return Container(
       height: 26,

@@ -8,7 +8,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/sopi_logo.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import 'widgets/mise_en_page_acces.dart';
 
 /// Orange des illustrations (épingle, pastille de validation).
@@ -149,7 +149,7 @@ class _EnteteOrientation extends StatelessWidget {
                       fontSize: 36,
                       letterSpacing: -0.6,
                       height: 42 / 36,
-                      color: CouleursSopi.marine,
+                      color: CouleursSopi.texte,
                     ),
                   ),
                 ),
@@ -239,8 +239,8 @@ class _CarteChoix extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fond = sombre ? CouleursSopi.marine : CouleursSopi.blanc;
-    final couleurTitre = sombre ? CouleursSopi.blanc : CouleursSopi.marine;
+    final fond = sombre ? CouleursSopi.texte : CouleursSopi.blanc;
+    final couleurTitre = sombre ? CouleursSopi.blanc : CouleursSopi.texte;
     final couleurTexte = sombre
         ? const Color(0xFFC9D6F5)
         : CouleursSopi.texteSecondaire;
@@ -256,9 +256,7 @@ class _CarteChoix extends StatelessWidget {
           border: sombre ? null : Border.all(color: CouleursSopi.bordure),
           boxShadow: [
             BoxShadow(
-              color: CouleursSopi.marine.withValues(
-                alpha: sombre ? 0.30 : 0.10,
-              ),
+              color: CouleursSopi.texte.withValues(alpha: sombre ? 0.30 : 0.10),
               blurRadius: 36,
               offset: const Offset(0, 18),
             ),
@@ -329,7 +327,7 @@ class _CarteChoix extends StatelessWidget {
                             Icons.arrow_forward_rounded,
                             size: 18,
                             color: sombre
-                                ? CouleursSopi.marine
+                                ? CouleursSopi.texte
                                 : CouleursSopi.blanc,
                           ),
                         ),
@@ -457,7 +455,7 @@ class _CalendrierEpingle extends _Peinture {
         ..close(),
       Paint()..color = CouleursSopi.bleu,
     );
-    final anneau = Paint()..color = CouleursSopi.marine;
+    final anneau = Paint()..color = CouleursSopi.texte;
     for (final x in const [44.0, 90.0]) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(

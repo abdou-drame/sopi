@@ -10,7 +10,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import '../reservation/depot_reservation.dart';
@@ -248,7 +248,7 @@ class _PuceJour extends StatelessWidget {
                     fontSize: 11,
                     color: actif
                         ? CouleursSopi.blanc.withValues(alpha: 0.85)
-                        : CouleursSopi.texteDiscret,
+                        : CouleursSopi.texteSecondaire,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -257,7 +257,7 @@ class _PuceJour extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: actif ? CouleursSopi.blanc : CouleursSopi.marine,
+                    color: actif ? CouleursSopi.blanc : CouleursSopi.texte,
                   ),
                 ),
               ],
@@ -328,7 +328,7 @@ class _CorpsJour extends StatelessWidget {
               '${_titreJour(jour)} · $nombre',
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 13,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),
@@ -434,7 +434,7 @@ class _LigneRendezVous extends StatelessWidget {
                         formaterDuree(d.dureeMinutes),
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 11,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                     ],
@@ -468,7 +468,7 @@ class _LigneRendezVous extends StatelessWidget {
                         '${d.prestationNom} · ${formaterArgent(d.prix)}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                       const SizedBox(height: 6),

@@ -10,7 +10,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'formats.dart';
@@ -197,7 +197,7 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
                           : '${etat.total} prestataires disponibles',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 13,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     ),
                   ),
@@ -298,7 +298,7 @@ class _Entete extends StatelessWidget {
                             height: 44,
                             child: Icon(
                               Icons.filter_list_rounded,
-                              color: CouleursSopi.marine,
+                              color: CouleursSopi.texte,
                             ),
                           ),
                         ),
@@ -321,7 +321,7 @@ class _Entete extends StatelessWidget {
                       const Icon(
                         Icons.search_rounded,
                         size: 20,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -336,7 +336,7 @@ class _Entete extends StatelessWidget {
                             hintText: 'Rechercher un salon, un service…',
                             hintStyle: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 14,
-                              color: CouleursSopi.texteDiscret,
+                              color: CouleursSopi.texteSecondaire,
                             ),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
@@ -422,7 +422,7 @@ class _Pilule extends StatelessWidget {
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontSize: 13,
                 fontWeight: active ? FontWeight.w700 : FontWeight.w600,
-                color: active ? CouleursSopi.blanc : CouleursSopi.marine,
+                color: active ? CouleursSopi.blanc : CouleursSopi.texte,
               ),
             ),
           ),
@@ -556,7 +556,7 @@ class _CartePrestataire extends StatelessWidget {
                             const Icon(
                               Icons.location_on_outlined,
                               size: 14,
-                              color: CouleursSopi.texteDiscret,
+                              color: CouleursSopi.texteSecondaire,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -566,7 +566,7 @@ class _CartePrestataire extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
-                                  color: CouleursSopi.texteDiscret,
+                                  color: CouleursSopi.texteSecondaire,
                                 ),
                               ),
                             ),
@@ -594,7 +594,7 @@ class _CartePrestataire extends StatelessWidget {
                                   text: formaterArgent(prestataire.prixMin!),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w700,
-                                    color: CouleursSopi.marine,
+                                    color: CouleursSopi.texte,
                                   ),
                                 ),
                               ],

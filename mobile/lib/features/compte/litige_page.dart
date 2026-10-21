@@ -9,7 +9,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../reservation/depot_reservation.dart';
 import '../reservation/modeles.dart';
@@ -64,7 +64,7 @@ class _EtatLitige extends ConsumerState<LitigePage> {
       context: context,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+      barrierColor: CouleursSopi.texte.withValues(alpha: .6),
       builder: (_) => const ChoixSourcePhoto(),
     );
     if (source == null || !mounted) return;
@@ -300,7 +300,7 @@ class _EtatLitige extends ConsumerState<LitigePage> {
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                     ],
@@ -377,7 +377,7 @@ class _CarteLitige extends StatelessWidget {
             'Réservation : ${reservation.prestataireNom} · ${reservation.prestationNom} · $date',
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 13,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
           const SizedBox(height: 14),
@@ -418,7 +418,7 @@ class _CarteLitige extends StatelessWidget {
             onChanged: (_) => onDescription(),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
-              color: CouleursSopi.marine,
+              color: CouleursSopi.texte,
             ),
             decoration: InputDecoration(
               filled: true,
@@ -434,7 +434,7 @@ class _CarteLitige extends StatelessWidget {
               ),
               errorText: erreurDescription,
               counterStyle: theme.textTheme.bodySmall?.copyWith(
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),
@@ -486,7 +486,7 @@ class _Pastille extends StatelessWidget {
     button: true,
     selected: choisie,
     child: Material(
-      color: choisie ? CouleursSopi.marine : CouleursSopi.blanc,
+      color: choisie ? CouleursSopi.texte : CouleursSopi.blanc,
       shape: StadiumBorder(
         side: choisie
             ? BorderSide.none
@@ -504,7 +504,7 @@ class _Pastille extends StatelessWidget {
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: choisie ? CouleursSopi.blanc : CouleursSopi.marine,
+              color: choisie ? CouleursSopi.blanc : CouleursSopi.texte,
             ),
           ),
         ),
@@ -590,7 +590,7 @@ class _Vignette extends StatelessWidget {
                 color: CouleursSopi.champ,
                 child: const Icon(
                   Icons.image_outlined,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             ),
@@ -609,7 +609,7 @@ class _Vignette extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: CouleursSopi.marine,
+                  color: CouleursSopi.texte,
                   shape: BoxShape.circle,
                   border: Border.all(color: CouleursSopi.blanc, width: 2),
                 ),
@@ -719,7 +719,7 @@ class _Confirmation extends StatelessWidget {
                     width: 104,
                     height: 104,
                     decoration: const BoxDecoration(
-                      color: CouleursSopi.marine,
+                      color: CouleursSopi.texte,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(

@@ -6,7 +6,7 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../reservation/formats.dart';
 import 'depot_prestataire.dart';
@@ -77,7 +77,7 @@ class DisponibilitesPage extends ConsumerWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Mes',
                   titreLigne2: 'disponibilités',
                   onRetour: () => _retour(context),
@@ -233,7 +233,7 @@ class _PuceCreneau extends StatelessWidget {
         heure,
       ),
       StatutCreneau.reserve => (
-        CouleursSopi.marine,
+        CouleursSopi.texte,
         CouleursSopi.blanc,
         FontWeight.w700,
         '$heure · réservé',
@@ -246,7 +246,7 @@ class _PuceCreneau extends StatelessWidget {
       ),
       StatutCreneau.indisponible => (
         CouleursSopi.ardoisePastel,
-        CouleursSopi.texteDiscret,
+        CouleursSopi.texteSecondaire,
         FontWeight.w600,
         heure,
       ),

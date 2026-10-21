@@ -35,7 +35,7 @@ class InterrupteurSopi extends StatelessWidget {
           padding: const EdgeInsets.all(3),
           alignment: valeur ? Alignment.centerRight : Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: valeur ? CouleursSopi.bleu : CouleursSopi.bordureForte,
+            color: valeur ? CouleursSopi.bleu : CouleursSopi.fondSecondaire,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Container(

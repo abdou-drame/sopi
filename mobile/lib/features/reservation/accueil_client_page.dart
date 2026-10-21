@@ -9,7 +9,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'formats.dart';
@@ -332,7 +332,7 @@ class _PilulePleine extends StatelessWidget {
       button: true,
       label: libelle,
       child: Material(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(22),
         child: InkWell(
           borderRadius: BorderRadius.circular(22),
@@ -380,7 +380,7 @@ class _RondBlanc extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Icon(icone, size: 20, color: CouleursSopi.marine),
+                Icon(icone, size: 20, color: CouleursSopi.texte),
                 if (pastille)
                   Positioned(
                     top: 11,

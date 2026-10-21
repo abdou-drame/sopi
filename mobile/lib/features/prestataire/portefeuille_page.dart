@@ -306,7 +306,7 @@ class LigneMouvement extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ],
@@ -318,7 +318,7 @@ class LigneMouvement extends StatelessWidget {
               style: theme.textTheme.titleSmall?.copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
-                color: augmente ? CouleursSopi.bleu : CouleursSopi.marine,
+                color: augmente ? CouleursSopi.bleu : CouleursSopi.texte,
               ),
             ),
           ],

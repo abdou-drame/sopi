@@ -7,7 +7,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import 'modeles.dart';
 
 /// Écran « Demande envoyée » (maquette DemandeEnvoyee) : récapitulatif de la demande qui vient d'être créée.
@@ -63,7 +63,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                                 width: 104,
                                 height: 104,
                                 decoration: const BoxDecoration(
-                                  color: CouleursSopi.marine,
+                                  color: CouleursSopi.texte,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -198,7 +198,7 @@ class _Ligne extends StatelessWidget {
           etiquette,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
         const SizedBox(width: 12),

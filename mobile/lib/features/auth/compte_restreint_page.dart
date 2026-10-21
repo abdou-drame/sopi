@@ -7,7 +7,7 @@ import '../../core/config/support.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
 
@@ -102,7 +102,7 @@ class CompteRestreintPage extends ConsumerWidget {
                           width: 104,
                           height: 104,
                           decoration: const BoxDecoration(
-                            color: CouleursSopi.marine,
+                            color: CouleursSopi.texte,
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(

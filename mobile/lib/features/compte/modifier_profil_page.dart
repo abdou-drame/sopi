@@ -157,7 +157,7 @@ class _EtatModifierProfil extends ConsumerState<ModifierProfilPage> {
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 12,
             height: 17 / 12,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
       ],

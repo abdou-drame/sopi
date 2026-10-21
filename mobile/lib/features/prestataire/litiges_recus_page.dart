@@ -7,8 +7,9 @@ import '../../core/api/erreurs.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/widgets/onglets_segmentes.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_prestataire.dart';
 import 'modeles_litiges.dart';
@@ -91,15 +92,19 @@ class _LitigesRecusPageState extends ConsumerState<LitigesRecusPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: EnTeteDegrade(
+              child: EnTeteEcran(
                 titreLigne1: 'Signalements',
                 titreLigne2: 'reçus',
                 onRetour: () => context.canPop()
                     ? context.pop()
                     : context.go(Chemins.profilPrestataire),
-                enfant: _OngletsLitiges(
+                enfant: OngletsSegmentes<OngletLitiges>(
+                  valeurs: OngletLitiges.values,
+                  libelle: (o) => o.libelle,
                   actif: _onglet,
                   onChange: (o) => setState(() => _onglet = o),
+                  tailleTexte: 12,
+                  cle: (o) => ValueKey('onglet-${o.name}'),
                 ),
               ),
             ),
@@ -111,66 +116,6 @@ class _LitigesRecusPageState extends ConsumerState<LitigesRecusPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Sélecteur À traiter / En examen / Clos : pilule marine de 48 px, onglet actif en bleu (sans pastille de nombre).
-class _OngletsLitiges extends StatelessWidget {
-  const _OngletsLitiges({required this.actif, required this.onChange});
-
-  final OngletLitiges actif;
-  final ValueChanged<OngletLitiges> onChange;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          for (final o in OngletLitiges.values) ...[
-            if (o != OngletLitiges.aTraiter) const SizedBox(width: 4),
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: o == actif,
-                label: o.libelle,
-                excludeSemantics: true,
-                child: Material(
-                  color: o == actif ? CouleursSopi.bleu : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    key: ValueKey('onglet-${o.name}'),
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => onChange(o),
-                    child: Center(
-                      child: Text(
-                        o.libelle,
-                        maxLines: 1,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 12,
-                          fontWeight: o == actif
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: o == actif
-                              ? CouleursSopi.blanc
-                              : CouleursSopi.texteSurMarine,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -267,7 +212,7 @@ class _CarteLitige extends StatelessWidget {
                 '${litige.motif} · $jour',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
               if (litige.onglet == OngletLitiges.aTraiter) ...[
@@ -308,7 +253,7 @@ class _NoteReponseRapide extends StatelessWidget {
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
           fontSize: 12,
           height: 17 / 12,
-          color: CouleursSopi.texteDiscret,
+          color: CouleursSopi.texteSecondaire,
         ),
       ),
     );

@@ -6,7 +6,7 @@ import '../reservation/formats.dart' show formaterNote;
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/session.dart';
 import '../auth/utilisateur.dart';
 import 'depot_prestataire.dart';
@@ -277,7 +277,7 @@ class _Ligne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final couleur = danger ? CouleursSopi.erreurTexte : CouleursSopi.marine;
+    final couleur = danger ? CouleursSopi.erreurTexte : CouleursSopi.texte;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -315,7 +315,7 @@ class _Ligne extends StatelessWidget {
                   complement!,
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 12,
-                    color: CouleursSopi.texteDiscret,
+                    color: CouleursSopi.texteSecondaire,
                   ),
                 ),
               ),
@@ -323,7 +323,7 @@ class _Ligne extends StatelessWidget {
               const Icon(
                 Icons.chevron_right_rounded,
                 size: 18,
-                color: CouleursSopi.desactive,
+                color: CouleursSopi.iconeInactive,
               ),
           ],
         ),

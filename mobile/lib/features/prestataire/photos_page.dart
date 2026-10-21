@@ -7,7 +7,7 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/bandeaux.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../compte/litige_page.dart' show ChoixSourcePhoto;
 import '../compte/modeles_litige.dart' show PhotoChoisie;
@@ -46,7 +46,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
       context: context,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+      barrierColor: CouleursSopi.texte.withValues(alpha: .6),
       builder: (_) => const ChoixSourcePhoto(),
     );
     if (source == null || !mounted) return;
@@ -195,7 +195,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: EnTeteDegrade(
+              child: EnTeteEcran(
                 titreLigne1: 'Photos de',
                 titreLigne2: "l'entreprise",
                 onRetour: _retour,
@@ -268,7 +268,7 @@ class _Vignette extends ConsumerWidget {
                     width: 26,
                     height: 26,
                     decoration: const BoxDecoration(
-                      color: CouleursSopi.marine,
+                      color: CouleursSopi.texte,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -296,7 +296,7 @@ class _ImageIndisponible extends StatelessWidget {
     child: Center(
       child: Icon(
         Icons.broken_image_outlined,
-        color: CouleursSopi.texteDiscret,
+        color: CouleursSopi.texteSecondaire,
       ),
     ),
   );

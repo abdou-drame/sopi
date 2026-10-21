@@ -142,7 +142,7 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
               '8 caractères minimum.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 12,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],

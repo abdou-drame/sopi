@@ -5,7 +5,7 @@ import '../../../core/animation/apparition.dart';
 import '../../../core/routing/chemins.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/theme/dimensions.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 
 /// Retour d'un écran d'accès : dépile si possible, sinon va à la connexion.
 void retourOuConnexion(BuildContext context) {
@@ -118,7 +118,7 @@ class TitreDeuxLignes extends StatelessWidget {
     final base = Theme.of(context).textTheme.headlineMedium!.copyWith(
       fontSize: taille,
       height: interligne / taille,
-      color: CouleursSopi.marine,
+      color: CouleursSopi.texte,
     );
     return Text.rich(
       TextSpan(

@@ -542,7 +542,7 @@ class _CaseCode extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: erreur ? CouleursSopi.erreurTexte : CouleursSopi.marine,
+                color: erreur ? CouleursSopi.erreurTexte : CouleursSopi.texte,
               ),
             )
           : (active && curseurVisible

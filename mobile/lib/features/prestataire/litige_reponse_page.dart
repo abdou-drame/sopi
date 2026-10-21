@@ -9,7 +9,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../compte/modeles_litige.dart' show libelleDecision;
 import 'depot_prestataire.dart';
@@ -131,7 +131,7 @@ class _LitigeReponsePageState extends ConsumerState<LitigeReponsePage> {
                 padding: EdgeInsets.zero,
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  EnTeteDegrade(
+                  EnTeteEcran(
                     titreLigne1: 'Répondre au',
                     titreLigne2: 'signalement',
                     onRetour: _retour,
@@ -164,7 +164,7 @@ class _LitigeReponsePageState extends ConsumerState<LitigeReponsePage> {
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ],
@@ -271,7 +271,7 @@ class _Contenu extends StatelessWidget {
             '${litige.prestationNom} · ${formaterDate(litige.dateRendezVous)}',
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 13,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
           const SizedBox(height: 12),
@@ -284,7 +284,7 @@ class _Contenu extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: CouleursSopi.marine,
+                  color: CouleursSopi.texte,
                   borderRadius: BorderRadius.circular(17),
                 ),
                 child: Text(
@@ -480,6 +480,9 @@ class _PreuveIndisponible extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const ColoredBox(
     color: CouleursSopi.champ,
-    child: Icon(Icons.broken_image_outlined, color: CouleursSopi.texteDiscret),
+    child: Icon(
+      Icons.broken_image_outlined,
+      color: CouleursSopi.texteSecondaire,
+    ),
   );
 }

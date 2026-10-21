@@ -13,7 +13,7 @@ import '../../core/widgets/champ_formulaire.dart';
 import '../../core/widgets/compte_a_rebours.dart';
 import '../../core/widgets/sopi_logo.dart';
 import '../../core/widgets/decompte.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../inscription_prestataire/stockage_jeton_suivi.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
@@ -315,7 +315,7 @@ class _CartePrestataire extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(DimensionsSopi.rayonCarte),
       ),
       child: Row(

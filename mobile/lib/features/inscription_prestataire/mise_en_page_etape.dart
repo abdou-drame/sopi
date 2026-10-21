@@ -4,7 +4,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/widgets/mise_en_page_acces.dart';
 
 /// Mise en page des trois étapes de l'inscription prestataire (maquettes PrestaInscription1, PrestaCompte et

@@ -7,7 +7,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import '../reservation/depot_reservation.dart';
@@ -264,7 +264,7 @@ class _Corps extends ConsumerWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 12,
                   height: 17 / 12,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             ),
@@ -298,7 +298,7 @@ class _CarteMontants extends StatelessWidget {
               libelle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
                 fontWeight: poids == FontWeight.w800
                     ? FontWeight.w700
                     : FontWeight.w500,
@@ -312,7 +312,7 @@ class _CarteMontants extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: poids,
-              color: couleur ?? CouleursSopi.marine,
+              color: couleur ?? CouleursSopi.texte,
             ),
           ),
         ],

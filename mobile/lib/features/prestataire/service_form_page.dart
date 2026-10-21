@@ -8,7 +8,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/interrupteur_sopi.dart';
 import '../../core/widgets/puces_choix.dart';
@@ -202,7 +202,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: edition ? 'Modifier le' : 'Ajouter un',
                   titreLigne2: 'service',
                   onRetour: _retour,
@@ -305,7 +305,7 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             fontSize: 12,
-                                            color: CouleursSopi.texteDiscret,
+                                            color: CouleursSopi.texteSecondaire,
                                           ),
                                     ),
                                   ],

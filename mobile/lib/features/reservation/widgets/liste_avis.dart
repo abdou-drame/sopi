@@ -5,7 +5,7 @@ import '../../../core/animation/chargement.dart';
 import '../../../core/api/erreurs.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/widgets/boutons.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../../../core/widgets/etats.dart';
 import '../depot_reservation.dart';
 import '../fiche_prestataire_page.dart';
@@ -174,7 +174,7 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: EnTeteDegrade(
+              child: EnTeteEcran(
                 titreLigne1: widget.titreLigne1,
                 titreLigne2: widget.titreLigne2,
                 onRetour: widget.onRetour,
@@ -225,7 +225,7 @@ class _SyntheseAvis extends StatelessWidget {
       height: 92,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(26),
       ),
       child: Row(

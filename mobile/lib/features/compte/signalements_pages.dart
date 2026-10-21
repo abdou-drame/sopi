@@ -7,7 +7,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/liste_infinie.dart';
 import '../../core/widgets/pastille_statut.dart';
@@ -84,7 +84,7 @@ class _CarteSignalement extends StatelessWidget {
                 '${litige.prestataireNom} · ${litige.prestationNom} · ${formaterDate(litige.dateRendezVous)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             ],
@@ -141,7 +141,7 @@ class DetailSignalementPage extends ConsumerWidget {
                   '${l.prestataireNom} · ${l.prestationNom} · ${formaterDate(l.dateRendezVous)}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 13,
-                    color: CouleursSopi.texteDiscret,
+                    color: CouleursSopi.texteSecondaire,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -199,7 +199,7 @@ class DetailSignalementPage extends ConsumerWidget {
           padding: EdgeInsets.zero,
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            const EnTeteDegrade(
+            const EnTeteEcran(
               titreLigne1: 'Détail du',
               titreLigne2: 'signalement',
             ),
@@ -287,6 +287,9 @@ class _PreuveIndisponible extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const ColoredBox(
     color: CouleursSopi.champ,
-    child: Icon(Icons.broken_image_outlined, color: CouleursSopi.texteDiscret),
+    child: Icon(
+      Icons.broken_image_outlined,
+      color: CouleursSopi.texteSecondaire,
+    ),
   );
 }

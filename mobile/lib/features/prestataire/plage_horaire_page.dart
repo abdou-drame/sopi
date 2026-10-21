@@ -8,7 +8,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/interrupteur_sopi.dart';
 import '../../core/widgets/puces_choix.dart';
 import '../../core/widgets/saisie_masquee.dart';
@@ -156,7 +156,7 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Ajouter des',
                   titreLigne2: 'créneaux',
                   onRetour: _retour,
@@ -257,7 +257,7 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
                                       style: theme.textTheme.bodySmall
                                           ?.copyWith(
                                             fontSize: 12,
-                                            color: CouleursSopi.texteDiscret,
+                                            color: CouleursSopi.texteSecondaire,
                                           ),
                                     ),
                                   ],
@@ -309,7 +309,7 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       height: 17 / 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),

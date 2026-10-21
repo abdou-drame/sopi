@@ -14,7 +14,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/ligne_montant.dart';
 import 'annulation_reservation.dart';
@@ -275,7 +275,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
             LigneMontant(
               libelle: 'Tarif du service',
               valeur: formaterArgent(r.prix),
-              couleurValeur: CouleursSopi.marine,
+              couleurValeur: CouleursSopi.texte,
             ),
             if (montantAcompte != null) ...[
               LigneMontant(
@@ -287,7 +287,7 @@ class _EtatDetail extends ConsumerState<DetailReservationPage>
                 LigneMontant(
                   libelle: 'Reste à payer sur place',
                   valeur: formaterArgent(r.prix - montantAcompte),
-                  couleurValeur: CouleursSopi.marine,
+                  couleurValeur: CouleursSopi.texte,
                 ),
             ],
           ],
@@ -681,7 +681,7 @@ class _BlocCode extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(26),
       ),
       child: Column(
@@ -755,7 +755,7 @@ class _BlocCode extends StatelessWidget {
                     child: Text(
                       code[i],
                       style: theme.textTheme.titleLarge?.copyWith(
-                        color: CouleursSopi.marine,
+                        color: CouleursSopi.texte,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -880,7 +880,7 @@ class _Etape extends StatelessWidget {
               },
               color: etat == _EtatEtape.aVenir
                   ? CouleursSopi.texteSecondaire
-                  : CouleursSopi.marine,
+                  : CouleursSopi.texte,
             ),
           ),
         ),

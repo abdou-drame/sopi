@@ -43,7 +43,7 @@ class _EtapeJustificatifsPageState
       context: context,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+      barrierColor: CouleursSopi.texte.withValues(alpha: .6),
       builder: (_) => const _ChoixSource(),
     );
     if (source == null || !mounted) return;
@@ -272,7 +272,7 @@ class _LigneJustificatif extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: CouleursSopi.marine,
+                        color: CouleursSopi.texte,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -285,7 +285,7 @@ class _LigneJustificatif extends StatelessWidget {
                         fontWeight: ajoute ? FontWeight.w600 : FontWeight.w400,
                         color: ajoute
                             ? CouleursSopi.bleu
-                            : CouleursSopi.texteDiscret,
+                            : CouleursSopi.texteSecondaire,
                       ),
                     ),
                   ],
@@ -300,7 +300,7 @@ class _LigneJustificatif extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     side: const BorderSide(color: CouleursSopi.bordureForte),
                     shape: const StadiumBorder(),
-                    foregroundColor: CouleursSopi.marine,
+                    foregroundColor: CouleursSopi.texte,
                     textStyle: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

@@ -7,7 +7,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/session.dart';
 import '../auth/utilisateur.dart';
 import '../../core/format/formateurs.dart';
@@ -202,7 +202,7 @@ class ProfilClientPage extends ConsumerWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             ),
@@ -254,7 +254,7 @@ class _Ligne extends StatelessWidget {
             const Icon(
               Icons.chevron_right_rounded,
               size: 20,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ],
         ),

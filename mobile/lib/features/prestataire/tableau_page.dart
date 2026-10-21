@@ -10,7 +10,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../auth/session.dart';
 import '../reservation/depot_reservation.dart';
 import '../reservation/widgets/composants.dart';
@@ -335,7 +335,7 @@ class _CorpsTableau extends ConsumerWidget {
                     'Demandes à traiter',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 11,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                   if (page != null)
@@ -354,7 +354,7 @@ class _CorpsTableau extends ConsumerWidget {
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     )
                   else
@@ -390,7 +390,7 @@ class _CorpsTableau extends ConsumerWidget {
                 'Aucune demande à traiter pour le moment.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             )

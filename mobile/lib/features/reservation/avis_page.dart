@@ -9,7 +9,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'modeles.dart';
@@ -270,7 +270,7 @@ class _EtatAvis extends ConsumerState<AvisPage> {
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                     ],
@@ -297,7 +297,7 @@ class _BoutonFermer extends StatelessWidget {
     button: true,
     label: 'Fermer',
     child: Material(
-      color: CouleursSopi.marine,
+      color: CouleursSopi.texte,
       borderRadius: BorderRadius.circular(DimensionsSopi.hauteurRetour / 2),
       child: InkWell(
         borderRadius: BorderRadius.circular(DimensionsSopi.hauteurRetour / 2),
@@ -369,7 +369,7 @@ class _CarteAvis extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 13,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
           const SizedBox(height: 18),
@@ -407,7 +407,9 @@ class _CarteAvis extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: note == 0 ? CouleursSopi.texteDiscret : CouleursSopi.bleu,
+              color: note == 0
+                  ? CouleursSopi.texteSecondaire
+                  : CouleursSopi.bleu,
             ),
           ),
           if (erreurNote != null) ...[
@@ -441,7 +443,7 @@ class _CarteAvis extends StatelessWidget {
             onChanged: (_) => onCommentaire(),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
-              color: CouleursSopi.marine,
+              color: CouleursSopi.texte,
             ),
             decoration: InputDecoration(
               filled: true,
@@ -457,7 +459,7 @@ class _CarteAvis extends StatelessWidget {
               disabledBorder: bordure,
               errorText: erreurCommentaire,
               counterStyle: theme.textTheme.bodySmall?.copyWith(
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),

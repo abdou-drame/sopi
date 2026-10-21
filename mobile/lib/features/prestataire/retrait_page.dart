@@ -10,7 +10,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/saisie_masquee.dart';
 import 'depot_prestataire.dart';
 import 'modeles_portefeuille.dart';
@@ -133,14 +133,14 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
               text: formaterArgent(limites!.solde),
               style: const TextStyle(
                 fontWeight: FontWeight.w700,
-                color: CouleursSopi.marine,
+                color: CouleursSopi.texte,
               ),
             ),
           ],
         ),
         style: theme.textTheme.bodyMedium?.copyWith(
           fontSize: 13,
-          color: CouleursSopi.texteDiscret,
+          color: CouleursSopi.texteSecondaire,
         ),
       );
     } else if (solde.hasError) {
@@ -167,7 +167,7 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
         'Solde disponible : …',
         style: theme.textTheme.bodyMedium?.copyWith(
           fontSize: 13,
-          color: CouleursSopi.texteDiscret,
+          color: CouleursSopi.texteSecondaire,
         ),
       );
     }
@@ -183,7 +183,7 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Retirer',
                   titreLigne2: 'mon argent',
                   onRetour: _retour,
@@ -224,7 +224,7 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
                               texteLimites,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
-                                color: CouleursSopi.texteDiscret,
+                                color: CouleursSopi.texteSecondaire,
                               ),
                             ),
                           ],
@@ -424,7 +424,7 @@ class _Confirmation extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Retrait',
                   titreLigne2: termine ? 'effectué' : 'en cours',
                   onRetour: onTerminer,
@@ -475,7 +475,7 @@ class _Confirmation extends StatelessWidget {
                             Text(
                               vers,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: CouleursSopi.texteDiscret,
+                                color: CouleursSopi.texteSecondaire,
                               ),
                             ),
                           ],

@@ -5,7 +5,7 @@ import '../../../core/animation/chargement.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/widgets/decompte.dart';
 import '../../../core/widgets/boutons.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../formats.dart';
 import '../modeles.dart';
 

@@ -91,7 +91,7 @@ class ChampSelecteur extends StatelessWidget {
                   valeur,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 15,
-                    color: CouleursSopi.marine,
+                    color: CouleursSopi.texte,
                   ),
                 ),
               ),

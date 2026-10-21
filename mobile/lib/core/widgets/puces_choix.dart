@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/couleurs.dart';
 
 /// Puces à choix unique (maquettes ServiceForm et PlageHoraire) : 38 px, rayon 19, texte 13.
-/// La puce choisie est marine avec un texte blanc 700 ; les autres sont bordées, texte 600.
+/// La puce choisie est bleue avec un texte blanc 700 ; les autres ont le fond #e9ecf3, texte 600, sans bordure.
 class PucesChoix<T> extends StatelessWidget {
   const PucesChoix({
     super.key,
@@ -34,13 +34,9 @@ class PucesChoix<T> extends StatelessWidget {
             excludeSemantics: true,
             child: Material(
               color: valeur == choisie
-                  ? CouleursSopi.marine
-                  : Colors.transparent,
-              shape: StadiumBorder(
-                side: valeur == choisie
-                    ? BorderSide.none
-                    : const BorderSide(color: CouleursSopi.bordureForte),
-              ),
+                  ? CouleursSopi.bleu
+                  : CouleursSopi.fondSecondaire,
+              shape: const StadiumBorder(),
               child: InkWell(
                 customBorder: const StadiumBorder(),
                 onTap: actif ? () => onChoix(valeur) : null,
@@ -57,7 +53,7 @@ class PucesChoix<T> extends StatelessWidget {
                           : FontWeight.w600,
                       color: valeur == choisie
                           ? CouleursSopi.blanc
-                          : CouleursSopi.marine,
+                          : CouleursSopi.texte,
                     ),
                   ),
                 ),

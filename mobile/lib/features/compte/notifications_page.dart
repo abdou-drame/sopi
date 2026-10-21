@@ -177,7 +177,7 @@ class _CarteNotification extends StatelessWidget {
                       dateRelative(n.dateCreation, maintenant),
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 11,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     ),
                   ],

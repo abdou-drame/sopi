@@ -33,7 +33,7 @@ class PilulePleine extends StatelessWidget {
       button: true,
       label: libelle,
       child: Material(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(22),
         child: InkWell(
           borderRadius: BorderRadius.circular(22),
@@ -81,7 +81,7 @@ class RondBlanc extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Icon(icone, size: 20, color: CouleursSopi.marine),
+                Icon(icone, size: 20, color: CouleursSopi.texte),
                 if (pastille)
                   Positioned(
                     top: 11,
@@ -139,7 +139,7 @@ class LignesDemande extends StatelessWidget {
               formaterDate(demande.debut),
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 12,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],
@@ -149,7 +149,7 @@ class LignesDemande extends StatelessWidget {
           '${demande.prestationNom} · ${formaterArgent(demande.prix)}',
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 13,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
       ],

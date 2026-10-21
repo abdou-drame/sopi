@@ -8,7 +8,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/saisie_masquee.dart';
 import '../../core/theme/couleurs.dart';
 import '../reservation/depot_reservation.dart' show horlogeProvider;
@@ -207,7 +207,7 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: 'Déclarer une',
                   titreLigne2: 'indisponibilité',
                   onRetour: _retour,

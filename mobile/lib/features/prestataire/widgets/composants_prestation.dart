@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/animation/chargement.dart';
 import '../../../core/format/formateurs.dart';
 import '../../../core/theme/couleurs.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../modeles.dart';
 
 /// En-tête des écrans Prestation et PrestaTerminer : titre centré, pastille de statut, client, prestation et date.
@@ -137,7 +137,7 @@ class CarteMontantsPrestation extends StatelessWidget {
             libelle,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
         ),
@@ -148,7 +148,7 @@ class CarteMontantsPrestation extends StatelessWidget {
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
             fontWeight: poids,
-            color: couleur ?? CouleursSopi.marine,
+            color: couleur ?? CouleursSopi.texte,
           ),
         ),
       ],

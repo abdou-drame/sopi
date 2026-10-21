@@ -7,8 +7,9 @@ import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/widgets/onglets_segmentes.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import 'annulation_reservation.dart';
@@ -80,13 +81,16 @@ class _MesReservationsPageState extends ConsumerState<MesReservationsPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
-                child: EnTeteDegrade(
+                child: EnTeteEcran(
                   titreLigne1: 'Mes',
                   titreLigne2: 'réservations',
                   avecRetour: false,
-                  enfant: _OngletsGroupes(
+                  enfant: OngletsSegmentes<GroupeReservations>(
+                    valeurs: GroupeReservations.values,
+                    libelle: (g) => g.libelle,
                     actif: _groupe,
                     onChange: (g) => setState(() => _groupe = g),
+                    tailleTexte: 13,
                   ),
                 ),
               ),
@@ -97,64 +101,6 @@ class _MesReservationsPageState extends ConsumerState<MesReservationsPage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// Sélecteur À venir / Terminées / Annulées : pilule marine de 48 px, onglet actif en bleu.
-class _OngletsGroupes extends StatelessWidget {
-  const _OngletsGroupes({required this.actif, required this.onChange});
-
-  final GroupeReservations actif;
-  final ValueChanged<GroupeReservations> onChange;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          for (final g in GroupeReservations.values) ...[
-            if (g != GroupeReservations.aVenir) const SizedBox(width: 4),
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: g == actif,
-                label: g.libelle,
-                excludeSemantics: true,
-                child: Material(
-                  color: g == actif ? CouleursSopi.bleu : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => onChange(g),
-                    child: Center(
-                      child: Text(
-                        g.libelle,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 13,
-                          fontWeight: g == actif
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: g == actif
-                              ? CouleursSopi.blanc
-                              : CouleursSopi.texteSurMarine,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -295,7 +241,7 @@ class CarteReservation extends ConsumerWidget {
                 '${r.prestationNom} · ${formaterDate(r.debut)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
               _PiedCarte(reservation: r),
@@ -322,7 +268,7 @@ class _PiedCarte extends ConsumerWidget {
     );
     final gras = texte?.copyWith(
       fontWeight: FontWeight.w700,
-      color: CouleursSopi.marine,
+      color: CouleursSopi.texte,
     );
 
     Widget ligne(Widget gauche, Widget? action) => Padding(

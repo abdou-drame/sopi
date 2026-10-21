@@ -4,7 +4,7 @@ import '../animation/chargement.dart';
 import '../api/erreurs.dart';
 import '../theme/dimensions.dart';
 import 'boutons.dart';
-import 'en_tete_degrade.dart';
+import 'en_tete_ecran.dart';
 import 'etats.dart';
 
 /// Une page de résultats : les éléments, la page courante et la dernière.
@@ -165,7 +165,7 @@ class _EtatListeInfinie<T> extends State<ListeInfinie<T>> {
   Widget build(BuildContext context) {
     final haut = MediaQuery.paddingOf(context).top;
     final bas = MediaQuery.paddingOf(context).bottom;
-    final enTete = EnTeteDegrade(
+    final enTete = EnTeteEcran(
       titreLigne1: widget.titreLigne1,
       titreLigne2: widget.titreLigne2,
       action: widget.action,

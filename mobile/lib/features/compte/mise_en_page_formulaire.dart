@@ -4,7 +4,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 
 /// Mise en page commune des formulaires du profil : dégradé, retour, titre en deux lignes, carte blanche
 /// et bouton « Enregistrer » épinglé en bas (maquettes ModifierProfil et ChangerMotDePasse).

@@ -32,9 +32,7 @@ class LigneMontant extends StatelessWidget {
               libelle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontWeight: fort ? FontWeight.w800 : FontWeight.w500,
-                color: fort
-                    ? CouleursSopi.marine
-                    : CouleursSopi.texteSecondaire,
+                color: fort ? CouleursSopi.texte : CouleursSopi.texteSecondaire,
               ),
             ),
           ),
@@ -45,7 +43,7 @@ class LigneMontant extends StatelessWidget {
               textAlign: TextAlign.right,
               style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: fort ? FontWeight.w800 : FontWeight.w700,
-                color: couleurValeur ?? CouleursSopi.marine,
+                color: couleurValeur ?? CouleursSopi.texte,
               ),
             ),
           ),

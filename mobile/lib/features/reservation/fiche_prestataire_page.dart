@@ -8,7 +8,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../compte/modeles_notification.dart' show dateRelative;
 import 'depot_reservation.dart';
@@ -107,7 +107,7 @@ class CarteAvis extends StatelessWidget {
               dateRelative(avis.dateCreation!, maintenant!),
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 11,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],
@@ -403,7 +403,7 @@ class _BarreChiffres extends StatelessWidget {
       height: 92,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.texte,
         borderRadius: BorderRadius.circular(26),
       ),
       child: p == null
@@ -579,7 +579,7 @@ class _CorpsFiche extends ConsumerWidget {
                     child: Text(
                       'Aucun avis pour le moment.',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     ),
                   )
@@ -654,7 +654,7 @@ class _CarteService extends StatelessWidget {
                         'Durée : ${formaterDuree(prestation.dureeMinutes)}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                     ],

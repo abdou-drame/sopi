@@ -14,7 +14,7 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'modeles.dart';
@@ -248,7 +248,7 @@ class _LigneRecap extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
-              color: couleur ?? CouleursSopi.marine,
+              color: couleur ?? CouleursSopi.texte,
             ),
           ),
         ),
@@ -540,7 +540,7 @@ class _Contenu extends ConsumerWidget {
                 child: Text(
                   'Annulation possible avant le rendez-vous, mais l\'acompte n\'est pas remboursé. Il l\'est si le prestataire annule.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: CouleursSopi.texteDiscret,
+                    color: CouleursSopi.texteSecondaire,
                     height: 17 / 12,
                   ),
                 ),
@@ -563,7 +563,7 @@ class _Contenu extends ConsumerWidget {
                       'Cette réservation ne peut pas être payée pour le moment.',
                 )
               else
-                BoutonMarine(
+                BoutonPrimaire(
                   libelle: 'Payer ${formaterArgent(montant)}',
                   onPressed: chargement ? null : onPayer,
                   chargement: chargement,
@@ -895,7 +895,7 @@ class _Echec extends StatelessWidget {
   @override
   Widget build(BuildContext context) => _MiseEnPageResultat(
     entete: const _EnTeteResultat(
-      fond: CouleursSopi.marine,
+      fond: CouleursSopi.texte,
       icone: Icons.close_rounded,
       ligne2: 'non abouti',
       message:
