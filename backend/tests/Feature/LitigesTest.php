@@ -436,14 +436,14 @@ describe('administration', function () {
         expect($litige->fresh()->statut)->toBe(StatutLitige::Ouvert);
     });
 
-    it('liste les litiges ouverts par défaut (les plus anciens d\'abord), filtre par statut et pagine', function () {
+    it('liste les litiges ouverts par défaut (les plus récents d\'abord), filtre par statut et pagine', function () {
         $admin = User::factory()->administrateur()->create();
         $recent = Litige::factory()->create();
         $ancien = Litige::factory()->create(['created_at' => now()->subDays(2)]);
         $clos = Litige::factory()->cloture()->create();
 
         $defaut = $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/litiges')->assertOk();
-        expect(array_column($defaut->json('data'), 'id'))->toBe([$ancien->id, $recent->id]);
+        expect(array_column($defaut->json('data'), 'id'))->toBe([$recent->id, $ancien->id]);
 
         $clotures = $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/litiges?statut=cloture')->json('data');
         expect(array_column($clotures, 'id'))->toBe([$clos->id]);

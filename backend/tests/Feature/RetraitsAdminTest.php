@@ -128,7 +128,7 @@ describe('retraits — liste', function () {
         $this->getJson(URL_RETRAITS_ADMIN.$requete)->assertUnprocessable()->assertJsonPath("errors.$champ.0", $message);
     })->with([
         'statut' => ['?statut=inconnu', 'statut', 'Le statut doit être en_cours, reussi ou echoue.'],
-        'prestataire' => ['?prestataire=abc', 'prestataire', 'Le prestataire doit être un identifiant valide.'],
+        'prestataire' => ['?prestataire=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'prestataire', 'Le nom du prestataire ne peut pas dépasser 100 caractères.'],
         'bloques' => ['?bloques=peut-etre', 'bloques', 'Le filtre « bloques » doit être vrai ou faux.'],
         'page' => ['?page=0', 'page', 'La page doit être au moins 1.'],
     ]);

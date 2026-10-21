@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Enums\TypeSanction;
 use App\Models\Sanction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Support\RechercheTexte;
+use Illuminate\Support\Str;
 
 /** Liste générale des sanctions pour l'administrateur (M12.1), lecture seule, du plus récent au plus ancien. */
 class SanctionsAdminService
@@ -25,7 +27,10 @@ class SanctionsAdminService
             $requete->where('type', $filtres['type']);
         }
         if (filled($filtres['utilisateur'] ?? null)) {
-            $requete->where('user_id', $filtres['utilisateur']);
+            // Identifiant du compte ou nom (prénom et nom, recherche partielle).
+            Str::isUuid($filtres['utilisateur'])
+                ? $requete->where('user_id', $filtres['utilisateur'])
+                : $requete->whereHas('user', fn ($q) => $q->whereRaw(RechercheTexte::clause("coalesce(prenom, '') || ' ' || coalesce(nom, '')"), [RechercheTexte::motif($filtres['utilisateur'])]));
         }
         if (filled($filtres['echeanceDansHeures'] ?? null)) {
             // Même définition que l'alerte « suspensions à échéance » : suspensions non levées qui se terminent dans l'intervalle.

@@ -45,11 +45,16 @@ class ReservationsAdminService
         if (filled($filtres['statut'] ?? null)) {
             $requete->where('reservations.statut', $filtres['statut']);
         }
+        // Client et prestataire : identifiant, ou nom (recherche partielle).
         if (filled($filtres['client'] ?? null)) {
-            $requete->where('reservations.client_id', $filtres['client']);
+            Str::isUuid($filtres['client'])
+                ? $requete->where('reservations.client_id', $filtres['client'])
+                : $requete->whereHas('client', fn (Builder $q) => $q->whereRaw(RechercheTexte::clause("coalesce(prenom, '') || ' ' || coalesce(nom, '')"), [RechercheTexte::motif($filtres['client'])]));
         }
         if (filled($filtres['prestataire'] ?? null)) {
-            $requete->whereHas('creneau', fn (Builder $q) => $q->where('prestataire_id', $filtres['prestataire']));
+            $requete->whereHas('creneau', fn (Builder $q) => Str::isUuid($filtres['prestataire'])
+                ? $q->where('prestataire_id', $filtres['prestataire'])
+                : $q->whereHas('prestataire', fn (Builder $p) => $p->whereRaw(RechercheTexte::clause('nom_entreprise'), [RechercheTexte::motif($filtres['prestataire'])])));
         }
         if (filled($filtres['debut'] ?? null) || filled($filtres['fin'] ?? null)) {
             $requete->whereHas('creneau', function (Builder $q) use ($filtres) {

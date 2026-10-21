@@ -34,7 +34,7 @@ class ListeSanctionsRequest extends FormRequest
         return [
             'actives' => ['nullable', 'boolean'],
             'type' => ['nullable', 'string', Rule::in(array_column(TypeSanction::cases(), 'value'))],
-            'utilisateur' => ['nullable', 'uuid'],
+            'utilisateur' => ['nullable', 'string', 'max:100'],
             'echeanceDansHeures' => ['nullable', 'integer', 'between:1,'.self::ECHEANCE_MAX_HEURES],
         ] + $this->reglesCommunes(false);
     }
@@ -44,7 +44,7 @@ class ListeSanctionsRequest extends FormRequest
         return [
             'actives.boolean' => 'Le filtre « actives » doit être vrai ou faux.',
             'type.in' => 'Le type doit être avertissement, suspension_temporaire ou bannissement_definitif.',
-            'utilisateur.uuid' => 'L\'utilisateur doit être un identifiant valide.',
+            'utilisateur.max' => 'Le nom du compte ne peut pas dépasser 100 caractères.',
             'echeanceDansHeures.integer' => 'L\'échéance doit être un nombre entier d\'heures.',
             'echeanceDansHeures.between' => 'L\'échéance doit être comprise entre 1 et '.self::ECHEANCE_MAX_HEURES.' heures.',
         ] + $this->messagesCommuns();

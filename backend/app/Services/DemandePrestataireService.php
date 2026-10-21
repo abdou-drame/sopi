@@ -34,9 +34,8 @@ class DemandePrestataireService
             $requete->whereHas('user', fn ($u) => $u->where('statut', StatutCompte::from($statut)->value));
         }
 
-        // Les demandes en attente se traitent dans l'ordre d'arrivée ; les autres listes, du plus récent au plus ancien.
-        $requete->orderBy('created_at', $statut === StatutCompte::EnAttenteValidation->value ? 'asc' : 'desc')
-            ->orderBy('id');
+        // Du plus récent au plus ancien, comme toutes les listes du back-office.
+        $requete->orderByDesc('created_at')->orderByDesc('id');
 
         return $requete->paginate(self::PAR_PAGE);
     }

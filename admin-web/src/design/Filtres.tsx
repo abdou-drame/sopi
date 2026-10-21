@@ -62,7 +62,7 @@ function FiltreMenu({ label, valeur, options, onChoisir }: { label: string; vale
   )
 }
 
-/** Champ texte ou nombre d'un filtre : s'applique à Entrée ou en quittant le champ, pour ne pas interroger l'API à chaque frappe. */
+/** Champ texte ou nombre d'un filtre : s'applique à Entrée, en quittant le champ ou 450 ms après la dernière frappe, pour ne pas interroger l'API à chaque touche. */
 function FiltreChamp({ f, valeur, onValider }: { f: Extract<DefinitionFiltre, { type: 'texte' | 'nombre' }>; valeur: string; onValider: (v: string) => void }) {
   const [saisie, setSaisie] = useState(valeur)
   const [origine, setOrigine] = useState(valeur)
@@ -72,6 +72,14 @@ function FiltreChamp({ f, valeur, onValider }: { f: Extract<DefinitionFiltre, { 
     setSaisie(valeur)
   }
   const valider = () => saisie.trim() !== valeur && onValider(saisie.trim())
+  // Le filtre s'applique aussi tout seul peu après la dernière frappe (Entrée ou sortie du champ l'appliquent tout de suite).
+  const valideur = useRef(valider)
+  valideur.current = valider
+  useEffect(() => {
+    if (saisie.trim() === valeur) return
+    const minuteur = window.setTimeout(() => valideur.current(), 450)
+    return () => window.clearTimeout(minuteur)
+  }, [saisie, valeur])
   return (
     <input
       type={f.type === 'nombre' ? 'number' : 'text'}

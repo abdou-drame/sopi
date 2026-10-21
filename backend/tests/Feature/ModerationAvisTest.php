@@ -176,7 +176,7 @@ describe('liste admin', function () {
             ->assertUnprocessable()->assertJsonPath("errors.$champ.0", $message);
     })->with([
         'note 6' => ['note=6', 'note', 'La note doit être comprise entre 1 et 5.'],
-        'prestataire invalide' => ['prestataire=abc', 'prestataire', 'Le prestataire doit être un identifiant valide.'],
+        'prestataire invalide' => ['prestataire=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'prestataire', 'Le nom du prestataire ne peut pas dépasser 100 caractères.'],
         'masque invalide' => ['masque=peut-etre', 'masque', 'Le filtre « masque » doit être vrai ou faux.'],
     ]);
 

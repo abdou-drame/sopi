@@ -14,7 +14,7 @@ class ListeAvisRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'prestataire' => ['nullable', 'uuid'],
+            'prestataire' => ['nullable', 'string', 'max:100'],
             'note' => ['nullable', 'integer', 'between:1,5'],
             'masque' => ['nullable', 'boolean'],
             'signale' => ['nullable', 'boolean'],
@@ -26,7 +26,7 @@ class ListeAvisRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'prestataire.uuid' => 'Le prestataire doit être un identifiant valide.',
+            'prestataire.max' => 'Le nom du prestataire ne peut pas dépasser 100 caractères.',
             'note.integer' => 'La note doit être un entier de 1 à 5.',
             'note.between' => 'La note doit être comprise entre 1 et 5.',
             'masque.boolean' => 'Le filtre « masque » doit être vrai ou faux.',

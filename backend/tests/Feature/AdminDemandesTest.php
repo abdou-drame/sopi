@@ -70,7 +70,7 @@ describe('accès réservé à l\'administrateur', function () {
 });
 
 describe('GET /admin/prestataires/demandes', function () {
-    it('liste par défaut les demandes en attente, de la plus ancienne à la plus récente', function () {
+    it('liste par défaut les demandes en attente, de la plus récente à la plus ancienne', function () {
         $recente = demande(attributs: ['nom_entreprise' => 'Récente', 'created_at' => now()->subHour()]);
         $ancienne = demande(attributs: ['nom_entreprise' => 'Ancienne', 'created_at' => now()->subDays(2)]);
         demande(StatutCompte::Actif, ['nom_entreprise' => 'Déjà actif']);
@@ -79,12 +79,12 @@ describe('GET /admin/prestataires/demandes', function () {
         $reponse = $this->actingAs(admin(), 'sanctum')->getJson('/api/v1/admin/prestataires/demandes')
             ->assertOk()
             ->assertJsonCount(2, 'data')
-            ->assertJsonPath('data.0.nomEntreprise', 'Ancienne')
-            ->assertJsonPath('data.1.nomEntreprise', 'Récente')
-            ->assertJsonPath('data.0.id', $ancienne->id)
+            ->assertJsonPath('data.0.nomEntreprise', 'Récente')
+            ->assertJsonPath('data.1.nomEntreprise', 'Ancienne')
+            ->assertJsonPath('data.1.id', $ancienne->id)
             ->assertJsonPath('data.0.statutCompte', 'en_attente')
-            ->assertJsonPath('data.0.nombreJustificatifs', 2)
-            ->assertJsonPath('data.1.nombreJustificatifs', 0)
+            ->assertJsonPath('data.1.nombreJustificatifs', 2)
+            ->assertJsonPath('data.0.nombreJustificatifs', 0)
             ->assertJsonStructure(['data' => [['id', 'nom', 'prenom', 'nomEntreprise', 'metier', 'quartier', 'statutCompte', 'dateSoumission', 'nombreJustificatifs']]]);
 
         expect($reponse->json('data.0'))->not->toHaveKeys(['telephone', 'email', 'adresse']);
