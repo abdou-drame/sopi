@@ -90,13 +90,32 @@ describe('modération des avis', () => {
     expect(appels.filter((a) => a.methode === 'POST')).toHaveLength(1)
   })
 
-  it('n’affiche sur la carte que « Masquer l’avis » et « Voir la réservation » (Conserver et Rétablir ne sont pas dessinés)', async () => {
+  it('affiche « Masquer » sur un avis publié, « Republier » sur un avis masqué, et un lien vers la réservation (pas de « Conserver »)', async () => {
     simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS, MASQUE]) } })
     afficherApplication('/avis')
-    expect(await screen.findByRole('button', { name: 'Masquer l’avis de Awa Diallo' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Masquer l’avis de Awa Diallo' })).toHaveTextContent('Masquer')
+    expect(screen.getByRole('button', { name: 'Rétablir l’avis de Awa Diallo' })).toHaveTextContent('Republier')
     expect(screen.getAllByRole('link', { name: 'Voir la réservation' })).toHaveLength(2)
     expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Rétablir l’avis/ })).not.toBeInTheDocument()
+  })
+
+  it('calcule les 4 cartes depuis le tableau de bord (publiés déduit du total) et réinitialise les filtres sans quitter la vue', async () => {
+    const tableau = { avis: { total: 10, signales: 0, masques: 3, noteMoyenne: 3 } }
+    simulerApi({ ...base, 'GET /admin/tableau-de-bord': { corps: tableau }, 'GET /admin/avis': { corps: PAGE([AVIS]) } })
+    afficherApplication('/avis?vue=tous&note=2')
+    await screen.findByRole('table', { name: /avis/i })
+    const carte = (nom: string) => within(screen.getByRole('region', { name: nom }))
+    expect(await carte('Avis reçus').findByText('10')).toBeInTheDocument()
+    expect(carte('Avis reçus').getByText('7 publiés · 3 masqués')).toBeInTheDocument()
+    expect(carte('Publiés').getByText('7')).toBeInTheDocument()
+    expect(carte('Publiés').getByText('70 %')).toBeInTheDocument()
+    expect(carte('Masqués').getByText('3')).toBeInTheDocument()
+    expect(carte('Masqués').getByText('30 %')).toBeInTheDocument()
+    expect(carte('Signalés').getByText('0')).toBeInTheDocument()
+    expect(carte('Signalés').getByText('Rien à modérer')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Réinitialiser' }))
+    expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=tous')
+    expect(screen.getByTestId('lieu')).not.toHaveTextContent('note=')
   })
 
   it('affiche l’erreur 409 du serveur dans la modale', async () => {
