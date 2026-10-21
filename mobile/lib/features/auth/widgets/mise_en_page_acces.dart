@@ -5,7 +5,8 @@ import '../../../core/animation/apparition.dart';
 import '../../../core/routing/chemins.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/theme/dimensions.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/theme/disposition.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 
 /// Retour d'un écran d'accès : dépile si possible, sinon va à la connexion.
 void retourOuConnexion(BuildContext context) {
@@ -17,8 +18,7 @@ void retourOuConnexion(BuildContext context) {
 }
 
 /// Délai d'une apparition en cascade, après la descente de l'en-tête.
-Duration delaiApresEntete(int rang) =>
-    DescenteDepuisLeHaut.duree + delaiCascade(rang);
+Duration delaiApresEntete(int rang) => delaiCascade(rang);
 
 /// Fait apparaître [child] en fondu et glissement, après la descente de l'en-tête, au rang [rang].
 class ApparitionAcces extends StatelessWidget {
@@ -44,7 +44,7 @@ class EcranAcces extends StatelessWidget {
     this.margePied = 24,
   });
 
-  /// En-tête dégradé (descend du haut).
+  /// En-tête sur fond uni.
   final Widget entete;
 
   /// Éléments sous l'en-tête, avec leurs espacements. Le premier (la carte) remonte de [chevauchement] sur l'en-tête.
@@ -118,7 +118,7 @@ class TitreDeuxLignes extends StatelessWidget {
     final base = Theme.of(context).textTheme.headlineMedium!.copyWith(
       fontSize: taille,
       height: interligne / taille,
-      color: CouleursSopi.marine,
+      color: CouleursSopi.texte,
     );
     return Text.rich(
       TextSpan(
@@ -160,83 +160,74 @@ class EnteteFormulaire extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEntete),
-        ),
-        child: FondDegrade(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              DimensionsSopi.margeEcran,
-              haut + 12,
-              DimensionsSopi.margeEcran,
-              basEntete,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+    final haut = hautEcran(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        DimensionsSopi.margeEcran,
+        haut,
+        DimensionsSopi.margeEcran,
+        basEntete,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Apparition(
+            delai: Duration.zero,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Apparition(
-                  delai: DescenteDepuisLeHaut.duree,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      BoutonRetour(onPressed: () => retourOuConnexion(context)),
-                      if (droite != null)
-                        Text(
-                          droite!,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
-                            color: CouleursSopi.texteSecondaire,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Apparition(
-                    delai: delaiApresEntete(1),
-                    child: TitreDeuxLignes(
-                      ligne1: titre1,
-                      ligne2: titre2,
-                      taille: 30,
-                      interligne: 36,
+                BoutonRetour(onPressed: () => retourOuConnexion(context)),
+                if (droite != null)
+                  Text(
+                    droite!,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      color: CouleursSopi.texteSecondaire,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                ),
-                if (sousTitre != null) ...[
-                  const SizedBox(height: 18),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Apparition(
-                      delai: delaiApresEntete(2),
-                      child: Text(
-                        sousTitre!,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          fontWeight: FontWeight.w400,
-                          color: CouleursSopi.texteSecondaire,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
-        ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Apparition(
+              delai: delaiApresEntete(1),
+              child: TitreDeuxLignes(
+                ligne1: titre1,
+                ligne2: titre2,
+                taille: 30,
+                interligne: 36,
+              ),
+            ),
+          ),
+          if (sousTitre != null) ...[
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Apparition(
+                delai: delaiApresEntete(2),
+                child: Text(
+                  sousTitre!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    height: 20 / 14,
+                    fontWeight: FontWeight.w400,
+                    color: CouleursSopi.texteSecondaire,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
 }
 
-/// Carte blanche du formulaire : coins 30, bordure fine, marge intérieure 22/20/24, 16 px de chaque côté de l'écran.
+/// Carte blanche du formulaire : coins 30, ombre douce sans bordure, marge intérieure 22/20/24, 16 px de chaque côté de l'écran.
 class CarteFormulaire extends StatelessWidget {
   const CarteFormulaire({super.key, required this.children, this.espace = 14});
 
@@ -256,7 +247,7 @@ class CarteFormulaire extends StatelessWidget {
           borderRadius: BorderRadius.circular(
             DimensionsSopi.rayonCarteFormulaire,
           ),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

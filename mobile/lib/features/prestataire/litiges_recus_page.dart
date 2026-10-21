@@ -7,8 +7,9 @@ import '../../core/api/erreurs.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/widgets/onglets_segmentes.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_prestataire.dart';
 import 'modeles_litiges.dart';
@@ -91,15 +92,19 @@ class _LitigesRecusPageState extends ConsumerState<LitigesRecusPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: EnTeteDegrade(
+              child: EnTeteEcran(
                 titreLigne1: 'Signalements',
                 titreLigne2: 'reçus',
                 onRetour: () => context.canPop()
                     ? context.pop()
                     : context.go(Chemins.profilPrestataire),
-                enfant: _OngletsLitiges(
+                enfant: OngletsSegmentes<OngletLitiges>(
+                  valeurs: OngletLitiges.values,
+                  libelle: (o) => o.libelle,
                   actif: _onglet,
                   onChange: (o) => setState(() => _onglet = o),
+                  tailleTexte: 12,
+                  cle: (o) => ValueKey('onglet-${o.name}'),
                 ),
               ),
             ),
@@ -111,66 +116,6 @@ class _LitigesRecusPageState extends ConsumerState<LitigesRecusPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Sélecteur À traiter / En examen / Clos : pilule marine de 48 px, onglet actif en bleu (sans pastille de nombre).
-class _OngletsLitiges extends StatelessWidget {
-  const _OngletsLitiges({required this.actif, required this.onChange});
-
-  final OngletLitiges actif;
-  final ValueChanged<OngletLitiges> onChange;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          for (final o in OngletLitiges.values) ...[
-            if (o != OngletLitiges.aTraiter) const SizedBox(width: 4),
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: o == actif,
-                label: o.libelle,
-                excludeSemantics: true,
-                child: Material(
-                  color: o == actif ? CouleursSopi.bleu : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    key: ValueKey('onglet-${o.name}'),
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => onChange(o),
-                    child: Center(
-                      child: Text(
-                        o.libelle,
-                        maxLines: 1,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 12,
-                          fontWeight: o == actif
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: o == actif
-                              ? CouleursSopi.blanc
-                              : CouleursSopi.texteSurMarine,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
       ),
     );
   }
@@ -194,7 +139,7 @@ class _PastilleLitige extends StatelessWidget {
         CouleursSopi.indigoTexte,
       ),
       OngletLitiges.clos => (
-        CouleursSopi.bordure,
+        CouleursSopi.fondSecondaire,
         CouleursSopi.texteSecondaire,
       ),
     };
@@ -228,11 +173,11 @@ class _CarteLitige extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final jour = formaterDate(litige.dateRendezVous).split(',').first;
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         key: ValueKey('litige-${litige.id}'),
@@ -267,7 +212,7 @@ class _CarteLitige extends StatelessWidget {
                 '${litige.motif} · $jour',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
               if (litige.onglet == OngletLitiges.aTraiter) ...[
@@ -296,21 +241,46 @@ class _NoteReponseRapide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: CouleursSopi.bordureForte),
-      ),
-      child: Text(
-        "Répondez rapidement : votre version est transmise à l'administrateur avec celle du client.",
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontSize: 12,
-          height: 17 / 12,
-          color: CouleursSopi.texteDiscret,
+    return CustomPaint(
+      foregroundPainter: _CadrePointille(),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Text(
+          "Répondez rapidement : votre version est transmise à l'administrateur avec celle du client.",
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontSize: 12,
+            height: 17 / 12,
+            color: CouleursSopi.texteSecondaire,
+          ),
         ),
       ),
     );
   }
+}
+
+/// Cadre en pointillés de 1 px arrondi à 22 (maquette : « 1px dashed #8a90a2 »).
+class _CadrePointille extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final trait = Paint()
+      ..color = CouleursSopi.iconeInactive
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final chemin = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(22),
+        ).deflate(0.5),
+      );
+    for (final m in chemin.computeMetrics()) {
+      for (var d = 0.0; d < m.length; d += 6) {
+        canvas.drawPath(m.extractPath(d, (d + 3).clamp(0, m.length)), trait);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter ancien) => false;
 }

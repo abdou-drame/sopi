@@ -6,8 +6,9 @@ import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import '../reservation/depot_reservation.dart';
@@ -96,7 +97,7 @@ class _DetailDemandePageState extends ConsumerState<DetailDemandePage> {
                   const SizedBox(height: 10),
                   BoutonCompact(
                     libelle: 'Refuser',
-                    ton: TonBoutonCompact.contour,
+                    ton: TonBoutonCompact.clair,
                     hauteur: 50,
                     taille: 15,
                     pleineLargeur: true,
@@ -124,70 +125,60 @@ class _EnTete extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final d = demande;
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
-      child: FondDegrade(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            MediaQuery.paddingOf(context).top + 12,
-            16,
-            28,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, hautEcran(context), 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  BoutonRetour(onPressed: onRetour),
-                  Expanded(
-                    child: Text(
-                      'Demande',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+              BoutonRetour(onPressed: onRetour),
+              Expanded(
+                child: Text(
+                  'Demande',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(width: 64),
-                ],
+                ),
               ),
-              const SizedBox(height: 22),
-              if (d != null) ...[
-                PastilleStatut(
-                  libelle: d.aTraiter
-                      ? 'En attente de votre réponse'
-                      : d.statut == StatutReservation.acceptee
-                      ? 'Acceptée, en attente du paiement'
-                      : d.statut.libelle,
-                  ton: tonDuStatut(d.statut),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  d.clientAffiche,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontSize: 28,
-                    height: 34 / 28,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${d.prestationNom} · ${formaterDate(d.debut)}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 14,
-                    color: CouleursSopi.texteSecondaire,
-                  ),
-                ),
-              ] else
-                const Padding(
-                  padding: EdgeInsets.only(top: 6),
-                  child: Squelette(largeur: 200, hauteur: 28),
-                ),
+              const SizedBox(width: 64),
             ],
           ),
-        ),
+          const SizedBox(height: 24),
+          if (d != null) ...[
+            PastilleStatut(
+              libelle: d.aTraiter
+                  ? 'En attente de votre réponse'
+                  : d.statut == StatutReservation.acceptee
+                  ? 'Acceptée, en attente du paiement'
+                  : d.statut.libelle,
+              ton: tonDuStatut(d.statut),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              d.clientAffiche,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontSize: 28,
+                height: 34 / 28,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${d.prestationNom} · ${formaterDate(d.debut)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                color: CouleursSopi.texteSecondaire,
+              ),
+            ),
+          ] else
+            const Padding(
+              padding: EdgeInsets.only(top: 6),
+              child: Squelette(largeur: 200, hauteur: 28),
+            ),
+        ],
       ),
     );
   }
@@ -198,13 +189,13 @@ class _CorpsSquelette extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+    padding: const EdgeInsets.fromLTRB(16, 84, 16, 0),
     child: Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Column(
         children: [
@@ -230,7 +221,7 @@ class _Corps extends ConsumerWidget {
     final theme = Theme.of(context);
     final echeance = d.reponseAvant;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 84, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -253,10 +244,10 @@ class _Corps extends ConsumerWidget {
           ],
           if (d.aTraiter) ...[
             if (echeance != null) ...[
-              const SizedBox(height: 14),
+              const SizedBox(height: 51),
               _BandeauDelai(echeance: echeance),
             ],
-            const SizedBox(height: 14),
+            const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
@@ -264,7 +255,7 @@ class _Corps extends ConsumerWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   fontSize: 12,
                   height: 17 / 12,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             ),
@@ -298,7 +289,7 @@ class _CarteMontants extends StatelessWidget {
               libelle,
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
                 fontWeight: poids == FontWeight.w800
                     ? FontWeight.w700
                     : FontWeight.w500,
@@ -312,7 +303,7 @@ class _CarteMontants extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: poids,
-              color: couleur ?? CouleursSopi.marine,
+              color: couleur ?? CouleursSopi.texte,
             ),
           ),
         ],
@@ -324,7 +315,7 @@ class _CarteMontants extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         children: [
@@ -342,7 +333,7 @@ class _CarteMontants extends StatelessWidget {
             formaterArgent(d.prix - d.acompte!),
           ),
           const SizedBox(height: 10),
-          Container(height: 1, color: CouleursSopi.bordure),
+          Container(height: 1, color: CouleursSopi.separateur),
           const SizedBox(height: 10),
           ligne('Commission Sopi', '− ${formaterArgent(d.commission!)}'),
           const SizedBox(height: 10),

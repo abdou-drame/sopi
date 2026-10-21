@@ -5,8 +5,8 @@ import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
 
 /// Champ des écrans d'accès, au format des maquettes : libellé 12 px / 600 en bleu-gris à 6 px au-dessus,
-/// champ de [hauteur] (52 par défaut, 50 pour l'inscription), 15 px, marge intérieure 16, bordure #d5ddf0.
-/// Une erreur passe la bordure au rouge et s'affiche sous le champ.
+/// champ de [hauteur] (52 par défaut, 50 pour l'inscription), 15 px, marge intérieure 16, fond #f1f3f8 sans bordure.
+/// Une erreur affiche un liseré rouge et le message sous le champ.
 class ChampFormulaire extends StatefulWidget {
   const ChampFormulaire({
     super.key,
@@ -58,11 +58,13 @@ class ChampFormulaire extends StatefulWidget {
 class _ChampFormulaireState extends State<ChampFormulaire> {
   bool _masque = true;
 
-  OutlineInputBorder _bordure(Color couleur, [double epaisseur = 1]) =>
-      OutlineInputBorder(
-        borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
-        borderSide: BorderSide(color: couleur, width: epaisseur),
-      );
+  /// Sans bordure ; seule une erreur dessine un liseré rouge.
+  OutlineInputBorder _bordure({bool erreur = false}) => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
+    borderSide: erreur
+        ? const BorderSide(color: CouleursSopi.erreurTexte, width: 1.5)
+        : BorderSide.none,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -100,24 +102,19 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
             style: theme.textTheme.bodyLarge?.copyWith(
               fontSize: widget.tailleTexte,
               fontWeight: widget.poidsTexte,
-              color: CouleursSopi.marine,
+              color: CouleursSopi.texte,
             ),
             decoration: InputDecoration(
+              filled: true,
+              fillColor: CouleursSopi.champ,
               hintText: widget.indication,
               isDense: true,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: widget.margeInterne,
               ),
-              enabledBorder: _bordure(
-                enErreur ? CouleursSopi.erreurTexte : CouleursSopi.bordureForte,
-              ),
-              disabledBorder: _bordure(
-                enErreur ? CouleursSopi.erreurTexte : CouleursSopi.bordureForte,
-              ),
-              focusedBorder: _bordure(
-                enErreur ? CouleursSopi.erreurTexte : CouleursSopi.bleu,
-                1.5,
-              ),
+              enabledBorder: _bordure(erreur: enErreur),
+              disabledBorder: _bordure(erreur: enErreur),
+              focusedBorder: _bordure(erreur: enErreur),
               suffixIcon: widget.motDePasse
                   ? IconButton(
                       tooltip: _masque
@@ -128,7 +125,7 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
                             ? Icons.visibility_outlined
                             : Icons.visibility_off_outlined,
                         size: 22,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                       onPressed: () => setState(() => _masque = !_masque),
                     )

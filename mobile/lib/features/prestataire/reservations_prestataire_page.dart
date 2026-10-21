@@ -7,8 +7,9 @@ import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/widgets/onglets_segmentes.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import '../reservation/modeles.dart' show StatutReservation;
@@ -82,15 +83,18 @@ class _ReservationsPrestatairePageState
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverToBoxAdapter(
-                child: EnTeteDegrade(
+                child: EnTeteEcran(
                   titreLigne1: 'Mes',
                   titreLigne2: 'réservations',
                   onRetour: () => context.canPop()
                       ? context.pop()
                       : context.go(Chemins.tableau),
-                  enfant: _OngletsDemandes(
+                  enfant: OngletsSegmentes<OngletDemandes>(
+                    valeurs: OngletDemandes.values,
+                    libelle: (o) => o.libelle,
                     actif: _onglet,
                     onChange: (o) => setState(() => _onglet = o),
+                    tailleTexte: 12,
                   ),
                 ),
               ),
@@ -108,65 +112,6 @@ class _ReservationsPrestatairePageState
   }
 }
 
-/// Sélecteur À traiter / À venir / Terminées / Annulées : pilule marine de 48 px, onglet actif en bleu.
-class _OngletsDemandes extends StatelessWidget {
-  const _OngletsDemandes({required this.actif, required this.onChange});
-
-  final OngletDemandes actif;
-  final ValueChanged<OngletDemandes> onChange;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      height: 48,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        children: [
-          for (final o in OngletDemandes.values) ...[
-            if (o != OngletDemandes.aTraiter) const SizedBox(width: 4),
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: o == actif,
-                label: o.libelle,
-                excludeSemantics: true,
-                child: Material(
-                  color: o == actif ? CouleursSopi.bleu : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => onChange(o),
-                    child: Center(
-                      child: Text(
-                        o.libelle,
-                        maxLines: 1,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: 12,
-                          fontWeight: o == actif
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: o == actif
-                              ? CouleursSopi.blanc
-                              : CouleursSopi.texteSurMarine,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 class _CorpsSquelette extends StatelessWidget {
   const _CorpsSquelette();
 
@@ -177,7 +122,7 @@ class _CorpsSquelette extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +137,7 @@ class _CorpsSquelette extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(children: [carte(), const SizedBox(height: 12), carte()]),
     );
   }
@@ -207,7 +152,7 @@ class _CorpsListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         children: [
           for (var i = 0; i < etat.elements.length; i++)
@@ -264,11 +209,11 @@ class CarteDemande extends StatelessWidget {
     final theme = Theme.of(context);
     final echeance = d.reponseAvant;
 
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(26),
@@ -303,7 +248,7 @@ class CarteDemande extends StatelessWidget {
                 '${d.prestationNom} · ${formaterDate(d.debut)}',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontSize: 13,
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
               if (d.aTraiter)

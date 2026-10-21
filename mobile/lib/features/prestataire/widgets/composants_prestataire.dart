@@ -7,14 +7,14 @@ import 'package:go_router/go_router.dart';
 import '../../../core/format/formateurs.dart';
 import '../../../core/routing/chemins.dart';
 import '../../../core/theme/couleurs.dart';
-import '../../../core/theme/dimensions.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../../../core/widgets/boutons.dart';
 import '../../reservation/depot_reservation.dart' show horlogeProvider;
 import '../actions_demande.dart';
 import '../formats_prestataire.dart';
 import '../modeles.dart';
 
-/// Bouton marine de l'en-tête (menu), maquette Tableau : 64 × 44, icône blanche.
+/// Bouton rond blanc de l'en-tête (menu), maquette Tableau : 44 × 44, ombre légère.
 class PilulePleine extends StatelessWidget {
   const PilulePleine({
     super.key,
@@ -29,23 +29,7 @@ class PilulePleine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: libelle,
-      child: Material(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(22),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: SizedBox(
-            width: DimensionsSopi.largeurRetour,
-            height: DimensionsSopi.hauteurRetour,
-            child: Icon(icone, size: 22, color: CouleursSopi.blanc),
-          ),
-        ),
-      ),
-    );
+    return BoutonRond(icone: icone, libelle: libelle, onPressed: onTap);
   }
 }
 
@@ -69,9 +53,12 @@ class RondBlanc extends StatelessWidget {
     return Semantics(
       button: true,
       label: libelle,
-      child: Material(
-        color: CouleursSopi.blanc,
-        shape: const CircleBorder(),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: CouleursSopi.blanc,
+          shape: BoxShape.circle,
+          boxShadow: OmbresSopi.boutonRond,
+        ),
         child: InkWell(
           customBorder: const CircleBorder(),
           onTap: onTap,
@@ -81,11 +68,11 @@ class RondBlanc extends StatelessWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Icon(icone, size: 20, color: CouleursSopi.marine),
+                Icon(icone, size: 20, color: CouleursSopi.texte),
                 if (pastille)
                   Positioned(
-                    top: 11,
-                    right: 12,
+                    top: 10,
+                    right: 11,
                     child: Container(
                       key: const ValueKey('pastille-notifications'),
                       width: 9,
@@ -93,10 +80,7 @@ class RondBlanc extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: CouleursSopi.bleu,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: CouleursSopi.blanc,
-                          width: 1.5,
-                        ),
+                        border: Border.all(color: CouleursSopi.blanc, width: 2),
                       ),
                     ),
                   ),
@@ -139,7 +123,7 @@ class LignesDemande extends StatelessWidget {
               formaterDate(demande.debut),
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 12,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],
@@ -149,7 +133,7 @@ class LignesDemande extends StatelessWidget {
           '${demande.prestationNom} · ${formaterArgent(demande.prix)}',
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 13,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
       ],
@@ -244,14 +228,14 @@ class CarteNouvelleDemande extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(DimensionsSopi.rayonCarte),
-        side: const BorderSide(color: CouleursSopi.bordure),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(DimensionsSopi.rayonCarte),
+        borderRadius: BorderRadius.circular(24),
         onTap: () => context.push(Chemins.reservationPrestataire(demande.id)),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),

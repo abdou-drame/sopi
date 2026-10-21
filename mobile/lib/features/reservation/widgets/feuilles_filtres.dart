@@ -42,7 +42,7 @@ Future<T?> ouvrirFeuille<T>(
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: CouleursSopi.bordureForte,
+                  color: CouleursSopi.iconeInactive,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -95,7 +95,7 @@ class LigneChoix extends StatelessWidget {
                 choisie
                     ? Icons.radio_button_checked_rounded
                     : Icons.radio_button_unchecked_rounded,
-                color: choisie ? CouleursSopi.bleu : CouleursSopi.bordureForte,
+                color: choisie ? CouleursSopi.bleu : CouleursSopi.iconeInactive,
               ),
             ],
           ),

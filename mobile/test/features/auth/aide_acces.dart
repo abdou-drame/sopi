@@ -126,7 +126,8 @@ Future<void> saisir(WidgetTester tester, int i, String texte) async {
 
 Future<void> toucher(WidgetTester tester, Finder cible) async {
   await tester.ensureVisible(cible);
-  await tester.pump();
+  // Le défilement qui amène la cible à l'écran ignore les touches pendant ≈ 150 ms.
+  await avancer(tester, 200);
   await tester.tap(cible);
   await avancer(tester, 100);
 }

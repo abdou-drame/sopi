@@ -117,8 +117,6 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
         ChampFormulaire(
           libelle: 'Mot de passe actuel',
           controleur: _actuel,
-          hauteur: 50,
-          margeInterne: 14,
           motDePasse: true,
           actionClavier: TextInputAction.next,
           erreur: _erreurs['mot_de_passe_actuel'],
@@ -130,8 +128,6 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
             ChampFormulaire(
               libelle: 'Nouveau mot de passe',
               controleur: _nouveau,
-              hauteur: 50,
-              margeInterne: 14,
               motDePasse: true,
               actionClavier: TextInputAction.next,
               erreur: _erreurs['nouveau_mot_de_passe'],
@@ -142,7 +138,7 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
               '8 caractères minimum.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontSize: 12,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],
@@ -150,8 +146,6 @@ class _EtatChangerMdp extends ConsumerState<ChangerMotDePassePage> {
         ChampFormulaire(
           libelle: 'Confirmer le nouveau mot de passe',
           controleur: _confirmation,
-          hauteur: 50,
-          margeInterne: 14,
           motDePasse: true,
           actionClavier: TextInputAction.done,
           erreur: _erreurs['confirmation'],

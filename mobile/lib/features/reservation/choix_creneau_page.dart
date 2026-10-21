@@ -8,7 +8,7 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/decompte.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'fiche_prestataire_page.dart';
@@ -261,13 +261,13 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(
-                  child: EnTeteDegrade(
+                  child: EnTeteEcran(
                     titreLigne1: 'Choisissez un',
                     titreLigne2: 'créneau',
                     tailleTitre: 28,
                     interligneTitre: 34,
                     onRetour: () => context.pop(),
-                    action: prestataire == null
+                    centre: prestataire == null
                         ? null
                         : ConstrainedBox(
                             constraints: BoxConstraints(
@@ -314,7 +314,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
     final heures = _duJour;
     final retenu = _verrou;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 34, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -338,7 +338,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),
@@ -347,18 +347,22 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
           const SizedBox(height: 14),
           SizedBox(
             height: 76,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: _jours.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 8),
-              itemBuilder: (_, i) => _TuileJour(
-                jour: _jours[i],
-                choisi: _jours[i] == _jour,
-                onTap: () => _choisirJour(_jours[i]),
+            child: LayoutBuilder(
+              // Cinq jours tiennent exactement dans la largeur (maquette) ; les suivants défilent.
+              builder: (_, contraintes) => ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _jours.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => _TuileJour(
+                  jour: _jours[i],
+                  largeur: (contraintes.maxWidth - 4 * 8) / 5,
+                  choisi: _jours[i] == _jour,
+                  onTap: () => _choisirJour(_jours[i]),
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 24),
           Text(
             'Heures disponibles',
             style: theme.textTheme.titleMedium?.copyWith(
@@ -366,7 +370,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           if (_chargement)
             const _SqueletteHeures()
           else if (heures.isEmpty)
@@ -375,7 +379,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               child: Text(
                 'Aucun créneau libre ce jour-là.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             )
@@ -416,7 +420,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
             ),
           ],
           if (retenu != null) ...[
-            const SizedBox(height: 18),
+            const SizedBox(height: 30),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -450,13 +454,13 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               ),
             ),
           ],
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           Text(
             'Seuls les créneaux libres sont affichés. Une fois choisi, le créneau vous est réservé le temps du compte à rebours. Passé ce délai, il faudra le choisir de nouveau.',
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 12,
               height: 17 / 12,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
         ],
@@ -468,32 +472,32 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
 class _TuileJour extends StatelessWidget {
   const _TuileJour({
     required this.jour,
+    required this.largeur,
     required this.choisi,
     required this.onTap,
   });
 
   final DateTime jour;
+  final double largeur;
   final bool choisi;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final couleur = choisi ? CouleursSopi.blanc : CouleursSopi.marine;
+    final couleur = choisi ? CouleursSopi.blanc : CouleursSopi.texte;
     return Semantics(
       button: true,
       selected: choisi,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          width: 56,
+          width: largeur,
           height: 76,
           decoration: BoxDecoration(
             color: choisi ? CouleursSopi.bleu : CouleursSopi.blanc,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: choisi ? CouleursSopi.bleu : CouleursSopi.bordure,
-            ),
+            boxShadow: choisi ? null : OmbresSopi.carte,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -504,7 +508,7 @@ class _TuileJour extends StatelessWidget {
                   fontSize: 11,
                   color: choisi
                       ? couleur.withValues(alpha: 0.85)
-                      : CouleursSopi.texteDiscret,
+                      : CouleursSopi.texteSecondaire,
                 ),
               ),
               const SizedBox(height: 4),
@@ -547,18 +551,16 @@ class _BoutonHeure extends StatelessWidget {
           height: 48,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: choisi ? CouleursSopi.marine : CouleursSopi.blanc,
+            color: choisi ? CouleursSopi.bleu : CouleursSopi.blanc,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: choisi ? CouleursSopi.marine : CouleursSopi.bordure,
-            ),
+            boxShadow: choisi ? null : OmbresSopi.carte,
           ),
           child: Text(
             libelle,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
               fontWeight: choisi ? FontWeight.w700 : FontWeight.w600,
-              color: choisi ? CouleursSopi.blanc : CouleursSopi.marine,
+              color: choisi ? CouleursSopi.blanc : CouleursSopi.texte,
             ),
           ),
         ),

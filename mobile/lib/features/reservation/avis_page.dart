@@ -7,9 +7,10 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import 'depot_reservation.dart';
 import 'modeles.dart';
@@ -129,186 +130,149 @@ class _EtatAvis extends ConsumerState<AvisPage> {
     final r = async.value;
     final theme = Theme.of(context);
     final bas = MediaQuery.viewInsetsOf(context).bottom;
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
 
     return Scaffold(
-      body: Stack(
+      backgroundColor: CouleursSopi.fond,
+      body: Column(
         children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 230,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEntete),
+          Expanded(
+            child: ListView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(0, haut, 0, DimensionsSopi.espace),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DimensionsSopi.margeEcran,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: _BoutonFermer(
+                      onPressed: _enCours
+                          ? null
+                          : () => context.canPop()
+                                ? context.pop()
+                                : context.go(Chemins.reservations),
+                    ),
+                  ),
                 ),
-                child: FondDegrade(child: SizedBox.expand()),
-              ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text.rich(
+                    TextSpan(
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: DimensionsSopi.tailleTitreEcran,
+                        height:
+                            DimensionsSopi.interligneTitreEcran /
+                            DimensionsSopi.tailleTitreEcran,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      children: const [
+                        TextSpan(text: "Comment s'est\n"),
+                        TextSpan(
+                          text: 'passée la prestation ?',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: DimensionsSopi.margeCarte,
+                  ),
+                  child: r == null
+                      ? (async.hasError
+                            ? EtatErreur(
+                                message: ErreurApi.depuis(async.error!).message,
+                                onReessayer: () => ref.invalidate(
+                                  detailReservationProvider(
+                                    widget.reservationId,
+                                  ),
+                                ),
+                              )
+                            : const Padding(
+                                padding: EdgeInsets.only(top: 40),
+                                child: EtatChargement(),
+                              ))
+                      : _CarteAvis(
+                          reservation: r,
+                          note: _note,
+                          commentaire: _commentaire,
+                          enCours: _enCours,
+                          erreurNote: _erreurNote,
+                          erreurCommentaire: _erreurCommentaire,
+                          onNote: (n) => setState(() {
+                            _note = n;
+                            _erreurNote = null;
+                          }),
+                          onCommentaire: () => setState(() {
+                            _erreurCommentaire = null;
+                          }),
+                        ),
+                ),
+                if (_erreur != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      DimensionsSopi.margeCarte,
+                      14,
+                      DimensionsSopi.margeCarte,
+                      0,
+                    ),
+                    child: BandeauErreur(message: _erreur!),
+                  ),
+              ],
             ),
           ),
-          Column(
-            children: [
-              Expanded(
-                child: ListView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.fromLTRB(
-                    0,
-                    haut + 24,
-                    0,
-                    DimensionsSopi.espace,
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              DimensionsSopi.margeCarte,
+              8,
+              DimensionsSopi.margeCarte,
+              bas > 0 ? 8 : 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BoutonPrimaire(
+                  libelle: 'Publier mon avis',
+                  chargement: _enCours,
+                  onPressed: r == null || _enCours ? null : _publier,
+                ),
+                if (bas == 0) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Votre avis est visible immédiatement sur la fiche du prestataire.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 12,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
                   ),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: DimensionsSopi.margeEcran,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: _BoutonFermer(
-                          onPressed: _enCours
-                              ? null
-                              : () => context.canPop()
-                                    ? context.pop()
-                                    : context.go(Chemins.reservations),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text.rich(
-                        TextSpan(
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: DimensionsSopi.tailleTitreEcran,
-                            height:
-                                DimensionsSopi.interligneTitreEcran /
-                                DimensionsSopi.tailleTitreEcran,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          children: const [
-                            TextSpan(text: "Comment s'est\n"),
-                            TextSpan(
-                              text: 'passée la prestation ?',
-                              style: TextStyle(fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: DimensionsSopi.margeCarte,
-                      ),
-                      child: r == null
-                          ? (async.hasError
-                                ? EtatErreur(
-                                    message: ErreurApi.depuis(
-                                      async.error!,
-                                    ).message,
-                                    onReessayer: () => ref.invalidate(
-                                      detailReservationProvider(
-                                        widget.reservationId,
-                                      ),
-                                    ),
-                                  )
-                                : const Padding(
-                                    padding: EdgeInsets.only(top: 40),
-                                    child: EtatChargement(),
-                                  ))
-                          : _CarteAvis(
-                              reservation: r,
-                              note: _note,
-                              commentaire: _commentaire,
-                              enCours: _enCours,
-                              erreurNote: _erreurNote,
-                              erreurCommentaire: _erreurCommentaire,
-                              onNote: (n) => setState(() {
-                                _note = n;
-                                _erreurNote = null;
-                              }),
-                              onCommentaire: () => setState(() {
-                                _erreurCommentaire = null;
-                              }),
-                            ),
-                    ),
-                    if (_erreur != null)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          DimensionsSopi.margeCarte,
-                          14,
-                          DimensionsSopi.margeCarte,
-                          0,
-                        ),
-                        child: BandeauErreur(message: _erreur!),
-                      ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  DimensionsSopi.margeCarte,
-                  8,
-                  DimensionsSopi.margeCarte,
-                  bas > 0 ? 8 : 24,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    BoutonPrimaire(
-                      libelle: 'Publier mon avis',
-                      chargement: _enCours,
-                      onPressed: r == null || _enCours ? null : _publier,
-                    ),
-                    if (bas == 0) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        'Votre avis est visible immédiatement sur la fiche du prestataire.',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          color: CouleursSopi.texteDiscret,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              SizedBox(height: bas),
-            ],
+                ],
+              ],
+            ),
           ),
+          SizedBox(height: bas),
         ],
       ),
     );
   }
 }
 
-/// Bouton « fermer » : pilule marine 64×44 avec une croix blanche (maquette Avis).
+/// Bouton « fermer » : rond blanc 44×44 avec une croix (maquette Avis).
 class _BoutonFermer extends StatelessWidget {
   const _BoutonFermer({required this.onPressed});
 
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: 'Fermer',
-    child: Material(
-      color: CouleursSopi.marine,
-      borderRadius: BorderRadius.circular(DimensionsSopi.hauteurRetour / 2),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(DimensionsSopi.hauteurRetour / 2),
-        onTap: onPressed,
-        child: const SizedBox(
-          width: DimensionsSopi.largeurRetour,
-          height: DimensionsSopi.hauteurRetour,
-          child: Icon(Icons.close_rounded, size: 22, color: CouleursSopi.blanc),
-        ),
-      ),
-    ),
+  Widget build(BuildContext context) => BoutonRond(
+    icone: Icons.close_rounded,
+    libelle: 'Fermer',
+    onPressed: onPressed,
   );
 }
 
@@ -340,9 +304,9 @@ class _CarteAvis extends StatelessWidget {
     final aErreur = erreurCommentaire != null;
     final bordure = OutlineInputBorder(
       borderRadius: BorderRadius.circular(18),
-      borderSide: BorderSide(
-        color: aErreur ? CouleursSopi.erreurTexte : CouleursSopi.bordureForte,
-      ),
+      borderSide: aErreur
+          ? const BorderSide(color: CouleursSopi.erreurTexte)
+          : BorderSide.none,
     );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
@@ -351,7 +315,7 @@ class _CarteAvis extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           DimensionsSopi.rayonCarteFormulaire,
         ),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -369,7 +333,7 @@ class _CarteAvis extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 13,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
           const SizedBox(height: 18),
@@ -393,7 +357,7 @@ class _CarteAvis extends StatelessWidget {
                       size: 40,
                       color: i <= note
                           ? CouleursSopi.bleu
-                          : CouleursSopi.texteSurMarine,
+                          : CouleursSopi.iconeInactive,
                     ),
                   ),
                 ),
@@ -407,7 +371,9 @@ class _CarteAvis extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: note == 0 ? CouleursSopi.texteDiscret : CouleursSopi.bleu,
+              color: note == 0
+                  ? CouleursSopi.texteSecondaire
+                  : CouleursSopi.bleu,
             ),
           ),
           if (erreurNote != null) ...[
@@ -441,23 +407,18 @@ class _CarteAvis extends StatelessWidget {
             onChanged: (_) => onCommentaire(),
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
-              color: CouleursSopi.marine,
+              color: CouleursSopi.texte,
             ),
             decoration: InputDecoration(
               filled: true,
               fillColor: CouleursSopi.champ,
               contentPadding: const EdgeInsets.all(14),
               enabledBorder: bordure,
-              focusedBorder: bordure.copyWith(
-                borderSide: BorderSide(
-                  color: aErreur ? CouleursSopi.erreurTexte : CouleursSopi.bleu,
-                  width: 1.5,
-                ),
-              ),
+              focusedBorder: bordure,
               disabledBorder: bordure,
               errorText: erreurCommentaire,
               counterStyle: theme.textTheme.bodySmall?.copyWith(
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),

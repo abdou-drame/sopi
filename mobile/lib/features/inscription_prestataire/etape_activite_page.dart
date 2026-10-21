@@ -99,7 +99,7 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
       useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+      barrierColor: CouleursSopi.texte.withValues(alpha: .6),
       builder: (_) => _FeuilleQuartiers(
         quartiers: quartiers,
         actuel: d.quartierAutre ? null : d.quartier,
@@ -232,7 +232,7 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
               'La liste des quartiers est indisponible. Saisissez le vôtre.',
               key: const ValueKey('liste-quartiers-indisponible'),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),
@@ -245,19 +245,17 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
           libelle('Quartier'),
           InkWell(
             key: const ValueKey('champ-quartier'),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(18),
             onTap: () => _choisirQuartier(quartiers.requireValue),
             child: Container(
               height: 50,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 color: CouleursSopi.champ,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: _erreurs['quartier'] != null && !d.quartierAutre
-                      ? CouleursSopi.erreurTexte
-                      : CouleursSopi.bordureForte,
-                ),
+                borderRadius: BorderRadius.circular(18),
+                border: _erreurs['quartier'] != null && !d.quartierAutre
+                    ? Border.all(color: CouleursSopi.erreurTexte, width: 1.5)
+                    : null,
               ),
               child: Row(
                 children: [
@@ -269,14 +267,14 @@ class _EtapeActivitePageState extends ConsumerState<EtapeActivitePage> {
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontSize: 15,
                         color: !d.quartierAutre && d.quartier == null
-                            ? CouleursSopi.texteDiscret
-                            : CouleursSopi.marine,
+                            ? CouleursSopi.texteSecondaire
+                            : CouleursSopi.texte,
                       ),
                     ),
                   ),
                   const Icon(
                     Icons.keyboard_arrow_down_rounded,
-                    color: CouleursSopi.texteDiscret,
+                    color: CouleursSopi.texteSecondaire,
                   ),
                 ],
               ),
@@ -365,18 +363,17 @@ class _PuceMetier extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selectionnee ? CouleursSopi.marine : CouleursSopi.blanc,
+            color: selectionnee
+                ? CouleursSopi.bleu
+                : CouleursSopi.fondSecondaire,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selectionnee ? CouleursSopi.marine : CouleursSopi.bordure,
-            ),
           ),
           child: Text(
             libelle,
             style: TextStyle(
               fontSize: 13,
               fontWeight: selectionnee ? FontWeight.w700 : FontWeight.w600,
-              color: selectionnee ? CouleursSopi.blanc : CouleursSopi.marine,
+              color: selectionnee ? CouleursSopi.blanc : CouleursSopi.texte,
             ),
           ),
         ),
@@ -445,7 +442,7 @@ class _FeuilleQuartiers extends StatelessWidget {
                 'Votre quartier',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: CouleursSopi.marine,
+                  color: CouleursSopi.texte,
                 ),
               ),
             ),

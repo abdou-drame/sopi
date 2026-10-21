@@ -5,7 +5,7 @@ import 'package:sopi/core/widgets/bandeaux.dart';
 import 'package:sopi/core/widgets/boutons.dart';
 import 'package:sopi/core/widgets/champ_formulaire.dart';
 import 'package:sopi/core/widgets/decompte.dart';
-import 'package:sopi/core/widgets/en_tete_degrade.dart';
+import 'package:sopi/core/widgets/en_tete_ecran.dart';
 import 'package:sopi/core/widgets/etats.dart';
 import 'package:sopi/core/widgets/ligne_montant.dart';
 import 'package:sopi/core/widgets/pastille_statut.dart';
@@ -25,10 +25,6 @@ void main() {
             'BoutonSecondaire',
             (l, p, c) =>
                 BoutonSecondaire(libelle: l, onPressed: p, chargement: c),
-          ),
-          (
-            'BoutonMarine',
-            (l, p, c) => BoutonMarine(libelle: l, onPressed: p, chargement: c),
           ),
         ]) {
       testWidgets('$nom : normal, désactivé et chargement', (tester) async {
@@ -127,51 +123,37 @@ void main() {
     });
   });
 
-  group('EnTeteDegrade', () {
-    testWidgets('titre en deux lignes (400 puis 800) et bouton retour 64×44', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        enrober(
-          const EnTeteDegrade(titreLigne1: 'Mes', titreLigne2: 'réservations'),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<Text>(find.text('Mes')).style?.fontWeight,
-        FontWeight.w400,
-      );
-      expect(
-        tester.widget<Text>(find.text('réservations')).style?.fontWeight,
-        FontWeight.w800,
-      );
-      expect(
-        tester.getSize(
-          find
-              .descendant(
-                of: find.byType(BoutonRetour),
-                matching: find.byType(SizedBox),
-              )
-              .first,
-        ),
-        const Size(64, 44),
-      );
-    });
+  group('EnTeteEcran', () {
+    testWidgets(
+      'titre en deux lignes (400 puis 800) et bouton retour rond 44×44',
+      (tester) async {
+        await tester.pumpWidget(
+          enrober(
+            const EnTeteEcran(titreLigne1: 'Mes', titreLigne2: 'réservations'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<Text>(find.text('Mes')).style?.fontWeight,
+          FontWeight.w400,
+        );
+        expect(
+          tester.widget<Text>(find.text('réservations')).style?.fontWeight,
+          FontWeight.w800,
+        );
+        expect(tester.getSize(find.byType(BoutonRetour)), const Size(44, 44));
+      },
+    );
 
-    testWidgets("l'en-tête descend du haut puis le titre apparaît", (
-      tester,
-    ) async {
+    testWidgets("le titre apparaît en fondu", (tester) async {
       await tester.pumpWidget(
         enrober(
-          const EnTeteDegrade(titreLigne1: 'Mes', titreLigne2: 'réservations'),
+          const EnTeteEcran(titreLigne1: 'Mes', titreLigne2: 'réservations'),
         ),
       );
-      final dyDepart = tester.getTopLeft(find.byType(FondDegrade)).dy;
-      expect(dyDepart, lessThan(0));
       expect(opacite(tester, find.text('Mes')), 0);
 
       await tester.pumpAndSettle();
-      expect(tester.getTopLeft(find.byType(FondDegrade)).dy, 0);
       expect(opacite(tester, find.text('Mes')), 1);
     });
 
@@ -180,11 +162,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         enrober(
-          const EnTeteDegrade(titreLigne1: 'Mes', titreLigne2: 'réservations'),
+          const EnTeteEcran(titreLigne1: 'Mes', titreLigne2: 'réservations'),
           sansAnimation: true,
         ),
       );
-      expect(tester.getTopLeft(find.byType(FondDegrade)).dy, 0);
       expect(find.text('réservations'), findsOneWidget);
       expect(find.byType(Opacity), findsNothing);
     });
@@ -198,9 +179,8 @@ void main() {
             builder: (context) => TextButton(
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => const Scaffold(
-                    body: EnTeteDegrade(titreLigne1: 'Détail'),
-                  ),
+                  builder: (_) =>
+                      const Scaffold(body: EnTeteEcran(titreLigne1: 'Détail')),
                 ),
               ),
               child: const Text('Ouvrir'),

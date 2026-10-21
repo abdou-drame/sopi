@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
 
-/// Base commune des trois boutons pilule : texte, état désactivé, état chargement.
+/// Base commune des boutons pilule : texte, état désactivé, état chargement.
 class _BoutonPilule extends StatelessWidget {
   const _BoutonPilule({
     required this.libelle,
@@ -11,7 +11,6 @@ class _BoutonPilule extends StatelessWidget {
     required this.chargement,
     required this.fond,
     required this.texte,
-    this.bordure,
     this.icone,
     this.pleineLargeur = true,
     this.hauteur = DimensionsSopi.hauteurBouton,
@@ -24,7 +23,6 @@ class _BoutonPilule extends StatelessWidget {
   final bool chargement;
   final Color fond;
   final Color texte;
-  final Color? bordure;
   final IconData? icone;
   final bool pleineLargeur;
   final double hauteur;
@@ -44,19 +42,15 @@ class _BoutonPilule extends StatelessWidget {
       elevation: const WidgetStatePropertyAll(0),
       backgroundColor: WidgetStateProperty.resolveWith(
         (etats) => etats.contains(WidgetState.disabled) && !chargement
-            ? CouleursSopi.bordure
+            ? CouleursSopi.fondSecondaire
             : fond,
       ),
       foregroundColor: WidgetStateProperty.resolveWith(
         (etats) => etats.contains(WidgetState.disabled) && !chargement
-            ? CouleursSopi.texteDiscret
+            ? CouleursSopi.texteSecondaire
             : texte,
       ),
-      side: WidgetStatePropertyAll(
-        bordure == null
-            ? BorderSide.none
-            : BorderSide(color: bordure!, width: 1.5),
-      ),
+      side: const WidgetStatePropertyAll(BorderSide.none),
       shape: WidgetStatePropertyAll(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(hauteur / 2),
@@ -109,6 +103,7 @@ class BoutonPrimaire extends StatelessWidget {
     this.chargement = false,
     this.icone,
     this.pleineLargeur = true,
+    this.hauteur = DimensionsSopi.hauteurBouton,
   });
 
   final String libelle;
@@ -116,12 +111,14 @@ class BoutonPrimaire extends StatelessWidget {
   final bool chargement;
   final IconData? icone;
   final bool pleineLargeur;
+  final double hauteur;
 
   @override
   Widget build(BuildContext context) => _BoutonPilule(
     libelle: libelle,
     onPressed: onPressed,
     chargement: chargement,
+    hauteur: hauteur,
     fond: CouleursSopi.bleu,
     texte: CouleursSopi.blanc,
     icone: icone,
@@ -129,7 +126,7 @@ class BoutonPrimaire extends StatelessWidget {
   );
 }
 
-/// Action secondaire : fond blanc, bordure bleue, texte bleu.
+/// Action secondaire : fond #e9ecf3, sans bordure, texte #12172b.
 class BoutonSecondaire extends StatelessWidget {
   const BoutonSecondaire({
     super.key,
@@ -151,38 +148,8 @@ class BoutonSecondaire extends StatelessWidget {
     libelle: libelle,
     onPressed: onPressed,
     chargement: chargement,
-    fond: CouleursSopi.blanc,
-    texte: CouleursSopi.bleu,
-    bordure: CouleursSopi.bleu,
-    icone: icone,
-    pleineLargeur: pleineLargeur,
-  );
-}
-
-/// Action sobre ou engageante : fond marine, texte blanc.
-class BoutonMarine extends StatelessWidget {
-  const BoutonMarine({
-    super.key,
-    required this.libelle,
-    required this.onPressed,
-    this.chargement = false,
-    this.icone,
-    this.pleineLargeur = true,
-  });
-
-  final String libelle;
-  final VoidCallback? onPressed;
-  final bool chargement;
-  final IconData? icone;
-  final bool pleineLargeur;
-
-  @override
-  Widget build(BuildContext context) => _BoutonPilule(
-    libelle: libelle,
-    onPressed: onPressed,
-    chargement: chargement,
-    fond: CouleursSopi.marine,
-    texte: CouleursSopi.blanc,
+    fond: CouleursSopi.fondSecondaire,
+    texte: CouleursSopi.texte,
     icone: icone,
     pleineLargeur: pleineLargeur,
   );
@@ -191,7 +158,7 @@ class BoutonMarine extends StatelessWidget {
 enum TonBoutonCompact { primaire, clair, contour }
 
 /// Bouton pilule de petite taille (cartes de liste, barres d'action) : « Réserver », « Voir », « Continuer ».
-/// [clair] : fond blanc, texte bleu, pour une pose sur fond bleu. [contour] : fond blanc, bordure grise, texte marine (action secondaire d'une carte).
+/// [clair] : fond blanc, texte bleu, pour une pose sur fond bleu. [contour] : fond #e9ecf3, texte #12172b (action secondaire d'une carte).
 class BoutonCompact extends StatelessWidget {
   const BoutonCompact({
     super.key,
@@ -222,11 +189,12 @@ class BoutonCompact extends StatelessWidget {
       libelle: libelle,
       onPressed: onPressed,
       chargement: chargement,
-      fond: clair ? CouleursSopi.blanc : CouleursSopi.bleu,
+      fond: contour
+          ? CouleursSopi.fondSecondaire
+          : (clair ? CouleursSopi.blanc : CouleursSopi.bleu),
       texte: contour
-          ? CouleursSopi.marine
+          ? CouleursSopi.texte
           : (clair ? CouleursSopi.bleu : CouleursSopi.blanc),
-      bordure: contour ? CouleursSopi.bordureForte : null,
       pleineLargeur: pleineLargeur,
       hauteur: hauteur,
       taille: taille,

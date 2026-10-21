@@ -5,7 +5,6 @@ import '../../../core/animation/chargement.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/widgets/decompte.dart';
 import '../../../core/widgets/boutons.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
 import '../formats.dart';
 import '../modeles.dart';
 
@@ -82,8 +81,7 @@ class NotePrestataire extends StatelessWidget {
 }
 
 /// Délai d'une apparition après la descente de l'en-tête, au rang [rang] de la cascade.
-Duration apresEntete(int rang) =>
-    DescenteDepuisLeHaut.duree + delaiCascade(rang);
+Duration apresEntete(int rang) => delaiCascade(rang);
 
 /// Fait apparaître [child] après la descente de l'en-tête.
 class ApparitionApresEntete extends StatelessWidget {
@@ -161,7 +159,7 @@ class SqueletteCartePrestataire extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(rayon),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         children: [

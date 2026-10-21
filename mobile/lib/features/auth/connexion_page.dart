@@ -7,13 +7,13 @@ import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/bandeaux.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/champ_formulaire.dart';
 import '../../core/widgets/compte_a_rebours.dart';
 import '../../core/widgets/sopi_logo.dart';
 import '../../core/widgets/decompte.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import '../inscription_prestataire/stockage_jeton_suivi.dart';
 import 'session.dart';
 import 'widgets/mise_en_page_acces.dart';
@@ -95,7 +95,6 @@ class _ConnexionPageState extends ConsumerState<ConnexionPage> {
     final bloque = _blocage != null;
     return Scaffold(
       body: EcranAcces(
-        chevauchement: 20,
         margePied: 28,
         entete: _EnteteConnexion(
           bloque: bloque,
@@ -210,7 +209,7 @@ class _ConnexionPageState extends ConsumerState<ConnexionPage> {
   }
 }
 
-/// En-tête : grand dégradé (coins 40), logo, titre en deux lignes (32/38) puis phrase d'accroche ou bandeau de blocage.
+/// En-tête sur fond uni : logo, titre en deux lignes (32/38) puis phrase d'accroche ou bandeau de blocage.
 class _EnteteConnexion extends StatelessWidget {
   const _EnteteConnexion({required this.bloque, this.bandeau});
 
@@ -220,90 +219,77 @@ class _EnteteConnexion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEnteteConnexion),
-        ),
-        child: FondDegrade(
-          tacheBasse: true,
-          child: Padding(
-            padding: EdgeInsets.only(top: haut + 28, bottom: bloque ? 42 : 70),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                  child: Apparition(
-                    delai: DescenteDepuisLeHaut.duree,
-                    child: Row(
-                      children: [
-                        const SopiLogo(taille: 52),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Sopi',
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
+    final haut = hautEcran(context) - hautMaquette;
+    return Padding(
+      padding: EdgeInsets.only(top: haut + 72, bottom: bloque ? 22 : 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Apparition(
+              delai: Duration.zero,
+              child: Row(
+                children: [
+                  const SopiLogo(taille: 52),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Sopi',
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                ),
-                const SizedBox(height: 52),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                  child: Apparition(
-                    delai: delaiApresEntete(1),
-                    child: const TitreDeuxLignes(
-                      ligne1: 'Heureux de',
-                      ligne2: 'vous revoir !',
-                      taille: 32,
-                      interligne: 38,
-                    ),
-                  ),
-                ),
-                SizedBox(height: bloque ? 6 : 18),
-                if (bandeau != null)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: DimensionsSopi.margeCarte,
-                    ),
-                    child: Apparition(
-                      delai: delaiApresEntete(2),
-                      child: bandeau!,
-                    ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Apparition(
-                      delai: delaiApresEntete(2),
-                      child: Text(
-                        'Réservez un mécanicien, un coiffeur ou un pressing dans votre quartier.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontSize: 14,
-                          height: 20 / 14,
-                          fontWeight: FontWeight.w400,
-                          color: CouleursSopi.texteSecondaire,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 52),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Apparition(
+              delai: delaiApresEntete(1),
+              child: const TitreDeuxLignes(
+                ligne1: 'Heureux de',
+                ligne2: 'vous revoir !',
+                taille: 32,
+                interligne: 38,
+              ),
+            ),
+          ),
+          SizedBox(height: bloque ? 6 : 18),
+          if (bandeau != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: DimensionsSopi.margeCarte,
+              ),
+              child: Apparition(delai: delaiApresEntete(2), child: bandeau!),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              child: Apparition(
+                delai: delaiApresEntete(2),
+                child: Text(
+                  'Réservez un mécanicien, un coiffeur ou un pressing dans votre quartier.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 14,
+                    height: 20 / 14,
+                    fontWeight: FontWeight.w400,
+                    color: CouleursSopi.texteSecondaire,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
 }
 
-/// Carte marine « Vous êtes professionnel ? » avec son bouton rond bleu.
+/// Carte blanche « Vous êtes professionnel ? » avec son bouton rond bleu.
 class _CartePrestataire extends StatelessWidget {
   const _CartePrestataire({required this.onTap});
 
@@ -315,8 +301,9 @@ class _CartePrestataire extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
-        borderRadius: BorderRadius.circular(DimensionsSopi.rayonCarte),
+        color: CouleursSopi.blanc,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Row(
         children: [
@@ -329,7 +316,7 @@ class _CartePrestataire extends StatelessWidget {
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
-                    color: CouleursSopi.blanc.withValues(alpha: 0.7),
+                    color: CouleursSopi.texteSecondaire,
                   ),
                 ),
                 Text(
@@ -337,7 +324,7 @@ class _CartePrestataire extends StatelessWidget {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: CouleursSopi.blanc,
+                    color: CouleursSopi.texte,
                   ),
                 ),
               ],

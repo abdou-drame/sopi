@@ -5,14 +5,14 @@ import '../../../core/animation/chargement.dart';
 import '../../../core/api/erreurs.dart';
 import '../../../core/theme/couleurs.dart';
 import '../../../core/widgets/boutons.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../../../core/widgets/etats.dart';
 import '../depot_reservation.dart';
 import '../fiche_prestataire_page.dart';
 import '../formats.dart';
 import '../modeles.dart';
 
-/// Écran « liste d'avis » commun au client (Avis sur {entreprise}) et au prestataire (Mes avis) : carte marine
+/// Écran « liste d'avis » commun au client (Avis sur {entreprise}) et au prestataire (Mes avis) : carte blanche
 /// (note moyenne, nombre d'avis), avis du plus récent au plus ancien, bouton « Voir plus d'avis » pour la page suivante.
 class ListeAvisPage extends ConsumerStatefulWidget {
   const ListeAvisPage({
@@ -174,10 +174,13 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: EnTeteDegrade(
+              child: EnTeteEcran(
                 titreLigne1: widget.titreLigne1,
                 titreLigne2: widget.titreLigne2,
                 onRetour: widget.onRetour,
+                ecartEnfant: 22,
+                margeEnfant: 16,
+                margeBasse: 0,
                 enfant: synthese,
               ),
             ),
@@ -190,7 +193,7 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
   }
 }
 
-/// Carte marine de 92 px : note moyenne et nombre d'avis, séparés par un filet.
+/// Carte blanche de 92 px : note moyenne et nombre d'avis, séparés par un filet.
 class _SyntheseAvis extends StatelessWidget {
   const _SyntheseAvis({required this.note, required this.nombre});
 
@@ -200,13 +203,13 @@ class _SyntheseAvis extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Widget bloc(String valeur, String libelle) => Column(
+    Widget bloc(String valeur, String libelle, Color couleurLibelle) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           valeur,
           style: theme.textTheme.titleLarge?.copyWith(
-            color: CouleursSopi.blanc,
+            color: CouleursSopi.texte,
             fontSize: 22,
             fontWeight: FontWeight.w800,
           ),
@@ -214,7 +217,7 @@ class _SyntheseAvis extends StatelessWidget {
         Text(
           libelle,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: CouleursSopi.blanc.withValues(alpha: 0.7),
+            color: couleurLibelle,
             fontSize: 11,
           ),
         ),
@@ -225,19 +228,20 @@ class _SyntheseAvis extends StatelessWidget {
       height: 92,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          bloc(note == null ? '–' : formaterNote(note!), 'Note moyenne'),
-          Container(
-            width: 1,
-            height: 40,
-            color: CouleursSopi.blanc.withValues(alpha: 0.18),
+          bloc(
+            note == null ? '–' : formaterNote(note!),
+            'Note moyenne',
+            CouleursSopi.texte.withValues(alpha: 0.7),
           ),
-          bloc('$nombre', 'Avis'),
+          Container(width: 1, height: 40, color: const Color(0xFFE3E7EF)),
+          bloc('$nombre', 'Avis', CouleursSopi.texteSecondaire),
         ],
       ),
     );

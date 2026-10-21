@@ -144,10 +144,9 @@ void main() {
     expect(find.byKey(const ValueKey('pastille-non-lue')), findsOneWidget);
     final nonLue = tester.widget<Text>(find.text('Réservation confirmée'));
     final lue = tester.widget<Text>(find.text('Réservation expirée'));
-    expect(
-      nonLue.style!.fontWeight!.value,
-      greaterThan(lue.style!.fontWeight!.value),
-    );
+    // Maquette : tous les titres sont en gras (700) ; la pastille bleue signale le non lu.
+    expect(nonLue.style!.fontWeight, FontWeight.w700);
+    expect(lue.style!.fontWeight, FontWeight.w700);
   });
 
   testWidgets('liste vide, puis erreur avec Réessayer', (tester) async {

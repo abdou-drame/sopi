@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/animation/chargement.dart';
 import '../../../core/format/formateurs.dart';
 import '../../../core/theme/couleurs.dart';
-import '../../../core/widgets/en_tete_degrade.dart';
+import '../../../core/theme/disposition.dart';
+import '../../../core/widgets/en_tete_ecran.dart';
 import '../modeles.dart';
 
 /// En-tête des écrans Prestation et PrestaTerminer : titre centré, pastille de statut, client, prestation et date.
@@ -25,63 +26,53 @@ class EnTetePrestation extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final d = demande;
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
-      child: FondDegrade(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            MediaQuery.paddingOf(context).top + 12,
-            16,
-            28,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, hautEcran(context), 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  BoutonRetour(onPressed: onRetour),
-                  Expanded(
-                    child: Text(
-                      titre,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+              BoutonRetour(onPressed: onRetour),
+              Expanded(
+                child: Text(
+                  titre,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(width: 64),
-                ],
+                ),
               ),
-              const SizedBox(height: 22),
-              if (d != null) ...[
-                Align(alignment: Alignment.centerLeft, child: pastille),
-                const SizedBox(height: 10),
-                Text(
-                  d.clientAffiche,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontSize: 28,
-                    height: 34 / 28,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${d.prestationNom} · ${formaterDate(d.debut)}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontSize: 14,
-                    color: CouleursSopi.texteSecondaire,
-                  ),
-                ),
-              ] else
-                const Padding(
-                  padding: EdgeInsets.only(top: 6),
-                  child: Squelette(largeur: 200, hauteur: 28),
-                ),
+              const SizedBox(width: 64),
             ],
           ),
-        ),
+          const SizedBox(height: 24),
+          if (d != null) ...[
+            Align(alignment: Alignment.centerLeft, child: pastille),
+            const SizedBox(height: 10),
+            Text(
+              d.clientAffiche,
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontSize: 28,
+                height: 34 / 28,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${d.prestationNom} · ${formaterDate(d.debut)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                color: CouleursSopi.texteSecondaire,
+              ),
+            ),
+          ] else
+            const Padding(
+              padding: EdgeInsets.only(top: 6),
+              child: Squelette(largeur: 200, hauteur: 28),
+            ),
+        ],
       ),
     );
   }
@@ -137,7 +128,7 @@ class CarteMontantsPrestation extends StatelessWidget {
             libelle,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontSize: 14,
-              color: CouleursSopi.texteDiscret,
+              color: CouleursSopi.texteSecondaire,
             ),
           ),
         ),
@@ -148,7 +139,7 @@ class CarteMontantsPrestation extends StatelessWidget {
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
             fontWeight: poids,
-            color: couleur ?? CouleursSopi.marine,
+            color: couleur ?? CouleursSopi.texte,
           ),
         ),
       ],
@@ -159,7 +150,7 @@ class CarteMontantsPrestation extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         children: [
@@ -176,7 +167,7 @@ class CarteMontantsPrestation extends StatelessWidget {
             formaterArgent(d.prix - d.acompte!),
           ),
           const SizedBox(height: 10),
-          Container(height: 1, color: CouleursSopi.bordure),
+          Container(height: 1, color: CouleursSopi.separateur),
           const SizedBox(height: 10),
           ligne('Commission Sopi', '− ${formaterArgent(d.commission!)}'),
           const SizedBox(height: 10),

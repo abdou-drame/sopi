@@ -7,12 +7,18 @@ import '../../core/animation/apparition.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/sopi_logo.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import 'widgets/mise_en_page_acces.dart';
 
 /// Orange des illustrations (épingle, pastille de validation).
 const _orange = Color(0xFFF59E0B);
+
+/// Teintes propres aux deux illustrations de la maquette Orientation.
+const _bleuClair = Color(0xFFBFDBFE);
+const _indigoClair = Color(0xFFC7D2FE);
+const _fondClair = Color(0xFFE8EEFC);
+const _texteArtisan = Color(0xFFC9D6F5);
 
 /// Écran d'orientation : premier écran sans session. Le client et l'artisan choisissent leur parcours.
 class OrientationPage extends StatelessWidget {
@@ -23,7 +29,6 @@ class OrientationPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       body: EcranAcces(
-        chevauchement: 34,
         margePied: 28,
         entete: const _EnteteOrientation(),
         corps: [
@@ -43,7 +48,7 @@ class OrientationPage extends StatelessWidget {
                         titre: 'Je cherche un artisan',
                         texte:
                             'Mécanique, coiffure, pressing près de chez vous.',
-                        sombre: false,
+                        artisan: false,
                         illustration: const _PeintureClient(),
                         onTap: () => context.push(Chemins.inscription),
                       ),
@@ -53,7 +58,7 @@ class OrientationPage extends StatelessWidget {
                       child: _CarteChoix(
                         titre: 'Je suis artisan',
                         texte: 'Recevez des clients et gérez vos réservations.',
-                        sombre: true,
+                        artisan: true,
                         illustration: const _PeintureArtisan(),
                         onTap: () =>
                             context.push(Chemins.inscriptionPrestataire),
@@ -92,83 +97,75 @@ class OrientationPage extends StatelessWidget {
   }
 }
 
-/// En-tête : même dégradé que la connexion, logo, pastille « Keur Massar », titre et sous-titre.
+/// En-tête sur fond uni : logo, pastille « Keur Massar », titre et sous-titre.
 class _EnteteOrientation extends StatelessWidget {
   const _EnteteOrientation();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(
-        bottom: Radius.circular(DimensionsSopi.rayonEnteteRestreint),
-      ),
-      child: FondDegrade(
-        tacheBasse: true,
-        child: Apparition(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(28, haut + 28, 28, 60),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+    final haut = hautEcran(context) - hautMaquette;
+    return Apparition(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(28, haut + 64, 24, 26),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    const SopiLogo(taille: 48, ombre: true),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Sopi',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(child: _PastilleQuartier()),
-                  ],
-                ),
-                const SizedBox(height: 34),
-                Semantics(
-                  header: true,
-                  child: Text.rich(
-                    const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Bienvenue\nsur ',
-                          style: TextStyle(fontWeight: FontWeight.w400),
-                        ),
-                        TextSpan(
-                          text: 'Sopi',
-                          style: TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                    style: theme.textTheme.headlineMedium!.copyWith(
-                      fontSize: 36,
-                      letterSpacing: -0.6,
-                      height: 42 / 36,
-                      color: CouleursSopi.marine,
-                    ),
+                const SopiLogo(taille: 48, ombre: true),
+                const SizedBox(width: 12),
+                Text(
+                  'Sopi',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 14),
-                Padding(
-                  padding: const EdgeInsets.only(right: 32),
-                  child: Text(
-                    "Choisissez comment vous souhaitez utiliser l'application.",
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontSize: 15,
-                      height: 22 / 15,
-                      fontWeight: FontWeight.w400,
-                      color: CouleursSopi.texteSecondaire,
-                    ),
-                  ),
-                ),
+                const SizedBox(width: 12),
+                const Expanded(child: _PastilleQuartier()),
               ],
             ),
-          ),
+            const SizedBox(height: 36),
+            Semantics(
+              header: true,
+              child: Text.rich(
+                const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Bienvenue\nsur ',
+                      style: TextStyle(fontWeight: FontWeight.w400),
+                    ),
+                    TextSpan(
+                      text: 'Sopi',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                ),
+                style: theme.textTheme.headlineMedium!.copyWith(
+                  fontSize: 36,
+                  letterSpacing: -0.6,
+                  height: 42 / 36,
+                  color: CouleursSopi.texte,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Padding(
+              padding: const EdgeInsets.only(right: 36),
+              child: Text(
+                "Choisissez comment vous souhaitez utiliser l'application.",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 15,
+                  height: 22 / 15,
+                  fontWeight: FontWeight.w400,
+                  color: CouleursSopi.texteSecondaire,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -185,9 +182,8 @@ class _PastilleQuartier extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: CouleursSopi.blanc.withValues(alpha: 0.85),
+          color: CouleursSopi.fondSecondaire,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: CouleursSopi.bordure),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
@@ -225,25 +221,21 @@ class _CarteChoix extends StatelessWidget {
   const _CarteChoix({
     required this.titre,
     required this.texte,
-    required this.sombre,
+    required this.artisan,
     required this.illustration,
     required this.onTap,
   });
 
   final String titre;
   final String texte;
-  final bool sombre;
+  final bool artisan;
   final Widget illustration;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fond = sombre ? CouleursSopi.marine : CouleursSopi.blanc;
-    final couleurTitre = sombre ? CouleursSopi.blanc : CouleursSopi.marine;
-    final couleurTexte = sombre
-        ? const Color(0xFFC9D6F5)
-        : CouleursSopi.texteSecondaire;
+    final couleurTexte = artisan ? _texteArtisan : CouleursSopi.texteSecondaire;
     return Semantics(
       button: true,
       label: '$titre. $texte Commencer',
@@ -251,18 +243,17 @@ class _CarteChoix extends StatelessWidget {
       onTap: onTap,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: fond,
+          color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(32.0),
-          border: sombre ? null : Border.all(color: CouleursSopi.bordure),
-          boxShadow: [
-            BoxShadow(
-              color: CouleursSopi.marine.withValues(
-                alpha: sombre ? 0.30 : 0.10,
-              ),
-              blurRadius: 36,
-              offset: const Offset(0, 18),
-            ),
-          ],
+          boxShadow: artisan
+              ? OmbresSopi.carte
+              : const [
+                  BoxShadow(
+                    color: Color(0x1A0F1B3D),
+                    blurRadius: 36,
+                    offset: Offset(0, 18),
+                  ),
+                ],
         ),
         child: Material(
           type: MaterialType.transparency,
@@ -283,7 +274,7 @@ class _CarteChoix extends StatelessWidget {
                         fontSize: 18,
                         height: 22 / 18,
                         fontWeight: FontWeight.w800,
-                        color: couleurTitre,
+                        color: CouleursSopi.texte,
                       ),
                     ),
                   ),
@@ -310,7 +301,7 @@ class _CarteChoix extends StatelessWidget {
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: sombre
+                              color: artisan
                                   ? CouleursSopi.blanc
                                   : CouleursSopi.bleu,
                             ),
@@ -320,7 +311,7 @@ class _CarteChoix extends StatelessWidget {
                           width: 40,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: sombre
+                            color: artisan
                                 ? CouleursSopi.blanc
                                 : CouleursSopi.bleu,
                             shape: BoxShape.circle,
@@ -328,8 +319,8 @@ class _CarteChoix extends StatelessWidget {
                           child: Icon(
                             Icons.arrow_forward_rounded,
                             size: 18,
-                            color: sombre
-                                ? CouleursSopi.marine
+                            color: artisan
+                                ? CouleursSopi.texte
                                 : CouleursSopi.blanc,
                           ),
                         ),
@@ -418,7 +409,7 @@ class _CalendrierEpingle extends _Peinture {
   Shader fond(Rect zone) => const LinearGradient(
     begin: Alignment(-0.34, -1),
     end: Alignment(0.34, 1),
-    colors: [CouleursSopi.bleuPastel, CouleursSopi.enteteFond],
+    colors: [CouleursSopi.bleuPastel, _fondClair],
   ).createShader(zone);
 
   @override
@@ -426,12 +417,12 @@ class _CalendrierEpingle extends _Peinture {
     canvas.drawCircle(
       const Offset(118, 40),
       44,
-      Paint()..color = CouleursSopi.enteteTacheBleue.withValues(alpha: 0.7),
+      Paint()..color = _bleuClair.withValues(alpha: 0.7),
     );
     canvas.drawCircle(
       const Offset(22, 150),
       34,
-      Paint()..color = CouleursSopi.enteteTacheIndigo.withValues(alpha: 0.6),
+      Paint()..color = _indigoClair.withValues(alpha: 0.6),
     );
 
     final corps = RRect.fromRectAndRadius(
@@ -457,7 +448,7 @@ class _CalendrierEpingle extends _Peinture {
         ..close(),
       Paint()..color = CouleursSopi.bleu,
     );
-    final anneau = Paint()..color = CouleursSopi.marine;
+    final anneau = Paint()..color = CouleursSopi.texte;
     for (final x in const [44.0, 90.0]) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(

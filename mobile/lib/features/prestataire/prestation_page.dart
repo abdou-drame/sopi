@@ -94,7 +94,7 @@ class _PrestationPageState extends ConsumerState<PrestationPage> {
                 ),
                 if (demande != null && demande.montantsConnus)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                    padding: const EdgeInsets.fromLTRB(16, 84, 16, 0),
                     child: CarteMontantsPrestation(
                       demande: demande,
                       libelleCredit: 'Crédité au portefeuille à la fin',
@@ -110,7 +110,7 @@ class _PrestationPageState extends ConsumerState<PrestationPage> {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+                  padding: const EdgeInsets.fromLTRB(20, 51, 20, 0),
                   child: Text(
                     'Code du client',
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -128,14 +128,14 @@ class _PrestationPageState extends ConsumerState<PrestationPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                   child: Text(
                     'Demandez au client le code à 6 caractères affiché dans son application. '
                     'Vous pourrez ensuite démarrer la prestation.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       height: 17 / 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),
@@ -159,7 +159,7 @@ class _PrestationPageState extends ConsumerState<PrestationPage> {
                 const SizedBox(height: 10),
                 BoutonCompact(
                   libelle: 'Annuler (le client est remboursé)',
-                  ton: TonBoutonCompact.contour,
+                  ton: TonBoutonCompact.clair,
                   hauteur: 50,
                   taille: 14,
                   pleineLargeur: true,

@@ -7,10 +7,10 @@ import '../../core/animation/apparition.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
-import '../../core/theme/dimensions.dart';
 import '../../core/theme/couleurs.dart';
+import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import '../../core/widgets/etats.dart';
 import '../../core/widgets/pastille_statut.dart';
 import '../reservation/depot_reservation.dart';
@@ -142,65 +142,55 @@ class _EnTeteAgenda extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
-      child: FondDegrade(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            MediaQuery.paddingOf(context).top + 40,
-            16,
-            24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Mon',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: DimensionsSopi.tailleTitreEcran,
-                        height:
-                            DimensionsSopi.interligneTitreEcran /
-                            DimensionsSopi.tailleTitreEcran,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    Text(
-                      'agenda',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: DimensionsSopi.tailleTitreEcran,
-                        height:
-                            DimensionsSopi.interligneTitreEcran /
-                            DimensionsSopi.tailleTitreEcran,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, hautEcran(context) + 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Mon',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontSize: DimensionsSopi.tailleTitreEcran,
+                    height:
+                        DimensionsSopi.interligneTitreEcran /
+                        DimensionsSopi.tailleTitreEcran,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  for (var i = 0; i < jours.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 8),
-                    Expanded(
-                      child: _PuceJour(
-                        jour: jours[i],
-                        actif: jours[i] == selection,
-                        onTap: () => onChoix(jours[i]),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                Text(
+                  'agenda',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontSize: DimensionsSopi.tailleTitreEcran,
+                    height:
+                        DimensionsSopi.interligneTitreEcran /
+                        DimensionsSopi.tailleTitreEcran,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 38),
+          Row(
+            children: [
+              for (var i = 0; i < jours.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                Expanded(
+                  child: _PuceJour(
+                    jour: jours[i],
+                    actif: jours[i] == selection,
+                    onTap: () => onChoix(jours[i]),
+                  ),
+                ),
+              ],
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -226,13 +216,11 @@ class _PuceJour extends StatelessWidget {
       selected: actif,
       label: '$nom ${jour.day}',
       excludeSemantics: true,
-      child: Material(
-        color: actif ? CouleursSopi.bleu : CouleursSopi.blanc,
-        shape: RoundedRectangleBorder(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: actif ? CouleursSopi.bleu : CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(22),
-          side: actif
-              ? BorderSide.none
-              : const BorderSide(color: CouleursSopi.bordure),
+          boxShadow: actif ? null : OmbresSopi.carte,
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(22),
@@ -248,7 +236,7 @@ class _PuceJour extends StatelessWidget {
                     fontSize: 11,
                     color: actif
                         ? CouleursSopi.blanc.withValues(alpha: 0.85)
-                        : CouleursSopi.texteDiscret,
+                        : CouleursSopi.texteSecondaire,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -257,7 +245,7 @@ class _PuceJour extends StatelessWidget {
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
-                    color: actif ? CouleursSopi.blanc : CouleursSopi.marine,
+                    color: actif ? CouleursSopi.blanc : CouleursSopi.texte,
                   ),
                 ),
               ],
@@ -279,7 +267,7 @@ class _CorpsSquelette extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Row(
         children: [
@@ -291,7 +279,7 @@ class _CorpsSquelette extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 42, 16, 0),
       child: Column(children: [ligne(), const SizedBox(height: 10), ligne()]),
     );
   }
@@ -318,7 +306,7 @@ class _CorpsJour extends StatelessWidget {
     final page = etat.pagination?.page ?? 1;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 42, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -328,11 +316,11 @@ class _CorpsJour extends StatelessWidget {
               '${_titreJour(jour)} · $nombre',
               style: theme.textTheme.bodyMedium?.copyWith(
                 fontSize: 13,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           for (var i = 0; i < rendezVous.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -403,11 +391,11 @@ class _LigneRendezVous extends StatelessWidget {
     final confirme =
         d.statut == StatutReservation.confirmee ||
         d.statut == StatutReservation.enCours;
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
@@ -434,7 +422,7 @@ class _LigneRendezVous extends StatelessWidget {
                         formaterDuree(d.dureeMinutes),
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 11,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                     ],
@@ -446,7 +434,7 @@ class _LigneRendezVous extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: confirme
                         ? CouleursSopi.bleu
-                        : CouleursSopi.texteSurMarine,
+                        : CouleursSopi.iconeInactive,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -468,7 +456,7 @@ class _LigneRendezVous extends StatelessWidget {
                         '${d.prestationNom} · ${formaterArgent(d.prix)}',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           fontSize: 13,
-                          color: CouleursSopi.texteDiscret,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
                       const SizedBox(height: 6),

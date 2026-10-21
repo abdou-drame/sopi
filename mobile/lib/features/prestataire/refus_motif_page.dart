@@ -7,7 +7,7 @@ import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/widgets/boutons.dart';
 import '../../core/widgets/bandeaux.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import 'actions_demande.dart';
 import 'depot_prestataire.dart';
 
@@ -80,7 +80,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                EnTeteDegrade(
+                EnTeteEcran(
                   titreLigne1: widget.annulation ? 'Annuler' : 'Refuser',
                   titreLigne2: widget.annulation
                       ? 'la prestation'
@@ -89,7 +89,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                 ),
                 if (demande != null)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    padding: const EdgeInsets.fromLTRB(16, 28, 16, 0),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -98,7 +98,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                       decoration: BoxDecoration(
                         color: CouleursSopi.blanc,
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: CouleursSopi.bordure),
+                        boxShadow: OmbresSopi.carte,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +118,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                                 formaterDate(demande.debut),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
-                                  color: CouleursSopi.texteDiscret,
+                                  color: CouleursSopi.texteSecondaire,
                                 ),
                               ),
                             ],
@@ -136,13 +136,18 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  padding: EdgeInsets.fromLTRB(
+                    16,
+                    demande != null ? 30 : 28,
+                    16,
+                    0,
+                  ),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: CouleursSopi.blanc,
                       borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: CouleursSopi.bordure),
+                      boxShadow: OmbresSopi.carte,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,27 +189,13 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: CouleursSopi.champ,
-                              contentPadding: const EdgeInsets.all(14),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: const BorderSide(
-                                  color: CouleursSopi.bordureForte,
-                                  width: 1.5,
-                                ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
                               ),
-                              focusedBorder: OutlineInputBorder(
+                              border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(18),
-                                borderSide: const BorderSide(
-                                  color: CouleursSopi.bleu,
-                                  width: 1.5,
-                                ),
-                              ),
-                              disabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(18),
-                                borderSide: const BorderSide(
-                                  color: CouleursSopi.bordureForte,
-                                  width: 1.5,
-                                ),
+                                borderSide: BorderSide.none,
                               ),
                             ),
                           ),
@@ -218,7 +209,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                                 '$motifMin caractères minimum',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 12,
-                                  color: CouleursSopi.texteDiscret,
+                                  color: CouleursSopi.texteSecondaire,
                                 ),
                               ),
                             ),
@@ -227,7 +218,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                               key: const ValueKey('compteur-motif'),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
-                                color: CouleursSopi.texteDiscret,
+                                color: CouleursSopi.texteSecondaire,
                               ),
                             ),
                           ],
@@ -237,7 +228,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  padding: const EdgeInsets.fromLTRB(16, 68, 16, 24),
                   child: BandeauInfo(
                     message: widget.annulation
                         ? 'Le client sera remboursé intégralement et verra ce motif.'
@@ -257,7 +248,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                BoutonMarine(
+                BoutonPrimaire(
                   libelle: widget.annulation
                       ? "Confirmer l'annulation"
                       : 'Confirmer le refus',
@@ -267,7 +258,7 @@ class _RefusMotifPageState extends ConsumerState<RefusMotifPage> {
                 const SizedBox(height: 10),
                 BoutonCompact(
                   libelle: 'Retour',
-                  ton: TonBoutonCompact.contour,
+                  ton: TonBoutonCompact.clair,
                   hauteur: 50,
                   taille: 14,
                   pleineLargeur: true,

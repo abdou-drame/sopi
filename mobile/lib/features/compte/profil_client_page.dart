@@ -6,8 +6,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import '../auth/session.dart';
 import '../auth/utilisateur.dart';
 import '../../core/format/formateurs.dart';
@@ -69,84 +69,62 @@ class ProfilClientPage extends ConsumerWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Stack(
-            children: [
-              const Positioned.fill(
-                child: DescenteDepuisLeHaut(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(DimensionsSopi.rayonEntete),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(24, hautEcran(context) + 46, 24, 91),
+              child: Column(
+                children: [
+                  Container(
+                    width: 96,
+                    height: 96,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: CouleursSopi.bleu,
+                      shape: BoxShape.circle,
                     ),
-                    child: FondDegrade(child: SizedBox.expand()),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    24,
-                    MediaQuery.paddingOf(context).top + 48,
-                    24,
-                    36,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 96,
-                        height: 96,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: CouleursSopi.bleu,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          initiale,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: 38,
-                            fontWeight: FontWeight.w800,
-                            color: CouleursSopi.blanc,
-                          ),
-                        ),
+                    child: Text(
+                      initiale,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontSize: 38,
+                        fontWeight: FontWeight.w800,
+                        color: CouleursSopi.blanc,
                       ),
-                      const SizedBox(height: 14),
-                      Text(
-                        u?.nomComplet ?? '',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      if (contact.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          contact,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            color: CouleursSopi.texteSecondaire,
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  Text(
+                    u?.nomComplet ?? '',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (contact.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      contact,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontSize: 13,
+                        color: CouleursSopi.texteSecondaire,
+                      ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(
-              DimensionsSopi.margeCarte,
-              20,
-              DimensionsSopi.margeCarte,
-              0,
+            padding: const EdgeInsets.symmetric(
+              horizontal: DimensionsSopi.margeCarte,
             ),
             child: Container(
               decoration: BoxDecoration(
                 color: CouleursSopi.blanc,
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: CouleursSopi.bordure),
+                boxShadow: OmbresSopi.carte,
               ),
               clipBehavior: Clip.antiAlias,
               child: Column(
@@ -184,7 +162,7 @@ class ProfilClientPage extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(
               DimensionsSopi.margeCarte,
-              20,
+              18,
               DimensionsSopi.margeCarte,
               0,
             ),
@@ -195,14 +173,19 @@ class ProfilClientPage extends ConsumerWidget {
           ),
           if (version != null)
             Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: Text(
-                "Version de l'application $version",
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: CouleursSopi.texteDiscret,
+              padding: const EdgeInsets.only(top: 10),
+              child: SizedBox(
+                height: 44,
+                child: Center(
+                  child: Text(
+                    "Version de l'application $version",
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -236,7 +219,7 @@ class _Ligne extends StatelessWidget {
         decoration: BoxDecoration(
           border: derniere
               ? null
-              : const Border(bottom: BorderSide(color: CouleursSopi.bordure)),
+              : const Border(bottom: BorderSide(color: Color(0xFFEEF2FA))),
         ),
         child: Row(
           children: [
@@ -253,8 +236,8 @@ class _Ligne extends StatelessWidget {
             ),
             const Icon(
               Icons.chevron_right_rounded,
-              size: 20,
-              color: CouleursSopi.texteDiscret,
+              size: 18,
+              color: CouleursSopi.iconeInactive,
             ),
           ],
         ),

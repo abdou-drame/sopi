@@ -116,6 +116,7 @@ void main() {
       expect(
         find.text(
           'Paiement sécurisé. Vous choisirez Wave ou Orange Money sur la page suivante.',
+          skipOffstage: false,
         ),
         findsOneWidget,
       );

@@ -10,7 +10,7 @@ class OngletSopi {
   final IconData icone;
 }
 
-/// Barre d'onglets flottante : pilule marine (68 de haut, rayon 34), onglet actif en pilule bleue.
+/// Barre d'onglets flottante : pilule blanche à ombre douce (68 de haut, rayon 34), onglet actif en pilule bleue.
 class BarreOnglets extends StatelessWidget {
   const BarreOnglets({
     super.key,
@@ -32,13 +32,14 @@ class BarreOnglets extends StatelessWidget {
           DimensionsSopi.margeEcran,
           0,
           DimensionsSopi.margeEcran,
-          12,
+          14,
         ),
         child: Container(
           height: DimensionsSopi.hauteurBarreOnglets,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
-            color: CouleursSopi.marine,
+            color: CouleursSopi.blanc,
+            boxShadow: OmbresSopi.barreBas,
             borderRadius: BorderRadius.circular(
               DimensionsSopi.rayonBarreOnglets,
             ),
@@ -96,7 +97,9 @@ class _Onglet extends StatelessWidget {
                 Icon(
                   onglet.icone,
                   size: 22,
-                  color: actif ? CouleursSopi.blanc : CouleursSopi.bleuPastel,
+                  color: actif
+                      ? CouleursSopi.blanc
+                      : CouleursSopi.iconeInactive,
                 ),
                 if (actif) ...[
                   const SizedBox(width: 6),

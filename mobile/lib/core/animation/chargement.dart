@@ -43,7 +43,7 @@ class SqueletteCarte extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,

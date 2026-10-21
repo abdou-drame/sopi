@@ -5,9 +5,8 @@ import '../../core/animation/apparition.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
-import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import 'modeles.dart';
 
 /// Écran « Demande envoyée » (maquette DemandeEnvoyee) : récapitulatif de la demande qui vient d'être créée.
@@ -28,32 +27,18 @@ class DemandeEnvoyeePage extends StatelessWidget {
     final r = reservation;
     final theme = Theme.of(context);
     final bas = MediaQuery.paddingOf(context).bottom;
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context) - hautMaquette;
 
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 0,
-            height: 380,
-            child: DescenteDepuisLeHaut(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(DimensionsSopi.rayonEnteteRestreint),
-                ),
-                child: const FondDegrade(child: SizedBox.expand()),
-              ),
-            ),
-          ),
           LayoutBuilder(
             builder: (context, contraintes) => SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: contraintes.maxHeight),
                 child: IntrinsicHeight(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, haut + 40, 16, bas + 24),
+                    padding: EdgeInsets.fromLTRB(16, haut + 80, 16, bas + 24),
                     child: Column(
                       children: [
                         Apparition(
@@ -63,13 +48,13 @@ class DemandeEnvoyeePage extends StatelessWidget {
                                 width: 104,
                                 height: 104,
                                 decoration: const BoxDecoration(
-                                  color: CouleursSopi.marine,
+                                  color: CouleursSopi.bleuPale,
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
                                   Icons.send_rounded,
                                   size: 46,
-                                  color: CouleursSopi.blanc,
+                                  color: CouleursSopi.bleu,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -109,7 +94,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 76),
                         Apparition.indexee(
                           index: 1,
                           child: Container(
@@ -118,7 +103,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: CouleursSopi.blanc,
                               borderRadius: BorderRadius.circular(26),
-                              border: Border.all(color: CouleursSopi.bordure),
+                              boxShadow: OmbresSopi.carte,
                             ),
                             child: Column(
                               children: [
@@ -134,7 +119,7 @@ class DemandeEnvoyeePage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: 32),
                         Apparition.indexee(
                           index: 2,
                           child: Container(
@@ -198,7 +183,7 @@ class _Ligne extends StatelessWidget {
           etiquette,
           style: theme.textTheme.bodyMedium?.copyWith(
             fontSize: 14,
-            color: CouleursSopi.texteDiscret,
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
         const SizedBox(width: 12),

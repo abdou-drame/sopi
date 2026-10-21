@@ -462,11 +462,12 @@ class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
           width: _tailleCarre,
           height: _tailleCarre,
           decoration: BoxDecoration(
-            color: succes ? CouleursSopi.succesFond : CouleursSopi.bleu,
+            color: succes ? CouleursSopi.succesFond : const Color(0xFFE8EEFC),
             borderRadius: BorderRadius.circular(28),
-            border: succes
-                ? Border.all(color: CouleursSopi.succesTexte, width: 3)
-                : null,
+            border: Border.all(
+              color: succes ? CouleursSopi.succesTexte : CouleursSopi.bleu,
+              width: 3,
+            ),
           ),
           child: succes
               ? CustomPaint(
@@ -481,11 +482,12 @@ class CodeSaisieState extends State<CodeSaisie> with TickerProviderStateMixin {
                 )
               : const Center(
                   child: SizedBox(
-                    width: 38,
-                    height: 38,
+                    width: 34,
+                    height: 34,
                     child: CircularProgressIndicator(
                       strokeWidth: 4,
-                      color: CouleursSopi.blanc,
+                      color: CouleursSopi.bleu,
+                      backgroundColor: Color(0xFFBFDBFE),
                       semanticsLabel:
                           'Un instant, nous confirmons le code du client.',
                     ),
@@ -518,23 +520,23 @@ class _CaseCode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final couleurBord = erreur
-        ? CouleursSopi.erreurTexte
-        : active
-        ? CouleursSopi.bleu
-        : CouleursSopi.bordureForte;
+    // Maquettes Prestation / CodeFaux : cases blanches ; liseré 2 px bleu (active) ou rouge (erreur) ;
+    // l'ombre ne marque que les cases encore vides.
+    final couleurBord = erreur ? CouleursSopi.erreurTexte : CouleursSopi.bleu;
     return Container(
       width: largeur,
       height: hauteur,
       margin: const EdgeInsets.symmetric(horizontal: 0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: grisee ? CouleursSopi.bordure : CouleursSopi.champ,
+        color: grisee ? CouleursSopi.fondSecondaire : CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: couleurBord,
-          width: active || erreur ? 2 : 1.2,
-        ),
+        border: active || erreur
+            ? Border.all(color: couleurBord, width: 2)
+            : null,
+        boxShadow: caractere == null && !active && !erreur
+            ? OmbresSopi.carte
+            : null,
       ),
       child: caractere != null
           ? Text(
@@ -542,7 +544,7 @@ class _CaseCode extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                color: erreur ? CouleursSopi.erreurTexte : CouleursSopi.marine,
+                color: erreur ? CouleursSopi.erreurTexte : CouleursSopi.texte,
               ),
             )
           : (active && curseurVisible

@@ -14,7 +14,7 @@ abstract final class ThemeSopi {
       seedColor: CouleursSopi.bleu,
       primary: CouleursSopi.bleu,
       onPrimary: CouleursSopi.blanc,
-      secondary: CouleursSopi.marine,
+      secondary: CouleursSopi.bleu,
       error: CouleursSopi.erreurTexte,
       surface: CouleursSopi.blanc,
       brightness: Brightness.light,
@@ -32,10 +32,18 @@ abstract final class ThemeSopi {
           : base.textTheme,
     );
 
-    OutlineInputBorder bordure(Color couleur, [double epaisseur = 1.2]) =>
+    // Champs sans bordure (maquettes) : fond #f1f3f8 uniquement.
+    final bordure = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
+      borderSide: BorderSide.none,
+    );
+    OutlineInputBorder bordureErreur([double epaisseur = 1.5]) =>
         OutlineInputBorder(
           borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
-          borderSide: BorderSide(color: couleur, width: epaisseur),
+          borderSide: BorderSide(
+            color: CouleursSopi.erreurTexte,
+            width: epaisseur,
+          ),
         );
 
     return base.copyWith(
@@ -43,7 +51,7 @@ abstract final class ThemeSopi {
       primaryTextTheme: texte,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
-        foregroundColor: CouleursSopi.marine,
+        foregroundColor: CouleursSopi.texte,
         elevation: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -53,29 +61,32 @@ abstract final class ThemeSopi {
           horizontal: 18,
           vertical: 16,
         ),
-        border: bordure(CouleursSopi.bordureForte),
-        enabledBorder: bordure(CouleursSopi.bordureForte),
-        focusedBorder: bordure(CouleursSopi.bleu, 2),
-        errorBorder: bordure(CouleursSopi.erreurTexte),
-        focusedErrorBorder: bordure(CouleursSopi.erreurTexte, 2),
-        hintStyle: texte.bodyMedium?.copyWith(color: CouleursSopi.texteDiscret),
+        border: bordure,
+        enabledBorder: bordure,
+        focusedBorder: bordure,
+        errorBorder: bordureErreur(),
+        focusedErrorBorder: bordureErreur(),
+        hintStyle: texte.bodyMedium?.copyWith(
+          color: CouleursSopi.texteSecondaire,
+        ),
       ),
       cardTheme: CardThemeData(
         color: CouleursSopi.blanc,
-        elevation: 0,
+        elevation: 1,
         margin: EdgeInsets.zero,
+        shadowColor: const Color(0x0F12172B),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(DimensionsSopi.rayonCarte),
-          side: const BorderSide(color: CouleursSopi.bordure),
         ),
       ),
       dividerTheme: const DividerThemeData(
-        color: CouleursSopi.bordure,
+        color: CouleursSopi.fondSecondaire,
         space: 1,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: CouleursSopi.marine,
-        contentTextStyle: texte.bodyMedium?.copyWith(color: CouleursSopi.blanc),
+        backgroundColor: CouleursSopi.blanc,
+        elevation: 4,
+        contentTextStyle: texte.bodyMedium?.copyWith(color: CouleursSopi.texte),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       ),
@@ -86,20 +97,20 @@ abstract final class ThemeSopi {
     TextStyle? s(TextStyle? style, FontWeight poids, Color couleur) =>
         style?.copyWith(fontWeight: poids, color: couleur);
     return t.copyWith(
-      displaySmall: s(t.displaySmall, FontWeight.w800, CouleursSopi.marine),
-      headlineMedium: s(t.headlineMedium, FontWeight.w800, CouleursSopi.marine),
-      headlineSmall: s(t.headlineSmall, FontWeight.w800, CouleursSopi.marine),
-      titleLarge: s(t.titleLarge, FontWeight.w800, CouleursSopi.marine),
-      titleMedium: s(t.titleMedium, FontWeight.w700, CouleursSopi.marine),
-      titleSmall: s(t.titleSmall, FontWeight.w700, CouleursSopi.marine),
-      bodyLarge: s(t.bodyLarge, FontWeight.w500, CouleursSopi.marine),
+      displaySmall: s(t.displaySmall, FontWeight.w800, CouleursSopi.texte),
+      headlineMedium: s(t.headlineMedium, FontWeight.w800, CouleursSopi.texte),
+      headlineSmall: s(t.headlineSmall, FontWeight.w800, CouleursSopi.texte),
+      titleLarge: s(t.titleLarge, FontWeight.w800, CouleursSopi.texte),
+      titleMedium: s(t.titleMedium, FontWeight.w700, CouleursSopi.texte),
+      titleSmall: s(t.titleSmall, FontWeight.w700, CouleursSopi.texte),
+      bodyLarge: s(t.bodyLarge, FontWeight.w500, CouleursSopi.texte),
       bodyMedium: s(
         t.bodyMedium,
         FontWeight.w400,
         CouleursSopi.texteSecondaire,
       ),
-      bodySmall: s(t.bodySmall, FontWeight.w400, CouleursSopi.texteDiscret),
-      labelLarge: s(t.labelLarge, FontWeight.w700, CouleursSopi.marine),
+      bodySmall: s(t.bodySmall, FontWeight.w400, CouleursSopi.texteSecondaire),
+      labelLarge: s(t.labelLarge, FontWeight.w700, CouleursSopi.texte),
       labelMedium: s(
         t.labelMedium,
         FontWeight.w600,

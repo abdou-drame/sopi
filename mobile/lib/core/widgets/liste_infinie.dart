@@ -4,7 +4,7 @@ import '../animation/chargement.dart';
 import '../api/erreurs.dart';
 import '../theme/dimensions.dart';
 import 'boutons.dart';
-import 'en_tete_degrade.dart';
+import 'en_tete_ecran.dart';
 import 'etats.dart';
 
 /// Une page de résultats : les éléments, la page courante et la dernière.
@@ -52,6 +52,8 @@ class ListeInfinie<T> extends StatefulWidget {
     this.enTete,
     this.avecRetour = true,
     this.enfantEntete,
+    this.ecartEntete = 18,
+    this.margeEntete = 20,
     this.margeBasse,
   });
 
@@ -62,6 +64,10 @@ class ListeInfinie<T> extends StatefulWidget {
 
   /// Contenu sous le titre, dans l'en-tête dégradé (carte de solde, onglets…).
   final Widget? enfantEntete;
+
+  /// Espace entre le titre et [enfantEntete], puis marge gauche et droite de celui-ci.
+  final double ecartEntete;
+  final double margeEntete;
 
   /// Espace sous la dernière ligne (par défaut : bas de l'écran + 24).
   final double? margeBasse;
@@ -165,12 +171,14 @@ class _EtatListeInfinie<T> extends State<ListeInfinie<T>> {
   Widget build(BuildContext context) {
     final haut = MediaQuery.paddingOf(context).top;
     final bas = MediaQuery.paddingOf(context).bottom;
-    final enTete = EnTeteDegrade(
+    final enTete = EnTeteEcran(
       titreLigne1: widget.titreLigne1,
       titreLigne2: widget.titreLigne2,
       action: widget.action,
       avecRetour: widget.avecRetour,
       enfant: widget.enfantEntete,
+      ecartEnfant: widget.ecartEntete,
+      margeEnfant: widget.margeEntete,
     );
 
     Widget zone(Widget enfant, {double hauteur = 320}) => SliverToBoxAdapter(

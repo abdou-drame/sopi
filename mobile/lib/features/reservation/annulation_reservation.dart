@@ -27,7 +27,7 @@ Future<bool> ouvrirAnnulation(
     isScrollControlled: true,
     useSafeArea: true,
     backgroundColor: Colors.transparent,
-    barrierColor: CouleursSopi.marine.withValues(alpha: .6),
+    barrierColor: CouleursSopi.texte.withValues(alpha: .6),
     builder: (_) => _FeuilleAnnulation(reservation: reservation),
   );
   if (annulee != true) return false;
@@ -109,7 +109,7 @@ class _EtatFeuille extends ConsumerState<_FeuilleAnnulation> {
                     width: 44,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: CouleursSopi.bordureForte,
+                      color: const Color(0xFFD5DDF0),
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),

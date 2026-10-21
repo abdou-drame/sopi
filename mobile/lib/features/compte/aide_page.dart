@@ -5,7 +5,7 @@ import '../../core/config/support.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 
 const messageMessagerieIndisponible = "Impossible d'ouvrir votre messagerie.";
 
@@ -57,7 +57,7 @@ class AidePage extends ConsumerWidget {
             child: CustomScrollView(
               slivers: [
                 const SliverToBoxAdapter(
-                  child: EnTeteDegrade(
+                  child: EnTeteEcran(
                     titreLigne1: 'Aide et',
                     titreLigne2: 'support',
                   ),
@@ -78,7 +78,7 @@ class AidePage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: CouleursSopi.blanc,
                         borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
+                        boxShadow: OmbresSopi.carte,
                       ),
                       child: Column(
                         children: [
@@ -91,7 +91,7 @@ class AidePage extends ConsumerWidget {
                                     ? null
                                     : const Border(
                                         top: BorderSide(
-                                          color: CouleursSopi.bordure,
+                                          color: Color(0xFFE3E7EF),
                                         ),
                                       ),
                               ),

@@ -7,8 +7,8 @@ import '../../core/api/erreurs.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
-import '../../core/theme/dimensions.dart';
-import '../../core/widgets/en_tete_degrade.dart';
+import '../../core/theme/disposition.dart';
+import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../compte/modeles_notification.dart' show dateRelative;
 import 'depot_reservation.dart';
@@ -78,7 +78,7 @@ class CarteAvis extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +107,7 @@ class CarteAvis extends StatelessWidget {
               dateRelative(avis.dateCreation!, maintenant!),
               style: theme.textTheme.bodySmall?.copyWith(
                 fontSize: 11,
-                color: CouleursSopi.texteDiscret,
+                color: CouleursSopi.texteSecondaire,
               ),
             ),
           ],
@@ -256,119 +256,94 @@ class _Entete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEntete),
-        ),
-        child: FondDegrade(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, haut + 24, 20, 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, hautEcran(context), 20, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: BoutonRetour(onPressed: () => context.pop()),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    BoutonRetour(onPressed: () => context.pop()),
-                    Expanded(
-                      child: Text(
-                        'Fiche prestataire',
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 64),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: CouleursSopi.bleu,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Icon(
-                          iconeMetier(profil?.metierCode ?? ''),
-                          size: 34,
-                          color: CouleursSopi.blanc,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: profil == null
-                            ? const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Squelette(largeur: 160, hauteur: 24),
-                                  SizedBox(height: 8),
-                                  Squelette(largeur: 110, hauteur: 13),
-                                ],
-                              )
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    profil!.nomEntreprise,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontSize: 24,
-                                          height: 30 / 24,
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.location_on_outlined,
-                                        size: 13,
-                                        color: CouleursSopi.texteSecondaire,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          '${profil!.quartier} · $metier',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                fontSize: 13,
-                                                color: CouleursSopi
-                                                    .texteSecondaire,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                      ),
-                    ],
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: CouleursSopi.bleu,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Icon(
+                    iconeMetier(profil?.metierCode ?? ''),
+                    size: 34,
+                    color: CouleursSopi.blanc,
                   ),
                 ),
-                const SizedBox(height: 22),
-                _BarreChiffres(profil: profil),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: profil == null
+                      ? const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Squelette(largeur: 160, hauteur: 24),
+                            SizedBox(height: 8),
+                            Squelette(largeur: 110, hauteur: 13),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              profil!.nomEntreprise,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontSize: 24,
+                                height: 30 / 24,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on_outlined,
+                                  size: 13,
+                                  color: CouleursSopi.texteSecondaire,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    '${profil!.quartier} · $metier',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontSize: 13,
+                                      color: CouleursSopi.texteSecondaire,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                ),
               ],
             ),
           ),
-        ),
+          const SizedBox(height: 30),
+          _BarreChiffres(profil: profil),
+        ],
       ),
     );
   }
 }
 
-/// Barre marine : note moyenne et nombre d'avis.
+/// Carte blanche : note moyenne et nombre d'avis.
 class _BarreChiffres extends StatelessWidget {
   const _BarreChiffres({required this.profil});
 
@@ -385,7 +360,7 @@ class _BarreChiffres extends StatelessWidget {
           style: theme.textTheme.titleLarge?.copyWith(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: CouleursSopi.blanc,
+            color: CouleursSopi.texte,
           ),
         ),
         const SizedBox(height: 2),
@@ -393,7 +368,7 @@ class _BarreChiffres extends StatelessWidget {
           libelle,
           style: theme.textTheme.bodySmall?.copyWith(
             fontSize: 11,
-            color: CouleursSopi.blanc.withValues(alpha: 0.7),
+            color: CouleursSopi.texteSecondaire,
           ),
         ),
       ],
@@ -403,8 +378,9 @@ class _BarreChiffres extends StatelessWidget {
       height: 92,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
-        color: CouleursSopi.marine,
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
+        boxShadow: OmbresSopi.carte,
       ),
       child: p == null
           ? const Row(
@@ -421,11 +397,7 @@ class _BarreChiffres extends StatelessWidget {
                   p.noteMoyenne == null ? '—' : formaterNote(p.noteMoyenne!),
                   'Note',
                 ),
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: CouleursSopi.blanc.withValues(alpha: 0.18),
-                ),
+                Container(width: 1, height: 40, color: CouleursSopi.separateur),
                 cellule('${p.nombreAvis}', 'Avis'),
               ],
             ),
@@ -531,7 +503,7 @@ class _CorpsFiche extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           if (profil.prestations.isEmpty)
             const EtatVide(
               message: 'Ce prestataire ne propose pas encore de service.',
@@ -549,7 +521,7 @@ class _CorpsFiche extends ConsumerWidget {
                   ),
                 ),
               ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 2),
           ApparitionApresEntete(
             rang: rang++,
             child: TitreSection(
@@ -563,7 +535,7 @@ class _CorpsFiche extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           avis.when(
             loading: () => const Squelette(hauteur: 90, rayon: 22),
             error: (e, _) => EtatErreur(
@@ -579,7 +551,7 @@ class _CorpsFiche extends ConsumerWidget {
                     child: Text(
                       'Aucun avis pour le moment.',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     ),
                   )
@@ -616,79 +588,81 @@ class _CarteService extends StatelessWidget {
     return Semantics(
       button: true,
       selected: choisie,
-      child: Material(
-        color: CouleursSopi.blanc,
-        borderRadius: BorderRadius.circular(22),
-        child: InkWell(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(22),
-          onTap: onTap,
-          child: Container(
-            // Bordure de 2 px quand le service est choisi : on retire 1 px de marge pour ne pas faire sauter la mise en page.
-            padding: EdgeInsets.symmetric(
-              horizontal: choisie ? 15 : 16,
-              vertical: choisie ? 13 : 14,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: choisie ? CouleursSopi.bleu : CouleursSopi.bordure,
-                width: choisie ? 2 : 1,
+          boxShadow: choisie ? null : OmbresSopi.carte,
+          border: choisie
+              ? Border.all(color: CouleursSopi.bleu, width: 2)
+              : null,
+        ),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: onTap,
+            child: Padding(
+              // Bordure de 2 px quand le service est choisi : la marge se réduit de 2 px pour ne pas faire sauter la mise en page.
+              padding: EdgeInsets.symmetric(
+                horizontal: choisie ? 14 : 16,
+                vertical: choisie ? 12 : 14,
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        prestation.nom,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Durée : ${formaterDuree(prestation.dureeMinutes)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          fontSize: 12,
-                          color: CouleursSopi.texteDiscret,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          formaterArgent(prestation.prix),
+                          prestation.nom,
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontSize: 15,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Acompte ${formaterArgent(prestation.montantAcompte)}',
+                          'Durée : ${formaterDuree(prestation.dureeMinutes)}',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: CouleursSopi.bleu,
+                            fontSize: 12,
+                            color: CouleursSopi.texteSecondaire,
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            formaterArgent(prestation.prix),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Acompte ${formaterArgent(prestation.montantAcompte)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: CouleursSopi.bleu,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

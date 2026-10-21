@@ -72,11 +72,9 @@ class ChampSelecteur extends StatelessWidget {
             color: CouleursSopi.champ,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
-              side: BorderSide(
-                color: enErreur
-                    ? CouleursSopi.erreurTexte
-                    : CouleursSopi.bordureForte,
-              ),
+              side: enErreur
+                  ? const BorderSide(color: CouleursSopi.erreurTexte)
+                  : BorderSide.none,
             ),
             child: InkWell(
               customBorder: RoundedRectangleBorder(
@@ -91,7 +89,7 @@ class ChampSelecteur extends StatelessWidget {
                   valeur,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontSize: 15,
-                    color: CouleursSopi.marine,
+                    color: CouleursSopi.texte,
                   ),
                 ),
               ),

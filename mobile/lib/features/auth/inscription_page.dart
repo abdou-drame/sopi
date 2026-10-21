@@ -122,7 +122,7 @@ class _InscriptionPageState extends ConsumerState<InscriptionPage> {
           titre1: 'Créer votre',
           titre2: 'compte client',
           droite: 'Étape 1 sur 1',
-          basEntete: 66,
+          basEntete: 26,
         ),
         corps: [
           ApparitionAcces(

@@ -86,7 +86,7 @@ class _TerminerPrestationPageState
                 ),
                 if (demande != null && demande.montantsConnus)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+                    padding: const EdgeInsets.fromLTRB(16, 84, 16, 0),
                     child: CarteMontantsPrestation(
                       demande: demande,
                       libelleCredit: 'Crédité à la fin',
@@ -102,14 +102,14 @@ class _TerminerPrestationPageState
                     ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+                  padding: const EdgeInsets.fromLTRB(20, 51, 20, 24),
                   child: Text(
                     'Quand le travail est fini et le reste payé sur place, terminez la prestation : '
                     'votre portefeuille est alors crédité.',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 12,
                       height: 17 / 12,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                 ),

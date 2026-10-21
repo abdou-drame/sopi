@@ -9,8 +9,8 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
+import '../../core/theme/disposition.dart';
 import '../../core/widgets/boutons.dart';
-import '../../core/widgets/en_tete_degrade.dart';
 import '../auth/session.dart';
 import '../reservation/depot_reservation.dart';
 import '../reservation/widgets/composants.dart';
@@ -96,100 +96,92 @@ class _EnteteTableau extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final haut = MediaQuery.paddingOf(context).top;
+    final haut = hautEcran(context);
     final nom = (prenom ?? '').trim();
     final initiale = nom.isEmpty ? '' : nom[0].toUpperCase();
 
-    return DescenteDepuisLeHaut(
-      child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(DimensionsSopi.rayonEntete),
-        ),
-        child: FondDegrade(
-          tacheBasse: true,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20, haut + 12, 20, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+    return ColoredBox(
+      color: CouleursSopi.fond,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20, haut, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                PilulePleine(
+                  libelle: 'Menu',
+                  icone: Icons.menu_rounded,
+                  onTap: () => context.go(Chemins.profilPrestataire),
+                ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    PilulePleine(
-                      libelle: 'Menu',
-                      icone: Icons.menu_rounded,
-                      onTap: () => context.go(Chemins.profilPrestataire),
+                    RondBlanc(
+                      libelle: 'Notifications',
+                      icone: Icons.notifications_none_rounded,
+                      pastille:
+                          (ref.watch(notificationsNonLuesProvider).value ?? 0) >
+                          0,
+                      onTap: () => context.push(Chemins.notifications),
                     ),
-                    Row(
-                      children: [
-                        RondBlanc(
-                          libelle: 'Notifications',
-                          icone: Icons.notifications_none_rounded,
-                          pastille:
-                              (ref.watch(notificationsNonLuesProvider).value ??
-                                  0) >
-                              0,
-                          onTap: () => context.push(Chemins.notifications),
-                        ),
-                        const SizedBox(width: 10),
-                        Semantics(
-                          button: true,
-                          label: 'Mon profil',
-                          child: GestureDetector(
-                            onTap: () => context.go(Chemins.profilPrestataire),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: CouleursSopi.bleu,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Text(
-                                initiale,
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: CouleursSopi.blanc,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
+                    const SizedBox(width: 10),
+                    Semantics(
+                      button: true,
+                      label: 'Mon profil',
+                      child: GestureDetector(
+                        onTap: () => context.go(Chemins.profilPrestataire),
+                        child: Container(
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            color: CouleursSopi.bleu,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            initiale,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: CouleursSopi.blanc,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.only(left: 4),
-                  child: Apparition(
-                    delai: apresEntete(0),
-                    child: Text.rich(
-                      TextSpan(
-                        text: 'Bonjour\n',
-                        children: [
-                          TextSpan(
-                            text: nom.isEmpty ? '!' : '$nom !',
-                            style: const TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                        ],
-                      ),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: DimensionsSopi.tailleTitreEcran,
-                        height:
-                            DimensionsSopi.interligneTitreEcran /
-                            DimensionsSopi.tailleTitreEcran,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 26),
-                const ApparitionApresEntete(rang: 1, child: _CarteSolde()),
               ],
             ),
-          ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Apparition(
+                delai: apresEntete(0),
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Bonjour\n',
+                    children: [
+                      TextSpan(
+                        text: nom.isEmpty ? '!' : '$nom !',
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontSize: DimensionsSopi.tailleTitreEcran,
+                    height:
+                        DimensionsSopi.interligneTitreEcran /
+                        DimensionsSopi.tailleTitreEcran,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 26),
+            const ApparitionApresEntete(rang: 1, child: _CarteSolde()),
+          ],
         ),
       ),
     );
@@ -313,7 +305,7 @@ class _CorpsTableau extends ConsumerWidget {
     final page = demandes.asData?.value;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 36, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -325,7 +317,7 @@ class _CorpsTableau extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: CouleursSopi.blanc,
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: CouleursSopi.bordure),
+                boxShadow: OmbresSopi.carte,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -335,7 +327,7 @@ class _CorpsTableau extends ConsumerWidget {
                     'Demandes à traiter',
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 11,
-                      color: CouleursSopi.texteDiscret,
+                      color: CouleursSopi.texteSecondaire,
                     ),
                   ),
                   if (page != null)
@@ -354,7 +346,7 @@ class _CorpsTableau extends ConsumerWidget {
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: CouleursSopi.texteDiscret,
+                        color: CouleursSopi.texteSecondaire,
                       ),
                     )
                   else
@@ -390,7 +382,7 @@ class _CorpsTableau extends ConsumerWidget {
                 'Aucune demande à traiter pour le moment.',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: CouleursSopi.texteDiscret,
+                  color: CouleursSopi.texteSecondaire,
                 ),
               ),
             )
