@@ -212,39 +212,36 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
                   titreLigne2: 'indisponibilité',
                   onRetour: _retour,
                 ),
-                Transform.translate(
-                  offset: const Offset(0, -16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.blanc,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
-                      ),
-                      child: Column(
-                        children: [
-                          _ligne(
-                            libelleJour: 'Du',
-                            jour: _jourDebut,
-                            heure: _heureDebut,
-                            champ: 'debut',
-                          ),
-                          const SizedBox(height: 12),
-                          _ligne(
-                            libelleJour: 'Au',
-                            jour: _jourFin,
-                            heure: _heureFin,
-                            champ: 'fin',
-                          ),
-                        ],
-                      ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: CouleursSopi.blanc,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: OmbresSopi.carte,
+                    ),
+                    child: Column(
+                      children: [
+                        _ligne(
+                          libelleJour: 'Du',
+                          jour: _jourDebut,
+                          heure: _heureDebut,
+                          champ: 'debut',
+                        ),
+                        const SizedBox(height: 12),
+                        _ligne(
+                          libelleJour: 'Au',
+                          jour: _jourFin,
+                          heure: _heureFin,
+                          champ: 'fin',
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: EdgeInsets.fromLTRB(16, 6, 16, 16),
                   child: BandeauErreur.alerte(
                     message:
                         'Attention : les réservations déjà prises sur cette période seront annulées et les clients remboursés.',
@@ -271,7 +268,7 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
                 const SizedBox(height: 10),
                 BoutonCompact(
                   libelle: 'Annuler',
-                  ton: TonBoutonCompact.contour,
+                  ton: TonBoutonCompact.clair,
                   hauteur: 50,
                   taille: 15,
                   pleineLargeur: true,

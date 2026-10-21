@@ -197,6 +197,7 @@ void main() {
       expect(
         find.text(
           'Les clients pourront réserver ces créneaux. Les réservations déjà prises ne sont pas modifiées.',
+          skipOffstage: false,
         ),
         findsOneWidget,
       );
@@ -253,12 +254,14 @@ void main() {
             : find.byType(Switch),
       );
       await tester.pump();
+      await tester.ensureVisible(find.byIcon(Icons.add_rounded));
+      await tester.pump();
       for (var i = 0; i < 6; i++) {
         await tester.tap(find.byIcon(Icons.add_rounded));
         await tester.pump();
       }
       // Plafonné à 8.
-      expect(find.text('8'), findsOneWidget);
+      expect(find.text('8', skipOffstage: false), findsOneWidget);
       expect(find.text('Pendant 8 semaines (8 au maximum)'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.remove_rounded));
       await tester.pump();
@@ -332,6 +335,7 @@ void main() {
       expect(
         find.text(
           'Cette demande créerait 600 créneaux ; le maximum est de 500 par requête.',
+          skipOffstage: false,
         ),
         findsOneWidget,
       );

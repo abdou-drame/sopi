@@ -52,13 +52,15 @@ class _PortefeuillePageState extends ConsumerState<PortefeuillePage> {
         titreLigne2: 'portefeuille',
         avecRetour: false,
         enfantEntete: const _CarteSoldePortefeuille(),
+        ecartEntete: 38,
+        margeEntete: 16,
         charger: _charger,
         construire: (context, m) => LigneMouvement(mouvement: m),
         messageVide: 'Aucun mouvement pour le moment.',
         iconeVide: Icons.account_balance_wallet_outlined,
         margeBasse: margeBarreOnglets(context),
         enTete: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
           child: Text(
             'Historique',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -273,7 +275,7 @@ class LigneMouvement extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         child: Row(
           children: [

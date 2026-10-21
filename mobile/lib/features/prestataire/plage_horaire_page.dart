@@ -161,139 +161,135 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
                   titreLigne2: 'créneaux',
                   onRetour: _retour,
                 ),
-                Transform.translate(
-                  offset: const Offset(0, -16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.blanc,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ChampSelecteur(
-                            libelle: 'Jour',
-                            valeur: '${formaterJourCourt(_jour)} ${_jour.year}',
-                            erreur: _erreurs['date'],
-                            onTap: _enCours ? () {} : _choisirJour,
-                          ),
-                          const SizedBox(height: 14),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: ChampFormulaire(
-                                  libelle: 'De',
-                                  controleur: _debut,
-                                  hauteur: 50,
-                                  margeInterne: 14,
-                                  enabled: !_enCours,
-                                  clavier: TextInputType.number,
-                                  formateurs: const [SaisieMasquee.heure],
-                                  erreur: _erreurs['heure_debut'],
-                                  onChanged: (_) => _effacer('heure_debut'),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: ChampFormulaire(
-                                  libelle: 'À',
-                                  controleur: _fin,
-                                  hauteur: 50,
-                                  margeInterne: 14,
-                                  enabled: !_enCours,
-                                  clavier: TextInputType.number,
-                                  formateurs: const [SaisieMasquee.heure],
-                                  erreur: _erreurs['heure_fin'],
-                                  onChanged: (_) => _effacer('heure_fin'),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-                          Text(
-                            "Durée d'un créneau",
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: CouleursSopi.texteSecondaire,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          PucesChoix<int>(
-                            valeurs: dureesCreneau,
-                            libelle: formaterDuree,
-                            choisie: _duree,
-                            actif: !_enCours,
-                            onChoix: (d) => setState(() {
-                              _duree = d;
-                              _erreurs = {..._erreurs}
-                                ..remove('duree_creneau_minutes');
-                            }),
-                          ),
-                          if (_erreurs['duree_creneau_minutes'] != null)
-                            MessageChamp(_erreurs['duree_creneau_minutes']!),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Répéter chaque semaine',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                    ),
-                                    Text(
-                                      'Pendant $_semaines semaines ($semainesMaxRepetition au maximum)',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            fontSize: 12,
-                                            color: CouleursSopi.texteSecondaire,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              InterrupteurSopi(
-                                libelle: 'Répéter chaque semaine',
-                                valeur: _repeter,
-                                onChanged: _enCours
-                                    ? null
-                                    : (v) => setState(() {
-                                        _repeter = v;
-                                        _erreurs = {..._erreurs}
-                                          ..remove('repeter_semaines');
-                                      }),
-                              ),
-                            ],
-                          ),
-                          if (_repeter)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: _CompteurSemaines(
-                                valeur: _semaines,
-                                actif: !_enCours,
-                                onChange: (v) => setState(() {
-                                  _semaines = v;
-                                  _erreurs = {..._erreurs}
-                                    ..remove('repeter_semaines');
-                                }),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: CouleursSopi.blanc,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: OmbresSopi.carte,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ChampSelecteur(
+                          libelle: 'Jour',
+                          valeur: '${formaterJourCourt(_jour)} ${_jour.year}',
+                          erreur: _erreurs['date'],
+                          onTap: _enCours ? () {} : _choisirJour,
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: ChampFormulaire(
+                                libelle: 'De',
+                                controleur: _debut,
+                                hauteur: 50,
+                                margeInterne: 14,
+                                enabled: !_enCours,
+                                clavier: TextInputType.number,
+                                formateurs: const [SaisieMasquee.heure],
+                                erreur: _erreurs['heure_debut'],
+                                onChanged: (_) => _effacer('heure_debut'),
                               ),
                             ),
-                          if (_erreurs['repeter_semaines'] != null)
-                            MessageChamp(_erreurs['repeter_semaines']!),
-                        ],
-                      ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ChampFormulaire(
+                                libelle: 'À',
+                                controleur: _fin,
+                                hauteur: 50,
+                                margeInterne: 14,
+                                enabled: !_enCours,
+                                clavier: TextInputType.number,
+                                formateurs: const [SaisieMasquee.heure],
+                                erreur: _erreurs['heure_fin'],
+                                onChanged: (_) => _effacer('heure_fin'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          "Durée d'un créneau",
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: CouleursSopi.texteSecondaire,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        PucesChoix<int>(
+                          valeurs: dureesCreneau,
+                          libelle: formaterDuree,
+                          choisie: _duree,
+                          actif: !_enCours,
+                          onChoix: (d) => setState(() {
+                            _duree = d;
+                            _erreurs = {..._erreurs}
+                              ..remove('duree_creneau_minutes');
+                          }),
+                        ),
+                        if (_erreurs['duree_creneau_minutes'] != null)
+                          MessageChamp(_erreurs['duree_creneau_minutes']!),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Répéter chaque semaine',
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                  Text(
+                                    'Pendant $_semaines semaines ($semainesMaxRepetition au maximum)',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontSize: 12,
+                                      color: CouleursSopi.texteSecondaire,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            InterrupteurSopi(
+                              libelle: 'Répéter chaque semaine',
+                              valeur: _repeter,
+                              onChanged: _enCours
+                                  ? null
+                                  : (v) => setState(() {
+                                      _repeter = v;
+                                      _erreurs = {..._erreurs}
+                                        ..remove('repeter_semaines');
+                                    }),
+                            ),
+                          ],
+                        ),
+                        if (_repeter)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: _CompteurSemaines(
+                              valeur: _semaines,
+                              actif: !_enCours,
+                              onChange: (v) => setState(() {
+                                _semaines = v;
+                                _erreurs = {..._erreurs}
+                                  ..remove('repeter_semaines');
+                              }),
+                            ),
+                          ),
+                        if (_erreurs['repeter_semaines'] != null)
+                          MessageChamp(_erreurs['repeter_semaines']!),
+                      ],
                     ),
                   ),
                 ),
@@ -303,7 +299,7 @@ class _PlageHorairePageState extends ConsumerState<PlageHorairePage> {
                     child: BandeauErreur.alerte(message: _erreurs['plages']!),
                   ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  padding: const EdgeInsets.fromLTRB(20, 6, 20, 16),
                   child: Text(
                     'Les clients pourront réserver ces créneaux. Les réservations déjà prises ne sont pas modifiées.',
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -354,7 +350,7 @@ class _CompteurSemaines extends StatelessWidget {
       label: libelle,
       excludeSemantics: true,
       child: Material(
-        color: CouleursSopi.enteteFond,
+        color: CouleursSopi.bleuPale,
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -366,7 +362,7 @@ class _CompteurSemaines extends StatelessWidget {
               icone,
               size: 18,
               color: cible == null
-                  ? CouleursSopi.bordureForte
+                  ? CouleursSopi.iconeInactive
                   : CouleursSopi.bleu,
             ),
           ),

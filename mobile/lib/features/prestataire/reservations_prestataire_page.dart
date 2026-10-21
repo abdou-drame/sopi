@@ -122,7 +122,7 @@ class _CorpsSquelette extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +137,7 @@ class _CorpsSquelette extends StatelessWidget {
     );
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(children: [carte(), const SizedBox(height: 12), carte()]),
     );
   }
@@ -152,7 +152,7 @@ class _CorpsListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: Column(
         children: [
           for (var i = 0; i < etat.elements.length; i++)
@@ -209,11 +209,11 @@ class CarteDemande extends StatelessWidget {
     final theme = Theme.of(context);
     final echeance = d.reponseAvant;
 
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(26),

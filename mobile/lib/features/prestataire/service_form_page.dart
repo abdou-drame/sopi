@@ -207,127 +207,120 @@ class _FormulaireState extends ConsumerState<_Formulaire> {
                   titreLigne2: 'service',
                   onRetour: _retour,
                 ),
-                Transform.translate(
-                  offset: const Offset(0, -16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.blanc,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ChampFormulaire(
-                            libelle: 'Nom du service',
-                            controleur: _nom,
-                            hauteur: 50,
-                            margeInterne: 14,
-                            enabled: !_enCours,
-                            erreur: _erreurs['nom'],
-                            onChanged: (_) => _effacer('nom'),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: CouleursSopi.blanc,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: OmbresSopi.carte,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ChampFormulaire(
+                          libelle: 'Nom du service',
+                          controleur: _nom,
+                          hauteur: 50,
+                          margeInterne: 14,
+                          enabled: !_enCours,
+                          erreur: _erreurs['nom'],
+                          onChanged: (_) => _effacer('nom'),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          'Durée',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: CouleursSopi.texteSecondaire,
                           ),
-                          const SizedBox(height: 14),
-                          Text(
-                            'Durée',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 12,
+                        ),
+                        const SizedBox(height: 8),
+                        PucesChoix<int>(
+                          valeurs: _durees,
+                          libelle: formaterDuree,
+                          choisie: _duree,
+                          actif: !_enCours,
+                          onChoix: (d) => setState(() {
+                            _duree = d;
+                            _erreurs = {..._erreurs}..remove('duree_minutes');
+                          }),
+                        ),
+                        _messageErreur(theme, 'duree_minutes'),
+                        const SizedBox(height: 14),
+                        ChampFormulaire(
+                          libelle: 'Prix (FCFA)',
+                          controleur: _prix,
+                          hauteur: 50,
+                          margeInterne: 14,
+                          enabled: !_enCours,
+                          clavier: TextInputType.number,
+                          formateurs: [FilteringTextInputFormatter.digitsOnly],
+                          erreur: _erreurs['prix'],
+                          onChanged: (_) => _effacer('prix'),
+                        ),
+                        const SizedBox(height: 14),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: CouleursSopi.bleuPale,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            "L'acompte demandé au client est calculé automatiquement par Sopi.",
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: CouleursSopi.texteSecondaire,
+                              color: CouleursSopi.bleu,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          PucesChoix<int>(
-                            valeurs: _durees,
-                            libelle: formaterDuree,
-                            choisie: _duree,
-                            actif: !_enCours,
-                            onChoix: (d) => setState(() {
-                              _duree = d;
-                              _erreurs = {..._erreurs}..remove('duree_minutes');
-                            }),
-                          ),
-                          _messageErreur(theme, 'duree_minutes'),
-                          const SizedBox(height: 14),
-                          ChampFormulaire(
-                            libelle: 'Prix (FCFA)',
-                            controleur: _prix,
-                            hauteur: 50,
-                            margeInterne: 14,
-                            enabled: !_enCours,
-                            clavier: TextInputType.number,
-                            formateurs: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            erreur: _erreurs['prix'],
-                            onChanged: (_) => _effacer('prix'),
-                          ),
-                          const SizedBox(height: 14),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: CouleursSopi.enteteFond,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Text(
-                              "L'acompte demandé au client est calculé automatiquement par Sopi.",
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: CouleursSopi.bleu,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Service actif',
-                                      style: theme.textTheme.titleMedium
-                                          ?.copyWith(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w700,
-                                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Service actif',
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                  Text(
+                                    'Visible et réservable par les clients',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontSize: 12,
+                                      color: CouleursSopi.texteSecondaire,
                                     ),
-                                    Text(
-                                      'Visible et réservable par les clients',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(
-                                            fontSize: 12,
-                                            color: CouleursSopi.texteSecondaire,
-                                          ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 12),
-                              InterrupteurSopi(
-                                libelle: 'Service actif',
-                                valeur: _actif,
-                                onChanged: _enCours
-                                    ? null
-                                    : (v) => setState(() {
-                                        _actif = v;
-                                        _erreurs = {..._erreurs}
-                                          ..remove('actif');
-                                      }),
-                              ),
-                            ],
-                          ),
-                          _messageErreur(theme, 'actif'),
-                        ],
-                      ),
+                            ),
+                            const SizedBox(width: 12),
+                            InterrupteurSopi(
+                              libelle: 'Service actif',
+                              valeur: _actif,
+                              onChanged: _enCours
+                                  ? null
+                                  : (v) => setState(() {
+                                      _actif = v;
+                                      _erreurs = {..._erreurs}..remove('actif');
+                                    }),
+                            ),
+                          ],
+                        ),
+                        _messageErreur(theme, 'actif'),
+                      ],
                     ),
                   ),
                 ),

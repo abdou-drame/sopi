@@ -100,6 +100,7 @@ class EnTeteEcran extends StatelessWidget {
     this.centre,
     this.enfant,
     this.ecartEnfant = 18,
+    this.margeEnfant = 20,
     this.margeBasse = 24,
     this.tailleTitre = DimensionsSopi.tailleTitreEcran,
     this.interligneTitre = DimensionsSopi.interligneTitreEcran,
@@ -121,6 +122,9 @@ class EnTeteEcran extends StatelessWidget {
 
   /// Espace entre le titre et [enfant], puis sous l'en-tête.
   final double ecartEnfant;
+
+  /// Marge gauche et droite de [enfant] (20 par défaut ; 16 pour une carte pleine largeur).
+  final double margeEnfant;
   final double margeBasse;
 
   final double tailleTitre;
@@ -195,7 +199,7 @@ class EnTeteEcran extends StatelessWidget {
           if (enfant != null) ...[
             SizedBox(height: ecartEnfant),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: margeEnfant),
               child: enfant!,
             ),
           ],

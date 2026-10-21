@@ -139,7 +139,7 @@ class _PastilleLitige extends StatelessWidget {
         CouleursSopi.indigoTexte,
       ),
       OngletLitiges.clos => (
-        CouleursSopi.bordure,
+        CouleursSopi.fondSecondaire,
         CouleursSopi.texteSecondaire,
       ),
     };
@@ -173,11 +173,11 @@ class _CarteLitige extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final jour = formaterDate(litige.dateRendezVous).split(',').first;
-    return Material(
-      color: CouleursSopi.blanc,
-      shape: RoundedRectangleBorder(
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(26),
-        side: const BorderSide(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: InkWell(
         key: ValueKey('litige-${litige.id}'),
@@ -241,21 +241,46 @@ class _NoteReponseRapide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: CouleursSopi.bordureForte),
-      ),
-      child: Text(
-        "Répondez rapidement : votre version est transmise à l'administrateur avec celle du client.",
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          fontSize: 12,
-          height: 17 / 12,
-          color: CouleursSopi.texteSecondaire,
+    return CustomPaint(
+      foregroundPainter: _CadrePointille(),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Text(
+          "Répondez rapidement : votre version est transmise à l'administrateur avec celle du client.",
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontSize: 12,
+            height: 17 / 12,
+            color: CouleursSopi.texteSecondaire,
+          ),
         ),
       ),
     );
   }
+}
+
+/// Cadre en pointillés de 1 px arrondi à 22 (maquette : « 1px dashed #8a90a2 »).
+class _CadrePointille extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final trait = Paint()
+      ..color = CouleursSopi.iconeInactive
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    final chemin = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Offset.zero & size,
+          const Radius.circular(22),
+        ).deflate(0.5),
+      );
+    for (final m in chemin.computeMetrics()) {
+      for (var d = 0.0; d < m.length; d += 6) {
+        canvas.drawPath(m.extractPath(d, (d + 3).clamp(0, m.length)), trait);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter ancien) => false;
 }

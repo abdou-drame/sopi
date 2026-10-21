@@ -6,7 +6,7 @@ import '../reservation/formats.dart' show formaterNote;
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
-import '../../core/widgets/en_tete_ecran.dart';
+import '../../core/theme/disposition.dart';
 import '../auth/session.dart';
 import '../auth/utilisateur.dart';
 import 'depot_prestataire.dart';
@@ -61,94 +61,84 @@ class ProfilPrestaPage extends ConsumerWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Stack(
-            children: [
-              const Positioned.fill(
-                child: DescenteDepuisLeHaut(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(DimensionsSopi.rayonEntete),
-                    ),
-                    child: FondDegrade(child: SizedBox.expand()),
-                  ),
+          ColoredBox(
+            color: CouleursSopi.fond,
+            child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  24,
+                  hautEcran(context) + 12,
+                  24,
+                  11,
                 ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    24,
-                    MediaQuery.paddingOf(context).top + 36,
-                    24,
-                    32,
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                          color: CouleursSopi.bleu,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          initiale,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: CouleursSopi.blanc,
-                          ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      alignment: Alignment.center,
+                      decoration: const BoxDecoration(
+                        color: CouleursSopi.bleu,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        initiale,
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: CouleursSopi.blanc,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entreprise,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (sousTitre.isNotEmpty) ...[
                       const SizedBox(height: 6),
                       Text(
-                        entreprise,
+                        sousTitre,
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 21,
-                          fontWeight: FontWeight.w800,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                          color: CouleursSopi.texteSecondaire,
                         ),
                       ),
-                      if (sousTitre.isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          sousTitre,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            color: CouleursSopi.texteSecondaire,
-                          ),
-                        ),
-                      ],
-                      if (u?.statutCompte == 'actif') ...[
-                        const SizedBox(height: 6),
-                        Container(
-                          key: const ValueKey('pastille-compte'),
-                          height: 26,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: CouleursSopi.succesFond,
-                            borderRadius: BorderRadius.circular(13),
-                          ),
-                          child: Text(
-                            'Compte actif',
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: CouleursSopi.succesTexte,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
-                  ),
+                    if (u?.statutCompte == 'actif') ...[
+                      const SizedBox(height: 6),
+                      Container(
+                        key: const ValueKey('pastille-compte'),
+                        height: 26,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: CouleursSopi.succesFond,
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: Text(
+                          'Compte actif',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: CouleursSopi.succesTexte,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
           _Groupe(
+            haut: 0,
             lignes: [
               _Ligne(
                 icone: Icons.diamond_outlined,
@@ -179,6 +169,7 @@ class ProfilPrestaPage extends ConsumerWidget {
             ],
           ),
           _Groupe(
+            haut: 14,
             lignes: [
               _Ligne(
                 icone: Icons.person_outline_rounded,
@@ -217,16 +208,18 @@ class ProfilPrestaPage extends ConsumerWidget {
 
 /// Carte blanche à bord arrondi (28) qui regroupe des lignes de 50 px.
 class _Groupe extends StatelessWidget {
-  const _Groupe({required this.lignes});
+  const _Groupe({required this.lignes, required this.haut});
+
+  final double haut;
 
   final List<_Ligne> lignes;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         DimensionsSopi.margeCarte,
-        12,
+        haut,
         DimensionsSopi.margeCarte,
         0,
       ),
@@ -234,7 +227,7 @@ class _Groupe extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -285,9 +278,7 @@ class _Ligne extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         decoration: BoxDecoration(
           border: separateur
-              ? const Border(
-                  bottom: BorderSide(color: CouleursSopi.separateurLigne),
-                )
+              ? const Border(bottom: BorderSide(color: Color(0xFFEEF2FA)))
               : null,
         ),
         child: Row(

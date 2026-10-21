@@ -144,7 +144,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
     } else {
       final ids = photos.requireValue;
       corps = Padding(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
         child: Column(
           children: [
             if (_erreur != null) ...[
@@ -199,6 +199,9 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
                 titreLigne1: 'Photos de',
                 titreLigne2: "l'entreprise",
                 onRetour: _retour,
+                ecartEnfant: 50,
+                margeEnfant: 24,
+                margeBasse: 0,
                 enfant: Text(
                   'Ces photos sont visibles par les clients sur votre fiche. '
                   'Utilisez des images nettes (JPEG, PNG ou WebP).',
@@ -268,7 +271,7 @@ class _Vignette extends ConsumerWidget {
                     width: 26,
                     height: 26,
                     decoration: const BoxDecoration(
-                      color: CouleursSopi.texte,
+                      color: CouleursSopi.bleu,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -302,7 +305,7 @@ class _ImageIndisponible extends StatelessWidget {
   );
 }
 
-/// Tuile « + » à bord pointillé de la maquette (bord plein : Flutter n'a pas de bordure pointillée native).
+/// Tuile « + » à bord pointillé de la maquette.
 class _TuileAjout extends StatelessWidget {
   const _TuileAjout({required this.onTap});
 
@@ -317,12 +320,8 @@ class _TuileAjout extends StatelessWidget {
         key: const ValueKey('ajouter-photo'),
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFFF7F9FF),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFFB8C4E6), width: 2),
-          ),
+        child: CustomPaint(
+          painter: _CadrePointille(),
           child: const Center(
             child: Icon(Icons.add_rounded, size: 26, color: CouleursSopi.bleu),
           ),
@@ -330,4 +329,29 @@ class _TuileAjout extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Fond champ et bord « 2px dashed #8a90a2 » arrondi à 20 (maquette).
+class _CadrePointille extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final fond = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      const Radius.circular(20),
+    );
+    canvas.drawRRect(fond, Paint()..color = CouleursSopi.champ);
+    final trait = Paint()
+      ..color = CouleursSopi.iconeInactive
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    final chemin = Path()..addRRect(fond.deflate(1));
+    for (final m in chemin.computeMetrics()) {
+      for (var d = 0.0; d < m.length; d += 8) {
+        canvas.drawPath(m.extractPath(d, (d + 4).clamp(0, m.length)), trait);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter ancien) => false;
 }

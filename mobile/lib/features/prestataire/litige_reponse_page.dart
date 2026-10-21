@@ -176,6 +176,14 @@ class _LitigeReponsePageState extends ConsumerState<LitigeReponsePage> {
   }
 }
 
+/// Champ sans bordure (maquette) ; liseré rouge seulement en cas d'erreur.
+OutlineInputBorder _bord(bool erreur) => OutlineInputBorder(
+  borderRadius: BorderRadius.circular(18),
+  borderSide: erreur
+      ? const BorderSide(color: CouleursSopi.erreurTexte)
+      : BorderSide.none,
+);
+
 class _Contenu extends StatelessWidget {
   const _Contenu({
     required this.litige,
@@ -211,7 +219,7 @@ class _Contenu extends StatelessWidget {
         CouleursSopi.indigoTexte,
       ),
       OngletLitiges.clos => (
-        CouleursSopi.bordure,
+        CouleursSopi.fondSecondaire,
         CouleursSopi.texteSecondaire,
       ),
     };
@@ -231,7 +239,7 @@ class _Contenu extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,7 +292,7 @@ class _Contenu extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: CouleursSopi.texte,
+                  color: CouleursSopi.bleu,
                   borderRadius: BorderRadius.circular(17),
                 ),
                 child: Text(
@@ -336,7 +344,7 @@ class _Contenu extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         child: bloc(
           'Votre réponse',
@@ -356,7 +364,7 @@ class _Contenu extends StatelessWidget {
         decoration: BoxDecoration(
           color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(30),
-          border: Border.all(color: CouleursSopi.bordure),
+          boxShadow: OmbresSopi.carte,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,29 +391,9 @@ class _Contenu extends StatelessWidget {
                   filled: true,
                   fillColor: CouleursSopi.champ,
                   contentPadding: const EdgeInsets.all(14),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide(
-                      color: erreurChamp != null
-                          ? CouleursSopi.erreurTexte
-                          : CouleursSopi.bordureForte,
-                    ),
-                  ),
-                  disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: const BorderSide(
-                      color: CouleursSopi.bordureForte,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18),
-                    borderSide: BorderSide(
-                      color: erreurChamp != null
-                          ? CouleursSopi.erreurTexte
-                          : CouleursSopi.bleu,
-                      width: 1.5,
-                    ),
-                  ),
+                  enabledBorder: _bord(erreurChamp != null),
+                  disabledBorder: _bord(false),
+                  focusedBorder: _bord(erreurChamp != null),
                 ),
               ),
             ),
@@ -417,27 +405,24 @@ class _Contenu extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      child: Transform.translate(
-        offset: Offset.zero,
-        child: Column(
-          children: [
+      child: Column(
+        children: [
+          const SizedBox(height: 26),
+          carteSignalement,
+          if (litige.cloture) ...[
             const SizedBox(height: 16),
-            carteSignalement,
-            if (litige.cloture) ...[
-              const SizedBox(height: 16),
-              BandeauInfo(
-                message: litige.motifDecision == null
-                    ? libelleDecision(litige.decision)
-                    : '${libelleDecision(litige.decision)}. ${litige.motifDecision}',
-              ),
-            ],
-            if (suite != null) ...[const SizedBox(height: 16), suite],
-            if (echec != null) ...[
-              const SizedBox(height: 16),
-              BandeauErreur.alerte(message: echec!),
-            ],
+            BandeauInfo(
+              message: litige.motifDecision == null
+                  ? libelleDecision(litige.decision)
+                  : '${libelleDecision(litige.decision)}. ${litige.motifDecision}',
+            ),
           ],
-        ),
+          if (suite != null) ...[const SizedBox(height: 16), suite],
+          if (echec != null) ...[
+            const SizedBox(height: 16),
+            BandeauErreur.alerte(message: echec!),
+          ],
+        ],
       ),
     );
   }

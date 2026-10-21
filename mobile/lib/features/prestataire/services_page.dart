@@ -36,7 +36,7 @@ class ServicesPage extends ConsumerWidget {
                   titreLigne2: 'et tarifs',
                   onRetour: () => _retour(context),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 36),
                 ...services.when(
                   loading: () => [
                     const SizedBox(height: 240, child: EtatChargement()),
@@ -106,7 +106,7 @@ class _CarteService extends StatelessWidget {
       decoration: BoxDecoration(
         color: actif ? CouleursSopi.blanc : CouleursSopi.ardoisePastel,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Row(
         children: [
@@ -130,7 +130,7 @@ class _CarteService extends StatelessWidget {
                     fontSize: 12,
                     color: actif
                         ? CouleursSopi.texteSecondaire
-                        : CouleursSopi.texteSecondaire,
+                        : CouleursSopi.iconeInactive,
                   ),
                 ),
               ],
@@ -142,7 +142,7 @@ class _CarteService extends StatelessWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: actif ? CouleursSopi.texte : CouleursSopi.texteSecondaire,
+              color: actif ? CouleursSopi.texte : CouleursSopi.iconeInactive,
             ),
           ),
           const SizedBox(width: 12),
@@ -151,7 +151,7 @@ class _CarteService extends StatelessWidget {
             label: 'Modifier ${service.nom}',
             excludeSemantics: true,
             child: Material(
-              color: actif ? CouleursSopi.enteteFond : CouleursSopi.blanc,
+              color: actif ? CouleursSopi.bleuPale : CouleursSopi.blanc,
               shape: const CircleBorder(),
               child: InkWell(
                 customBorder: const CircleBorder(),

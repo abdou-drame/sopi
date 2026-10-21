@@ -90,7 +90,7 @@ class DisponibilitesPage extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 ...creneaux.when(
                   loading: () => [
                     const SizedBox(height: 240, child: EtatChargement()),
@@ -158,7 +158,7 @@ class DisponibilitesPage extends ConsumerWidget {
                 const SizedBox(height: 10),
                 BoutonCompact(
                   libelle: 'Déclarer une indisponibilité',
-                  ton: TonBoutonCompact.contour,
+                  ton: TonBoutonCompact.clair,
                   hauteur: 50,
                   taille: 15,
                   pleineLargeur: true,
@@ -192,7 +192,7 @@ class _CarteJour extends StatelessWidget {
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: CouleursSopi.bordure),
+        boxShadow: OmbresSopi.carte,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +233,7 @@ class _PuceCreneau extends StatelessWidget {
         heure,
       ),
       StatutCreneau.reserve => (
-        CouleursSopi.texte,
+        CouleursSopi.bleu,
         CouleursSopi.blanc,
         FontWeight.w700,
         '$heure · réservé',
@@ -246,7 +246,7 @@ class _PuceCreneau extends StatelessWidget {
       ),
       StatutCreneau.indisponible => (
         CouleursSopi.ardoisePastel,
-        CouleursSopi.texteSecondaire,
+        CouleursSopi.iconeInactive,
         FontWeight.w600,
         heure,
       ),

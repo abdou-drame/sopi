@@ -188,101 +188,98 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
                   titreLigne2: 'mon argent',
                   onRetour: _retour,
                 ),
-                Transform.translate(
-                  offset: const Offset(0, -16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.blanc,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ligneSolde,
-                          const SizedBox(height: 14),
-                          ChampFormulaire(
-                            libelle: 'Montant à retirer (FCFA)',
-                            controleur: _montant,
-                            hauteur: 60,
-                            tailleTexte: 24,
-                            poidsTexte: FontWeight.w800,
-                            enabled: !_enCours,
-                            clavier: TextInputType.number,
-                            formateurs: const [SaisieMilliers()],
-                            erreur: _erreurs['montant'],
-                            onChanged: (_) {
-                              _effacer('montant');
-                            },
-                          ),
-                          if (texteLimites != null) ...[
-                            const SizedBox(height: 14),
-                            Text(
-                              texteLimites,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                fontSize: 12,
-                                color: CouleursSopi.texteSecondaire,
-                              ),
-                            ),
-                          ],
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: CouleursSopi.blanc,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: OmbresSopi.carte,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ligneSolde,
+                        const SizedBox(height: 14),
+                        ChampFormulaire(
+                          libelle: 'Montant à retirer (FCFA)',
+                          controleur: _montant,
+                          hauteur: 60,
+                          tailleTexte: 24,
+                          poidsTexte: FontWeight.w800,
+                          enabled: !_enCours,
+                          clavier: TextInputType.number,
+                          formateurs: const [SaisieMilliers()],
+                          erreur: _erreurs['montant'],
+                          onChanged: (_) {
+                            _effacer('montant');
+                          },
+                        ),
+                        if (texteLimites != null) ...[
                           const SizedBox(height: 14),
                           Text(
-                            'Recevoir sur',
-                            style: theme.textTheme.labelMedium?.copyWith(
+                            texteLimites,
+                            style: theme.textTheme.bodySmall?.copyWith(
                               fontSize: 12,
-                              fontWeight: FontWeight.w600,
                               color: CouleursSopi.texteSecondaire,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              for (final o in OperateurRetrait.values) ...[
-                                if (o != OperateurRetrait.values.first)
-                                  const SizedBox(width: 10),
-                                Expanded(
-                                  child: _ChoixOperateur(
-                                    operateur: o,
-                                    choisi: _operateur == o,
-                                    actif: !_enCours,
-                                    onTap: () => setState(() {
-                                      _operateur = o;
-                                      _erreurs = {..._erreurs}
-                                        ..remove('operateur');
-                                      _echec = null;
-                                    }),
-                                  ),
-                                ),
-                              ],
-                            ],
+                        ],
+                        const SizedBox(height: 14),
+                        Text(
+                          'Recevoir sur',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: CouleursSopi.texteSecondaire,
                           ),
-                          if (_erreurs['operateur'] != null)
-                            MessageChamp(_erreurs['operateur']!),
-                          const SizedBox(height: 14),
-                          ChampFormulaire(
-                            libelle: 'Numéro de téléphone',
-                            controleur: _telephone,
-                            indication: '77 123 45 67',
-                            enabled: !_enCours,
-                            clavier: TextInputType.phone,
-                            formateurs: [
-                              FilteringTextInputFormatter.allow(
-                                RegExp(r'[0-9+ ]'),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            for (final o in OperateurRetrait.values) ...[
+                              if (o != OperateurRetrait.values.first)
+                                const SizedBox(width: 10),
+                              Expanded(
+                                child: _ChoixOperateur(
+                                  operateur: o,
+                                  choisi: _operateur == o,
+                                  actif: !_enCours,
+                                  onTap: () => setState(() {
+                                    _operateur = o;
+                                    _erreurs = {..._erreurs}
+                                      ..remove('operateur');
+                                    _echec = null;
+                                  }),
+                                ),
                               ),
                             ],
-                            erreur: _erreurs['telephone_versement'],
-                            onChanged: (_) => _effacer('telephone_versement'),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                        if (_erreurs['operateur'] != null)
+                          MessageChamp(_erreurs['operateur']!),
+                        const SizedBox(height: 14),
+                        ChampFormulaire(
+                          libelle: 'Numéro de téléphone',
+                          controleur: _telephone,
+                          indication: '77 123 45 67',
+                          enabled: !_enCours,
+                          clavier: TextInputType.phone,
+                          formateurs: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[0-9+ ]'),
+                            ),
+                          ],
+                          erreur: _erreurs['telephone_versement'],
+                          onChanged: (_) => _effacer('telephone_versement'),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  padding: const EdgeInsets.fromLTRB(16, 9, 16, 16),
                   child: _echec != null
                       ? BandeauErreur.alerte(message: _echec!)
                       : Container(
@@ -350,14 +347,14 @@ class _ChoixOperateur extends StatelessWidget {
       selected: choisi,
       label: operateur.libelle,
       excludeSemantics: true,
-      child: Material(
-        color: CouleursSopi.blanc,
-        shape: RoundedRectangleBorder(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: CouleursSopi.blanc,
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(
-            color: choisi ? CouleursSopi.bleu : CouleursSopi.bordure,
-            width: choisi ? 2 : 1,
-          ),
+          border: choisi
+              ? Border.all(color: CouleursSopi.bleu, width: 2)
+              : null,
+          boxShadow: choisi ? null : OmbresSopi.carte,
         ),
         child: InkWell(
           key: ValueKey('operateur-${operateur.code}'),
@@ -429,70 +426,67 @@ class _Confirmation extends StatelessWidget {
                   titreLigne2: termine ? 'effectué' : 'en cours',
                   onRetour: onTerminer,
                 ),
-                Transform.translate(
-                  offset: const Offset(0, -16),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: CouleursSopi.blanc,
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: CouleursSopi.bordure),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 64,
-                            height: 64,
-                            decoration: BoxDecoration(
-                              color: termine
-                                  ? CouleursSopi.bleuPastel
-                                  : CouleursSopi.ardoisePastel,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              termine
-                                  ? Icons.check_rounded
-                                  : Icons.schedule_rounded,
-                              size: 32,
-                              color: termine
-                                  ? CouleursSopi.bleu
-                                  : CouleursSopi.ardoiseTexte,
-                            ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: CouleursSopi.blanc,
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: OmbresSopi.carte,
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: termine
+                                ? CouleursSopi.bleuPastel
+                                : CouleursSopi.ardoisePastel,
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            formaterArgent(retrait.montant),
-                            key: const ValueKey('montant-retrait'),
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          if (vers.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              vers,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: CouleursSopi.texteSecondaire,
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 14),
-                          Text(
+                          child: Icon(
                             termine
-                                ? 'Le versement a été effectué.'
-                                : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; vous êtes prévenu dès que le versement est terminé.",
-                            textAlign: TextAlign.center,
+                                ? Icons.check_rounded
+                                : Icons.schedule_rounded,
+                            size: 32,
+                            color: termine
+                                ? CouleursSopi.bleu
+                                : CouleursSopi.ardoiseTexte,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          formaterArgent(retrait.montant),
+                          key: const ValueKey('montant-retrait'),
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (vers.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            vers,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              fontSize: 13,
-                              height: 19 / 13,
                               color: CouleursSopi.texteSecondaire,
                             ),
                           ),
                         ],
-                      ),
+                        const SizedBox(height: 14),
+                        Text(
+                          termine
+                              ? 'Le versement a été effectué.'
+                              : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; vous êtes prévenu dès que le versement est terminé.",
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontSize: 13,
+                            height: 19 / 13,
+                            color: CouleursSopi.texteSecondaire,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
