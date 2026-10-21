@@ -346,7 +346,7 @@ export function LigneLien({ vers, libelle, texte, discret = false, children }: {
           state={{ recherche: search }}
           aria-label={libelle}
           className={`mq-rond mq-lr inline-flex items-center justify-center ${discret ? 'gap-1.5 border border-[#e6e8ee] bg-white' : 'bg-[#f3f4f7]'} text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8] ${
-            discret ? 'h-9 rounded-full px-4 text-[13px] font-semibold' : texte ? 'h-[34px] rounded-[17px] px-3.5 text-xs font-bold' : 'size-9 rounded-full'
+            discret ? 'h-8 rounded-full px-3.5 text-xs font-semibold' : texte ? 'h-[34px] rounded-[17px] px-3.5 text-xs font-bold' : 'size-9 rounded-full'
           }`}
         >
           {texte ?? <IFlecheHautDroite />}

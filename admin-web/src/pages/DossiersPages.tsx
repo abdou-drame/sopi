@@ -107,20 +107,22 @@ function CarteStat({
   note?: string
 }) {
   return (
-    <section aria-label={titre} className="box-border flex flex-col rounded-[32px] bg-white p-4">
-      <div className="flex items-center justify-between">
-        <span className={`grid size-9 place-items-center rounded-[18px] ${teinte}`}>{icone}</span>
-        <span className={`rounded-full px-3 py-1 text-xs font-bold ${badgeTeinte}`}>{badge}</span>
-      </div>
-      <div className="mt-2.5 text-[13px] font-medium text-[#8a90a2]">{titre}</div>
-      <div className="mt-0.5 text-[32px] leading-[36px] font-bold tracking-[-1px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : valeur}</div>
-      {pourcentage !== undefined ? (
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eceef2]" role="presentation">
-          <div className="barre-metier h-full rounded-full" style={{ width: `${pourcentage}%`, background: couleurBarre }} />
+    <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] bg-white px-4 py-2.5">
+      <span className={`grid size-9 shrink-0 place-items-center rounded-full ${teinte}`}>{icone}</span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="truncate text-xs font-medium text-[#8a90a2]">{titre}</span>
+          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${badgeTeinte}`}>{badge}</span>
         </div>
-      ) : (
-        <div className="mt-2 text-[13px] text-[#8a90a2]">{note}</div>
-      )}
+        <div className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : valeur}</div>
+        {pourcentage !== undefined ? (
+          <div className="mt-1 h-1 overflow-hidden rounded-full bg-[#eceef2]" role="presentation">
+            <div className="barre-metier h-full rounded-full" style={{ width: `${pourcentage}%`, background: couleurBarre }} />
+          </div>
+        ) : (
+          <div className="truncate text-xs text-[#8a90a2]">{note}</div>
+        )}
+      </div>
     </section>
   )
 }
@@ -156,30 +158,25 @@ export function DossiersListePage() {
   const filtre = recherche.trim() !== '' || metier !== ''
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <TitrePage compact titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier." />
 
-      <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
-        <section aria-label="En attente de décision" className="box-border flex flex-col rounded-[32px] p-4 text-white shadow-[0_18px_36px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
-          <div className="flex items-center justify-between">
-            <span className="grid size-9 place-items-center rounded-[18px] bg-white/20">
-              <IHorloge />
-            </span>
-            {enAttente === 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-xs font-bold">
-                <span className="[&>svg]:size-3.5">
-                  <ICoche />
-                </span>
-                À jour
-              </span>
-            )}
+      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+        <section aria-label="En attente de décision" className="box-border flex items-center gap-3 rounded-[24px] px-4 py-2.5 text-white shadow-[0_14px_28px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
+          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20">
+            <IHorloge />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="truncate text-xs font-semibold opacity-90">En attente de décision</span>
+              {enAttente === 0 && <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">À jour</span>}
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] tabular-nums">{enAttente === undefined ? '—' : enAttente}</span>
+              <span className="text-xs font-semibold opacity-90">{enAttente === 1 ? 'dossier' : 'dossiers'}</span>
+            </div>
+            <div className="truncate text-xs opacity-85">Plus ancien : {ageMax == null ? 'aucun dossier en retard' : dureeMinutes(ageMax)}</div>
           </div>
-          <div className="mt-2.5 text-[13px] font-semibold opacity-90">En attente de décision</div>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[32px] leading-[36px] font-bold tracking-[-1px] tabular-nums">{enAttente === undefined ? '—' : enAttente}</span>
-            <span className="text-sm font-semibold opacity-90">{enAttente === 1 ? 'dossier' : 'dossiers'}</span>
-          </div>
-          <div className="mt-2 text-[13px] opacity-85">Plus ancien : {ageMax == null ? 'aucun dossier en retard' : dureeMinutes(ageMax)}</div>
         </section>
 
         <CarteStat
@@ -213,7 +210,7 @@ export function DossiersListePage() {
         />
       </div>
 
-      <CarteMq className="flex flex-col gap-2.5 !p-4">
+      <CarteMq className="flex flex-col gap-2 !p-3 !rounded-[24px]">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
             pastille
@@ -227,7 +224,7 @@ export function DossiersListePage() {
             }))}
           />
           <div className="ml-auto flex flex-wrap items-center gap-2.5">
-            <label className="flex h-9 w-[280px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
               <IRecherche taille={16} />
               <input
                 type="search"
@@ -238,7 +235,7 @@ export function DossiersListePage() {
                 className="min-w-0 flex-1 border-none bg-transparent text-[13px] text-[#12172b] outline-none placeholder:text-[#9aa0b2]"
               />
             </label>
-            <label className="relative flex h-9 items-center gap-2 rounded-[18px] border border-[#e6e8ee] bg-white pr-4 pl-4 text-[13px] font-semibold text-[#12172b]">
+            <label className="relative flex h-8 items-center gap-2 rounded-[18px] border border-[#e6e8ee] bg-white pr-4 pl-4 text-[13px] font-semibold text-[#12172b]">
               <IFiltre />
               <select
                 value={metier}
@@ -258,11 +255,11 @@ export function DossiersListePage() {
         </div>
         <div className="overflow-x-auto">
           <table
-            className="w-full min-w-[820px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-2 [&_td]:align-middle [&_td]:font-medium"
+            className="w-full min-w-[820px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
             aria-label={T.legende}
           >
             <thead>
-              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-2 [&_th]:font-semibold">
+              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
                 <th>{T.prestataire}</th>
                 <th>{T.metier}</th>
                 <th>{T.quartier}</th>
@@ -283,7 +280,7 @@ export function DossiersListePage() {
                   <LigneLien key={d.id} vers={`/dossiers-prestataires/${d.id}`} libelle={`Examiner le dossier de ${nomComplet(d)}`} texte="Ouvrir le dossier" discret>
                     <td>
                       <div className="flex items-center gap-3">
-                        <Avatar nom={d.nomEntreprise || nomComplet(d)} taille={36} />
+                        <Avatar nom={d.nomEntreprise || nomComplet(d)} taille={30} />
                         <span className="min-w-0">
                           <span className="block font-semibold text-[#12172b]">{d.nomEntreprise || nomComplet(d)}</span>
                           <span className="mt-0.5 block text-xs font-normal text-[#9aa0b2]">{nomComplet(d)}</span>
@@ -291,11 +288,11 @@ export function DossiersListePage() {
                       </div>
                     </td>
                     <td>
-                      <span className="inline-block rounded-full bg-[#e7edff] px-3 py-1 text-xs font-semibold text-[#1d4ed8]">{L.metiers[d.metier] ?? d.metier}</span>
+                      <span className="inline-block rounded-full bg-[#e7edff] px-2.5 py-0.5 text-xs font-semibold text-[#1d4ed8]">{L.metiers[d.metier] ?? d.metier}</span>
                     </td>
                     <td className="text-[#6b7287]">{d.quartier}</td>
                     <td>
-                      <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${complet ? 'bg-[#eef1f6] text-[#4f566b]' : 'bg-[#fff0d4] text-[#983705]'}`}>
+                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${complet ? 'bg-[#eef1f6] text-[#4f566b]' : 'bg-[#fff0d4] text-[#983705]'}`}>
                         {d.nombreJustificatifs}/{PIECES_ATTENDUES} pièces
                       </span>
                     </td>
