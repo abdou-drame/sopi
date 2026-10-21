@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react'
+import { AnimatedCard } from './animation/composants'
 
 export const sansAccent = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 
 /** Pastille de statut : fond coloré, point et libellé. */
 export function Pastille({ fond, point, libelle }: { fond: string; point: string; libelle: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs font-semibold ${fond}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs font-semibold transition-colors duration-200 ${fond}`}>
       <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: point }} />
       {libelle}
     </span>
@@ -15,6 +16,7 @@ export function Pastille({ fond, point, libelle }: { fond: string; point: string
 /** Carte bleue de synthèse (dégradé) : icône ronde, titre, grand chiffre avec unité et note. */
 export function CarteBleue({ icone, titre, valeur, unite, aJour, note }: { icone: ReactNode; titre: string; valeur: number | undefined; unite: string; aJour?: boolean; note: string }) {
   return (
+    <AnimatedCard>
     <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] px-4 py-2.5 text-white shadow-[0_14px_28px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20">{icone}</span>
       <div className="min-w-0 flex-1">
@@ -29,6 +31,7 @@ export function CarteBleue({ icone, titre, valeur, unite, aJour, note }: { icone
         <div className="truncate text-xs opacity-85">{note}</div>
       </div>
     </section>
+    </AnimatedCard>
   )
 }
 
@@ -74,6 +77,7 @@ export function CarteStat({
   formater?: (n: number) => string
 }) {
   return (
+    <AnimatedCard>
     <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] bg-white px-4 py-2.5">
       <span className={`grid size-9 shrink-0 place-items-center rounded-full ${teinte}`}>{icone}</span>
       <div className="min-w-0 flex-1">
@@ -91,6 +95,7 @@ export function CarteStat({
         )}
       </div>
     </section>
+    </AnimatedCard>
   )
 }
 

@@ -7,6 +7,7 @@ import { L } from '../i18n/libelles'
 import { HoteEnTete } from './EnTeteLarge'
 import MenuPlus from './MenuPlus'
 import Logo from '../design/Logo'
+import { PageTransition } from '../design/animation/composants'
 import {
   IActualiser,
   IAvis,
@@ -179,9 +180,9 @@ export default function Coque() {
             <Rail />
             <main id="contenu" tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-4 outline-none">
               <div ref={setHote} className="empty:hidden px-2" />
-              <div key={lieu.pathname} className="page-entree flex flex-col gap-4">
+              <PageTransition>
                 <Outlet />
-              </div>
+              </PageTransition>
             </main>
           </div>
         </div>

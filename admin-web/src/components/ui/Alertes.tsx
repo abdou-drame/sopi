@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { L } from '../../i18n/libelles'
+import { animationsActives } from '../../design/animation/usePresence'
 
 export type TypeRetour = 'succes' | 'info' | 'erreur'
 
@@ -13,6 +14,8 @@ interface Retour {
   id: number
   type: TypeRetour
   texte: string
+  /** Vrai pendant l'animation de sortie : l'alerte est déjà fermée, elle n'est plus qu'à retirer de l'écran. */
+  sortie?: boolean
 }
 
 interface Notifieur {
@@ -48,7 +51,7 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
       onMouseLeave={() => setEnPause(false)}
       onFocus={() => setEnPause(true)}
       onBlur={() => setEnPause(false)}
-      className={`animate-glissement flex items-start gap-3 rounded-[20px] border-l-4 bg-white px-4 py-3.5 text-[13px] font-semibold text-[#12172b] shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
+      className={`${retour.sortie ? 'anim-toast-sortie' : 'animate-glissement'} flex items-start gap-3 rounded-[20px] border-l-4 bg-white px-4 py-3.5 text-[13px] font-semibold text-[#12172b] shadow-[0_12px_32px_rgba(18,23,43,0.16)] ${styles[retour.type]}`}
     >
       <span className="min-w-0 flex-1">{retour.texte}</span>
       <button
@@ -66,7 +69,12 @@ function AlerteFlottante({ retour, onFin }: { retour: Retour; onFin: (id: number
 /** Fournit les retours d'action (succès, information, erreur) : alertes flottantes qui disparaissent seules. */
 export function AlertesProvider({ children }: { children: ReactNode }) {
   const [retours, setRetours] = useState<Retour[]>([])
-  const retirer = useCallback((id: number) => setRetours((liste) => liste.filter((r) => r.id !== id)), [])
+  const retirer = useCallback((id: number) => {
+    const enlever = () => setRetours((liste) => liste.filter((r) => r.id !== id))
+    if (!animationsActives()) return enlever()
+    setRetours((liste) => liste.map((r) => (r.id === id ? { ...r, sortie: true } : r)))
+    setTimeout(enlever, 180)
+  }, [])
   const notifieur = useMemo<Notifieur>(() => {
     let suivant = 0
     const ajouter = (type: TypeRetour) => (texte: string) =>
@@ -82,7 +90,7 @@ export function AlertesProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="pointer-events-none fixed right-4 top-4 z-50 flex w-[min(24rem,calc((100vw-2rem)/var(--echelle)))] flex-col gap-2">
         {retours.map((r) => (
-          <div key={r.id} className="pointer-events-auto">
+          <div key={r.id} className={r.sortie ? 'pointer-events-none' : 'pointer-events-auto'}>
             <AlerteFlottante retour={r} onFin={retirer} />
           </div>
         ))}

@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { L } from '../i18n/libelles'
 import { BoutonAction } from './boutons'
 import { ChampZone } from './champs'
+import { usePresence } from './animation/usePresence'
 
 interface Props {
   ouverte: boolean
@@ -66,6 +67,7 @@ export default function Fenetre({
   const [motif, setMotif] = useState('')
   const [tente, setTente] = useState(false)
   const boite = useRef<HTMLDivElement>(null)
+  const { monte, sortie } = usePresence(ouverte)
 
   useEffect(() => {
     if (!ouverte) return
@@ -79,7 +81,7 @@ export default function Fenetre({
     }
   }, [ouverte])
 
-  if (!ouverte) return null
+  if (!monte) return null
 
   const afficherMotif = motifObligatoire || motifFacultatif
   const longueur = motif.trim().length
@@ -122,7 +124,7 @@ export default function Fenetre({
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#12172b]/50 px-4 py-14 sm:items-start" onKeyDown={surClavier}>
+    <div data-sortie={sortie || undefined} className="anim-fond fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#12172b]/50 px-4 py-14 data-[sortie]:pointer-events-none sm:items-start" onKeyDown={surClavier}>
       <div
         ref={boite}
         role="dialog"
@@ -130,7 +132,7 @@ export default function Fenetre({
         aria-labelledby={idTitre}
         aria-describedby={description ? idDescription : undefined}
         style={{ maxWidth: largeur }}
-        className="box-border w-full rounded-[28px] bg-white p-6 shadow-[0_24px_60px_rgba(18,23,43,0.25)]"
+        className="anim-modale box-border w-full rounded-[28px] bg-white p-6 shadow-[0_24px_60px_rgba(18,23,43,0.25)]"
       >
         <form onSubmit={soumettre} noValidate>
           <h2 id={idTitre} className="m-0 text-xl leading-[normal] font-bold">

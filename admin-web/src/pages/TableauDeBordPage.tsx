@@ -1,4 +1,5 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
+import { AnimatedCard } from '../design/animation/composants'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/endpoints'
@@ -67,6 +68,7 @@ function CarteChiffre({
 }) {
   const clair = degrade ? 'opacity-80' : 'text-[#9aa0b2]'
   return (
+    <AnimatedCard>
     <section
       className={`box-border rounded-[24px] px-5 py-3 ${degrade ? 'text-white' : 'bg-white'}`}
       style={degrade ? { background: DEGRADE_BLEU } : undefined}
@@ -81,6 +83,7 @@ function CarteChiffre({
       </div>
       <div className={`mt-0.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>
     </section>
+    </AnimatedCard>
   )
 }
 

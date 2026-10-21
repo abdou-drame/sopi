@@ -110,7 +110,7 @@ const TONS: Record<TonBadge, string> = {
 /** Pastille de statut : padding 5px 12px, pilule, 12 px (600 dans les tableaux, 700 ailleurs). */
 export function Badge({ ton, children, gras = false }: { ton: TonBadge; children: ReactNode; gras?: boolean }) {
   return (
-    <span className={`inline-block rounded-full px-3 py-[5px] text-xs ${gras ? 'font-bold' : 'font-semibold'} ${TONS[ton]}`}>{children}</span>
+    <span className={`inline-block rounded-full px-3 py-[5px] text-xs transition-colors duration-200 ${gras ? 'font-bold' : 'font-semibold'} ${TONS[ton]}`}>{children}</span>
   )
 }
 
