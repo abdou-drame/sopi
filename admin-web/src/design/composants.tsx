@@ -124,12 +124,12 @@ const PALETTE = [
 ]
 
 /** Avatar d'initiales : paires pastel des maquettes, choisies de façon stable d'après le nom. */
-export function Avatar({ nom, taille = 40 }: { nom: string; taille?: 36 | 40 | 44 }) {
+export function Avatar({ nom, taille = 40 }: { nom: string; taille?: 30 | 36 | 40 | 44 }) {
   let h = 0
   for (const c of nom) h = (h * 31 + c.charCodeAt(0)) >>> 0
   const mots = nom.trim().split(/\s+/).filter(Boolean)
   const initiales = ((mots[0]?.[0] ?? '') + (mots.length > 1 ? (mots[mots.length - 1][0] ?? '') : (mots[0]?.[1] ?? ''))).toUpperCase()
-  const dim = taille === 36 ? 'size-9 text-xs' : taille === 44 ? 'size-11 text-[13px]' : 'size-10 text-[13px]'
+  const dim = taille === 30 ? 'size-[30px] text-[11px]' : taille === 36 ? 'size-9 text-xs' : taille === 44 ? 'size-11 text-[13px]' : 'size-10 text-[13px]'
   return (
     <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full font-bold ${dim} ${PALETTE[h % PALETTE.length]}`}>
       {initiales}

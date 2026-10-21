@@ -27,6 +27,7 @@ import {
   type TonBadge,
 } from '../design/composants'
 import { IDocument, IHorloge, IRecherche, IUtilisateur } from '../design/icones'
+import { CarteBleue, CarteStat, ICoche, ICroix, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
@@ -49,8 +50,6 @@ const nomComplet = (d: { prenom: string; nom: string }) => `${d.prenom} ${d.nom}
 const PIECES_ATTENDUES = Object.keys(T.documents).length
 const TON_STATUT: Record<string, TonBadge> = { en_attente: 'attention', actif: 'succes', refuse: 'danger' }
 
-const sansAccent = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-
 const PASTILLE_STATUT: Record<string, { fond: string; point: string }> = {
   en_attente: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
   actif: { fond: 'bg-[#d7f7e4] text-[#0e6245]', point: '#16a34a' },
@@ -59,72 +58,7 @@ const PASTILLE_STATUT: Record<string, { fond: string; point: string }> = {
 
 function PastilleStatut({ code, libelle, alerte }: { code: string; libelle: string; alerte: boolean }) {
   const style = alerte ? { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' } : (PASTILLE_STATUT[code] ?? { fond: 'bg-[#eef1f6] text-[#4f566b]', point: '#9aa0b2' })
-  return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs font-semibold ${style.fond}`}>
-      <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: style.point }} />
-      {libelle}
-    </span>
-  )
-}
-
-const ICO = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
-const ICoche = () => (
-  <svg {...ICO}>
-    <path d="M5 12.5l4.5 4.5L19 7.5" />
-  </svg>
-)
-const ICroix = () => (
-  <svg {...ICO}>
-    <path d="M6 6l12 12M18 6L6 18" />
-  </svg>
-)
-const IFiltre = () => (
-  <svg {...ICO} width={16} height={16}>
-    <path d="M4 7h16M7 12h10M10 17h4" />
-  </svg>
-)
-
-/** Carte de synthèse blanche : rond d'icône coloré, badge, grand chiffre et barre de progression fine (si un pourcentage existe). */
-function CarteStat({
-  icone,
-  teinte,
-  badge,
-  badgeTeinte,
-  titre,
-  valeur,
-  pourcentage,
-  couleurBarre,
-  note,
-}: {
-  icone: React.ReactNode
-  teinte: string
-  badge: string
-  badgeTeinte: string
-  titre: string
-  valeur: number | undefined
-  pourcentage?: number
-  couleurBarre?: string
-  note?: string
-}) {
-  return (
-    <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] bg-white px-4 py-2.5">
-      <span className={`grid size-9 shrink-0 place-items-center rounded-full ${teinte}`}>{icone}</span>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <span className="truncate text-xs font-medium text-[#8a90a2]">{titre}</span>
-          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${badgeTeinte}`}>{badge}</span>
-        </div>
-        <div className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : valeur}</div>
-        {pourcentage !== undefined ? (
-          <div className="mt-1 h-1 overflow-hidden rounded-full bg-[#eceef2]" role="presentation">
-            <div className="barre-metier h-full rounded-full" style={{ width: `${pourcentage}%`, background: couleurBarre }} />
-          </div>
-        ) : (
-          <div className="truncate text-xs text-[#8a90a2]">{note}</div>
-        )}
-      </div>
-    </section>
-  )
+  return <Pastille fond={style.fond} point={style.point} libelle={libelle} />
 }
 
 export function DossiersListePage() {
@@ -162,22 +96,14 @@ export function DossiersListePage() {
       <TitrePage compact titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier." />
 
       <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
-        <section aria-label="En attente de décision" className="box-border flex items-center gap-3 rounded-[24px] px-4 py-2.5 text-white shadow-[0_14px_28px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
-          <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20">
-            <IHorloge />
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-xs font-semibold opacity-90">En attente de décision</span>
-              {enAttente === 0 && <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">À jour</span>}
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] tabular-nums">{enAttente === undefined ? '—' : enAttente}</span>
-              <span className="text-xs font-semibold opacity-90">{enAttente === 1 ? 'dossier' : 'dossiers'}</span>
-            </div>
-            <div className="truncate text-xs opacity-85">Plus ancien : {ageMax == null ? 'aucun dossier en retard' : dureeMinutes(ageMax)}</div>
-          </div>
-        </section>
+        <CarteBleue
+          icone={<IHorloge />}
+          titre="En attente de décision"
+          valeur={enAttente}
+          unite={enAttente === 1 ? 'dossier' : 'dossiers'}
+          aJour={enAttente === 0}
+          note={`Plus ancien : ${ageMax == null ? 'aucun dossier en retard' : dureeMinutes(ageMax)}`}
+        />
 
         <CarteStat
           icone={<ICoche />}

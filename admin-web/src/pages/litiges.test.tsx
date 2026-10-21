@@ -71,6 +71,29 @@ describe('litiges', () => {
     expect(screen.getByTestId('lieu')).toHaveTextContent('/litiges?statut=cloture')
   })
 
+  it('calcule les 4 cartes (ouverts, clôturés, acomptes bloqués, taux) et filtre la page par recherche et décision', async () => {
+    const tableau = { litiges: { total: 6, ouverts: 2, clos: 4 }, reservations: { total: 35 } }
+    const rembourse = { ...LITIGE, id: 'l-2', motif: 'Retard', client: { ...LITIGE.client, prenom: 'Fatou', nom: 'Sow' }, decision: 'avertissement', paiements: [{ ...LITIGE.paiements[0], id: 'pa-2', statut: 'rembourse', montantAcompte: 2000 }] }
+    simulerApi({ ...base, 'GET /admin/tableau-de-bord': { corps: tableau }, 'GET /admin/litiges': { corps: PAGE([LITIGE, rembourse]) } })
+    afficherApplication('/litiges')
+    const liste = await screen.findByRole('table', { name: 'Liste des litiges' })
+    const carte = (nom: string) => within(screen.getByRole('region', { name: nom }))
+    expect(await carte('Litiges ouverts').findByText('2')).toBeInTheDocument()
+    expect(carte('Clôturés').getByText('4')).toBeInTheDocument()
+    expect(carte('Clôturés').getByText('67 %')).toBeInTheDocument()
+    // Acomptes bloqués : 4 500 (payé), le paiement remboursé de 2 000 n'est pas compté.
+    expect(await carte('Acomptes bloqués').findByText((t) => t.replace(/[^0-9]/g, '') === '4500')).toBeInTheDocument()
+    expect(carte('Taux de litige').getByText('17')).toBeInTheDocument()
+    expect(carte('Taux de litige').getByText(/6 litiges pour 35 réservations/)).toBeInTheDocument()
+    expect(within(liste).getAllByRole('link', { name: /Ouvrir le litige/ })).toHaveLength(2)
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Rechercher un client ou un prestataire' }), 'fatou')
+    expect(within(liste).getAllByRole('link', { name: /Ouvrir le litige/ })).toHaveLength(1)
+    await userEvent.clear(screen.getByRole('searchbox', { name: 'Rechercher un client ou un prestataire' }))
+    await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Filtrer par décision' }), 'ouvert')
+    expect(within(liste).getByRole('link', { name: 'Ouvrir le litige Prestataire absent' })).toBeInTheDocument()
+    expect(within(liste).queryByRole('link', { name: 'Ouvrir le litige Retard' })).not.toBeInTheDocument()
+  })
+
   it('affiche le détail : motif, chronologie, acompte, réservation et personnes concernées', async () => {
     simulerApi(routesDetail)
     afficherApplication(`/litiges/${ID}`)

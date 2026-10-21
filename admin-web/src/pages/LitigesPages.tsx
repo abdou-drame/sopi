@@ -4,14 +4,15 @@ import type { ReactNode } from 'react'
 import { useParams } from 'react-router-dom'
 import { messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
-import type { CibleSanction, DecisionLitige, LitigeDetail } from '../api/typesAdmin'
+import type { CibleSanction, DecisionLitige, Litige, LitigeDetail } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useRetours } from '../components/ui/Alertes'
 import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import { ChampJour, ChampSelect } from '../design/champs'
 import Fenetre from '../design/Fenetre'
-import { Badge, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PiedListe, TitreCarte, TitreDetail, TitrePage, type TonBadge } from '../design/composants'
-import { IHorloge, IImage, IMessage } from '../design/icones'
+import { Avatar, Badge, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PaginationRonde, TitreCarte, TitreDetail, TitrePage } from '../design/composants'
+import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
+import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
@@ -30,26 +31,122 @@ const OPTIONS_STATUT = [
 
 const nomComplet = (p: { prenom: string; nom: string }) => `${p.prenom} ${p.nom}`
 
-const TON_STATUT: Record<string, TonBadge> = { ouvert: 'danger', cloture: 'succes' }
 
 /** « Clôturé · rejet » quand la clôture est un rejet de la plainte, « Clôturé » pour toute autre décision. */
 const libelleStatut = (statut: string, decision: DecisionLitige | null) => (statut === 'cloture' && decision === 'rejet' ? T.clotureRejet : (L.statuts[statut] ?? statut))
+
+const PASTILLE_DECISION: Record<string, { fond: string; point: string }> = {
+  ouvert: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
+  rejet: { fond: 'bg-[#eef1f6] text-[#4f566b]', point: '#6b7287' },
+  avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
+  suspension_temporaire: { fond: 'bg-[#ffe6d5] text-[#9a3412]', point: '#f97316' },
+  bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' },
+  rembourse: { fond: 'bg-[#e7edff] text-[#1d4ed8]', point: '#1d4ed8' },
+}
+
+/** Code d'affichage de la décision : « remboursé » si un paiement du litige l'est, « ouvert » tant qu'aucune décision n'est prise. */
+function codeDecision(l: Litige): string {
+  if (l.decision === null) return l.statut === 'ouvert' ? 'ouvert' : 'rejet'
+  if (l.paiements.some((p) => p.statut === 'rembourse')) return 'rembourse'
+  return l.decision
+}
+const libelleDecision = (code: string) => (code === 'ouvert' ? 'En cours' : code === 'rembourse' ? 'Remboursé' : (T.decisionsCourt[code] ?? code))
+
+/** Un acompte est bloqué tant que le paiement est encaissé et pas remboursé. */
+const acompteBloque = (l: Litige) => l.paiements.filter((p) => !['rembourse', 'echoue', 'en_attente'].includes(p.statut)).reduce((somme, p) => somme + p.montantAcompte, 0)
+
+const ICO = { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true } as const
+const IBalance = () => (
+  <svg {...ICO}>
+    <path d="M12 4v16M6 20h12M5 7h14M5 7l-3 7a3 3 0 006 0L5 7zM19 7l-3 7a3 3 0 006 0l-3-7z" />
+  </svg>
+)
+const IPortefeuille = () => (
+  <svg {...ICO}>
+    <rect x="4" y="6" width="16" height="13" rx="3" />
+    <path d="M4 10h16M15 14.5h2" />
+  </svg>
+)
+const IPourcent = () => (
+  <svg {...ICO}>
+    <path d="M19 5L5 19M7.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM16.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+  </svg>
+)
 
 export function LitigesListePage() {
   const etat = useFiltresUrl(['statut'], { statut: 'ouvert' })
   const liste = useListe('litiges', api.litiges, etat)
   const { data: tableau } = useQuery({ queryKey: ['tableau-de-bord'], queryFn: api.tableauDeBord, retry: false })
-  const compteurs: Record<string, number | undefined> = {
-    ouvert: tableau?.litiges.ouverts,
-    cloture: tableau?.litiges.clos,
-    tous: tableau?.litiges.total,
-  }
+  // L'API n'expose pas le total des acomptes bloqués : on somme les litiges ouverts de la première page (20 au plus).
+  const { data: ouverts } = useQuery({ queryKey: ['litiges-ouverts-acomptes'], queryFn: () => api.litiges({ statut: 'ouvert' }), retry: false })
+  const [recherche, setRecherche] = useState('')
+  const [decision, setDecision] = useState('')
+
+  const nbOuverts = tableau?.litiges.ouverts
+  const nbClos = tableau?.litiges.clos
+  const nbLitiges = tableau?.litiges.total
+  const nbReservations = tableau?.reservations.total
+  const compteurs: Record<string, number | undefined> = { ouvert: nbOuverts, cloture: nbClos, tous: nbLitiges }
+  const pct = (n: number | undefined, d: number | undefined) => (n === undefined || !d ? undefined : Math.round((n / d) * 100))
+  const partClos = pct(nbClos, nbLitiges)
+  const taux = pct(nbLitiges, nbReservations)
+  const acomptes = ouverts ? ouverts.data.reduce((somme, l) => somme + acompteBloque(l), 0) : undefined
+  const acomptesPartiels = ouverts !== undefined && ouverts.meta.total > ouverts.data.length
+  const infosTaux = nbLitiges === undefined || nbReservations === undefined ? undefined : { nbLitiges, nbReservations }
+
+  const lignes = liste.lignes.filter(
+    (l) => (!decision || codeDecision(l) === decision) && sansAccent(`${nomComplet(l.client)} ${nomComplet(l.prestataire)} ${l.prestataire.nomEntreprise ?? ''}`).includes(sansAccent(recherche.trim())),
+  )
+  const filtre = recherche.trim() !== '' || decision !== ''
+
   return (
-    <div className="flex flex-col gap-4">
-      <TitrePage titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement." />
-      <CarteMq className="flex flex-col gap-3.5">
+    <div className="flex flex-col gap-3">
+      <TitrePage compact titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement." />
+
+      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+        <CarteBleue
+          icone={<IBalance />}
+          titre="Litiges ouverts"
+          valeur={nbOuverts}
+          unite="à trancher"
+          aJour={nbOuverts === 0}
+          note={nbOuverts === 0 ? 'Aucune décision en attente' : `${nbOuverts ?? '—'} décision${nbOuverts === 1 ? '' : 's'} en attente`}
+        />
+        <CarteStat
+          icone={<ICoche />}
+          teinte="bg-[#d7f7e4] text-[#16a34a]"
+          badge={partClos === undefined ? '—' : `${partClos} %`}
+          badgeTeinte="bg-[#d7f7e4] text-[#0e6245]"
+          titre="Clôturés"
+          valeur={nbClos}
+          pourcentage={partClos ?? 0}
+          couleurBarre="#16a34a"
+        />
+        <CarteStat
+          icone={<IPortefeuille />}
+          teinte="bg-[#fff0d4] text-[#d97706]"
+          badge="Gelés"
+          badgeTeinte="bg-[#eef1f6] text-[#4f566b]"
+          titre="Acomptes bloqués"
+          valeur={acomptes}
+          formater={formatNombre}
+          note={acomptes === undefined ? undefined : acomptesPartiels ? `FCFA · sur les ${ouverts?.data.length} premiers litiges` : acomptes === 0 ? 'Aucun acompte en litige' : 'FCFA'}
+        />
+        <CarteStat
+          icone={<IPourcent />}
+          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          badge={infosTaux ? `${infosTaux.nbLitiges} / ${infosTaux.nbReservations}` : '—'}
+          badgeTeinte="bg-[#fff0d4] text-[#983705]"
+          titre="Taux de litige"
+          valeur={taux}
+          note={infosTaux ? `% · ${infosTaux.nbLitiges} litige${infosTaux.nbLitiges > 1 ? 's' : ''} pour ${infosTaux.nbReservations} réservation${infosTaux.nbReservations > 1 ? 's' : ''}` : undefined}
+        />
+      </div>
+
+      <CarteMq className="flex flex-col gap-2 !p-3 !rounded-[24px]">
         <div className="flex flex-wrap items-center gap-3">
           <Onglets
+            pastille
             libelle={T.statut}
             onglets={OPTIONS_STATUT.map((o) => ({
               cle: o.valeur,
@@ -59,39 +156,74 @@ export function LitigesListePage() {
               onSelect: () => etat.definir({ statut: o.valeur }),
             }))}
           />
+          <div className="ml-auto flex flex-wrap items-center gap-2.5">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+              <IRecherche taille={16} />
+              <input
+                type="search"
+                value={recherche}
+                onChange={(e) => setRecherche(e.target.value)}
+                placeholder="Client ou prestataire…"
+                aria-label="Rechercher un client ou un prestataire"
+                className="min-w-0 flex-1 border-none bg-transparent text-[13px] text-[#12172b] outline-none placeholder:text-[#9aa0b2]"
+              />
+            </label>
+            <label className="relative flex h-8 items-center gap-2 rounded-[18px] border border-[#e6e8ee] bg-white pr-4 pl-4 text-[13px] font-semibold text-[#12172b]">
+              <IFiltre />
+              <select value={decision} onChange={(e) => setDecision(e.target.value)} aria-label="Filtrer par décision" className="cursor-pointer appearance-none border-none bg-transparent pr-1 text-[13px] font-semibold outline-none">
+                <option value="">{T.decisionChamp}</option>
+                {Object.keys(PASTILLE_DECISION).map((code) => (
+                  <option key={code} value={code}>
+                    {libelleDecision(code)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="mq-table min-w-[860px]" aria-label={T.legende}>
+          <table
+            className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
+            aria-label={T.legende}
+          >
             <thead>
-              <tr>
+              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
                 <th>Litige</th>
                 <th>{T.client}</th>
                 <th>{T.prestataire}</th>
-                <th style={{ textAlign: 'right' }}>{T.acompte}</th>
+                <th>{T.acompte}</th>
                 <th>{T.ouvertLe}</th>
-                <th>{L.commun.statut}</th>
-                <th className="relative">
+                <th>{T.decisionChamp}</th>
+                <th className="relative text-right">
                   <span className="sr-only">Action</span>
+                  <span aria-hidden="true">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {liste.lignes.map((l) => {
+              {lignes.map((l) => {
                 const acompte = l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)
+                const code = codeDecision(l)
+                const style = PASTILLE_DECISION[code] ?? PASTILLE_DECISION.rejet
                 return (
-                  <LigneLien key={l.id} vers={`/litiges/${l.id}`} libelle={`Ouvrir le litige ${l.motif}`}>
+                  <LigneLien key={l.id} vers={`/litiges/${l.id}`} libelle={`Ouvrir le litige ${l.motif}`} texte="Voir le litige" discret>
                     <td>
-                      <span className="block font-semibold">{l.reservation.prestation}</span>
-                      <span className="mt-px block text-[11px] text-[#9aa0b2]">—</span>
+                      <span className="block font-semibold text-[#12172b]">{l.reservation.prestation}</span>
+                      <span className="mt-0.5 block text-xs font-normal text-[#9aa0b2]">{l.motif}</span>
                     </td>
-                    <td>{nomComplet(l.client)}</td>
-                    <td>{l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)}</td>
-                    <td style={{ textAlign: 'right' }}>
-                      <span className="font-semibold tabular-nums">{acompte === null ? '—' : formatMontant(acompte)}</span>
-                    </td>
-                    <td>{formatDate(l.dateCreation)}</td>
                     <td>
-                      <Badge ton={l.statut === 'cloture' && l.decision === 'rejet' ? 'neutre' : (TON_STATUT[l.statut] ?? 'neutre')}>{libelleStatut(l.statut, l.decision)}</Badge>
+                      <div className="flex items-center gap-2.5">
+                        <Avatar nom={nomComplet(l.client)} taille={30} />
+                        <span className="font-semibold text-[#12172b]">{nomComplet(l.client)}</span>
+                      </div>
+                    </td>
+                    <td className="text-[#6b7287]">{l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)}</td>
+                    <td>
+                      <span className="font-semibold text-[#12172b] tabular-nums">{acompte === null ? '—' : formatMontant(acompte)}</span>
+                    </td>
+                    <td className="text-[#6b7287]">{formatDate(l.dateCreation)}</td>
+                    <td>
+                      <Pastille fond={style.fond} point={style.point} libelle={libelleDecision(code)} />
                     </td>
                   </LigneLien>
                 )
@@ -99,13 +231,22 @@ export function LitigesListePage() {
             </tbody>
           </table>
         </div>
-        <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={T.vide} onReessayer={liste.recharger} />
-        <PiedListe
-          resume={`${liste.premier} à ${liste.dernier} sur ${liste.total} ${liste.total > 1 ? 'résultats' : 'résultat'}`}
-          precedent={liste.page > 1}
-          suivant={liste.page < liste.totalPages}
-          onPrecedent={() => etat.allerPage(liste.page - 1)}
-          onSuivant={() => etat.allerPage(liste.page + 1)}
+        <EtatsListe
+          chargement={liste.chargement}
+          erreur={liste.erreur}
+          vide={liste.donneesPresentes && lignes.length === 0}
+          messageVide={filtre && liste.lignes.length > 0 ? 'Aucun litige de cette page ne correspond à la recherche.' : T.vide}
+          onReessayer={liste.recharger}
+        />
+        <PaginationRonde
+          resume={
+            <>
+              Affichage de <strong className="font-semibold text-[#12172b]">{liste.premier}–{liste.dernier}</strong> sur {liste.total} {liste.total > 1 ? 'litiges' : 'litige'}
+            </>
+          }
+          page={liste.page}
+          totalPages={liste.totalPages}
+          onPage={etat.allerPage}
         />
       </CarteMq>
     </div>
