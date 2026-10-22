@@ -157,7 +157,7 @@ function ItemRail({ libelle, children }: { libelle: string; children: React.Reac
       {children}
       {visible && (
         <span aria-hidden="true" className="pointer-events-none absolute top-0 left-full z-30 flex h-full items-center pl-2.5">
-          <span className="animate-infobulle rounded-[10px] bg-[#12172b] px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(18,23,43,0.25)]">{libelle}</span>
+          <span className="animate-infobulle rounded-[10px] bg-[#1d4ed8] px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(29,78,216,0.3)]">{libelle}</span>
         </span>
       )}
     </span>
