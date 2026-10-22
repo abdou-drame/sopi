@@ -194,7 +194,7 @@ function Rail() {
     <aside
       ref={racine}
       aria-label={L.coque.raccourcis}
-      className="sticky top-4 hidden h-[calc(100vh/var(--echelle)-32px)] max-h-[820px] flex-[0_0_50px] flex-col justify-center gap-3 self-start min-[900px]:flex"
+      className="sticky top-4 z-30 hidden h-[calc(100vh/var(--echelle)-32px)] max-h-[820px] flex-[0_0_50px] flex-col justify-center gap-3 self-start min-[900px]:flex"
     >
       <span
         aria-hidden="true"
