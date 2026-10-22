@@ -104,7 +104,7 @@ const TONS: Record<TonBadge, string> = {
   danger: 'bg-[#fde9e9] text-[#b0161b]',
   succes: 'bg-[#d7f7e4] text-[#0e6245]',
   neutre: 'bg-[#eef1f6] text-[#4f566b]',
-  info: 'bg-[#e7edff] text-[#2563eb]',
+  info: 'bg-neutre-claire text-neutre',
 }
 
 /** Pastille de statut : padding 5px 12px, pilule, 12 px (600 dans les tableaux, 700 ailleurs). */
@@ -120,7 +120,7 @@ const PALETTE = [
   'bg-[#d7f7e4] text-[#0e6245]',
   'bg-[#fff0d4] text-[#983705]',
   'bg-[#ede7ff] text-[#5b3fd0]',
-  'bg-[#dbeafe] text-[#2563eb]',
+  'bg-neutre-claire text-neutre',
 ]
 
 /** Avatar d'initiales : paires pastel des maquettes, choisies de façon stable d'après le nom. */

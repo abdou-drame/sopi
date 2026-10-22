@@ -19,9 +19,9 @@ const ABSENT = '—'
 /** Couleur du point de statut d'une réservation (statuts du backend). */
 const POINT_STATUT: Record<string, string> = {
   en_attente: '#f59e0b',
-  acceptee: '#2563eb',
-  confirmee: '#2563eb',
-  en_cours: '#2563eb',
+  acceptee: 'var(--color-neutre)',
+  confirmee: 'var(--color-neutre)',
+  en_cours: 'var(--color-neutre)',
   terminee: '#16a34a',
   refusee: '#e5484d',
   annulee: '#9aa0b2',

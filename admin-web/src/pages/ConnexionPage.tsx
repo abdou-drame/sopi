@@ -77,7 +77,7 @@ function Anneau() {
   return (
     <svg viewBox="0 0 88 88" className="size-20 shrink-0">
       <circle cx="44" cy="44" r={r} fill="none" stroke="#e2e8f0" strokeWidth="11" />
-      {part(0.62, 0, '#2563eb')}
+      {part(0.62, 0, 'var(--color-neutre)')}
       {part(0.2, 0.64, '#f5b82e')}
       {part(0.1, 0.86, '#ef6a5a')}
     </svg>
@@ -122,7 +122,7 @@ function Apercus() {
       <div className={`${CARTE_APERCU} top-24 right-0 w-60`}>
         <p className="text-[11px] font-semibold">{A.reservations}</p>
         <p className="mt-2 text-lg font-bold">248</p>
-        <Progression libelle={A.confirmees} valeur="132" pourcent={68} couleur="#2563eb" />
+        <Progression libelle={A.confirmees} valeur="132" pourcent={68} couleur="var(--color-neutre)" />
         <Progression libelle={A.terminees} valeur="90" pourcent={46} couleur="#10b981" />
         <Progression libelle={A.enAttente} valeur="26" pourcent={14} couleur="#f5b82e" />
       </div>

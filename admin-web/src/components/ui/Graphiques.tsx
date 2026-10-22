@@ -130,7 +130,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
           ) : null,
         )}
         {n > 0 && (
-          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="#b8c8f5" strokeDasharray="3 4" />
+          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="#CBD5E1" strokeDasharray="3 4" />
         )}
         {series.map((s, k) => {
           const points = s.valeurs.map((v, i) => [x(i), y(v)] as [number, number])
@@ -258,7 +258,7 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
                     className="relative w-full origin-bottom rounded-full transition-[background-color,box-shadow] duration-200"
                     style={{
                       height: `${hauteur}%`,
-                      backgroundColor: estActif ? 'var(--color-marque)' : '#a9bdf6',
+                      backgroundColor: estActif ? 'var(--color-marque)' : '#a7d4bf',
                       backgroundImage: rayures,
                       boxShadow: compact && estActif ? '0 8px 14px rgba(45,106,79,0.35)' : undefined,
                       animation: `croissance 500ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 80}ms both`,

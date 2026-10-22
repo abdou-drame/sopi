@@ -22,6 +22,9 @@
   --color-marque: #2d6a4f;
   --color-marque-fonce: #1b4332;
   --color-marque-claire: #eaf6f0;
+  /* Neutre ardoise : statuts neutres, alertes d'information */
+  --color-neutre: #475569;
+  --color-neutre-claire: #eef0f4;
   --color-primaire-50: #f3faf6;
   --color-primaire-100: #eaf6f0;
   --color-primaire-200: #cfe8da;
@@ -63,9 +66,9 @@
   --color-erreur-fond: #fde4e4;
   --color-erreur-texte: #a12626;
   --color-erreur: #d64545;
-  --color-info-fond: #dcebfb;
-  --color-info-texte: #2563eb;
-  --color-info: #2563eb;
+  --color-info-fond: var(--color-neutre-claire);
+  --color-info-texte: var(--color-neutre);
+  --color-info: var(--color-neutre);
 
   /* Rayons : cartes très arrondies, boutons et champs en gélule */
   --radius-petit: 0.75rem;

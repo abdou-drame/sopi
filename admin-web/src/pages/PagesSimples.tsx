@@ -7,7 +7,7 @@ function PageMessage({ titre, texte, code }: { titre: string; texte: string; cod
     <Carte className="mx-auto mt-10 max-w-md">
       <div className="flex flex-col items-center gap-3 py-6 text-center">
         {code && (
-          <p aria-hidden="true" className="m-0 text-6xl leading-[normal] font-bold text-[#b8c8f5]">
+          <p aria-hidden="true" className="m-0 text-6xl leading-[normal] font-bold text-[#a7d4bf]">
             {code}
           </p>
         )}

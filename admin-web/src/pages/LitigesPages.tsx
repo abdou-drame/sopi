@@ -43,7 +43,7 @@ const PASTILLE_DECISION: Record<string, { fond: string; point: string }> = {
   avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
   suspension_temporaire: { fond: 'bg-[#ffe6d5] text-[#9a3412]', point: '#f97316' },
   bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' },
-  rembourse: { fond: 'bg-[#e7edff] text-[#2563eb]', point: '#2563eb' },
+  rembourse: { fond: 'bg-neutre-claire text-neutre', point: 'var(--color-neutre)' },
 }
 
 /** Code d'affichage de la décision : « remboursé » si un paiement du litige l'est, « ouvert » tant qu'aucune décision n'est prise. */
@@ -422,19 +422,19 @@ export function LitigeDetailPage() {
                 <CarteMq>
                   <EnteteCarte icone={<IHorloge />} titre="Chronologie" sousTitre="Du début de la réservation à aujourd'hui" />
                   <div className="mt-5 flex flex-col">
-                    <EtapeChrono grand couleur="#2563eb" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
-                    <EtapeChrono grand couleur="#2563eb" titre="Prestation terminée par le prestataire" detail={ABSENT} />
+                    <EtapeChrono grand couleur="var(--color-neutre)" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
+                    <EtapeChrono grand couleur="var(--color-neutre)" titre="Prestation terminée par le prestataire" detail={ABSENT} />
                     <EtapeChrono grand couleur="#e5484d" titre="Litige ouvert par le client" detail={`${formatDate(l.dateCreation)} · ${heureDe(l.dateCreation)}`} />
                     {ouvert ? (
                       <EtapeChrono
                         grand
                         derniere
-                        couleur="#cdd9fb"
+                        couleur="#CBD5E1"
                         titre="En attente d'une décision"
                         detail={reponse}
                       />
                     ) : (
-                      <EtapeChrono grand derniere couleur="#2563eb" titre="Litige clôturé" detail={cloture} />
+                      <EtapeChrono grand derniere couleur="var(--color-neutre)" titre="Litige clôturé" detail={cloture} />
                     )}
                   </div>
                 </CarteMq>
@@ -489,7 +489,7 @@ export function LitigeDetailPage() {
                 <CarteMq>
                   <TitreCarte titre="Personnes concernées" />
                   <div className="mt-3.5 flex flex-col gap-2.5">
-                    <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-[#dbeafe] text-[#2563eb]" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
+                    <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-neutre-claire text-neutre" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
                     <Personne nom={nomPrestataire} role={`Prestataire · note ${ABSENT}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
                   </div>
                 </CarteMq>

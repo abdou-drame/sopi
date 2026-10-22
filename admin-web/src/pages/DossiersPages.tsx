@@ -425,11 +425,11 @@ export function DossierDetailPage() {
                 <CarteMq>
                   <TitreCarte titre="Historique du dossier" />
                   <div className="mt-4 flex flex-col">
-                    <EtapeChrono couleur="#2563eb" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
+                    <EtapeChrono couleur="var(--color-neutre)" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
                     {d.statutCompte === 'en_attente' ? (
-                      <EtapeChrono couleur="#cdd9fb" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
+                      <EtapeChrono couleur="#CBD5E1" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
                     ) : (
-                      <EtapeChrono couleur={d.statutCompte === 'actif' ? '#0e6245' : '#2563eb'} titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
+                      <EtapeChrono couleur={d.statutCompte === 'actif' ? '#0e6245' : 'var(--color-neutre)'} titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
                     )}
                   </div>
                 </CarteMq>

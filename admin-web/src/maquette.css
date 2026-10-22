@@ -39,9 +39,9 @@ html.maquette {
   --color-attention: #fbbf24;
   --color-attention-fond: #fff1cc;
   --color-attention-texte: #8a5a00;
-  --color-info: #2563eb;
-  --color-info-fond: #e7edff;
-  --color-info-texte: #2563eb;
+  --color-info: var(--color-neutre);
+  --color-info-fond: var(--color-neutre-claire);
+  --color-info-texte: var(--color-neutre);
 }
 
 html.maquette,

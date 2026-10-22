@@ -124,7 +124,7 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
               className="serie-forme"
               data-forme={courbe ? 'point' : 'colonne'}
               {...forme}
-              fill={courbe ? '#fff' : estActif ? 'var(--color-marque)' : '#a9bdf6'}
+              fill={courbe ? '#fff' : estActif ? 'var(--color-marque)' : '#a7d4bf'}
               stroke="var(--color-marque)"
               strokeWidth={courbe ? 2.5 : 0}
               style={{ opacity: courbe || f.valeur > 0 ? 1 : 0 }}

@@ -122,7 +122,7 @@ function pastilleEtat(s: SanctionListe) {
 
 const TYPE_STYLE: Record<string, { fond: string; icone: ReactNode }> = {
   avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', icone: <IAlerte /> },
-  suspension_temporaire: { fond: 'bg-[#e7edff] text-[#2563eb]', icone: <IPause /> },
+  suspension_temporaire: { fond: 'bg-neutre-claire text-neutre', icone: <IPause /> },
   bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', icone: <IInterdit /> },
 }
 
