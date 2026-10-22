@@ -11,6 +11,7 @@ import Fenetre from '../design/Fenetre'
 import { Avatar, BoutonPlus, Carte as CarteMq, Onglets, PaginationRonde, TitrePage } from '../design/composants'
 import { IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, IFiltre, Pastille, sansAccent } from '../design/synthese'
+import { CartesSquelette } from '../design/etats'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate, nombreDeJours } from '../lib/format'
@@ -173,7 +174,8 @@ export default function SanctionsListePage() {
         <BoutonPlus onClick={() => navigate('/utilisateurs')}>Nouvelle sanction</BoutonPlus>
       </TitrePage>
 
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+      {liste.chargement && <CartesSquelette n={4} />}
+      <div hidden={liste.chargement} className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
         <CarteBleue icone={<IBouclier />} titre="Sanctions actives" valeur={actives} unite={toutes === undefined ? '' : `sur ${toutes}`} note={detail} />
         <CarteStat
           icone={<IAlerte />}
@@ -242,7 +244,7 @@ export default function SanctionsListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" hidden={liste.chargement}>
           <table
             className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
             aria-label={T.legende}
@@ -306,8 +308,17 @@ export default function SanctionsListePage() {
           chargement={liste.chargement}
           erreur={liste.erreur}
           vide={liste.donneesPresentes && lignes.length === 0}
-          messageVide={recherche.trim() !== '' && liste.lignes.length > 0 ? 'Aucune sanction de cette page ne correspond à la recherche.' : T.vide}
+          messageVide={T.vide}
           onReessayer={liste.recharger}
+          colonnes={[{ titre: 'Prestataire' }, { titre: T.type }, { titre: T.motif }, { titre: 'Début' }, { titre: T.fin }, { titre: L.commun.statut }]}
+          largeurMin={860}
+          compact
+          filtresActifs={recherche.trim() !== '' || etat.modifies}
+          messageFiltres={recherche.trim() !== '' && liste.lignes.length > 0 ? 'Aucune sanction de cette page ne correspond à la recherche.' : undefined}
+          onReinitialiser={() => {
+            setRecherche('')
+            etat.reinitialiser()
+          }}
         />
         {liste.total > 0 && (
           <PaginationRonde

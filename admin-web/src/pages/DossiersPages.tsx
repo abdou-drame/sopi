@@ -29,6 +29,7 @@ import {
 import { IDocument, IHorloge, IRecherche, IUtilisateur } from '../design/icones'
 import { CarteBleue, CarteStat, ICoche, ICroix, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
+import { CartesSquelette } from '../design/etats'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { formatDate, formatDateHeure } from '../lib/format'
@@ -95,7 +96,8 @@ export function DossiersListePage() {
     <div className="flex flex-col gap-3">
       <TitrePage compact titre="Dossiers" suite="prestataires" sousTitre="Examinez les demandes d'inscription, puis validez ou refusez chaque dossier." />
 
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+      {liste.chargement && <CartesSquelette n={4} />}
+      <div hidden={liste.chargement} className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
         <CarteBleue
           icone={<IHorloge />}
           titre="En attente de décision"
@@ -179,7 +181,7 @@ export function DossiersListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" hidden={liste.chargement}>
           <table
             className="w-full min-w-[820px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
             aria-label={T.legende}
@@ -236,8 +238,18 @@ export function DossiersListePage() {
           chargement={liste.chargement}
           erreur={liste.erreur}
           vide={liste.donneesPresentes && lignes.length === 0}
-          messageVide={filtre && liste.lignes.length > 0 ? 'Aucun dossier de cette page ne correspond à la recherche.' : T.vide}
+          messageVide={T.vide}
           onReessayer={liste.recharger}
+          colonnes={[{ titre: T.prestataire }, { titre: T.metier }, { titre: T.quartier }, { titre: 'Pièces' }, { titre: 'Reçu le' }, { titre: L.commun.statut }]}
+          largeurMin={820}
+          compact
+          filtresActifs={filtre || etat.modifies}
+          messageFiltres={filtre && liste.lignes.length > 0 ? 'Aucun dossier de cette page ne correspond à la recherche.' : undefined}
+          onReinitialiser={() => {
+            setRecherche('')
+            setMetier('')
+            etat.reinitialiser()
+          }}
         />
         <PaginationRonde
           resume={

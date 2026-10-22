@@ -10,6 +10,7 @@ import Fenetre from '../design/Fenetre'
 import { Avatar, Carte as CarteMq, Onglets, PaginationRonde, TitrePage } from '../design/composants'
 import { IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, Pastille } from '../design/synthese'
+import { CartesSquelette } from '../design/etats'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate } from '../lib/format'
@@ -270,7 +271,8 @@ export default function AvisListePage() {
     <div className="flex flex-col gap-3">
       <TitrePage compact titre="Avis" suite="des clients" sousTitre="Consultez les avis publiés et masquez ceux qui enfreignent les règles." />
 
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+      {liste.chargement && <CartesSquelette n={4} />}
+      <div hidden={liste.chargement} className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
         <CarteBleue icone={<IBulle />} titre="Avis reçus" valeur={stats?.total} unite={stats?.total === 1 ? 'avis' : 'avis'} note={stats ? `${publies} publié${publies === 1 ? '' : 's'} · ${stats.masques} masqué${stats.masques > 1 ? 's' : ''}` : '—'} />
         <CarteStat
           icone={<IOeil />}
@@ -337,7 +339,7 @@ export default function AvisListePage() {
             )}
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" hidden={liste.chargement}>
           <table
             className="w-full min-w-[980px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
             aria-label={T.legende}
@@ -369,6 +371,11 @@ export default function AvisListePage() {
           vide={liste.donneesPresentes && liste.lignes.length === 0}
           messageVide={T.vide}
           onReessayer={liste.recharger}
+          colonnes={[{ titre: 'Client' }, { titre: 'Prestataire' }, { titre: T.note }, { titre: 'Commentaire' }, { titre: 'Date' }, { titre: L.commun.statut }]}
+          largeurMin={980}
+          compact
+          filtresActifs={etat.modifies}
+          onReinitialiser={etat.reinitialiser}
         />
         {liste.total > 0 && (
           <PaginationRonde

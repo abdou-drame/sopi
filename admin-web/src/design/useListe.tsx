@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { messageDErreur } from '../api/client'
 import type { Page } from '../api/types'
 import type { FiltresUrl } from '../lib/useFiltresUrl'
-import { EtatChargement, EtatErreur, EtatVide } from './etats'
+import { EtatChargement, EtatErreur, EtatVide, TableauSquelette } from './etats'
 
 /** Lignes montrées par page à l'écran. L'API en renvoie 20 : chaque page de l'API fournit deux pages de l'écran. */
 export const LIGNES_PAR_PAGE = 10
@@ -42,9 +42,35 @@ export function useListe<T>(cle: string, charger: (params: Record<string, string
 }
 
 /** États vide, chargement et erreur d'une liste (Etats.html), identiques sur toutes les pages. */
-export function EtatsListe({ chargement, erreur, vide, messageVide, onReessayer }: { chargement: boolean; erreur: string | null; vide: boolean; messageVide: string; onReessayer: () => void }) {
-  if (chargement) return <EtatChargement />
+export function EtatsListe({
+  chargement,
+  erreur,
+  vide,
+  messageVide,
+  onReessayer,
+  colonnes,
+  largeurMin,
+  compact,
+  filtresActifs = false,
+  messageFiltres,
+  onReinitialiser,
+}: {
+  chargement: boolean
+  erreur: string | null
+  vide: boolean
+  messageVide: string
+  onReessayer: () => void
+  /** Si fourni, le premier chargement affiche un tableau fantôme à ces colonnes (l'appelant masque alors son vrai tableau). */
+  colonnes?: { titre: string; droite?: boolean }[]
+  largeurMin?: number
+  compact?: boolean
+  /** Vrai si une recherche ou un filtre est actif : le vide devient « Aucun résultat pour ces filtres ». */
+  filtresActifs?: boolean
+  messageFiltres?: string
+  onReinitialiser?: () => void
+}) {
+  if (chargement) return colonnes ? <TableauSquelette colonnes={colonnes} largeurMin={largeurMin} compact={compact} /> : <EtatChargement />
   if (erreur) return <EtatErreur texte={erreur} onReessayer={onReessayer} />
-  if (vide) return <EtatVide texte={messageVide} />
+  if (vide) return filtresActifs ? <EtatVide variante="filtres" texte={messageFiltres} onReinitialiser={onReinitialiser} /> : <EtatVide texte={messageVide} />
   return null
 }

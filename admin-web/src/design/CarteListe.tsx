@@ -40,7 +40,7 @@ export default function CarteListe({
   return (
     <Carte className="flex flex-col gap-3.5">
       {(filtres.length > 0 || avant) && <Filtres filtres={filtres} etat={etat} avant={avant} />}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" hidden={liste.chargement}>
         <table className="mq-table" style={{ minWidth: largeurMin }} aria-label={legende}>
           <thead>
             <tr>
@@ -57,7 +57,17 @@ export default function CarteListe({
           <tbody>{children}</tbody>
         </table>
       </div>
-      <EtatsListe chargement={liste.chargement} erreur={liste.erreur} vide={liste.donneesPresentes && liste.lignes.length === 0} messageVide={messageVide} onReessayer={liste.recharger} />
+      <EtatsListe
+        chargement={liste.chargement}
+        erreur={liste.erreur}
+        vide={liste.donneesPresentes && liste.lignes.length === 0}
+        messageVide={messageVide}
+        onReessayer={liste.recharger}
+        colonnes={colonnes}
+        largeurMin={largeurMin}
+        filtresActifs={etat.modifies}
+        onReinitialiser={etat.reinitialiser}
+      />
       {liste.total > 0 && (
         <PiedListe
           resume={`${liste.premier} à ${liste.dernier} sur ${L.commun.resultats(liste.total)}`}

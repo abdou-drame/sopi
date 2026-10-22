@@ -14,6 +14,7 @@ import { Avatar, Badge, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono
 import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
+import { CartesSquelette } from '../design/etats'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { aujourdhui, formatDate, formatHeureDuJour, formatMontant, formatNombre } from '../lib/format'
@@ -103,7 +104,8 @@ export function LitigesListePage() {
     <div className="flex flex-col gap-3">
       <TitrePage compact titre="Litiges" suite="à trancher" sousTitre="Examinez chaque litige, puis tranchez : rejet, avertissement, suspension ou bannissement." />
 
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
+      {liste.chargement && <CartesSquelette n={4} />}
+      <div hidden={liste.chargement} className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(190px,1fr))]">
         <CarteBleue
           icone={<IBalance />}
           titre="Litiges ouverts"
@@ -181,7 +183,7 @@ export function LitigesListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" hidden={liste.chargement}>
           <table
             className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
             aria-label={T.legende}
@@ -235,8 +237,18 @@ export function LitigesListePage() {
           chargement={liste.chargement}
           erreur={liste.erreur}
           vide={liste.donneesPresentes && lignes.length === 0}
-          messageVide={filtre && liste.lignes.length > 0 ? 'Aucun litige de cette page ne correspond à la recherche.' : T.vide}
+          messageVide={T.vide}
           onReessayer={liste.recharger}
+          colonnes={[{ titre: 'Litige' }, { titre: T.client }, { titre: T.prestataire }, { titre: T.acompte }, { titre: T.ouvertLe }, { titre: T.decisionChamp }]}
+          largeurMin={860}
+          compact
+          filtresActifs={filtre || etat.modifies}
+          messageFiltres={filtre && liste.lignes.length > 0 ? 'Aucun litige de cette page ne correspond à la recherche.' : undefined}
+          onReinitialiser={() => {
+            setRecherche('')
+            setDecision('')
+            etat.reinitialiser()
+          }}
         />
         <PaginationRonde
           resume={

@@ -10,7 +10,7 @@ import { formatMontant } from '../lib/format'
 import { useFiltresUrl } from '../lib/useFiltresUrl'
 import { ChampJour, ChampSelect } from './champs'
 import CarteListe from './CarteListe'
-import { EtatChargement, EtatErreur, EtatVide } from './etats'
+import { CartesSquelette, EtatChargement, EtatErreur, EtatVide, TableauSquelette } from './etats'
 import Fenetre from './Fenetre'
 import PageDetailMq from './PageDetailMq'
 import { BadgeDuStatut } from './Statut'
@@ -136,6 +136,41 @@ describe('états vide, chargement, erreur', () => {
     expect(screen.getByText('Aucun utilisateur.')).toBeInTheDocument()
   })
 
+  it('vide « données » : icône, titre et message, sans bouton', () => {
+    render(<EtatVide texte="Aucun utilisateur." />)
+    expect(screen.getByText('Aucune donnée pour l’instant')).toBeInTheDocument()
+    expect(screen.getByRole('status').querySelector('svg')).not.toBeNull()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('vide « filtres » : titre dédié et bouton qui réinitialise (absent sans action)', async () => {
+    const reinitialiser = vi.fn()
+    const { rerender } = render(<EtatVide variante="filtres" onReinitialiser={reinitialiser} />)
+    expect(screen.getByText('Aucun résultat pour ces filtres')).toBeInTheDocument()
+    expect(screen.queryByText('Aucune donnée pour l’instant')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Réinitialiser les filtres' }))
+    expect(reinitialiser).toHaveBeenCalledTimes(1)
+    rerender(<EtatVide variante="filtres" />)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('squelette de tableau : mêmes titres de colonnes, lignes fantômes, annoncé occupé', () => {
+    render(<TableauSquelette colonnes={[{ titre: 'Nom' }, { titre: 'Montant', droite: true }]} lignes={3} />)
+    const zone = screen.getByRole('status', { name: 'Chargement…' })
+    expect(zone).toHaveAttribute('aria-busy', 'true')
+    expect(Array.from(zone.querySelectorAll('th')).map((t) => t.textContent)).toEqual(['Nom', 'Montant', ''])
+    expect(zone.querySelectorAll('tbody tr')).toHaveLength(3)
+    expect(zone.querySelectorAll('tbody td')).toHaveLength(9) // 2 colonnes + la colonne d'actions, trois fois
+    expect(zone.querySelectorAll('.mq-sk').length).toBeGreaterThan(9)
+  })
+
+  it('cartes fantômes : une par carte attendue', () => {
+    render(<CartesSquelette n={3} />)
+    const zone = screen.getByRole('status', { name: 'Chargement…' })
+    expect(zone).toHaveAttribute('aria-busy', 'true')
+    expect(zone.children).toHaveLength(3)
+  })
+
   it('erreur : message et bouton Réessayer', async () => {
     const reessayer = vi.fn()
     render(<EtatErreur texte="Échec." onReessayer={reessayer} />)
@@ -215,9 +250,9 @@ describe('liste dessinée et filtres dans l’adresse', () => {
   it('lit les filtres d’une adresse partagée et les réinitialise', async () => {
     const charger = vi.fn().mockResolvedValue(page(1, 1, []))
     enveloppe(<EcranListe charger={charger} />, '/?statut=tous&q=zed')
-    await screen.findByText('Aucun élément.')
+    const titre = await screen.findByText('Aucun résultat pour ces filtres')
     expect(screen.getByLabelText('Recherche')).toHaveValue('zed')
-    await userEvent.click(screen.getByRole('button', { name: /Réinitialiser/ }))
+    await userEvent.click(within(titre.closest('[role="status"]') as HTMLElement).getByRole('button', { name: 'Réinitialiser les filtres' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent(/^\/$/)
     expect(screen.getByLabelText('Recherche')).toHaveValue('')
   })
@@ -237,6 +272,28 @@ describe('liste dessinée et filtres dans l’adresse', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Erreur serveur.')
     await userEvent.click(screen.getByRole('button', { name: 'Réessayer' }))
     expect(await screen.findByText('Alpha')).toBeInTheDocument()
+  })
+
+  it('chargement : tableau fantôme à la place du vrai tableau, puis les données', async () => {
+    let finir: (p: Page<Element>) => void = () => {}
+    const charger = vi.fn().mockReturnValue(new Promise<Page<Element>>((r) => (finir = r)))
+    enveloppe(<EcranListe charger={charger} />)
+    const squelette = await screen.findByRole('status', { name: 'Chargement…' })
+    expect(within(squelette).getByText('Nom')).toBeInTheDocument()
+    expect(screen.queryByRole('table', { name: 'Éléments' })).not.toBeInTheDocument()
+    finir(page(1, 1, [{ id: '1', nom: 'Alpha' }]))
+    expect(await screen.findByText('Alpha')).toBeInTheDocument()
+    expect(screen.queryByRole('status', { name: 'Chargement…' })).not.toBeInTheDocument()
+  })
+
+  it('erreur : « Réessayer » relance la requête', async () => {
+    const charger = vi.fn().mockRejectedValueOnce(new ApiError('Erreur serveur.', 500)).mockResolvedValue(page(1, 1, []))
+    enveloppe(<EcranListe charger={charger} />)
+    await screen.findByRole('alert')
+    expect(charger).toHaveBeenCalledTimes(1)
+    await userEvent.click(screen.getByRole('button', { name: 'Réessayer' }))
+    await screen.findByText('Aucune donnée pour l’instant')
+    expect(charger).toHaveBeenCalledTimes(2)
   })
 
   it('affiche l’état vide', async () => {

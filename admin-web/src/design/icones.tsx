@@ -82,6 +82,18 @@ export const IRecherche = (p: P) => (
     <path d="m20 20-3.5-3.5" />
   </Ico>
 )
+export const IBoiteVide = (p: P) => (
+  <Ico taille={18} trait={1.9} {...p}>
+    <path d="M3 13l3-8h12l3 8" />
+    <path d="M3 13v6a1 1 0 001 1h16a1 1 0 001-1v-6h-5.5a2.5 2.5 0 01-5 0z" />
+  </Ico>
+)
+export const IAlerte = (p: P) => (
+  <Ico taille={18} trait={1.9} {...p}>
+    <path d="M12 4L2.5 20h19L12 4z" />
+    <path d="M12 10v4M12 17v.01" />
+  </Ico>
+)
 export const ICloche = (p: P) => (
   <Ico taille={18} trait={1.9} {...p}>
     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8" />
