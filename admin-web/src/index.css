@@ -343,10 +343,30 @@ body {
   background: transparent;
 }
 
-/* Focus visible et cohérent pour la navigation au clavier */
+/* Focus clavier : un seul anneau, aux couleurs de la marque, pour toute l'application (jamais au clic souris) */
+:root {
+  --anneau-focus: var(--color-marque);
+}
 :focus-visible {
-  outline: 3px solid var(--color-primaire-400);
+  outline: 2px solid var(--anneau-focus);
   outline-offset: 2px;
+}
+/* Sur fond sombre (barre d'actions groupées) l'anneau vert se confondrait : il passe au blanc. */
+[role='toolbar'] :focus-visible {
+  outline-color: #fff;
+}
+/* Champ de recherche ou filtre dans une gélule : l'anneau entoure la gélule entière, pas le champ nu. */
+label:has(> input.bg-transparent:focus-visible, > select.bg-transparent:focus-visible) {
+  outline: 2px solid var(--anneau-focus);
+  outline-offset: 2px;
+}
+label > input.bg-transparent:focus-visible,
+label > select.bg-transparent:focus-visible {
+  outline: none;
+}
+/* Onglets : le conteneur défile (overflow) et rognerait l'anneau, qui est donc tracé à l'intérieur de l'onglet. */
+[role='tablist'] > [role='tab']:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Hachures diagonales des barres en gélule (inactives) : motif en nuances de la couleur courante */

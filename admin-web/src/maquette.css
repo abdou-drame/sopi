@@ -222,9 +222,9 @@ html.maquette .fond-sopi {
 }
 
 /* Champs de recherche */
-.mq-champ:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgb(45 106 79 / 0.2);
+.mq-champ:focus-visible {
+  outline: 2px solid var(--anneau-focus);
+  outline-offset: 2px;
 }
 
 /* Tableaux : lignes impaires .rang (survol #f6f7fa), lignes paires sur fond #f3f4f7 */
