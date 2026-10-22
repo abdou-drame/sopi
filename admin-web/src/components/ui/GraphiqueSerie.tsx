@@ -102,14 +102,14 @@ export default function GraphiqueSerie({
       data-survol={survol !== null}
       className="relative mt-1 h-[150px]"
     >
+      {/* Halo décoratif : deux lueurs de la couleur de marque qui respirent lentement (CSS pur, derrière le SVG). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 60%, rgba(45,106,79,0.16), transparent 70%)",
-        }}
-      />
+      >
+        <span className="halo-serie halo-serie-principal" />
+        <span className="halo-serie halo-serie-secondaire" />
+      </div>
       <LazyMotion features={domAnimation} strict>
         <svg
           viewBox={`0 0 ${L} ${H}`}
