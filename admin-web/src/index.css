@@ -568,10 +568,10 @@ tr[data-selectionnee='true'] > td { background-color: #eef3ff; }
     rx 550ms var(--ease-sortie), fill 200ms, stroke-width 550ms var(--ease-sortie), opacity 300ms;
 }
 .serie-ligne {
-  transition: stroke-dashoffset 700ms var(--ease-sortie), d 550ms var(--ease-sortie);
+  transition: stroke-dashoffset 700ms var(--ease-sortie);
 }
 .serie-aire {
-  transition: opacity 600ms ease-out, d 550ms var(--ease-sortie);
+  transition: opacity 600ms ease-out;
 }
 .serie-bulle {
   transition: transform 300ms var(--ease-sortie);
