@@ -100,7 +100,7 @@ export default function GraphiqueSerie({
       data-mode={mode}
       data-anime={anime}
       data-survol={survol !== null}
-      className="relative mt-1 h-[150px]"
+      className="graphique-serie relative mt-1 h-[150px]"
     >
       {/* Halo décoratif : deux lueurs de la couleur de marque qui respirent lentement (CSS pur, derrière le SVG). */}
       <div
