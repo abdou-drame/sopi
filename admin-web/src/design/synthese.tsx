@@ -6,7 +6,7 @@ export const sansAccent = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, 
 /** Pastille de statut : fond coloré, point et libellé. */
 export function Pastille({ fond, point, libelle }: { fond: string; point: string; libelle: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs font-semibold transition-colors duration-200 ${fond}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-[5px] text-xs whitespace-nowrap font-semibold transition-colors duration-200 ${fond}`}>
       <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: point }} />
       {libelle}
     </span>

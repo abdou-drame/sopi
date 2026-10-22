@@ -196,7 +196,7 @@ export function DossiersListePage() {
                 const complet = d.nombreJustificatifs >= PIECES_ATTENDUES
                 const manquante = d.statutCompte === 'en_attente' && !complet
                 return (
-                  <LigneLien key={d.id} vers={`/dossiers-prestataires/${d.id}`} libelle={`Examiner le dossier de ${nomComplet(d)}`} texte="Ouvrir le dossier" discret>
+                  <LigneLien key={d.id} vers={`/dossiers-prestataires/${d.id}`} libelle={`Examiner le dossier de ${nomComplet(d)}`} texte="Ouvrir" discret>
                     <td>
                       <div className="flex items-center gap-3">
                         <Avatar nom={d.nomEntreprise || nomComplet(d)} taille={30} />
