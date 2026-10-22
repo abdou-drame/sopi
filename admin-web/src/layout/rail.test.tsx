@@ -59,4 +59,14 @@ describe('rail de gauche', () => {
     await userEvent.keyboard('{Escape}')
     expect(rail.queryByText('Actualiser')).toBeNull()
   })
+
+  it('pose un point rouge sur les écrans qui ont des alertes, et seulement eux', async () => {
+    const alertes = { alertes: [{ type: 'avis_signales', gravite: 'attention', compteur: 2, message: '2 avis signalés.' }], parGravite: { info: 0, attention: 2, critique: 0 }, total: 2 }
+    simulerApi({ ...base, 'GET /admin/alertes': { corps: alertes } })
+    afficherApplication('/')
+    const rail = within(await screen.findByRole('complementary', { name: 'Raccourcis' }))
+    const avis = await rail.findByRole('link', { name: /^Avis, 2 alertes/ })
+    expect(within(avis).getByTestId('point-alerte')).toBeInTheDocument()
+    expect(rail.getAllByTestId('point-alerte')).toHaveLength(1)
+  })
 })
