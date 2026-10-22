@@ -32,7 +32,7 @@ function FiltreMenu({ label, valeur, options, onChoisir }: { label: string; vale
         }
       }}
     >
-      <BoutonFiltre aria-haspopup="menu" aria-expanded={ouvert} aria-label={label} onClick={() => setOuvert((o) => !o)}>
+      <BoutonFiltre aria-haspopup="menu" aria-expanded={ouvert} aria-label={`Filtrer par ${label.toLowerCase()}${choisi ? ` : ${choisi.libelle}` : ''}`} onClick={() => setOuvert((o) => !o)}>
         {choisi ? `${label} : ${choisi.libelle}` : label}
       </BoutonFiltre>
       {ouvert && (

@@ -34,7 +34,7 @@ describe('notifications en échec', () => {
     expect(lien).toHaveAttribute('href', '/notifications-en-echec/n-1')
     expect(within(tableau).getByText('E-mail')).toBeInTheDocument()
     expect(within(tableau).getByText('TransportException')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Canal' }))
+    await userEvent.click(screen.getByRole('button', { name: /Filtrer par canal/ }))
     await userEvent.click(screen.getByRole('menuitemradio', { name: 'Push' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/notifications-en-echec?canal=push')
     expect(appels.some((a) => a.chemin === '/admin/notifications-en-echec' && a.recherche.get('canal') === 'push')).toBe(true)
