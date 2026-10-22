@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { IChevronBas, IFlecheHautDroite, IPlus, IRecherche, IRetour } from './icones'
 
@@ -148,8 +148,35 @@ export interface OngletDef {
 
 /** Onglets : conteneur #f3f4f7 (padding 4), item de 36 px, actif bleu avec compteur en pastille blanche translucide. */
 export function Onglets({ onglets, libelle, pastille = false }: { onglets: OngletDef[]; libelle: string; pastille?: boolean }) {
+  const racine = useRef<HTMLDivElement>(null)
+  const [cible, setCible] = useState<{ x: number; l: number } | null>(null)
+  const [glisse, setGlisse] = useState(false)
+  const indexActif = onglets.findIndex((o) => o.actif)
+  const signature = onglets.map((o) => `${o.cle}:${o.compteur ?? ''}`).join('|')
+
+  // La pastille se place sur l'onglet actif ; le premier placement est immédiat, les suivants glissent.
+  useLayoutEffect(() => {
+    const actif = racine.current?.querySelectorAll<HTMLElement>('[role="tab"]')[indexActif]
+    setCible(actif ? { x: actif.offsetLeft, l: actif.offsetWidth } : null)
+  }, [indexActif, signature])
+  useLayoutEffect(() => {
+    if (cible && !glisse) {
+      const image = requestAnimationFrame(() => setGlisse(true))
+      return () => cancelAnimationFrame(image)
+    }
+  }, [cible, glisse])
+
   return (
-    <div role="tablist" aria-label={libelle} className={`flex max-w-full overflow-x-auto rounded-full bg-[#f3f4f7] p-1 ${pastille ? 'gap-1' : ''}`}>
+    <div ref={racine} role="tablist" aria-label={libelle} className={`relative flex max-w-full overflow-x-auto rounded-full bg-[#f3f4f7] p-1 ${pastille ? 'gap-1' : ''}`}>
+      {cible && (
+        <span
+          aria-hidden="true"
+          data-testid="pastille-onglet"
+          data-glisse={glisse || undefined}
+          className={`mq-onglet-pastille pointer-events-none absolute top-1 left-0 h-9 rounded-full ${pastille ? 'bg-white shadow-[0_2px_8px_rgba(18,23,43,0.12)]' : 'bg-marque'}`}
+          style={{ width: cible.l, transform: `translateX(${cible.x}px)` }}
+        />
+      )}
       {onglets.map((o) => (
         <button
           key={o.cle}
@@ -157,8 +184,8 @@ export function Onglets({ onglets, libelle, pastille = false }: { onglets: Ongle
           role="tab"
           aria-selected={o.actif}
           onClick={o.onSelect}
-          className={`flex h-9 cursor-pointer items-center gap-2 rounded-full border-none px-4 text-[13px] font-semibold whitespace-nowrap ${
-            o.actif ? (pastille ? 'bg-white text-[#12172b] shadow-[0_2px_8px_rgba(18,23,43,0.12)]' : 'bg-marque text-white') : 'bg-transparent text-[#6b7287]'
+          className={`relative z-[1] flex h-9 cursor-pointer items-center gap-2 rounded-full border-none bg-transparent px-4 text-[13px] font-semibold whitespace-nowrap transition-colors duration-200 ${
+            o.actif ? (pastille ? 'text-[#12172b]' : 'text-white') : 'text-[#6b7287]'
           }`}
         >
           {o.libelle}

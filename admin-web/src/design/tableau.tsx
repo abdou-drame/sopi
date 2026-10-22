@@ -96,7 +96,7 @@ export default function TableauDonnees<T>({
   return (
     <div className="overflow-x-auto" hidden={masque}>
       <table
-        className={compact ? 'w-full border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium' : 'mq-table'}
+        className={compact ? 'lignes-cascade w-full border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium' : 'lignes-cascade mq-table'}
         style={{ minWidth: largeurMin }}
         aria-label={legende}
       >

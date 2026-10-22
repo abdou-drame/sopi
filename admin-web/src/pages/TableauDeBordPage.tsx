@@ -6,6 +6,7 @@ import { api } from '../api/endpoints'
 import type { Revenus } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
+import NombreAnime from '../components/ui/NombreAnime'
 import GraphiqueSerie, { type ModeSerie } from '../components/ui/GraphiqueSerie'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, FOND_MARQUE, TitrePage } from '../design/composants'
@@ -78,7 +79,7 @@ function CarteChiffre({
         {pastille && <span className={`rounded-full px-[9px] py-[3px] text-[11px] font-bold ${degrade ? 'bg-white/20' : 'bg-[#f3f4f7] text-[#9aa0b2]'}`}>{pastille}</span>}
       </div>
       <div className="mt-1 text-[26px] leading-[30px] font-bold tracking-[-0.8px] tabular-nums">
-        {valeur === undefined ? ABSENT : formatNombre(valeur)}
+        {valeur === undefined ? ABSENT : <NombreAnime valeur={valeur} />}
         {unite && <span className={`text-sm font-medium ${clair}`}> {unite}</span>}
       </div>
       <div className={`mt-0.5 text-xs ${degrade ? 'opacity-80' : 'text-[#8a90a2]'}`}>{note}</div>

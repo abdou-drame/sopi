@@ -658,3 +658,29 @@ html[data-flash='reduit']::after {
 @media (prefers-reduced-motion: reduce) {
   html[data-flash='plein']::after { animation: flash-pulse 500ms ease-out both; }
 }
+
+/* Lignes de tableau en cascade : fondu et glissement de 8 px, décalés de 25 ms (250 ms au plus) à l'arrivée des lignes. */
+@keyframes ligne-entree {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.lignes-cascade > tbody > tr { animation: ligne-entree 260ms var(--ease-sortie) backwards; }
+.lignes-cascade > tbody > tr:nth-child(1) { animation-delay: 0ms; }
+.lignes-cascade > tbody > tr:nth-child(2) { animation-delay: 25ms; }
+.lignes-cascade > tbody > tr:nth-child(3) { animation-delay: 50ms; }
+.lignes-cascade > tbody > tr:nth-child(4) { animation-delay: 75ms; }
+.lignes-cascade > tbody > tr:nth-child(5) { animation-delay: 100ms; }
+.lignes-cascade > tbody > tr:nth-child(6) { animation-delay: 125ms; }
+.lignes-cascade > tbody > tr:nth-child(7) { animation-delay: 150ms; }
+.lignes-cascade > tbody > tr:nth-child(8) { animation-delay: 175ms; }
+.lignes-cascade > tbody > tr:nth-child(9) { animation-delay: 200ms; }
+.lignes-cascade > tbody > tr:nth-child(10) { animation-delay: 225ms; }
+
+/* Pastille des onglets : glisse d'un onglet à l'autre (le premier placement est immédiat). */
+.mq-onglet-pastille[data-glisse] {
+  transition: transform var(--duree-lente, 300ms) var(--ease-sortie, ease-out), width var(--duree-lente, 300ms) var(--ease-sortie, ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lignes-cascade > tbody > tr { animation: none; }
+  .mq-onglet-pastille[data-glisse] { transition: none; }
+}

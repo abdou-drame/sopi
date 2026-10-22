@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import NombreAnime from '../components/ui/NombreAnime'
 import { AnimatedCard } from './animation/composants'
 
 export const sansAccent = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
@@ -25,7 +26,7 @@ export function CarteBleue({ icone, titre, valeur, unite, aJour, note }: { icone
           {aJour && <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold">À jour</span>}
         </div>
         <div className="flex items-baseline gap-1.5">
-          <span className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] tabular-nums">{valeur === undefined ? '—' : valeur}</span>
+          <span className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] tabular-nums">{valeur === undefined ? '—' : <NombreAnime valeur={valeur} format={String} />}</span>
           <span className="text-xs font-semibold opacity-90">{unite}</span>
         </div>
         <div className="truncate text-xs opacity-85">{note}</div>
@@ -85,7 +86,7 @@ export function CarteStat({
           <span className="truncate text-xs font-medium text-[#8a90a2]">{titre}</span>
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${badgeTeinte}`}>{badge}</span>
         </div>
-        <div className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : formater ? formater(valeur) : valeur}</div>
+        <div className="text-[24px] leading-[28px] font-bold tracking-[-0.8px] text-[#12172b] tabular-nums">{valeur === undefined ? '—' : <NombreAnime valeur={valeur} format={formater ?? String} />}</div>
         {pourcentage !== undefined ? (
           <div className="mt-1 h-1 overflow-hidden rounded-full bg-[#eceef2]" role="presentation">
             <div className="barre-metier h-full rounded-full" style={{ width: `${pourcentage}%`, background: couleurBarre }} />
