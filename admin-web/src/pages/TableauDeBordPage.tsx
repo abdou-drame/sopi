@@ -358,12 +358,32 @@ function CartePrestataires() {
 
 const GRAVITE_BANNIERE = { critique: 'danger', attention: 'attention', info: 'info' } as const
 
+const CLE_MASQUEES = 'sopi.admin.alertes-masquees'
+
+function lireMasquees(): Record<string, number> {
+  try {
+    const valeur: unknown = JSON.parse(localStorage.getItem(CLE_MASQUEES) ?? '{}')
+    return valeur && typeof valeur === 'object' ? (valeur as Record<string, number>) : {}
+  } catch {
+    return {}
+  }
+}
+
+function ecrireMasquees(masquees: Record<string, number>): Record<string, number> {
+  try {
+    localStorage.setItem(CLE_MASQUEES, JSON.stringify(masquees))
+  } catch {
+    /* stockage indisponible : la bannière reste masquée pour cette visite */
+  }
+  return masquees
+}
+
 /** Bannières d'alerte de l'administrateur : une par alerte réelle de l'API, avec le lien de l'écran concerné. */
 function AlertesTableau() {
   const { data } = useAlertes()
-  // La croix masque la bannière pour cette visite seulement : l'alerte revient au rechargement tant que le problème existe.
-  const [masquees, setMasquees] = useState<string[]>([])
-  const alertes = (data?.alertes ?? []).filter((a) => !masquees.includes(a.type))
+  // La croix masque la bannière durablement (mémorisé dans le navigateur) ; elle revient si le nombre d'éléments en alerte augmente.
+  const [masquees, setMasquees] = useState<Record<string, number>>(lireMasquees)
+  const alertes = (data?.alertes ?? []).filter((a) => !(a.type in masquees) || a.compteur > masquees[a.type])
   if (alertes.length === 0) return null
   return (
     <div className="flex flex-col gap-2.5" aria-label={T.alertes}>
@@ -372,7 +392,7 @@ function AlertesTableau() {
           key={a.type}
           gravite={GRAVITE_BANNIERE[a.gravite]}
           action={{ libelle: L.commun.voirCourt, vers: lienDeLAlerte(a) }}
-          onFermer={() => setMasquees((m) => [...m, a.type])}
+          onFermer={() => setMasquees((m) => ecrireMasquees({ ...m, [a.type]: a.compteur }))}
         >
           {a.message}
         </BanniereAlerteMq>
