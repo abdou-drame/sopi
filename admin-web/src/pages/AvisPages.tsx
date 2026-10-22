@@ -37,9 +37,9 @@ export const OPTIONS_NOTE = [{ valeur: '', libelle: L.commun.tous }, ...[5, 4, 3
 function chargerAvis(params: Record<string, string | number>) {
   const { vue, ...reste } = params
   const filtres: Record<string, string | number> = { ...reste }
-  if ((vue as Vue) === 'a_traiter') filtres.aTraiter = 'true'
-  if ((vue as Vue) === 'signales') filtres.signale = 'true'
-  if ((vue as Vue) === 'masques') filtres.masque = 'true'
+  if ((vue as Vue) === 'a_traiter') filtres.aTraiter = '1'
+  if ((vue as Vue) === 'signales') filtres.signale = '1'
+  if ((vue as Vue) === 'masques') filtres.masque = '1'
   return api.avis(filtres)
 }
 

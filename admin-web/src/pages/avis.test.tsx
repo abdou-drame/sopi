@@ -50,7 +50,7 @@ describe('modération des avis', () => {
     afficherApplication('/avis')
     expect(await screen.findByText(/Service décevant/)).toBeInTheDocument()
     const recherche = appels.find((a) => a.chemin === '/admin/avis')?.recherche
-    expect(recherche?.get('aTraiter')).toBe('true')
+    expect(recherche?.get('aTraiter')).toBe('1')
     expect(recherche?.has('vue')).toBe(false)
     await userEvent.click(screen.getByRole('tab', { name: /Masqués/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=masques')
