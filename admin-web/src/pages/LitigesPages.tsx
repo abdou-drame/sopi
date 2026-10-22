@@ -199,7 +199,7 @@ export function LitigesListePage() {
                 const code = codeDecision(l)
                 const style = PASTILLE_DECISION[code] ?? PASTILLE_DECISION.rejet
                 return (
-                  <LigneLien key={l.id} vers={`/litiges/${l.id}`} libelle={`Ouvrir le litige ${l.motif}`} texte="Voir le litige" discret>
+                  <LigneLien key={l.id} vers={`/litiges/${l.id}`} libelle={`Ouvrir le litige ${l.motif}`} texte="Voir" discret>
                     <td>
                       <span className="block font-semibold text-[#12172b]">{l.reservation.prestation}</span>
                       <span className="mt-0.5 block text-xs font-normal text-[#9aa0b2]">{l.motif}</span>
