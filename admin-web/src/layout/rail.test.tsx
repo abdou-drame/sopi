@@ -1,6 +1,6 @@
-import { act, screen, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
 
 const PAGE = { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 0 } }
@@ -58,6 +58,15 @@ describe('rail de gauche', () => {
     expect(await rail.findByText('Actualiser')).toBeInTheDocument()
     await userEvent.keyboard('{Escape}')
     expect(rail.queryByText('Actualiser')).toBeNull()
+  })
+
+  it('Actualiser pose le flash visuel sur la page puis le retire, et relance toujours les requêtes', async () => {
+    const rail = await ouvrirRail('/')
+    const avant = vi.mocked(fetch).mock.calls.length
+    await userEvent.click(rail.getByRole('button', { name: 'Actualiser' }))
+    expect(document.documentElement).toHaveAttribute('data-flash')
+    await waitFor(() => expect(document.documentElement).not.toHaveAttribute('data-flash'), { timeout: 2000 })
+    expect(vi.mocked(fetch).mock.calls.length).toBeGreaterThan(avant)
   })
 
   it('pose un point rouge sur les écrans qui ont des alertes, et seulement eux', async () => {
