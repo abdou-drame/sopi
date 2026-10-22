@@ -69,4 +69,22 @@ describe('rail de gauche', () => {
     expect(within(avis).getByTestId('point-alerte')).toBeInTheDocument()
     expect(rail.getAllByTestId('point-alerte')).toHaveLength(1)
   })
+
+  it('pose aussi le point rouge sur Dossiers et Litiges quand ils ont des alertes', async () => {
+    const alertes = {
+      alertes: [
+        { type: 'dossiers_en_attente', gravite: 'info', compteur: 3, message: '3 dossiers en attente.' },
+        { type: 'litiges_ouverts', gravite: 'critique', compteur: 1, message: '1 litige ouvert.' },
+      ],
+      parGravite: { info: 3, attention: 0, critique: 1 },
+      total: 4,
+    }
+    simulerApi({ ...base, 'GET /admin/alertes': { corps: alertes } })
+    afficherApplication('/')
+    const rail = within(await screen.findByRole('complementary', { name: 'Raccourcis' }))
+    for (const nom of [/^Dossiers, 3 alertes/, /^Litiges, 1 alerte/]) {
+      expect(within(await rail.findByRole('link', { name: nom })).getByTestId('point-alerte')).toBeInTheDocument()
+    }
+    expect(rail.getAllByTestId('point-alerte')).toHaveLength(2)
+  })
 })
