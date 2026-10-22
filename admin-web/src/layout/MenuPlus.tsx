@@ -2,8 +2,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
+import { compteursParEcran, useAlertes } from '../api/useAlertes'
 import { L } from '../i18n/libelles'
 import { echelleActuelle } from '../lib/echelle'
+import { PointAlerte } from './PointAlerte'
 import { ICalendrier, ICloche, IChevronBas, IGraphique, IPaiement, IRetrait } from '../design/icones'
 
 interface Page {
@@ -31,6 +33,10 @@ export default function MenuPlus() {
   const declencheur = useRef<HTMLButtonElement>(null)
   const liste = useRef<HTMLDivElement>(null)
   const actif = PAGES_PLUS.some((p) => dansPage(pathname, p.chemin))
+  const { data } = useAlertes()
+  const compteurs = compteursParEcran(data?.alertes ?? [])
+  const enAlerte = (chemin: string) => (compteurs[chemin] ?? 0) > 0
+  const plusEnAlerte = PAGES_PLUS.some((p) => enAlerte(p.chemin))
 
   useEffect(() => setOuvert(false), [pathname])
 
@@ -86,10 +92,11 @@ export default function MenuPlus() {
         aria-current={actif ? 'page' : undefined}
         onClick={() => setOuvert((o) => !o)}
         onKeyDown={(e) => e.key === 'ArrowDown' && !ouvert && (e.preventDefault(), setOuvert(true))}
-        className="mq-nvi cursor-pointer border-none bg-transparent font-[inherit]"
+        className="mq-nvi relative cursor-pointer border-none bg-transparent font-[inherit]"
       >
         {L.menu.plus}
         <IChevronBas width={14} height={14} />
+        {plusEnAlerte && <PointAlerte className="top-1.5 right-1.5" bordure="border-[#f3f4f7]" />}
       </button>
       {ouvert &&
         createPortal(
@@ -109,10 +116,11 @@ export default function MenuPlus() {
                   to={p.chemin}
                   role="menuitem"
                   aria-current={courante ? 'page' : undefined}
-                  className={`mq-rond flex h-11 items-center gap-3 rounded-[22px] px-3.5 text-[13px] leading-[normal] font-semibold text-[#12172b] ${courante ? 'bg-[#f3f4f7] font-bold' : ''}`}
+                  className={`mq-rond relative flex h-11 items-center gap-3 rounded-[22px] px-3.5 text-[13px] leading-[normal] font-semibold text-[#12172b] ${courante ? 'bg-[#f3f4f7] font-bold' : ''}`}
                 >
                   <span className={courante ? 'text-[#1d4ed8]' : 'text-[#6b7287]'}>{p.icone}</span>
                   {p.libelle}
+                  {enAlerte(p.chemin) && <PointAlerte className="top-1/2 right-4 -translate-y-1/2" />}
                 </Link>
               )
             })}

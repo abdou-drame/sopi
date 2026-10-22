@@ -6,6 +6,7 @@ import { useAuth } from '../auth/AuthContext'
 import { L } from '../i18n/libelles'
 import { HoteEnTete } from './EnTeteLarge'
 import MenuPlus from './MenuPlus'
+import { PointAlerte } from './PointAlerte'
 import Logo from '../design/Logo'
 import { PageTransition } from '../design/animation/composants'
 import {
@@ -75,17 +76,19 @@ function BarreDuHaut() {
       <nav aria-label={L.menu.titre} className="flex min-w-0 flex-[1_1_auto] justify-center">
         <div className="flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-[#f3f4f7] p-1">
           {NAV.map((e) => {
-            const compteur = e === DOSSIERS || e === LITIGES ? (compteurs[e.chemin] ?? 0) : 0
+            const compteur = compteurs[e.chemin] ?? 0
+            const nombre = e === DOSSIERS || e === LITIGES
             return (
               <NavLink
                 key={e.chemin}
                 to={e.chemin}
                 end={e.chemin === '/'}
                 aria-label={`${e.libelle}${compteur ? `, ${L.coque.alertes(compteur)}` : ''}`}
-                className="mq-nvi"
+                className="mq-nvi relative"
               >
                 {e.libelle}
-                {compteur > 0 && <Pastille valeur={compteur} rouge={e === LITIGES} />}
+                {compteur > 0 && nombre && <Pastille valeur={compteur} rouge={e === LITIGES} />}
+                {compteur > 0 && !nombre && <PointAlerte className="top-1.5 right-1.5" bordure="border-[#f3f4f7]" />}
               </NavLink>
             )
           })}
@@ -166,6 +169,8 @@ function ItemRail({ libelle, children }: { libelle: string; children: React.Reac
 
 function Rail() {
   const { deconnexion } = useAuth()
+  const { data } = useAlertes()
+  const compteurs = compteursParEcran(data?.alertes ?? [])
   const clientRequetes = useQueryClient()
   const { pathname } = useLocation()
   const racine = useRef<HTMLElement>(null)
@@ -207,8 +212,14 @@ function Rail() {
         <div key={g} className={CAPSULE} style={{ animationDelay: `${g * 40}ms` }}>
           {groupe.map((e) => (
             <ItemRail key={e.chemin} libelle={e.libelle}>
-              <NavLink to={e.chemin} end={e.chemin === '/'} aria-label={e.libelle} className="mq-ric">
+              <NavLink
+                to={e.chemin}
+                end={e.chemin === '/'}
+                aria-label={`${e.libelle}${compteurs[e.chemin] ? `, ${L.coque.alertes(compteurs[e.chemin])}` : ''}`}
+                className="mq-ric"
+              >
                 {e.icone}
+                {compteurs[e.chemin] > 0 && <PointAlerte className="top-[6px] right-[6px]" />}
               </NavLink>
             </ItemRail>
           ))}
