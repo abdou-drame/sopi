@@ -568,16 +568,45 @@ tr[data-selectionnee='true'] > td { background-color: #eef3ff; }
     rx 550ms var(--ease-sortie), fill 200ms, stroke-width 550ms var(--ease-sortie), opacity 300ms;
 }
 .serie-ligne {
-  transition: stroke-dashoffset 700ms var(--ease-sortie), d 550ms var(--ease-sortie);
+  transition: stroke-dashoffset 700ms var(--ease-sortie);
 }
 .serie-aire {
-  transition: opacity 600ms ease-out, d 550ms var(--ease-sortie);
+  transition: opacity 600ms ease-out;
 }
 .serie-bulle {
   transition: transform 300ms var(--ease-sortie);
 }
 .serie-survol {
   transition: x 300ms var(--ease-sortie), opacity 200ms ease-out;
+}
+/* Halo du graphique : lueurs floues (dégradé radial) qui pulsent en transform/opacity ; fixes si le mouvement est réduit. */
+.halo-serie {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.14;
+  will-change: transform, opacity;
+}
+.halo-serie-principal {
+  inset: 0 15%;
+  background: radial-gradient(ellipse at 50% 60%, rgba(45, 106, 79, 0.9), transparent 70%);
+  animation: halo-respire 7s ease-in-out infinite;
+}
+.halo-serie-secondaire {
+  top: -8%;
+  right: 4%;
+  width: 40%;
+  height: 70%;
+  background: radial-gradient(circle, rgba(45, 106, 79, 0.9), transparent 70%);
+  animation: halo-respire 9s ease-in-out -4s infinite;
+}
+@keyframes halo-respire {
+  0%, 100% { opacity: 0.08; transform: scale(1); }
+  50% { opacity: 0.22; transform: scale(1.12); }
+}
+:root[data-theme='dark'] .halo-serie { filter: saturate(0.8); }
+[data-anime='false'] .halo-serie { animation: none; opacity: 0.14; }
+@media (prefers-reduced-motion: reduce) {
+  .halo-serie { animation: none; opacity: 0.14; }
 }
 [data-anime='false'] .serie-forme,
 [data-anime='false'] .serie-ligne,
