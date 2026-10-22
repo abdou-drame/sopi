@@ -145,9 +145,10 @@ html.maquette .fond-sopi {
 }
 .mq-ric {
   position: relative;
-  width: 48px;
-  height: 48px;
-  border-radius: 24px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border-radius: 19px;
   color: #6b7287;
   display: flex;
   align-items: center;
@@ -155,19 +156,69 @@ html.maquette .fond-sopi {
   border: none;
   background: transparent;
   cursor: pointer;
+  transition: background-color var(--duree-rapide, 150ms) var(--ease-standard, ease), color var(--duree-rapide, 150ms) var(--ease-standard, ease),
+    transform 100ms var(--ease-standard, ease);
+}
+/* Zone de clic de 40 px pour un visuel de 38 px. */
+.mq-ric::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
 }
 .mq-ric:hover {
   background: #f3f4f7;
   color: #12172b;
 }
+.mq-ric:active {
+  transform: scale(0.94);
+}
+/* L'écran actif : le fond bleu est porté par .mq-ric-indicateur, qui glisse d'une icône à l'autre. */
 .mq-ric[aria-current="page"],
 .mq-ric[aria-current="page"]:hover {
-  background: #1d4ed8;
+  background: transparent;
   color: #fff;
-  box-shadow: 0 8px 16px rgb(29 78 216 / 0.28);
 }
 .mq-ric[aria-current="page"] svg {
   stroke-width: 1.9;
+}
+.mq-ric-indicateur {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  border-radius: 19px;
+  background: #1d4ed8;
+  box-shadow: 0 8px 16px rgb(29 78 216 / 0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duree-rapide, 150ms) ease;
+  animation: rail-fondu var(--duree-normale, 250ms) var(--ease-sortie, ease-out) both;
+}
+.mq-ric-indicateur[data-glisse] {
+  transition: transform var(--duree-normale, 250ms) var(--ease-sortie, ease-out), opacity var(--duree-rapide, 150ms) ease;
+}
+/* Apparition du rail : chaque capsule se fond en glissant de 8 px depuis la gauche. */
+.rail-capsule {
+  animation: rail-entree var(--duree-normale, 250ms) var(--ease-sortie, ease-out) backwards;
+}
+@keyframes rail-entree {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes rail-fondu {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-ric,
+  .mq-ric-indicateur,
+  .mq-ric-indicateur[data-glisse],
+  .rail-capsule {
+    transition: none !important;
+    animation: none !important;
+  }
+  .mq-ric:active {
+    transform: none;
+  }
 }
 
 /* Champs de recherche */

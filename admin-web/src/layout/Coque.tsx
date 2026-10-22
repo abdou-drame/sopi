@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { compteursParEcran, useAlertes } from '../api/useAlertes'
@@ -45,7 +45,7 @@ const RAIL = [
   [SANCTIONS, UTILISATEURS, METIERS],
 ]
 
-const CAPSULE = 'flex flex-col gap-1.5 rounded-[34px] bg-white p-2.5'
+const CAPSULE = 'rail-capsule relative flex flex-col gap-1 rounded-[26px] bg-white p-1.5'
 
 function Pastille({ valeur, rouge = false }: { valeur: number; rouge?: boolean }) {
   return (
@@ -121,30 +121,110 @@ function BarreDuHaut() {
   )
 }
 
+/** Libellé du rail au survol (après 300 ms) ou au focus clavier ; Échap le ferme. L'élément garde son aria-label, la bulle est décorative. */
+function ItemRail({ libelle, children }: { libelle: string; children: React.ReactNode }) {
+  const [visible, setVisible] = useState(false)
+  const minuteur = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const arreter = () => clearTimeout(minuteur.current)
+  useEffect(() => arreter, [])
+  const montrerApres = () => {
+    arreter()
+    minuteur.current = setTimeout(() => setVisible(true), 300)
+  }
+  const masquer = () => {
+    arreter()
+    setVisible(false)
+  }
+  // Un focus venu d'un clic ne déclenche pas la bulle : seulement la navigation au clavier.
+  const clic = useRef(false)
+  const auFocus = () => {
+    if (!clic.current) setVisible(true)
+  }
+  return (
+    <span
+      className="relative flex"
+      onMouseEnter={montrerApres}
+      onMouseLeave={masquer}
+      onPointerDown={() => (clic.current = true)}
+      onFocus={auFocus}
+      onBlur={() => {
+        clic.current = false
+        masquer()
+      }}
+      onClick={masquer}
+      onKeyDown={(e) => e.key === 'Escape' && masquer()}
+    >
+      {children}
+      {visible && (
+        <span aria-hidden="true" className="pointer-events-none absolute top-0 left-full z-30 flex h-full items-center pl-2.5">
+          <span className="animate-infobulle rounded-[10px] bg-[#12172b] px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(18,23,43,0.25)]">{libelle}</span>
+        </span>
+      )}
+    </span>
+  )
+}
+
 function Rail() {
   const { deconnexion } = useAuth()
   const clientRequetes = useQueryClient()
+  const { pathname } = useLocation()
+  const racine = useRef<HTMLElement>(null)
+  const [cible, setCible] = useState<{ x: number; y: number; l: number; h: number } | null>(null)
+  const [glisse, setGlisse] = useState(false)
+
+  // Position de l'indicateur : celle de l'icône marquée aria-current (rien si l'écran n'est pas dans le rail).
+  const mesurer = useCallback(() => {
+    const actif = racine.current?.querySelector<HTMLElement>('a[aria-current="page"]')
+    setCible(actif ? { x: actif.offsetLeft, y: actif.offsetTop, l: actif.offsetWidth, h: actif.offsetHeight } : null)
+  }, [])
+  useLayoutEffect(mesurer, [mesurer, pathname])
+  useEffect(() => {
+    window.addEventListener('resize', mesurer)
+    return () => window.removeEventListener('resize', mesurer)
+  }, [mesurer])
+  // Le premier placement est immédiat ; seuls les suivants glissent.
+  useEffect(() => {
+    if (cible && !glisse) {
+      const image = requestAnimationFrame(() => setGlisse(true))
+      return () => cancelAnimationFrame(image)
+    }
+  }, [cible, glisse])
+
   return (
     <aside
+      ref={racine}
       aria-label={L.coque.raccourcis}
-      className="sticky top-4 hidden h-[calc(100vh/var(--echelle)-32px)] max-h-[820px] flex-[0_0_68px] flex-col justify-center gap-4 self-start min-[900px]:flex"
+      className="sticky top-4 hidden h-[calc(100vh/var(--echelle)-32px)] max-h-[820px] flex-[0_0_50px] flex-col justify-center gap-3 self-start min-[900px]:flex"
     >
+      <span
+        aria-hidden="true"
+        data-testid="indicateur-rail"
+        data-glisse={glisse || undefined}
+        className="mq-ric-indicateur"
+        style={cible ? { opacity: 1, width: cible.l, height: cible.h, transform: `translate(${cible.x}px, ${cible.y}px)` } : undefined}
+      />
       {RAIL.map((groupe, g) => (
-        <div key={g} className={CAPSULE}>
+        <div key={g} className={CAPSULE} style={{ animationDelay: `${g * 40}ms` }}>
           {groupe.map((e) => (
-            <NavLink key={e.chemin} to={e.chemin} end={e.chemin === '/'} aria-label={e.libelle} title={e.libelle} className="mq-ric">
-              {e.icone}
-            </NavLink>
+            <ItemRail key={e.chemin} libelle={e.libelle}>
+              <NavLink to={e.chemin} end={e.chemin === '/'} aria-label={e.libelle} className="mq-ric">
+                {e.icone}
+              </NavLink>
+            </ItemRail>
           ))}
         </div>
       ))}
-      <div className={CAPSULE}>
-        <button type="button" aria-label={L.coque.actualiser} title={L.coque.actualiser} onClick={() => void clientRequetes.invalidateQueries()} className="mq-ric">
-          <IActualiser />
-        </button>
-        <button type="button" aria-label={L.coque.deconnexion} title={L.coque.deconnexion} onClick={() => void deconnexion()} className="mq-ric">
-          <IDeconnexion />
-        </button>
+      <div className={CAPSULE} style={{ animationDelay: `${RAIL.length * 40}ms` }}>
+        <ItemRail libelle={L.coque.actualiser}>
+          <button type="button" aria-label={L.coque.actualiser} onClick={() => void clientRequetes.invalidateQueries()} className="mq-ric">
+            <IActualiser />
+          </button>
+        </ItemRail>
+        <ItemRail libelle={L.coque.deconnexion}>
+          <button type="button" aria-label={L.coque.deconnexion} onClick={() => void deconnexion()} className="mq-ric">
+            <IDeconnexion />
+          </button>
+        </ItemRail>
       </div>
     </aside>
   )
