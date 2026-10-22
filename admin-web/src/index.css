@@ -18,17 +18,23 @@
 @theme static {
   --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Couleur de marque : bleu profond des cartes */
-  --color-primaire-50: #eef4fc;
-  --color-primaire-100: #d7e4fb;
-  --color-primaire-200: #b4ccf3;
-  --color-primaire-300: #86aae6;
-  --color-primaire-400: #5a89d3;
-  --color-primaire-500: #3b78c0;
-  --color-primaire-600: #2b66ae;
-  --color-primaire-700: #1f4f95;
-  --color-primaire-800: #173f7a;
-  --color-primaire-900: #112e5a;
+  /* Couleur de marque : vert forêt (une seule source : à changer ici et dans maquette.css) */
+  --color-marque: #2d6a4f;
+  --color-marque-fonce: #1b4332;
+  --color-marque-claire: #eaf6f0;
+  /* Neutre ardoise : statuts neutres, alertes d'information */
+  --color-neutre: #475569;
+  --color-neutre-claire: #eef0f4;
+  --color-primaire-50: #f3faf6;
+  --color-primaire-100: #eaf6f0;
+  --color-primaire-200: #cfe8da;
+  --color-primaire-300: #a3d1b8;
+  --color-primaire-400: #6fb08f;
+  --color-primaire-500: #44906f;
+  --color-primaire-600: #2d6a4f;
+  --color-primaire-700: #1b4332;
+  --color-primaire-800: #163a2b;
+  --color-primaire-900: #0f2a1e;
 
   /* Neutres */
   --color-fond: #f4f6fa;
@@ -60,9 +66,9 @@
   --color-erreur-fond: #fde4e4;
   --color-erreur-texte: #a12626;
   --color-erreur: #d64545;
-  --color-info-fond: #dcebfb;
-  --color-info-texte: #1f4f95;
-  --color-info: #3b78c0;
+  --color-info-fond: var(--color-neutre-claire);
+  --color-info-texte: var(--color-neutre);
+  --color-info: var(--color-neutre);
 
   /* Rayons : cartes très arrondies, boutons et champs en gélule */
   --radius-petit: 0.75rem;
@@ -72,10 +78,10 @@
   --radius-gelule: 9999px;
 
   /* Ombres larges et très diffuses, sans bordure */
-  --shadow-carte: 0 1px 2px rgb(17 46 90 / 0.03), 0 10px 32px rgb(17 46 90 / 0.07);
-  --shadow-eleve: 0 16px 48px rgb(17 46 90 / 0.2);
+  --shadow-carte: 0 1px 2px rgb(27 67 50 / 0.03), 0 10px 32px rgb(27 67 50 / 0.07);
+  --shadow-eleve: 0 16px 48px rgb(27 67 50 / 0.2);
   --shadow-bouton: 0 6px 16px rgb(31 79 149 / 0.28);
-  --shadow-infobulle: 0 6px 18px rgb(17 46 90 / 0.25);
+  --shadow-infobulle: 0 6px 18px rgb(27 67 50 / 0.25);
 
   /* Tailles de texte propres au back-office */
   --text-titre-page: 1.875rem;
@@ -202,14 +208,14 @@
 :root,
 .apercu-fond-clair {
   --fond-page: var(--color-fond);
-  --fond-tache-bleu: rgb(180 204 243 / 0.55);
+  --fond-tache-bleu: rgb(168 215 190 / 0.55);
   --fond-tache-cyan: rgb(150 222 240 / 0.38);
   --fond-tache-violet: rgb(206 188 246 / 0.3);
 }
 :root[data-theme="dark"],
 .apercu-fond-sombre {
   --fond-page: color-mix(in srgb, var(--color-primaire-900) 45%, black);
-  --fond-tache-bleu: rgb(59 120 220 / 0.42);
+  --fond-tache-bleu: rgb(45 140 100 / 0.42);
   --fond-tache-cyan: rgb(34 190 225 / 0.28);
   --fond-tache-violet: rgb(139 92 246 / 0.34);
 }
@@ -428,17 +434,15 @@ body {
 }
 
 /*
- * Carte « Sopi » : dégradé du bleu de la marque. Les teintes sont fixées ici (et non via les jetons primaire-*,
+ * Carte « Sopi » : aplat de la couleur de marque. Les teintes sont fixées ici (et non via les jetons primaire-*,
  * inversés en mode sombre) afin que le texte blanc garde le même contraste dans les deux modes.
  */
 .carte-sopi {
-  background:
-    radial-gradient(120% 90% at 0% 0%, rgb(255 255 255 / 0.16), transparent 55%),
-    linear-gradient(135deg, #2b66ae 0%, #1f4f95 48%, #112e5a 100%);
+  background: #2d6a4f;
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.22) inset,
-    0 18px 40px rgb(17 46 90 / 0.28),
-    0 2px 6px rgb(17 46 90 / 0.18);
+    0 18px 40px rgb(27 67 50 / 0.28),
+    0 2px 6px rgb(27 67 50 / 0.18);
 }
 .carte-sopi::before {
   content: '';

@@ -7,13 +7,13 @@ function PageMessage({ titre, texte, code }: { titre: string; texte: string; cod
     <Carte className="mx-auto mt-10 max-w-md">
       <div className="flex flex-col items-center gap-3 py-6 text-center">
         {code && (
-          <p aria-hidden="true" className="m-0 text-6xl leading-[normal] font-bold text-[#b8c8f5]">
+          <p aria-hidden="true" className="m-0 text-6xl leading-[normal] font-bold text-[#a7d4bf]">
             {code}
           </p>
         )}
         <h1 className="m-0 text-2xl leading-[normal] font-bold text-[#12172b]">{titre}</h1>
         <p className="m-0 text-sm leading-[normal] text-[#8a90a2]">{texte}</p>
-        <Link to="/" className="mq-btn-bleu mt-2 inline-flex h-12 items-center rounded-3xl bg-[#1d4ed8] px-6 text-[13px] font-bold text-white no-underline shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
+        <Link to="/" className="mq-btn-bleu mt-2 inline-flex h-12 items-center rounded-3xl bg-marque px-6 text-[13px] font-bold text-white no-underline shadow-[0_8px_18px_rgba(45,106,79,0.30)]">
           {L.erreurs.retourAccueil}
         </Link>
       </div>

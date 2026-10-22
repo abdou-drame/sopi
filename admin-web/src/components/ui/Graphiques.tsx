@@ -130,7 +130,7 @@ export function GraphiqueCourbe({ description, libelles, series, formatValeur = 
           ) : null,
         )}
         {n > 0 && (
-          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="#b8c8f5" strokeDasharray="3 4" />
+          <line x1={x(actif)} x2={x(actif)} y1={MARGE.haut} y2={y(0)} stroke="#CBD5E1" strokeDasharray="3 4" />
         )}
         {series.map((s, k) => {
           const points = s.valeurs.map((v, i) => [x(i), y(v)] as [number, number])
@@ -231,7 +231,7 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
-            style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(29,78,216,0.16), transparent 70%)', animation: 'apparition 600ms ease-out both' }}
+            style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(45,106,79,0.16), transparent 70%)', animation: 'apparition 600ms ease-out both' }}
           />
         )}
         <div aria-hidden="true" className={`absolute inset-x-0 top-1.5 bottom-8 flex-col justify-between ${compact ? 'hidden' : 'flex'}`}>
@@ -258,18 +258,18 @@ export function GraphiqueBarres({ description, donnees, formatValeur = (v) => St
                     className="relative w-full origin-bottom rounded-full transition-[background-color,box-shadow] duration-200"
                     style={{
                       height: `${hauteur}%`,
-                      backgroundColor: estActif ? '#1d4ed8' : '#a9bdf6',
+                      backgroundColor: estActif ? 'var(--color-marque)' : '#a7d4bf',
                       backgroundImage: rayures,
-                      boxShadow: compact && estActif ? '0 8px 14px rgba(29,78,216,0.35)' : undefined,
+                      boxShadow: compact && estActif ? '0 8px 14px rgba(45,106,79,0.35)' : undefined,
                       animation: `croissance 500ms cubic-bezier(0.22, 1, 0.36, 1) ${i * 80}ms both`,
                     }}
                   >
                     {estActif && d.valeur > 0 && (
                       <>
-                        <span className="absolute -top-[38px] left-1/2 -translate-x-1/2 rounded-full bg-[#1d4ed8] px-[9px] py-[3px] text-[10px] font-bold whitespace-nowrap text-white">
+                        <span className="absolute -top-[38px] left-1/2 -translate-x-1/2 rounded-full bg-marque px-[9px] py-[3px] text-[10px] font-bold whitespace-nowrap text-white">
                           {formatValeur(d.valeur)}
                         </span>
-                        <span className="absolute -top-2.5 left-1/2 box-border size-3.5 -translate-x-1/2 rounded-full border-[3px] border-[#1d4ed8] bg-white" />
+                        <span className="absolute -top-2.5 left-1/2 box-border size-3.5 -translate-x-1/2 rounded-full border-[3px] border-marque bg-white" />
                       </>
                     )}
                   </div>

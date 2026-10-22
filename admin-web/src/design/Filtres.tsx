@@ -52,7 +52,7 @@ function FiltreMenu({ label, valeur, options, onChoisir }: { label: string; vale
                 className={`mq-rond flex h-11 w-full cursor-pointer items-center justify-between gap-3 rounded-[22px] border-none px-3.5 text-left text-[13px] font-semibold whitespace-nowrap text-[#12172b] ${actif ? 'bg-[#f3f4f7] font-bold' : 'bg-transparent'}`}
               >
                 {o.libelle}
-                {actif && <span aria-hidden="true" className="size-[7px] rounded-full bg-[#1d4ed8]" />}
+                {actif && <span aria-hidden="true" className="size-[7px] rounded-full bg-marque" />}
               </button>
             )
           })}

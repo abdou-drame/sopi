@@ -6,7 +6,7 @@ import type { PointRevenus, Regroupement } from '../api/types'
 import { GraphiqueCourbe } from '../components/ui/Graphiques'
 import { BoutonAction } from '../design/boutons'
 import { ChampJour, ChampSelect } from '../design/champs'
-import { Carte, DEGRADE_BLEU, EnteteCarte, PiedListe, TitrePage } from '../design/composants'
+import { Carte, FOND_MARQUE, EnteteCarte, PiedListe, TitrePage } from '../design/composants'
 import { EtatChargement, EtatErreur, EtatVide } from '../design/etats'
 import { IGraphique } from '../design/icones'
 import { L } from '../i18n/libelles'
@@ -51,7 +51,7 @@ function libellePeriode(p: PointRevenus, regroupement: Regroupement): string {
 /** Chiffre de la maquette Revenus : libellé 12/600, montant 30/34 avec « FCFA » en petit, légende 12. */
 function Chiffre({ libelle, montant, legende, principal = false }: { libelle: string; montant: number; legende?: string; principal?: boolean }) {
   return (
-    <section className={`box-border rounded-[28px] px-5 py-[18px] ${principal ? 'text-white' : 'bg-white'}`} style={principal ? { background: DEGRADE_BLEU } : undefined} aria-label={libelle}>
+    <section className={`box-border rounded-[28px] px-5 py-[18px] ${principal ? 'text-white' : 'bg-white'}`} style={principal ? { background: FOND_MARQUE } : undefined} aria-label={libelle}>
       <div className={`text-xs leading-[normal] font-semibold ${principal ? 'opacity-85' : 'text-[#8a90a2]'}`}>{libelle}</div>
       <div className="mt-2 text-[30px] leading-[34px] font-bold tracking-[-0.8px] tabular-nums">
         <span aria-label={formatMontant(montant)}>
@@ -172,7 +172,7 @@ export default function RevenusPage() {
                   description={T.graphiqueDescription}
                   libelles={series.map((p) => libelleAxe(p, regroupement))}
                   series={[
-                    { nom: T.legendeAcomptes, couleur: '#1d4ed8', valeurs: series.map((p) => p.acomptesEncaisses) },
+                    { nom: T.legendeAcomptes, couleur: 'var(--color-marque)', valeurs: series.map((p) => p.acomptesEncaisses) },
                     { nom: T.legendeRevenus, couleur: '#16a34a', valeurs: series.map((p) => p.revenus) },
                   ]}
                   formatValeur={formatMontant}

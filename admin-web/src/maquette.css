@@ -6,17 +6,17 @@
 html.maquette {
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Accent #1d4ed8 et marine #0f1b3d */
-  --color-primaire-50: #f1f5ff;
-  --color-primaire-100: #e7edff;
-  --color-primaire-200: #c7d6fe;
-  --color-primaire-300: #9db7fc;
-  --color-primaire-400: #6f92f5;
-  --color-primaire-500: #3b66ea;
-  --color-primaire-600: #1d4ed8;
-  --color-primaire-700: #1a44bd;
-  --color-primaire-800: #17338f;
-  --color-primaire-900: #0f1b3d;
+  /* Accent #2D6A4F (vert forêt) et vert très sombre #0f2a1e */
+  --color-primaire-50: #f3faf6;
+  --color-primaire-100: #eaf6f0;
+  --color-primaire-200: #cfe8da;
+  --color-primaire-300: #a3d1b8;
+  --color-primaire-400: #6fb08f;
+  --color-primaire-500: #44906f;
+  --color-primaire-600: #2d6a4f;
+  --color-primaire-700: #1b4332;
+  --color-primaire-800: #163a2b;
+  --color-primaire-900: #0f2a1e;
 
   /* Rayons : 32 cartes, 24 boutons, 20 tuiles, 999 pilules */
   --radius-petit: 0.75rem;
@@ -26,7 +26,7 @@ html.maquette {
   --radius-gelule: 9999px;
 
   --shadow-carte: none;
-  --shadow-bouton: 0 8px 18px rgb(29 78 216 / 0.3);
+  --shadow-bouton: 0 8px 18px rgb(45 106 79 / 0.3);
   --shadow-eleve: 0 24px 60px rgb(18 23 43 / 0.2);
 
   /* États */
@@ -39,9 +39,9 @@ html.maquette {
   --color-attention: #fbbf24;
   --color-attention-fond: #fff1cc;
   --color-attention-texte: #8a5a00;
-  --color-info: #1d4ed8;
-  --color-info-fond: #e7edff;
-  --color-info-texte: #1d4ed8;
+  --color-info: var(--color-neutre);
+  --color-info-fond: var(--color-neutre-claire);
+  --color-info-texte: var(--color-neutre);
 }
 
 html.maquette,
@@ -77,15 +77,15 @@ html.maquette .fond-sopi {
   background-color: #e4e7ee;
 }
 
-/* Boutons des pages : bleu (principal), blanc, rouge doux, gris */
+/* Boutons des pages : couleur de marque (principal), blanc, rouge doux, gris */
 .mq-btn-bleu {
-  background: #1d4ed8;
+  background: var(--color-marque);
   color: #fff;
-  box-shadow: 0 8px 18px rgb(29 78 216 / 0.3);
+  box-shadow: 0 8px 18px rgb(45 106 79 / 0.3);
   transition: background-color 0.15s, transform 0.1s;
 }
 .mq-btn-bleu:hover:not(:disabled) {
-  background: #1a44bd;
+  background: var(--color-marque-fonce);
 }
 .mq-btn-bleu:active:not(:disabled) {
   transform: scale(0.98);
@@ -187,8 +187,8 @@ html.maquette .fond-sopi {
   left: 0;
   z-index: 1;
   border-radius: 19px;
-  background: #1d4ed8;
-  box-shadow: 0 8px 16px rgb(29 78 216 / 0.28);
+  background: var(--color-marque);
+  box-shadow: 0 8px 16px rgb(45 106 79 / 0.28);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--duree-rapide, 150ms) ease;
@@ -224,7 +224,7 @@ html.maquette .fond-sopi {
 /* Champs de recherche */
 .mq-champ:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgb(29 78 216 / 0.2);
+  box-shadow: 0 0 0 3px rgb(45 106 79 / 0.2);
 }
 
 /* Tableaux : lignes impaires .rang (survol #f6f7fa), lignes paires sur fond #f3f4f7 */

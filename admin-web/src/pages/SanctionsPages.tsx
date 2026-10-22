@@ -122,7 +122,7 @@ function pastilleEtat(s: SanctionListe) {
 
 const TYPE_STYLE: Record<string, { fond: string; icone: ReactNode }> = {
   avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', icone: <IAlerte /> },
-  suspension_temporaire: { fond: 'bg-[#e7edff] text-[#1d4ed8]', icone: <IPause /> },
+  suspension_temporaire: { fond: 'bg-neutre-claire text-neutre', icone: <IPause /> },
   bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', icone: <IInterdit /> },
 }
 
@@ -206,7 +206,7 @@ export default function SanctionsListePage() {
         />
         <CarteStat
           icone={<IPause />}
-          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          teinte="bg-marque-claire text-marque"
           badge="Hors ligne"
           badgeTeinte="bg-[#eef1f6] text-[#4f566b]"
           titre="Prestataires suspendus"
@@ -229,7 +229,7 @@ export default function SanctionsListePage() {
             }))}
           />
           <div className="ml-auto flex flex-wrap items-center gap-2.5">
-            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-marque">
               <IRecherche taille={16} />
               <input
                 type="search"

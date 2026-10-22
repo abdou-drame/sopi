@@ -17,7 +17,7 @@ export function Pastille({ fond, point, libelle }: { fond: string; point: string
 export function CarteBleue({ icone, titre, valeur, unite, aJour, note }: { icone: ReactNode; titre: string; valeur: number | undefined; unite: string; aJour?: boolean; note: string }) {
   return (
     <AnimatedCard>
-    <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] px-4 py-2.5 text-white shadow-[0_14px_28px_-14px_rgba(30,64,216,0.55)]" style={{ background: 'linear-gradient(150deg, #2E5BFF 0%, #1E40D8 55%, #1A33A8 100%)' }}>
+    <section aria-label={titre} className="box-border flex items-center gap-3 rounded-[24px] px-4 py-2.5 text-white shadow-[0_14px_28px_-14px_rgba(45,106,79,0.55)]" style={{ background: 'var(--color-marque)' }}>
       <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20">{icone}</span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">

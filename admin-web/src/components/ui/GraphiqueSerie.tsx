@@ -76,13 +76,13 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
-        style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(29,78,216,0.16), transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(45,106,79,0.16), transparent 70%)' }}
       />
       <svg viewBox={`0 0 ${L} ${H}`} className="relative h-full w-full" aria-hidden="true" onMouseLeave={() => setSurvol(null)}>
         <defs>
           <linearGradient id="serie-aire" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--color-marque)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--color-marque)" stopOpacity="0" />
           </linearGradient>
         </defs>
         {choisi && (
@@ -93,7 +93,7 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
             width={pas - 4}
             height={BASE - MARGE.haut + 14}
             rx={14}
-            fill="#1d4ed8"
+            fill="var(--color-marque)"
             style={{ opacity: survol !== null ? 0.08 : 0 }}
           />
         )}
@@ -103,7 +103,7 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
           d={chemin}
           pathLength={1}
           fill="none"
-          stroke="#1d4ed8"
+          stroke="var(--color-marque)"
           strokeWidth={2.5}
           strokeLinecap="round"
           strokeDasharray={1}
@@ -124,8 +124,8 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
               className="serie-forme"
               data-forme={courbe ? 'point' : 'colonne'}
               {...forme}
-              fill={courbe ? '#fff' : estActif ? '#1d4ed8' : '#a9bdf6'}
-              stroke="#1d4ed8"
+              fill={courbe ? '#fff' : estActif ? 'var(--color-marque)' : '#a7d4bf'}
+              stroke="var(--color-marque)"
               strokeWidth={courbe ? 2.5 : 0}
               style={{ opacity: courbe || f.valeur > 0 ? 1 : 0 }}
             />
@@ -133,7 +133,7 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
         })}
         {choisi && choisi.valeur > 0 && (
           <g className="serie-bulle" style={{ transform: `translate(${choisi.cx}px, ${choisi.y - 12}px)` }}>
-            <rect x={-largeurBulle / 2} y={-17} width={largeurBulle} height={17} rx={8.5} fill="#1d4ed8" />
+            <rect x={-largeurBulle / 2} y={-17} width={largeurBulle} height={17} rx={8.5} fill="var(--color-marque)" />
             <text y={-5} textAnchor="middle" fontSize={10} fontWeight={700} fill="#fff">
               {texte}
             </text>

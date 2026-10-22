@@ -196,7 +196,7 @@ function ChampPrestataire({ valeur, onValider }: { valeur: string; onValider: (v
     return () => window.clearTimeout(minuteur)
   }, [saisie, valeur])
   return (
-    <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+    <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-marque">
       <IRecherche taille={16} />
       <input
         type="search"

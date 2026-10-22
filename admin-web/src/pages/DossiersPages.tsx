@@ -14,7 +14,7 @@ import {
   Avatar,
   Badge,
   Carte as CarteMq,
-  DEGRADE_BLEU,
+  FOND_MARQUE,
   EnteteCarte,
   EtapeChrono,
   LigneLien,
@@ -130,7 +130,7 @@ export function DossiersListePage() {
         />
         <CarteStat
           icone={<IDocument />}
-          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          teinte="bg-marque-claire text-marque"
           badge="Total"
           badgeTeinte="bg-[#eef1f6] text-[#4f566b]"
           titre="Dossiers reçus"
@@ -153,7 +153,7 @@ export function DossiersListePage() {
             }))}
           />
           <div className="ml-auto flex flex-wrap items-center gap-2.5">
-            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-marque">
               <IRecherche taille={16} />
               <input
                 type="search"
@@ -207,7 +207,7 @@ export function DossiersListePage() {
                       </div>
                     </td>
                     <td>
-                      <span className="inline-block rounded-full bg-[#e7edff] px-2.5 py-0.5 text-xs font-semibold text-[#1d4ed8]">{L.metiers[d.metier] ?? d.metier}</span>
+                      <span className="inline-block rounded-full bg-marque-claire px-2.5 py-0.5 text-xs font-semibold text-marque">{L.metiers[d.metier] ?? d.metier}</span>
                     </td>
                     <td className="text-[#6b7287]">{d.quartier}</td>
                     <td>
@@ -269,7 +269,7 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
       <button type="button" onClick={() => setModale('refuser')} className="mq-btn-blanc h-12 cursor-pointer rounded-3xl border-none bg-white px-[22px] text-[13px] font-bold text-[#b0161b]">
         {T.refuser}
       </button>
-      <button type="button" onClick={() => setModale('accepter')} className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]">
+      <button type="button" onClick={() => setModale('accepter')} className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-marque px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(45,106,79,0.30)]">
         Valider le dossier
       </button>
       <Fenetre
@@ -332,7 +332,7 @@ function LienVoirPiece({ chemin, nom }: { chemin: string; nom: string }) {
       aria-label={`Voir ${nom}`}
       disabled={enCours}
       onClick={() => void ouvrir()}
-      className="cursor-pointer border-none bg-transparent p-0 text-xs font-bold text-[#1d4ed8]"
+      className="cursor-pointer border-none bg-transparent p-0 text-xs font-bold text-marque"
     >
       Voir
     </button>
@@ -398,7 +398,7 @@ export function DossierDetailPage() {
                       const nom = T.documents[j.typeDocument] ?? j.typeDocument
                       return (
                         <div key={j.id} className="rounded-[22px] bg-[#f3f4f7] p-2.5">
-                          <div className="flex h-[120px] items-center justify-center overflow-hidden rounded-2xl bg-[#e7edff]">
+                          <div className="flex h-[120px] items-center justify-center overflow-hidden rounded-2xl bg-marque-claire">
                             <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={nom} className="h-[120px] w-full rounded-2xl!" />
                           </div>
                           <div className="flex items-center justify-between px-1.5 pt-2.5 pb-1">
@@ -414,7 +414,7 @@ export function DossierDetailPage() {
               <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
                 <CarteMq>
                   <TitreCarte titre="Décision" sousTitre="Le prestataire est prévenu par e-mail et notification" />
-                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: FOND_MARQUE }}>
                     <div className="text-xs font-semibold opacity-80">Statut actuel</div>
                     <div className="mt-1.5 text-[28px] leading-[34px] font-bold tracking-[-0.6px]">{statut}</div>
                     <div className="mt-[18px] flex items-center justify-between text-xs">
@@ -425,11 +425,11 @@ export function DossierDetailPage() {
                 <CarteMq>
                   <TitreCarte titre="Historique du dossier" />
                   <div className="mt-4 flex flex-col">
-                    <EtapeChrono couleur="#1d4ed8" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
+                    <EtapeChrono couleur="var(--color-neutre)" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
                     {d.statutCompte === 'en_attente' ? (
-                      <EtapeChrono couleur="#cdd9fb" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
+                      <EtapeChrono couleur="#CBD5E1" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
                     ) : (
-                      <EtapeChrono couleur="#1d4ed8" titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
+                      <EtapeChrono couleur={d.statutCompte === 'actif' ? '#0e6245' : 'var(--color-neutre)'} titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
                     )}
                   </div>
                 </CarteMq>
