@@ -32,8 +32,8 @@ const TON_DU_STATUT: Record<string, TonBadge> = {
 const POINT_DU_STATUT: Record<string, string> = {
   en_attente: '#f59e0b',
   acceptee: '#f59e0b',
-  confirmee: '#1d4ed8',
-  en_cours: '#1d4ed8',
+  confirmee: '#2563eb',
+  en_cours: '#2563eb',
   terminee: '#16a34a',
   refusee: '#e5484d',
   annulee: '#9aa0b2',

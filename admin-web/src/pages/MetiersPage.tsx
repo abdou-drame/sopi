@@ -147,7 +147,7 @@ function ActionActivation({ metier, onFait }: { metier: Metier; onFait: (message
 /** Pastille d'icône des maquettes : clé (Mécanique), ciseaux (Coiffure), chemise (Pressing) ; autre métier : son initiale. */
 const PASTILLES: Record<string, { fond: string; icone: ReactNode }> = {
   mecanique: {
-    fond: 'bg-[#e7edff] text-[#1d4ed8]',
+    fond: 'bg-marque-claire text-marque',
     icone: <IMetiers taille={24} trait={1.8} />,
   },
   coiffure: {

@@ -95,8 +95,8 @@ export function TitreCarte({ titre, sousTitre }: { titre: string; sousTitre?: st
   )
 }
 
-/** Bloc dégradé 150° des maquettes (#3563e8 → #1d4ed8 → #17338f). */
-export const DEGRADE_BLEU = 'linear-gradient(150deg, #3563e8 0%, #1d4ed8 50%, #17338f 100%)'
+/** Fond plat de la couleur de marque (cartes « hero »). */
+export const FOND_MARQUE = 'var(--color-marque)'
 
 export type TonBadge = 'attention' | 'danger' | 'succes' | 'neutre' | 'info'
 const TONS: Record<TonBadge, string> = {
@@ -104,7 +104,7 @@ const TONS: Record<TonBadge, string> = {
   danger: 'bg-[#fde9e9] text-[#b0161b]',
   succes: 'bg-[#d7f7e4] text-[#0e6245]',
   neutre: 'bg-[#eef1f6] text-[#4f566b]',
-  info: 'bg-[#e7edff] text-[#1d4ed8]',
+  info: 'bg-[#e7edff] text-[#2563eb]',
 }
 
 /** Pastille de statut : padding 5px 12px, pilule, 12 px (600 dans les tableaux, 700 ailleurs). */
@@ -115,12 +115,12 @@ export function Badge({ ton, children, gras = false }: { ton: TonBadge; children
 }
 
 const PALETTE = [
-  'bg-[#e7edff] text-[#1d4ed8]',
+  'bg-marque-claire text-marque',
   'bg-[#fde7f3] text-[#a3206b]',
   'bg-[#d7f7e4] text-[#0e6245]',
   'bg-[#fff0d4] text-[#983705]',
   'bg-[#ede7ff] text-[#5b3fd0]',
-  'bg-[#dbeafe] text-[#1d4ed8]',
+  'bg-[#dbeafe] text-[#2563eb]',
 ]
 
 /** Avatar d'initiales : paires pastel des maquettes, choisies de façon stable d'après le nom. */
@@ -158,13 +158,13 @@ export function Onglets({ onglets, libelle, pastille = false }: { onglets: Ongle
           aria-selected={o.actif}
           onClick={o.onSelect}
           className={`flex h-9 cursor-pointer items-center gap-2 rounded-full border-none px-4 text-[13px] font-semibold whitespace-nowrap ${
-            o.actif ? (pastille ? 'bg-white text-[#12172b] shadow-[0_2px_8px_rgba(18,23,43,0.12)]' : 'bg-[#1d4ed8] text-white') : 'bg-transparent text-[#6b7287]'
+            o.actif ? (pastille ? 'bg-white text-[#12172b] shadow-[0_2px_8px_rgba(18,23,43,0.12)]' : 'bg-marque text-white') : 'bg-transparent text-[#6b7287]'
           }`}
         >
           {o.libelle}
           {o.compteur !== undefined &&
             (pastille ? (
-              <span className={`grid h-[22px] min-w-[22px] place-items-center rounded-full px-1.5 text-[11px] font-bold ${o.actif ? 'bg-[#1d4ed8] text-white' : 'bg-[#e6e8ee] text-[#6b7287]'}`}>{o.compteur}</span>
+              <span className={`grid h-[22px] min-w-[22px] place-items-center rounded-full px-1.5 text-[11px] font-bold ${o.actif ? 'bg-marque text-white' : 'bg-[#e6e8ee] text-[#6b7287]'}`}>{o.compteur}</span>
             ) : o.actif ? (
               <span className="rounded-[9px] bg-white/[0.22] px-[7px] text-[11px] leading-[18px]">{o.compteur}</span>
             ) : (
@@ -275,7 +275,7 @@ export function PaginationRonde({ resume, page, totalPages, onPage }: { resume: 
             aria-label={`Page ${n}`}
             aria-current={n === page ? 'page' : undefined}
             onClick={() => onPage(n)}
-            className={`${rond} cursor-pointer ${n === page ? 'border-[#1d4ed8] bg-[#1d4ed8] text-white' : 'mq-rond border-[#e6e8ee] bg-white text-[#12172b]'}`}
+            className={`${rond} cursor-pointer ${n === page ? 'border-marque bg-marque text-white' : 'mq-rond border-[#e6e8ee] bg-white text-[#12172b]'}`}
           >
             {n}
           </button>
@@ -345,7 +345,7 @@ export function LigneLien({ vers, libelle, texte, discret = false, children }: {
           data-voir
           state={{ recherche: search }}
           aria-label={libelle}
-          className={`mq-rond mq-lr inline-flex items-center justify-center ${discret ? 'gap-1.5 border border-[#e6e8ee] bg-white' : 'bg-[#f3f4f7]'} text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1d4ed8] ${
+          className={`mq-rond mq-lr inline-flex items-center justify-center ${discret ? 'gap-1.5 border border-[#e6e8ee] bg-white' : 'bg-[#f3f4f7]'} text-[#12172b] after:absolute after:inset-0 after:z-0 after:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marque ${
             discret ? 'h-8 rounded-full px-3.5 text-xs font-semibold' : texte ? 'h-[34px] rounded-[17px] px-3.5 text-xs font-bold' : 'size-9 rounded-full'
           }`}
         >
@@ -425,7 +425,7 @@ export function GrilleTuiles({ elements, className = '' }: { elements: { libelle
 /** Lien dans le texte d'une tuile ou d'une carte. */
 export function LienTexte({ vers, children }: { vers: string; children: ReactNode }) {
   return (
-    <Link to={vers} className="font-semibold text-[#1d4ed8] hover:underline">
+    <Link to={vers} className="font-semibold text-marque hover:underline">
       {children}
     </Link>
   )

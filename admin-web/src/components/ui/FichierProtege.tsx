@@ -73,7 +73,7 @@ export default function FichierProtege({ chemin, alt, typeMime, className = 'siz
       href={adresse!}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex ${className} flex-col items-center justify-center gap-1 rounded-2xl border border-[#e6e8ee] bg-[#f3f4f7] p-2 text-center text-xs font-medium text-[#1d4ed8] hover:bg-[#e7edff]`}
+      className={`inline-flex ${className} flex-col items-center justify-center gap-1 rounded-2xl border border-[#e6e8ee] bg-[#f3f4f7] p-2 text-center text-xs font-medium text-marque hover:bg-marque-claire`}
     >
       <span aria-hidden="true" className="text-lg font-bold">PDF</span>
       {L.fichiers.ouvrir}

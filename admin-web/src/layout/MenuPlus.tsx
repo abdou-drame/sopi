@@ -118,7 +118,7 @@ export default function MenuPlus() {
                   aria-current={courante ? 'page' : undefined}
                   className={`mq-rond relative flex h-11 items-center gap-3 rounded-[22px] px-3.5 text-[13px] leading-[normal] font-semibold text-[#12172b] ${courante ? 'bg-[#f3f4f7] font-bold' : ''}`}
                 >
-                  <span className={courante ? 'text-[#1d4ed8]' : 'text-[#6b7287]'}>{p.icone}</span>
+                  <span className={courante ? 'text-marque' : 'text-[#6b7287]'}>{p.icone}</span>
                   {p.libelle}
                   {enAlerte(p.chemin) && <PointAlerte className="top-1/2 right-4 -translate-y-1/2" />}
                 </Link>

@@ -28,7 +28,7 @@ const ContexteRetours = createContext<Notifieur | null>(null)
 
 const styles: Record<TypeRetour, string> = {
   succes: 'border-l-[#16a34a]',
-  info: 'border-l-[#1d4ed8]',
+  info: 'border-l-[#2563eb]',
   erreur: 'border-l-[#e5484d]',
 }
 

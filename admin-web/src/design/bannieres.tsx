@@ -32,7 +32,7 @@ export function BanniereDecision({ ton, children }: { ton: 'succes' | 'danger'; 
 const GRAVITES = {
   danger: { trait: 'border-l-[#b0161b]', pastille: 'bg-[#fde9e9] text-[#b0161b]' },
   attention: { trait: 'border-l-[#8a5a00]', pastille: 'bg-[#fff1cc] text-[#8a5a00]' },
-  info: { trait: 'border-l-[#1d4ed8]', pastille: 'bg-[#e7edff] text-[#1d4ed8]' },
+  info: { trait: 'border-l-[#2563eb]', pastille: 'bg-[#e7edff] text-[#2563eb]' },
 } as const
 
 /** Bannière d'alerte : carte blanche, trait de 6 px à gauche, pastille d'icône, texte et lien d'action facultatif. */

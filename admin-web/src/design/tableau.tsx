@@ -18,11 +18,11 @@ export interface ContexteLigne<T> {
   proprietes: (ligne: T) => { 'data-selectionnee'?: 'true' }
 }
 
-const CASE = 'size-4 cursor-pointer accent-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-40'
+const CASE = 'size-4 cursor-pointer accent-marque disabled:cursor-not-allowed disabled:opacity-40'
 
 function Fleche({ sens }: { sens: EtatTri['sens'] | null }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={sens ? 'text-[#1d4ed8]' : 'opacity-50'}>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={sens ? 'text-marque' : 'opacity-50'}>
       {sens === 'asc' ? <path d="M12 19V5M6 11l6-6 6 6" /> : sens === 'desc' ? <path d="M12 5v14M6 13l6 6 6-6" /> : <path d="M8 9l4-4 4 4M8 15l4 4 4-4" />}
     </svg>
   )

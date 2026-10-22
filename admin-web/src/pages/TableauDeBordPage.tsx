@@ -8,7 +8,7 @@ import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
 import GraphiqueSerie, { type ModeSerie } from '../components/ui/GraphiqueSerie'
 import { BanniereAlerteMq } from '../design/bannieres'
-import { Avatar, Carte, DEGRADE_BLEU, TitrePage } from '../design/composants'
+import { Avatar, Carte, FOND_MARQUE, TitrePage } from '../design/composants'
 import { ICalendrier, IColonnes, ICourbe, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
@@ -19,15 +19,15 @@ const ABSENT = '—'
 /** Couleur du point de statut d'une réservation (statuts du backend). */
 const POINT_STATUT: Record<string, string> = {
   en_attente: '#f59e0b',
-  acceptee: '#1d4ed8',
-  confirmee: '#1d4ed8',
-  en_cours: '#1d4ed8',
+  acceptee: '#2563eb',
+  confirmee: '#2563eb',
+  en_cours: '#2563eb',
   terminee: '#16a34a',
   refusee: '#e5484d',
   annulee: '#9aa0b2',
 }
 
-const COULEURS_METIER = ['#1d4ed8', '#5b83ef', '#a9bdf6']
+const COULEURS_METIER = ['#2D6A4F', '#52a37c', '#a7d4bf']
 
 function LienFleche({ vers, libelle }: { vers: string; libelle: string }) {
   return (
@@ -71,7 +71,7 @@ function CarteChiffre({
     <AnimatedCard>
     <section
       className={`box-border rounded-[24px] px-5 py-3 ${degrade ? 'text-white' : 'bg-white'}`}
-      style={degrade ? { background: DEGRADE_BLEU } : undefined}
+      style={degrade ? { background: FOND_MARQUE } : undefined}
     >
       <div className="flex items-center justify-between">
         <span className={`text-xs font-semibold ${degrade ? 'opacity-85' : 'text-[#8a90a2]'}`}>{titre}</span>
@@ -148,7 +148,7 @@ function CarteReservations() {
             role="tab"
             aria-selected={!annuel}
             onClick={() => setAnnuel(false)}
-            className={`h-[34px] cursor-pointer rounded-full border-none px-4 text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-transparent text-[#8a90a2]' : 'bg-[#1d4ed8] text-white'}`}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-4 text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-transparent text-[#8a90a2]' : 'bg-marque text-white'}`}
           >
             Mensuel
           </button>
@@ -157,7 +157,7 @@ function CarteReservations() {
             role="tab"
             aria-selected={annuel}
             onClick={() => setAnnuel(true)}
-            className={`h-[34px] cursor-pointer rounded-full border-none px-[18px] text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
+            className={`h-[34px] cursor-pointer rounded-full border-none px-[18px] text-xs font-semibold transition-colors duration-200 ${annuel ? 'bg-marque text-white' : 'bg-transparent text-[#8a90a2]'}`}
           >
             Annuel
           </button>
@@ -177,7 +177,7 @@ function CarteReservations() {
               aria-label={libelle}
               title={libelle}
               onClick={() => setMode(cle)}
-              className={`grid size-[34px] cursor-pointer place-items-center rounded-full border-none transition-colors duration-200 ${mode === cle ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
+              className={`grid size-[34px] cursor-pointer place-items-center rounded-full border-none transition-colors duration-200 ${mode === cle ? 'bg-marque text-white' : 'bg-transparent text-[#8a90a2]'}`}
             >
               <Icone />
             </button>
@@ -201,7 +201,7 @@ function CarteDossiers() {
   return (
     <Carte>
       <EnTeteSimple titre="Dossiers à traiter" sousTitre="Demandes d'inscription" vers="/dossiers-prestataires" libelle="Ouvrir les dossiers" />
-      <div className="mt-3 box-border rounded-[22px] p-4 text-white" style={{ background: DEGRADE_BLEU }}>
+      <div className="mt-3 box-border rounded-[22px] p-4 text-white" style={{ background: FOND_MARQUE }}>
         <div className="text-xs font-semibold opacity-80">En attente de décision</div>
         <div className="mt-1.5 flex items-baseline gap-2">
           <span className="text-[34px] leading-[38px] font-bold tracking-[-1px]">{nombre === undefined ? ABSENT : nombre}</span>
@@ -327,7 +327,7 @@ function CarteLitiges() {
   )
 }
 
-const COULEURS_PASTILLE = ['bg-[#dbeafe] text-[#1d4ed8]', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#d7f7e4] text-[#0e6245]', 'bg-[#fff0d4] text-[#983705]']
+const COULEURS_PASTILLE = ['bg-marque-claire text-marque', 'bg-[#fde7f3] text-[#a3206b]', 'bg-[#d7f7e4] text-[#0e6245]', 'bg-[#fff0d4] text-[#983705]']
 
 function CartePrestataires() {
   const { data } = useQuery({
@@ -349,7 +349,7 @@ function CartePrestataires() {
           </span>
         ))}
         {reste > 0 && (
-          <span className={`${rond} -ml-2.5 bg-[#1d4ed8] text-white`}>+{reste}</span>
+          <span className={`${rond} -ml-2.5 bg-marque text-white`}>+{reste}</span>
         )}
       </div>
     </Carte>

@@ -52,7 +52,7 @@ function Pastille({ valeur, rouge = false }: { valeur: number; rouge?: boolean }
   return (
     <span
       aria-hidden="true"
-      className={`box-border flex h-[18px] min-w-[18px] items-center justify-center rounded-[9px] px-[5px] text-[10px] font-bold text-white ${rouge ? 'bg-[#e5484d]' : 'bg-[#1d4ed8]'}`}
+      className={`box-border flex h-[18px] min-w-[18px] items-center justify-center rounded-[9px] px-[5px] text-[10px] font-bold text-white ${rouge ? 'bg-[#e5484d]' : 'bg-marque'}`}
     >
       {valeur}
     </span>
@@ -69,7 +69,7 @@ function BarreDuHaut() {
     <header className="box-border flex flex-wrap items-center gap-x-5 gap-y-3 rounded-full bg-white py-2.5 pr-3.5 pl-[22px]">
       <Link to="/" aria-label={L.marque} className="flex items-center gap-2.5">
         <Logo />
-        <span aria-hidden="true" className="text-xl font-extrabold tracking-[-0.5px] text-[#1d4ed8]">
+        <span aria-hidden="true" className="text-xl font-extrabold tracking-[-0.5px] text-marque">
           {L.marque}
         </span>
       </Link>
@@ -115,7 +115,7 @@ function BarreDuHaut() {
           aria-label={L.coque.menuCompte}
           role="img"
           className="grid size-11 place-items-center rounded-[22px] text-sm font-bold text-white"
-          style={{ background: 'linear-gradient(135deg, #3b66ea, #17338f)' }}
+          style={{ background: 'var(--color-marque)' }}
         >
           <span aria-hidden="true">{initiales}</span>
         </span>
@@ -160,7 +160,7 @@ function ItemRail({ libelle, children }: { libelle: string; children: React.Reac
       {children}
       {visible && (
         <span aria-hidden="true" className="pointer-events-none absolute top-0 left-full z-30 flex h-full items-center pl-2.5">
-          <span className="animate-infobulle rounded-[10px] bg-[#1d4ed8] px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(29,78,216,0.3)]">{libelle}</span>
+          <span className="animate-infobulle rounded-[10px] bg-marque px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(45,106,79,0.3)]">{libelle}</span>
         </span>
       )}
     </span>

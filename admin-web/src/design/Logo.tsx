@@ -4,8 +4,8 @@ export default function Logo({ taille = 34 }: { taille?: number }) {
     <svg width={taille} height={taille} viewBox="0 0 120 120" aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="mq-logo" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#3b66ea" />
-          <stop offset="1" stopColor="#1d4ed8" />
+          <stop offset="0" stopColor="var(--color-marque)" />
+          <stop offset="1" stopColor="var(--color-marque)" />
         </linearGradient>
       </defs>
       <rect width="120" height="120" rx="30" fill="url(#mq-logo)" />

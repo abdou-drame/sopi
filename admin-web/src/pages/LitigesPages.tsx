@@ -10,7 +10,7 @@ import { useRetours } from '../components/ui/Alertes'
 import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import { ChampJour, ChampSelect } from '../design/champs'
 import Fenetre from '../design/Fenetre'
-import { Avatar, Badge, Carte as CarteMq, DEGRADE_BLEU, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PaginationRonde, TitreCarte, TitreDetail, TitrePage } from '../design/composants'
+import { Avatar, Badge, Carte as CarteMq, FOND_MARQUE, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PaginationRonde, TitreCarte, TitreDetail, TitrePage } from '../design/composants'
 import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
@@ -43,7 +43,7 @@ const PASTILLE_DECISION: Record<string, { fond: string; point: string }> = {
   avertissement: { fond: 'bg-[#fff0d4] text-[#983705]', point: '#f59e0b' },
   suspension_temporaire: { fond: 'bg-[#ffe6d5] text-[#9a3412]', point: '#f97316' },
   bannissement_definitif: { fond: 'bg-[#fde9e9] text-[#b0161b]', point: '#e5484d' },
-  rembourse: { fond: 'bg-[#e7edff] text-[#1d4ed8]', point: '#1d4ed8' },
+  rembourse: { fond: 'bg-[#e7edff] text-[#2563eb]', point: '#2563eb' },
 }
 
 /** Code d'affichage de la décision : « remboursé » si un paiement du litige l'est, « ouvert » tant qu'aucune décision n'est prise. */
@@ -137,7 +137,7 @@ export function LitigesListePage() {
         />
         <CarteStat
           icone={<IPourcent />}
-          teinte="bg-[#e7edff] text-[#1d4ed8]"
+          teinte="bg-marque-claire text-marque"
           badge={infosTaux ? `${infosTaux.nbLitiges} / ${infosTaux.nbReservations}` : '—'}
           badgeTeinte="bg-[#fff0d4] text-[#983705]"
           titre="Taux de litige"
@@ -160,7 +160,7 @@ export function LitigesListePage() {
             }))}
           />
           <div className="ml-auto flex flex-wrap items-center gap-2.5">
-            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-[#1d4ed8]">
+            <label className="flex h-8 w-[260px] max-w-full items-center gap-2.5 rounded-[18px] border border-[#e6e8ee] bg-[#f6f7fa] px-4 text-[#9aa0b2] focus-within:border-marque">
               <IRecherche taille={16} />
               <input
                 type="search"
@@ -301,7 +301,7 @@ function ActionTrancher({ litige, onFait }: { litige: LitigeDetail; onFait: (mes
       <button
         type="button"
         onClick={() => setOuverte(true)}
-        className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-[#1d4ed8] px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(29,78,216,0.30)]"
+        className="mq-btn-bleu h-12 cursor-pointer rounded-3xl border-none bg-marque px-6 text-[13px] font-bold text-white shadow-[0_8px_18px_rgba(45,106,79,0.30)]"
       >
         {T.trancher}
       </button>
@@ -422,8 +422,8 @@ export function LitigeDetailPage() {
                 <CarteMq>
                   <EnteteCarte icone={<IHorloge />} titre="Chronologie" sousTitre="Du début de la réservation à aujourd'hui" />
                   <div className="mt-5 flex flex-col">
-                    <EtapeChrono grand couleur="#1d4ed8" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
-                    <EtapeChrono grand couleur="#1d4ed8" titre="Prestation terminée par le prestataire" detail={ABSENT} />
+                    <EtapeChrono grand couleur="#2563eb" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
+                    <EtapeChrono grand couleur="#2563eb" titre="Prestation terminée par le prestataire" detail={ABSENT} />
                     <EtapeChrono grand couleur="#e5484d" titre="Litige ouvert par le client" detail={`${formatDate(l.dateCreation)} · ${heureDe(l.dateCreation)}`} />
                     {ouvert ? (
                       <EtapeChrono
@@ -434,7 +434,7 @@ export function LitigeDetailPage() {
                         detail={reponse}
                       />
                     ) : (
-                      <EtapeChrono grand derniere couleur="#1d4ed8" titre="Litige clôturé" detail={cloture} />
+                      <EtapeChrono grand derniere couleur="#2563eb" titre="Litige clôturé" detail={cloture} />
                     )}
                   </div>
                 </CarteMq>
@@ -443,12 +443,12 @@ export function LitigeDetailPage() {
                   <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-3">
                     {l.preuves.length > 0
                       ? l.preuves.map((preuve, i) => (
-                          <div key={preuve.id} className="flex h-[150px] items-center justify-center overflow-hidden rounded-[22px] bg-[#e7edff]">
+                          <div key={preuve.id} className="flex h-[150px] items-center justify-center overflow-hidden rounded-[22px] bg-marque-claire">
                             <FichierProtege chemin={cheminApi(preuve.url)} alt={`Preuve ${i + 1} du client`} className="h-[150px] w-full rounded-[22px]!" />
                           </div>
                         ))
                       : [1, 2].map((n) => (
-                          <div key={n} className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-[22px] bg-[#e7edff] text-xs font-semibold text-[#6b84c9]">
+                          <div key={n} className="flex h-[150px] flex-col items-center justify-center gap-2 rounded-[22px] bg-marque-claire text-xs font-semibold text-[#5f8f7a]">
                             <IImage taille={24} />
                             Photo {n} · {ABSENT}
                           </div>
@@ -459,7 +459,7 @@ export function LitigeDetailPage() {
               <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
                 <CarteMq>
                   <TitreCarte titre="Acompte concerné" sousTitre="Retenu en attendant la décision" />
-                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: DEGRADE_BLEU }}>
+                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: FOND_MARQUE }}>
                     <div className="text-xs font-semibold opacity-80">Montant de l'acompte</div>
                     <div className="mt-1.5 flex items-baseline gap-2">
                       <span className="text-[38px] leading-[44px] font-bold tracking-[-1px] tabular-nums">{acompte === null ? ABSENT : formatNombre(acompte)}</span>
@@ -489,7 +489,7 @@ export function LitigeDetailPage() {
                 <CarteMq>
                   <TitreCarte titre="Personnes concernées" />
                   <div className="mt-3.5 flex flex-col gap-2.5">
-                    <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-[#dbeafe] text-[#1d4ed8]" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
+                    <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-[#dbeafe] text-[#2563eb]" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
                     <Personne nom={nomPrestataire} role={`Prestataire · note ${ABSENT}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
                   </div>
                 </CarteMq>
