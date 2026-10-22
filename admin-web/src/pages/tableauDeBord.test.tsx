@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
@@ -104,6 +104,7 @@ describe('tableau de bord', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
     sessionStorage.clear()
+    localStorage.clear()
   })
 
   it('montre les revenus par métier réels, du plus élevé au plus bas', async () => {
@@ -169,6 +170,20 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     await screen.findByRole('link', { name: 'Ouvrir les dossiers' })
     expect(screen.queryByText('2 dossiers en attente.')).not.toBeInTheDocument()
+  })
+
+  it('la bannière masquée le reste après rechargement, et revient si le nombre augmente', async () => {
+    simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
+    const { unmount } = afficherApplication('/')
+    await userEvent.click(await screen.findByRole('button', { name: 'Masquer l’alerte' }))
+    unmount()
+    afficherApplication('/')
+    await screen.findByText('Vidange')
+    expect(screen.queryByText('2 dossiers en attente.')).not.toBeInTheDocument()
+    localStorage.setItem('sopi.admin.alertes-masquees', JSON.stringify({ dossiers_en_attente: 1 }))
+    cleanup()
+    afficherApplication('/')
+    expect(await screen.findByText('2 dossiers en attente.')).toBeInTheDocument()
   })
 
   it('montre les litiges ouverts et relie la carte à la liste des litiges', async () => {
