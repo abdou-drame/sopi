@@ -527,6 +527,15 @@ body {
 .anim-fond[data-sortie] .anim-modale { animation: modale-sortie 180ms ease-in both; }
 .anim-toast-sortie { animation: toast-sortie 180ms ease-in both; }
 
+/* Barre d'actions groupées (sélection de lignes) : montée depuis le bas ; mouvement réduit = durées quasi nulles (règle globale plus haut). */
+@keyframes barre-entree { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes barre-sortie { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(12px); } }
+.anim-barre { animation: barre-entree 220ms var(--ease-sortie) both; }
+.anim-barre[data-sortie] { animation: barre-sortie 180ms ease-in both; }
+
+/* Ligne cochée d'un tableau */
+tr[data-selectionnee='true'] > td { background-color: #eef3ff; }
+
 /* Retour visuel au clic sur tous les boutons de page */
 .mq-btn-bleu, .mq-btn-blanc, .mq-btn-rouge, .mq-btn-gris { transition: background-color 0.15s, transform 0.1s; }
 .mq-btn-bleu:active:not(:disabled), .mq-btn-blanc:active:not(:disabled), .mq-btn-rouge:active:not(:disabled), .mq-btn-gris:active:not(:disabled) { transform: scale(0.97); }

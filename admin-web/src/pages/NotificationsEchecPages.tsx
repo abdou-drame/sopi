@@ -43,9 +43,9 @@ export function NotificationsEchecListePage() {
           { cle: 'type', type: 'select', label: T.type, options: OPTIONS_TYPE },
           { cle: 'ancienneteMinutes', type: 'nombre', label: T.anciennete },
         ]}
-        colonnes={[{ titre: T.colDestinataire }, { titre: T.colType }, { titre: T.colCanaux }, { titre: T.colTentatives, droite: true }, { titre: T.colDate }, { titre: T.colErreur }]}
+        colonnes={[{ titre: T.colDestinataire, tri: (n) => libelleDestinataire(n) }, { titre: T.colType, tri: (n) => libelleType(n.type) }, { titre: T.colCanaux }, { titre: T.colTentatives, droite: true, tri: (n) => n.tentatives }, { titre: T.colDate, tri: (n) => n.dateCreation }, { titre: T.colErreur }]}
       >
-        {liste.lignes.map((n: NotificationEchec) => (
+        {(lignes) => lignes.map((n: NotificationEchec) => (
           <LigneLien key={n.id} vers={`/notifications-en-echec/${n.id}`} libelle={`Voir le détail de la notification ${libelleType(n.type)}`}>
             <td className="font-semibold">{libelleDestinataire(n)}</td>
             <td>{libelleType(n.type)}</td>

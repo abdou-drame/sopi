@@ -15,6 +15,7 @@ import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { CartesSquelette } from '../design/etats'
+import TableauDonnees from '../design/tableau'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { aujourdhui, formatDate, formatHeureDuJour, formatMontant, formatNombre } from '../lib/format'
@@ -183,27 +184,17 @@ export function LitigesListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto" hidden={liste.chargement}>
-          <table
-            className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
-            aria-label={T.legende}
-          >
-            <thead>
-              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
-                <th>Litige</th>
-                <th>{T.client}</th>
-                <th>{T.prestataire}</th>
-                <th>{T.acompte}</th>
-                <th>{T.ouvertLe}</th>
-                <th>{T.decisionChamp}</th>
-                <th className="relative text-right">
-                  <span className="sr-only">Action</span>
-                  <span aria-hidden="true">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {lignes.map((l) => {
+        <TableauDonnees
+          variante="compact"
+          legende={T.legende}
+          lignes={lignes}
+          largeurMin={860}
+          actionsColonne="Action"
+          libelleActions="Actions"
+          masque={liste.chargement}
+          colonnes={[{ titre: 'Litige', tri: (l) => l.reservation.prestation }, { titre: T.client, tri: (l) => nomComplet(l.client) }, { titre: T.prestataire, tri: (l) => l.prestataire.nomEntreprise ?? nomComplet(l.prestataire) }, { titre: T.acompte, tri: (l) => (l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)) }, { titre: T.ouvertLe, tri: (l) => l.dateCreation }, { titre: T.decisionChamp, tri: (l) => libelleDecision(codeDecision(l)) }]}
+        >
+              {(triees) => triees.map((l) => {
                 const acompte = l.paiements.length === 0 ? null : l.paiements.reduce((somme, p) => somme + p.montantAcompte, 0)
                 const code = codeDecision(l)
                 const style = PASTILLE_DECISION[code] ?? PASTILLE_DECISION.rejet
@@ -230,9 +221,7 @@ export function LitigesListePage() {
                   </LigneLien>
                 )
               })}
-            </tbody>
-          </table>
-        </div>
+        </TableauDonnees>
         <EtatsListe
           chargement={liste.chargement}
           erreur={liste.erreur}

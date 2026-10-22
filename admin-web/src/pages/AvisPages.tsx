@@ -11,6 +11,9 @@ import { Avatar, Carte as CarteMq, Onglets, PaginationRonde, TitrePage } from '.
 import { IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, Pastille } from '../design/synthese'
 import { CartesSquelette } from '../design/etats'
+import TableauDonnees, { type ContexteLigne } from '../design/tableau'
+import { BarreActionsGroupees } from '../design/ActionsGroupees'
+import { useSelection } from '../design/useSelection'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate } from '../lib/format'
@@ -209,12 +212,13 @@ function ChampPrestataire({ valeur, onValider }: { valeur: string; onValider: (v
   )
 }
 
-function LigneAvis({ a, retour }: { a: AvisAdmin; retour: ReturnType<typeof useRetours> }) {
+function LigneAvis({ a, retour, ctx }: { a: AvisAdmin; retour: ReturnType<typeof useRetours>; ctx: ContexteLigne<AvisAdmin> }) {
   const nom = `${a.client.prenom} ${a.client.nom}`
   const style = PASTILLE_AVIS[a.statut] ?? PASTILLE_AVIS.supprime
   const libelleStatut = a.masque ? L.statuts.supprime : (L.statuts[a.statut] ?? a.statut)
   return (
-    <tr>
+    <tr {...ctx.proprietes(a)}>
+      {ctx.caseACocher(a)}
       <td>
         <div className="flex items-center gap-2.5">
           <Avatar nom={nom} taille={30} />
@@ -266,6 +270,13 @@ export default function AvisListePage() {
   const pct = (n: number | undefined) => (n === undefined || !stats || stats.total === 0 ? undefined : Math.round((n / stats.total) * 100))
   const partPublies = pct(publies)
   const partMasques = pct(stats?.masques)
+  const nomClient = (a: AvisAdmin) => `${a.client.prenom} ${a.client.nom}`
+  const selection = useSelection(liste.lignes, (a) => a.id, {
+    libelle: (a) => T.libelleLigne(nomClient(a)),
+    reinitialiserQuand: JSON.stringify(etat.parametresApi),
+  })
+  const aMasquer = selection.coches.filter((a) => !a.masque)
+  const aRepublier = selection.coches.filter((a) => a.masque)
   const filtresActifs = etat.valeurs.note !== '' || etat.valeurs.prestataire !== ''
   return (
     <div className="flex flex-col gap-3">
@@ -339,32 +350,49 @@ export default function AvisListePage() {
             )}
           </div>
         </div>
-        <div className="overflow-x-auto" hidden={liste.chargement}>
-          <table
-            className="w-full min-w-[980px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
-            aria-label={T.legende}
-          >
-            <thead>
-              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
-                <th>Client</th>
-                <th>Prestataire</th>
-                <th>{T.note}</th>
-                <th>Commentaire</th>
-                <th>Date</th>
-                <th>{L.commun.statut}</th>
-                <th className="text-right">
-                  <span className="sr-only">Actions</span>
-                  <span aria-hidden="true">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {liste.lignes.map((a) => (
-                <LigneAvis key={a.id} a={a} retour={retour} />
+        <TableauDonnees
+          variante="compact"
+          legende={T.legende}
+          lignes={liste.lignes}
+          largeurMin={980}
+          actionsColonne="Actions"
+          libelleActions="Actions"
+          masque={liste.chargement}
+          selection={selection}
+          colonnes={[{ titre: 'Client', tri: nomClient }, { titre: 'Prestataire', tri: (a) => a.prestataire.nomEntreprise }, { titre: T.note, tri: (a) => a.note }, { titre: 'Commentaire' }, { titre: 'Date', tri: (a) => a.dateCreation }, { titre: L.commun.statut, tri: (a) => (a.masque ? L.statuts.supprime : (L.statuts[a.statut] ?? a.statut)) }]}
+        >
+              {(triees, ctx) => triees.map((a) => (
+                <LigneAvis key={a.id} a={a} retour={retour} ctx={ctx} />
               ))}
-            </tbody>
-          </table>
-        </div>
+        </TableauDonnees>
+        <BarreActionsGroupees
+          selection={selection}
+          actions={[
+            {
+              libelle: T.masquer,
+              elements: aMasquer.map((a) => ({ id: a.id, libelle: nomClient(a) })),
+              titre: T.masquerLotTitre,
+              description: T.masquerTexte,
+              libelleConfirmer: T.masquer,
+              danger: true,
+              motifObligatoire: true,
+              motifMin: MOTIF_MIN,
+              motifMax: MOTIF_MAX,
+              libelleMotif: T.motif,
+              executer: (id, motif) => api.masquerAvis(id, motif),
+              messageSucces: T.masquerLotFait,
+            },
+            {
+              libelle: 'Republier',
+              elements: aRepublier.map((a) => ({ id: a.id, libelle: nomClient(a) })),
+              titre: T.retablirLotTitre,
+              description: T.retablirLotTexte,
+              libelleConfirmer: 'Republier',
+              executer: (id) => api.retablirAvis(id),
+              messageSucces: T.retablirLotFait,
+            },
+          ]}
+        />
         <EtatsListe
           chargement={liste.chargement}
           erreur={liste.erreur}

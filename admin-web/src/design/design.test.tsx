@@ -206,7 +206,7 @@ function EcranListe({ charger }: { charger: (p: Record<string, string | number>)
         { cle: 'q', type: 'texte', label: 'Recherche' },
       ]}
     >
-      {liste.lignes.map((e) => (
+      {(lignes) => lignes.map((e) => (
         <LigneLien key={e.id} vers={`/fiche/${e.id}`} libelle={`Voir le détail : ${e.nom}`}>
           <td>{e.nom}</td>
         </LigneLien>

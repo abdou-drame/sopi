@@ -39,9 +39,9 @@ export function ReservationsListePage() {
           { cle: 'prestataire', type: 'texte', label: T.prestataire },
           { cle: 'client', type: 'texte', label: T.client },
         ]}
-        colonnes={[{ titre: 'Réservation' }, { titre: 'Date' }, { titre: 'Heure' }, { titre: T.colPrix, droite: true }, { titre: T.colPaiement }, { titre: L.commun.statut }]}
+        colonnes={[{ titre: 'Réservation', tri: (r) => r.prestation.nom }, { titre: 'Date', tri: (r) => r.creneau.debut }, { titre: 'Heure', tri: (r) => formatHeureDuJour(r.creneau.debut) }, { titre: T.colPrix, droite: true, tri: (r) => Number(r.prixApplique) }, { titre: T.colPaiement, tri: (r) => (r.statutPaiement ? (L.statuts[r.statutPaiement] ?? r.statutPaiement) : null) }, { titre: L.commun.statut, tri: (r) => L.statuts[r.statut] ?? r.statut }]}
       >
-        {liste.lignes.map((r: ReservationListe) => (
+        {(lignes) => lignes.map((r: ReservationListe) => (
           <LigneLien key={r.id} vers={`/reservations/${r.id}`} libelle={`Voir le détail de la réservation ${r.prestation.nom}`}>
             <td>
               <div className="flex items-center gap-3">

@@ -30,6 +30,7 @@ import { IDocument, IHorloge, IRecherche, IUtilisateur } from '../design/icones'
 import { CarteBleue, CarteStat, ICoche, ICroix, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { CartesSquelette } from '../design/etats'
+import TableauDonnees from '../design/tableau'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { formatDate, formatDateHeure } from '../lib/format'
@@ -181,27 +182,17 @@ export function DossiersListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto" hidden={liste.chargement}>
-          <table
-            className="w-full min-w-[820px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
-            aria-label={T.legende}
-          >
-            <thead>
-              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
-                <th>{T.prestataire}</th>
-                <th>{T.metier}</th>
-                <th>{T.quartier}</th>
-                <th>Pièces</th>
-                <th>Reçu le</th>
-                <th>{L.commun.statut}</th>
-                <th className="relative text-right">
-                  <span className="sr-only">Action</span>
-                  <span aria-hidden="true">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {lignes.map((d) => {
+        <TableauDonnees
+          variante="compact"
+          legende={T.legende}
+          lignes={lignes}
+          largeurMin={820}
+          actionsColonne="Action"
+          libelleActions="Actions"
+          masque={liste.chargement}
+          colonnes={[{ titre: T.prestataire, tri: (d) => d.nomEntreprise || nomComplet(d) }, { titre: T.metier, tri: (d) => L.metiers[d.metier] ?? d.metier }, { titre: T.quartier, tri: (d) => d.quartier }, { titre: 'Pièces', tri: (d) => d.nombreJustificatifs }, { titre: 'Reçu le', tri: (d) => d.dateSoumission }, { titre: L.commun.statut, tri: (d) => L.statuts[d.statutCompte] ?? d.statutCompte }]}
+        >
+              {(triees) => triees.map((d) => {
                 const complet = d.nombreJustificatifs >= PIECES_ATTENDUES
                 const manquante = d.statutCompte === 'en_attente' && !complet
                 return (
@@ -231,9 +222,7 @@ export function DossiersListePage() {
                   </LigneLien>
                 )
               })}
-            </tbody>
-          </table>
-        </div>
+        </TableauDonnees>
         <EtatsListe
           chargement={liste.chargement}
           erreur={liste.erreur}

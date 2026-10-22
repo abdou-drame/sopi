@@ -74,7 +74,7 @@ describe('écrans de consultation', () => {
     expect(lien).toHaveAttribute('href', '/reservations/r-1')
     expect(screen.getByText(/· Awa D./)).toBeInTheDocument()
     expect(screen.queryByText(/Diallo/)).not.toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Statut' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Statut', expanded: false }))
     await userEvent.click(screen.getByRole('menuitemradio', { name: 'Terminée' }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/reservations?statut=terminee')
     expect(appels.some((a) => a.chemin === '/admin/reservations' && a.recherche.get('statut') === 'terminee')).toBe(true)

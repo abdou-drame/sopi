@@ -12,6 +12,9 @@ import { Avatar, BoutonPlus, Carte as CarteMq, Onglets, PaginationRonde, TitrePa
 import { IRecherche } from '../design/icones'
 import { CarteBleue, CarteStat, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import { CartesSquelette } from '../design/etats'
+import TableauDonnees from '../design/tableau'
+import { BarreActionsGroupees } from '../design/ActionsGroupees'
+import { useSelection } from '../design/useSelection'
 import { EtatsListe, useListe } from '../design/useListe'
 import { L } from '../i18n/libelles'
 import { formatDate, nombreDeJours } from '../lib/format'
@@ -167,6 +170,12 @@ export default function SanctionsListePage() {
             .join(' · ')
 
   const lignes = liste.lignes.filter((s) => sansAccent(`${s.utilisateur.prenom} ${s.utilisateur.nom}`).includes(sansAccent(recherche.trim())))
+  const nomSanctionne = (s: SanctionListe) => `${s.utilisateur.prenom} ${s.utilisateur.nom}`
+  const selection = useSelection(lignes, (s) => s.id, {
+    libelle: (s) => T.libelleLigne(nomSanctionne(s)),
+    peutCocher: (s) => s.active,
+    reinitialiserQuand: `${JSON.stringify(etat.parametresApi)}|${recherche.trim()}`,
+  })
 
   return (
     <div className="flex flex-col gap-3">
@@ -244,32 +253,24 @@ export default function SanctionsListePage() {
             </label>
           </div>
         </div>
-        <div className="overflow-x-auto" hidden={liste.chargement}>
-          <table
-            className="w-full min-w-[860px] border-collapse text-[13px] [&_tbody_td]:border-b [&_tbody_td]:border-[#eceef2] [&_tbody_tr:last-child_td]:border-b-0 [&_td]:px-4 [&_td]:py-1.5 [&_td]:align-middle [&_td]:font-medium"
-            aria-label={T.legende}
-          >
-            <thead>
-              <tr className="text-left text-[11px] tracking-[0.06em] text-[#9aa0b2] uppercase [&_th]:border-b [&_th]:border-[#eceef2] [&_th]:px-4 [&_th]:py-1.5 [&_th]:font-semibold">
-                <th>Prestataire</th>
-                <th>{T.type}</th>
-                <th>{T.motif}</th>
-                <th>Début</th>
-                <th>{T.fin}</th>
-                <th>{L.commun.statut}</th>
-                <th className="text-right">
-                  <span className="sr-only">{T.actionsColonne}</span>
-                  <span aria-hidden="true">Actions</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {lignes.map((s) => {
+        <TableauDonnees
+          variante="compact"
+          legende={T.legende}
+          lignes={lignes}
+          largeurMin={860}
+          actionsColonne={T.actionsColonne}
+          libelleActions="Actions"
+          masque={liste.chargement}
+          selection={selection}
+          colonnes={[{ titre: 'Prestataire', tri: nomSanctionne }, { titre: T.type, tri: (s) => libelleType(s) }, { titre: T.motif }, { titre: 'Début', tri: (s) => s.dateCreation }, { titre: T.fin, tri: (s) => s.dateFin }, { titre: L.commun.statut, tri: (s) => etatSanction(s).libelle }]}
+        >
+              {(triees, ctx) => triees.map((s) => {
                 const nom = `${s.utilisateur.prenom} ${s.utilisateur.nom}`
                 const type = TYPE_STYLE[s.type] ?? TYPE_STYLE.avertissement
                 const etatStyle = pastilleEtat(s)
                 return (
-                  <tr key={s.id}>
+                  <tr key={s.id} {...ctx.proprietes(s)}>
+                    {ctx.caseACocher(s)}
                     <td>
                       <div className="flex items-center gap-2.5">
                         <Avatar nom={nom} taille={30} />
@@ -301,9 +302,21 @@ export default function SanctionsListePage() {
                   </tr>
                 )
               })}
-            </tbody>
-          </table>
-        </div>
+        </TableauDonnees>
+        <BarreActionsGroupees
+          selection={selection}
+          actions={[
+            {
+              libelle: T.lever,
+              elements: selection.coches.map((s) => ({ id: s.id, libelle: nomSanctionne(s) })),
+              titre: T.leverLotTitre,
+              description: T.leverTexte,
+              libelleConfirmer: T.lever,
+              executer: (id) => api.leverSanction(id),
+              messageSucces: T.leverLotFait,
+            },
+          ]}
+        />
         <EtatsListe
           chargement={liste.chargement}
           erreur={liste.erreur}

@@ -50,9 +50,9 @@ export function PaiementsListePage() {
           { cle: 'remboursementDu', type: 'select', label: T.remboursementDu, options: OPTIONS_REMBOURSEMENT },
           { cle: 'retardRemboursementMinutes', type: 'nombre', label: T.retard },
         ]}
-        colonnes={[{ titre: T.colReservation }, { titre: T.colPaye }, { titre: T.colAcompte, droite: true }, { titre: T.colCommission, droite: true }, { titre: T.colRemboursement }, { titre: L.commun.statut }]}
+        colonnes={[{ titre: T.colReservation, tri: (p) => p.reservationId }, { titre: T.colPaye, tri: (p) => p.payeLe }, { titre: T.colAcompte, droite: true, tri: (p) => Number(p.montantAcompte) }, { titre: T.colCommission, droite: true, tri: (p) => Number(p.commission) }, { titre: T.colRemboursement }, { titre: L.commun.statut, tri: (p) => L.statuts[p.statut] ?? p.statut }]}
       >
-        {liste.lignes.map((p: PaiementAdmin) => {
+        {(lignes) => lignes.map((p: PaiementAdmin) => {
           const e = etatRemboursement(p)
           return (
             <LigneLien key={p.id} vers={`/paiements/${p.id}`} libelle={`Voir le détail du paiement ${p.reservationId.slice(0, 8)}`}>

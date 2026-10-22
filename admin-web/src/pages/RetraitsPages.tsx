@@ -56,9 +56,9 @@ export function RetraitsListePage() {
           { cle: 'statut', type: 'select', label: T.statut, options: OPTIONS_STATUT },
           { cle: 'bloques', type: 'select', label: T.bloques, options: OPTIONS_BLOQUES },
         ]}
-        colonnes={[{ titre: T.colPrestataire }, { titre: T.colDemande }, { titre: T.colTraite }, { titre: T.colMontant }, { titre: T.colVersement }, { titre: L.commun.statut }]}
+        colonnes={[{ titre: T.colPrestataire, tri: (r) => r.prestataire.nomEntreprise }, { titre: T.colDemande, tri: (r) => r.dateDemande }, { titre: T.colTraite, tri: (r) => r.traiteLe }, { titre: T.colMontant, tri: (r) => Number(r.montant) }, { titre: T.colVersement }, { titre: L.commun.statut, tri: (r) => L.statuts[r.statut] ?? r.statut }]}
       >
-        {liste.lignes.map((r: RetraitListe) => (
+        {(lignes) => lignes.map((r: RetraitListe) => (
           <LigneLien key={r.id} vers={`/retraits/${r.id}`} libelle={`Voir le détail du retrait de ${r.prestataire.nomEntreprise}`} texte={L.commun.voirCourt}>
             <td>
               <div className="flex items-center gap-3">

@@ -70,9 +70,9 @@ export function UtilisateursListePage() {
           { cle: 'q', type: 'recherche', label: 'Rechercher un utilisateur', placeholder: 'Rechercher par nom ou téléphone' },
           { cle: 'statut', type: 'select', label: 'Statut', options: OPTIONS_STATUT },
         ]}
-        colonnes={[{ titre: prestataires ? 'Prestataire' : 'Client' }, { titre: 'Métier' }, { titre: 'Quartier' }, { titre: 'Note' }, { titre: 'Réservations', droite: true }, { titre: L.commun.statut }]}
+        colonnes={[{ titre: prestataires ? 'Prestataire' : 'Client', tri: (u) => u.prestataire?.nomEntreprise ?? `${u.prenom} ${u.nom}` }, { titre: 'Métier', tri: (u) => (u.prestataire ? (L.metiers[u.prestataire.metier] ?? u.prestataire.metier) : null) }, { titre: 'Quartier', tri: (u) => u.prestataire?.quartier }, { titre: 'Note' }, { titre: 'Réservations', droite: true }, { titre: L.commun.statut, tri: (u) => L.statuts[u.statut] ?? u.statut }]}
       >
-        {liste.lignes.map((u) => {
+        {(lignes) => lignes.map((u) => {
           const nom = u.prestataire?.nomEntreprise ?? `${u.prenom} ${u.nom}`
           return (
             <LigneLien key={u.id} vers={`/utilisateurs/${u.id}`} libelle={`Voir le profil de ${nom}`} texte={L.commun.voirCourt}>
