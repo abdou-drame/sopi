@@ -3,6 +3,7 @@ import { useState, type ReactNode } from 'react'
 import { erreursParChamp, messageDErreur } from '../api/client'
 import { api } from '../api/endpoints'
 import type { PointRevenus, Regroupement } from '../api/types'
+import NombreAnime from '../components/ui/NombreAnime'
 import { GraphiqueCourbe } from '../components/ui/Graphiques'
 import { BoutonAction } from '../design/boutons'
 import { ChampJour, ChampSelect } from '../design/champs'
@@ -10,7 +11,7 @@ import { Carte, FOND_MARQUE, EnteteCarte, PiedListe, TitrePage } from '../design
 import { EtatChargement, EtatErreur, EtatVide } from '../design/etats'
 import { IGraphique } from '../design/icones'
 import { L } from '../i18n/libelles'
-import { ajouterJours, aujourdhui, formatDateHeure, formatJourCalendaire, formatMontant, formatNombre, nombreDeJours } from '../lib/format'
+import { ajouterJours, aujourdhui, formatDateHeure, formatJourCalendaire, formatMontant, nombreDeJours } from '../lib/format'
 
 const T = L.revenus
 const MAX_JOURS = 366
@@ -55,7 +56,7 @@ function Chiffre({ libelle, montant, legende, principal = false }: { libelle: st
       <div className={`text-xs leading-[normal] font-semibold ${principal ? 'opacity-85' : 'text-[#8a90a2]'}`}>{libelle}</div>
       <div className="mt-2 text-[30px] leading-[34px] font-bold tracking-[-0.8px] tabular-nums">
         <span aria-label={formatMontant(montant)}>
-          {formatNombre(montant)} <span className={`text-sm font-medium ${principal ? 'opacity-80' : 'text-[#9aa0b2]'}`}>FCFA</span>
+          <NombreAnime valeur={montant} /> <span className={`text-sm font-medium ${principal ? 'opacity-80' : 'text-[#9aa0b2]'}`}>FCFA</span>
         </span>
       </div>
       {legende && <div className={`mt-1.5 text-xs leading-[normal] ${principal ? 'opacity-80' : 'text-[#8a90a2]'}`}>{legende}</div>}
