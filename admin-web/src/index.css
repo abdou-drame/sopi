@@ -548,3 +548,24 @@ body {
   transform-origin: left;
   animation: barre-metier-entree 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* Série (tableau de bord) : chaque période est une forme unique ; les transitions font le morph colonne ↔ point et tracent la courbe. */
+.serie-forme {
+  transition: x 550ms var(--ease-sortie), y 550ms var(--ease-sortie), width 550ms var(--ease-sortie), height 550ms var(--ease-sortie),
+    rx 550ms var(--ease-sortie), fill 200ms, stroke-width 550ms var(--ease-sortie), opacity 300ms;
+}
+.serie-ligne {
+  transition: stroke-dashoffset 700ms var(--ease-sortie), d 550ms var(--ease-sortie);
+}
+.serie-aire {
+  transition: opacity 600ms ease-out, d 550ms var(--ease-sortie);
+}
+.serie-bulle {
+  transition: transform 550ms var(--ease-sortie);
+}
+[data-anime='false'] .serie-forme,
+[data-anime='false'] .serie-ligne,
+[data-anime='false'] .serie-aire,
+[data-anime='false'] .serie-bulle {
+  transition: none;
+}

@@ -6,10 +6,10 @@ import { api } from '../api/endpoints'
 import type { Revenus } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
-import { GraphiqueBarres } from '../components/ui/Graphiques'
+import GraphiqueSerie, { type ModeSerie } from '../components/ui/GraphiqueSerie'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, DEGRADE_BLEU, TitrePage } from '../design/composants'
-import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
+import { ICalendrier, IColonnes, ICourbe, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
 
@@ -121,6 +121,7 @@ function dernieresSemaines(): Tranche[] {
 /** Réservations par période : le total de la pagination de chaque tranche (créneaux commençant dans la tranche). */
 function CarteReservations() {
   const [annuel, setAnnuel] = useState(true)
+  const [mode, setMode] = useState<ModeSerie>('colonnes')
   const tranches = useMemo(() => (annuel ? derniersMois() : dernieresSemaines()), [annuel])
   const resultats = useQueries({
     queries: tranches.map((t) => ({
@@ -161,11 +162,32 @@ function CarteReservations() {
             Annuel
           </button>
         </div>
+        <div role="tablist" aria-label="Type de graphique" className="flex rounded-full bg-[#f3f4f7] p-1">
+          {(
+            [
+              ['courbe', 'Courbe', ICourbe],
+              ['colonnes', 'Colonnes', IColonnes],
+            ] as const
+          ).map(([cle, libelle, Icone]) => (
+            <button
+              key={cle}
+              type="button"
+              role="tab"
+              aria-selected={mode === cle}
+              aria-label={libelle}
+              title={libelle}
+              onClick={() => setMode(cle)}
+              className={`grid size-[34px] cursor-pointer place-items-center rounded-full border-none transition-colors duration-200 ${mode === cle ? 'bg-[#1d4ed8] text-white' : 'bg-transparent text-[#8a90a2]'}`}
+            >
+              <Icone />
+            </button>
+          ))}
+        </div>
         <LienFleche vers="/reservations" libelle="Ouvrir" />
       </div>
       <div className="mt-[18px] flex-1">
-        {/* La clé relance l'animation de croissance quand on change de période. */}
-        <GraphiqueBarres compact key={annuel ? 'mois' : 'semaines'} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
+        {/* Les formes glissent vers leurs nouvelles valeurs quand on change de période, et se transforment quand on change de type. */}
+        <GraphiqueSerie mode={mode} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
       </div>
     </section>
   )

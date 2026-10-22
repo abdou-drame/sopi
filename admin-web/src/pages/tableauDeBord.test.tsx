@@ -223,6 +223,23 @@ describe('tableau de bord', () => {
     expect(await screen.findByText('Nombre de réservations par semaine')).toBeInTheDocument()
   })
 
+  it('bascule le graphique des réservations entre colonnes et courbe sans changer les données', async () => {
+    simulerApi({
+      ...toutes,
+      'GET /admin/reservations': () => ({ corps: { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 42 } } }),
+    })
+    afficherApplication('/')
+    const graphique = () => screen.getAllByRole('img').find((e) => (e.getAttribute('aria-label') ?? '').startsWith('Réservations : ')) as HTMLElement
+    await screen.findByText('Nombre de réservations par mois')
+    expect(screen.getByRole('tab', { name: 'Colonnes' })).toHaveAttribute('aria-selected', 'true')
+    expect(graphique()).toHaveAttribute('data-mode', 'colonnes')
+    await userEvent.click(screen.getByRole('tab', { name: 'Courbe' }))
+    expect(screen.getByRole('tab', { name: 'Courbe' })).toHaveAttribute('aria-selected', 'true')
+    expect(graphique()).toHaveAttribute('data-mode', 'courbe')
+    await userEvent.click(screen.getByRole('tab', { name: 'Colonnes' }))
+    expect(graphique()).toHaveAttribute('data-mode', 'colonnes')
+  })
+
   it('actualise en lecture seule depuis le rail', async () => {
     const { appels } = simulerApi(toutes)
     afficherApplication('/')

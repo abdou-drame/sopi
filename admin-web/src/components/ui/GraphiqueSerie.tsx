@@ -1,0 +1,138 @@
+import { useEffect, useState } from 'react'
+import { animationsActives } from '../../design/animation/usePresence'
+
+export type ModeSerie = 'colonnes' | 'courbe'
+
+interface Props {
+  description: string
+  donnees: { libelle: string; valeur: number }[]
+  mode: ModeSerie
+  formatValeur?: (v: number) => string
+}
+
+const L = 360
+const H = 150
+const MARGE = { haut: 34, bas: 26, cote: 14 }
+const BASE = H - MARGE.bas
+const DIAMETRE_POINT = 10
+
+/** Arrondit le maximum à une valeur « ronde » pour que la plus haute forme ne touche pas le haut. */
+function maximumRond(max: number): number {
+  if (max <= 0) return 1
+  const puissance = 10 ** Math.floor(Math.log10(max))
+  const n = max / puissance
+  return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * puissance
+}
+
+/** Courbe lisse sans dépassement : entre deux points, les tangentes sont horizontales. */
+function trace(points: [number, number][]): string {
+  if (points.length === 0) return ''
+  return points.reduce((d, [x, y], i) => {
+    if (i === 0) return `M${x},${y}`
+    const [px, py] = points[i - 1]
+    const milieu = (px + x) / 2
+    return `${d} C${milieu},${py} ${milieu},${y} ${x},${y}`
+  }, '')
+}
+
+/**
+ * Série de valeurs par période, en colonnes ou en courbe. Chaque période est UNE seule forme SVG : une colonne arrondie
+ * qui, en mode courbe, se resserre en point sur la courbe (transitions CSS sur x, y, largeur, hauteur et rayon),
+ * pendant que la ligne se trace. Le passage d'un mode à l'autre est donc un vrai morph, dans les deux sens.
+ * Au premier affichage les formes poussent depuis la base ; sans animation possible (mouvement réduit), tout est posé d'emblée.
+ */
+export default function GraphiqueSerie({ description, donnees, mode, formatValeur = (v) => String(v) }: Props) {
+  const anime = animationsActives()
+  const [pret, setPret] = useState(!anime)
+  useEffect(() => {
+    if (pret) return
+    const image = requestAnimationFrame(() => setPret(true))
+    return () => cancelAnimationFrame(image)
+  }, [pret])
+
+  const [survol, setSurvol] = useState<number | null>(null)
+  const maxValeur = Math.max(0, ...donnees.map((d) => d.valeur))
+  const max = maximumRond(maxValeur)
+  const actif = survol ?? Math.max(0, donnees.findIndex((d) => d.valeur === maxValeur))
+  const resume = donnees.map((d) => `${d.libelle} ${formatValeur(d.valeur)}`).join(', ')
+
+  const n = Math.max(donnees.length, 1)
+  const pas = (L - 2 * MARGE.cote) / n
+  const largeurColonne = Math.min(pas * 0.55, 26)
+  const formes = donnees.map((d, i) => {
+    const cx = MARGE.cote + pas * (i + 0.5)
+    const y = pret ? BASE - (d.valeur / max) * (BASE - MARGE.haut) : BASE
+    return { cx, y, valeur: d.valeur }
+  })
+  const courbe = mode === 'courbe'
+  const chemin = trace(formes.map((f) => [f.cx, f.y]))
+  const aire = formes.length > 0 ? `${chemin} L${formes[formes.length - 1].cx},${BASE} L${formes[0].cx},${BASE} Z` : ''
+  const choisi = formes[actif]
+  const texte = choisi ? formatValeur(choisi.valeur) : ''
+  const largeurBulle = texte.length * 6.4 + 16
+
+  return (
+    <div role="img" aria-label={`${description} : ${resume}`} data-mode={mode} data-anime={anime} className="relative mt-1 h-[150px]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
+        style={{ background: 'radial-gradient(ellipse at 50% 60%, rgba(29,78,216,0.16), transparent 70%)' }}
+      />
+      <svg viewBox={`0 0 ${L} ${H}`} className="relative h-full w-full" aria-hidden="true" onMouseLeave={() => setSurvol(null)}>
+        <defs>
+          <linearGradient id="serie-aire" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path className="serie-aire" d={aire} fill="url(#serie-aire)" style={{ opacity: courbe && pret ? 1 : 0 }} />
+        <path
+          className="serie-ligne"
+          d={chemin}
+          pathLength={1}
+          fill="none"
+          stroke="#1d4ed8"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeDasharray={1}
+          strokeDashoffset={courbe && pret ? 0 : 1}
+        />
+        {formes.map((f, i) => {
+          const estActif = i === actif
+          const hauteurColonne = f.valeur > 0 ? Math.max(BASE - f.y, pret ? 4 : 0) : 0
+          const forme = courbe
+            ? { x: f.cx - DIAMETRE_POINT / 2, y: f.y - DIAMETRE_POINT / 2, width: DIAMETRE_POINT, height: DIAMETRE_POINT, rx: DIAMETRE_POINT / 2 }
+            : { x: f.cx - largeurColonne / 2, y: BASE - hauteurColonne, width: largeurColonne, height: hauteurColonne, rx: largeurColonne / 2 }
+          return (
+            <rect
+              key={i}
+              className="serie-forme"
+              data-forme={courbe ? 'point' : 'colonne'}
+              {...forme}
+              fill={courbe ? '#fff' : estActif ? '#1d4ed8' : '#a9bdf6'}
+              stroke="#1d4ed8"
+              strokeWidth={courbe ? 2.5 : 0}
+              style={{ opacity: courbe || f.valeur > 0 ? 1 : 0 }}
+            />
+          )
+        })}
+        {choisi && choisi.valeur > 0 && (
+          <g className="serie-bulle" style={{ transform: `translate(${choisi.cx}px, ${choisi.y - 12}px)` }}>
+            <rect x={-largeurBulle / 2} y={-17} width={largeurBulle} height={17} rx={8.5} fill="#1d4ed8" />
+            <text y={-5} textAnchor="middle" fontSize={10} fontWeight={700} fill="#fff">
+              {texte}
+            </text>
+          </g>
+        )}
+        {donnees.map((d, i) => (
+          <text key={i} x={formes[i].cx} y={H - 8} textAnchor="middle" fontSize={11} fontWeight={500} fill="#9aa0b2">
+            {d.libelle}
+          </text>
+        ))}
+        {formes.map((f, i) => (
+          <rect key={`h-${i}`} x={f.cx - pas / 2} y={0} width={pas} height={H} fill="transparent" onMouseEnter={() => setSurvol(i)} />
+        ))}
+      </svg>
+    </div>
+  )
+}
