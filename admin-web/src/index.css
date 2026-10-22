@@ -561,11 +561,15 @@ body {
   transition: opacity 600ms ease-out, d 550ms var(--ease-sortie);
 }
 .serie-bulle {
-  transition: transform 550ms var(--ease-sortie);
+  transition: transform 300ms var(--ease-sortie);
+}
+.serie-survol {
+  transition: x 300ms var(--ease-sortie), opacity 200ms ease-out;
 }
 [data-anime='false'] .serie-forme,
 [data-anime='false'] .serie-ligne,
 [data-anime='false'] .serie-aire,
-[data-anime='false'] .serie-bulle {
+[data-anime='false'] .serie-bulle,
+[data-anime='false'] .serie-survol {
   transition: none;
 }

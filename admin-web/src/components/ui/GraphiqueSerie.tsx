@@ -72,7 +72,7 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
   const largeurBulle = texte.length * 6.4 + 16
 
   return (
-    <div role="img" aria-label={`${description} : ${resume}`} data-mode={mode} data-anime={anime} className="relative mt-1 h-[150px]">
+    <div role="img" aria-label={`${description} : ${resume}`} data-mode={mode} data-anime={anime} data-survol={survol !== null} className="relative mt-1 h-[150px]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-4 bottom-6"
@@ -85,6 +85,18 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
             <stop offset="100%" stopColor="#1d4ed8" stopOpacity="0" />
           </linearGradient>
         </defs>
+        {choisi && (
+          <rect
+            className="serie-survol"
+            x={choisi.cx - pas / 2 + 2}
+            y={MARGE.haut - 14}
+            width={pas - 4}
+            height={BASE - MARGE.haut + 14}
+            rx={14}
+            fill="#1d4ed8"
+            style={{ opacity: survol !== null ? 0.08 : 0 }}
+          />
+        )}
         <path className="serie-aire" d={aire} fill="url(#serie-aire)" style={{ opacity: courbe && pret ? 1 : 0 }} />
         <path
           className="serie-ligne"
@@ -99,10 +111,13 @@ export default function GraphiqueSerie({ description, donnees, mode, formatValeu
         />
         {formes.map((f, i) => {
           const estActif = i === actif
+          const grossi = survol === i
+          const diametre = grossi ? DIAMETRE_POINT + 5 : DIAMETRE_POINT
+          const largeur = largeurColonne + (grossi ? 5 : 0)
           const hauteurColonne = f.valeur > 0 ? Math.max(BASE - f.y, pret ? 4 : 0) : 0
           const forme = courbe
-            ? { x: f.cx - DIAMETRE_POINT / 2, y: f.y - DIAMETRE_POINT / 2, width: DIAMETRE_POINT, height: DIAMETRE_POINT, rx: DIAMETRE_POINT / 2 }
-            : { x: f.cx - largeurColonne / 2, y: BASE - hauteurColonne, width: largeurColonne, height: hauteurColonne, rx: largeurColonne / 2 }
+            ? { x: f.cx - diametre / 2, y: f.y - diametre / 2, width: diametre, height: diametre, rx: diametre / 2 }
+            : { x: f.cx - largeur / 2, y: BASE - hauteurColonne, width: largeur, height: hauteurColonne, rx: largeur / 2 }
           return (
             <rect
               key={i}

@@ -70,6 +70,21 @@ describe('GraphiqueSerie', () => {
     expect(screen.queryByText('40 rés.')).not.toBeInTheDocument()
   })
 
+  it('au survol : la forme grossit, le halo suit la souris et revient au repos à la sortie', () => {
+    simuler(true)
+    const { container } = render(<GraphiqueSerie description="R" donnees={donnees} mode="colonnes" />)
+    const repos = nombre(formes(container)[0], 'width')
+    const racine = container.querySelector('[data-survol]') as HTMLElement
+    expect(racine.dataset.survol).toBe('false')
+    fireEvent.mouseEnter(container.querySelectorAll('rect[fill="transparent"]')[0])
+    expect(racine.dataset.survol).toBe('true')
+    expect(nombre(formes(container)[0], 'width')).toBeGreaterThan(repos)
+    expect(container.querySelector('rect.serie-survol')).not.toBeNull()
+    fireEvent.mouseLeave(container.querySelector('svg') as SVGSVGElement)
+    expect(racine.dataset.survol).toBe('false')
+    expect(nombre(formes(container)[0], 'width')).toBe(repos)
+  })
+
   it('mouvement réduit : tout est posé d’emblée, sans croissance ni transition', () => {
     simuler(true)
     const { container } = render(<GraphiqueSerie description="R" donnees={donnees} mode="colonnes" />)
