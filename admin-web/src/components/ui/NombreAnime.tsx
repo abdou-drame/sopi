@@ -25,7 +25,8 @@ export default function NombreAnime({ valeur, format = formatNombre, duree = 900
     const debut = performance.now()
     const de = depart.current
     const pas = (maintenant: number) => {
-      const t = Math.min(1, (maintenant - debut) / duree)
+      // L'horodatage de la première image peut précéder `debut` : sans le plancher à 0, le temps serait négatif et le nombre dépasserait sous zéro.
+      const t = Math.max(0, Math.min(1, (maintenant - debut) / duree))
       const courant = Math.round(de + (valeur - de) * (1 - Math.pow(1 - t, 3)))
       depart.current = courant
       setAffiche(courant)

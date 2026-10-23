@@ -25,12 +25,14 @@ describe('cercle d’Actualiser', () => {
     const animer = vi.fn()
     ;(document.documentElement as unknown as Record<string, unknown>).animate = animer
     const actualiser = vi.fn(() => Promise.resolve())
+    const repartirDeZero = vi.fn(() => Promise.resolve())
     ;(document as unknown as Record<string, unknown>).startViewTransition = vi.fn((rappel: () => Promise<void>) => {
       void rappel()
       return { ready: Promise.resolve() }
     })
-    actualiserEnCercle(bouton(), actualiser)
-    expect(actualiser).toHaveBeenCalledTimes(1)
+    actualiserEnCercle(bouton(), actualiser, repartirDeZero)
+    expect(repartirDeZero).toHaveBeenCalledTimes(1)
+    expect(actualiser).not.toHaveBeenCalled()
     await vi.waitFor(() => expect(animer).toHaveBeenCalledTimes(1))
     const [cles, options] = animer.mock.calls[0]
     expect(cles.clipPath[0]).toBe('circle(0px at 120px 220px)')

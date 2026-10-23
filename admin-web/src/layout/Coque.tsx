@@ -312,7 +312,7 @@ function Rail() {
               setTourne(true)
               clearTimeout(minuteurTour.current)
               minuteurTour.current = setTimeout(() => setTourne(false), 700)
-              actualiserEnCercle(e.currentTarget, () => clientRequetes.invalidateQueries())
+              actualiserEnCercle(e.currentTarget, () => clientRequetes.invalidateQueries(), () => clientRequetes.resetQueries())
             }}
             className="mq-ric"
           >
