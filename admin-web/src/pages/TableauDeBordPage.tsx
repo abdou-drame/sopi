@@ -8,10 +8,10 @@ import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
 import NombreAnime from '../components/ui/NombreAnime'
 import JaugeMetier from '../components/ui/JaugeMetier'
-import GraphiqueSerie, { type ModeSerie } from '../components/ui/GraphiqueSerie'
+import GraphiqueGroupe from '../components/ui/GraphiqueGroupe'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, FOND_MARQUE, TitrePage } from '../design/composants'
-import { ICalendrier, IColonnes, ICourbe, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
+import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
 import { L, dureeMinutes } from '../i18n/libelles'
 import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
 
@@ -118,27 +118,40 @@ function dernieresSemaines(): Tranche[] {
   })
 }
 
+/** Séries du graphique des réservations, dans l'ordre des colonnes ; `undefined` = toutes les réservations. */
+const STATUTS_GRAPHIQUE = ['annulee', 'terminee', undefined] as const
+const SERIES_RESERVATIONS = [
+  { libelle: 'Annulées', couleur: '#e0a830' },
+  { libelle: 'Terminées', couleur: '#2d9d6a' },
+  { libelle: 'Réservations', couleur: '#4b6fd6' },
+]
+
 /** Réservations par période : le total de la pagination de chaque tranche (créneaux commençant dans la tranche). */
 function CarteReservations() {
   const [annuel, setAnnuel] = useState(true)
-  const [mode, setMode] = useState<ModeSerie>('colonnes')
   const tranches = useMemo(() => (annuel ? derniersMois() : dernieresSemaines()), [annuel])
+  // Trois totaux par tranche : annulées, terminées et toutes les réservations (le total de la pagination suffit).
   const resultats = useQueries({
-    queries: tranches.map((t) => ({
-      queryKey: ['reservations-tranche', t.debut, t.fin],
-      queryFn: () => api.reservations({ debut: t.debut, fin: t.fin }),
-      retry: false,
-      staleTime: 60_000,
-    })),
+    queries: tranches.flatMap((t) =>
+      STATUTS_GRAPHIQUE.map((statut) => ({
+        queryKey: ['reservations-tranche', t.debut, t.fin, statut ?? 'toutes'],
+        queryFn: () => api.reservations({ debut: t.debut, fin: t.fin, ...(statut ? { statut } : {}) }),
+        retry: false,
+        staleTime: 60_000,
+      })),
+    ),
   })
-  const donnees = tranches.map((t, i) => ({ libelle: t.libelle, valeur: resultats[i].data?.meta.total ?? 0 }))
+  const groupes = tranches.map((t, i) => ({
+    libelle: t.libelle,
+    valeurs: STATUTS_GRAPHIQUE.map((_, k) => resultats[i * STATUTS_GRAPHIQUE.length + k].data?.meta.total ?? 0),
+  }))
   return (
     <section className="box-border flex min-w-0 flex-[1_1_340px] flex-col rounded-[32px] bg-white p-[18px]">
       <div className="flex flex-wrap items-center gap-3.5">
         <span className="grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]">
           <IGraphique />
         </span>
-        <span className="min-w-[140px] flex-1">
+        <span className="min-w-[96px] flex-1">
           <span className="block text-[15px] font-bold">{T.reservations}</span>
           <span className="mt-0.5 block text-xs text-[#8a90a2]">{annuel ? 'Nombre de réservations par mois' : 'Nombre de réservations par semaine'}</span>
         </span>
@@ -162,32 +175,11 @@ function CarteReservations() {
             Annuel
           </button>
         </div>
-        <div role="tablist" aria-label="Type de graphique" className="flex rounded-full bg-[#f3f4f7] p-1">
-          {(
-            [
-              ['courbe', 'Courbe', ICourbe],
-              ['colonnes', 'Colonnes', IColonnes],
-            ] as const
-          ).map(([cle, libelle, Icone]) => (
-            <button
-              key={cle}
-              type="button"
-              role="tab"
-              aria-selected={mode === cle}
-              aria-label={libelle}
-              title={libelle}
-              onClick={() => setMode(cle)}
-              className={`grid size-[34px] cursor-pointer place-items-center rounded-full border-none transition-colors duration-200 ${mode === cle ? 'bg-marque text-white' : 'bg-transparent text-[#8a90a2]'}`}
-            >
-              <Icone />
-            </button>
-          ))}
-        </div>
         <LienFleche vers="/reservations" libelle="Ouvrir" />
       </div>
       <div className="mt-[18px] flex-1">
-        {/* Les formes glissent vers leurs nouvelles valeurs quand on change de période, et se transforment quand on change de type. */}
-        <GraphiqueSerie mode={mode} description={T.reservations} donnees={donnees} formatValeur={formatNombre} />
+        {/* Les colonnes poussent depuis la base à l'arrivée, puis glissent vers leurs nouvelles valeurs quand on change de période. */}
+        <GraphiqueGroupe description={T.reservations} series={SERIES_RESERVATIONS} groupes={groupes} formatValeur={formatNombre} />
       </div>
     </section>
   )

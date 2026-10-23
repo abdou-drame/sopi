@@ -1,4 +1,4 @@
-import { cleanup, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
@@ -242,21 +242,27 @@ describe('tableau de bord', () => {
     expect(await screen.findByText('Nombre de réservations par semaine')).toBeInTheDocument()
   })
 
-  it('bascule le graphique des réservations entre colonnes et courbe sans changer les données', async () => {
+  it('détaille au survol les annulées, les terminées et le total réels de la période, la dernière par défaut', async () => {
     simulerApi({
       ...toutes,
-      'GET /admin/reservations': () => ({ corps: { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total: 42 } } }),
+      'GET /admin/reservations': ({ url }) => {
+        const statut = url.searchParams.get('statut')
+        const total = statut === 'annulee' ? 5 : statut === 'terminee' ? 30 : 42
+        return { corps: { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total } } }
+      },
     })
     afficherApplication('/')
-    const graphique = () => screen.getAllByRole('img').find((e) => (e.getAttribute('aria-label') ?? '').startsWith('Réservations : ')) as HTMLElement
     await screen.findByText('Nombre de réservations par mois')
-    expect(screen.getByRole('tab', { name: 'Colonnes' })).toHaveAttribute('aria-selected', 'true')
-    expect(graphique()).toHaveAttribute('data-mode', 'colonnes')
-    await userEvent.click(screen.getByRole('tab', { name: 'Courbe' }))
-    expect(screen.getByRole('tab', { name: 'Courbe' })).toHaveAttribute('aria-selected', 'true')
-    expect(graphique()).toHaveAttribute('data-mode', 'courbe')
-    await userEvent.click(screen.getByRole('tab', { name: 'Colonnes' }))
-    expect(graphique()).toHaveAttribute('data-mode', 'colonnes')
+    const graphique = screen.getAllByRole('img').find((e) => (e.getAttribute('aria-label') ?? '').startsWith('Réservations : ')) as HTMLElement
+    await waitFor(() => expect(graphique.querySelector('.groupe-bulle')).toHaveTextContent(/Annulées\s*5.*Terminées\s*30.*Réservations\s*42/))
+    expect(graphique.querySelectorAll('.groupe-colonne')).toHaveLength(18)
+    expect(graphique).toHaveAttribute('aria-label', expect.stringContaining('Annulées 5, Terminées 30, Réservations 42'))
+    // Le survol d'une autre période déplace l'infobulle sur elle.
+    const zones = graphique.querySelectorAll('svg rect[fill="transparent"]')
+    fireEvent.mouseEnter(zones[0])
+    expect(graphique).toHaveAttribute('data-survol', 'true')
+    fireEvent.mouseLeave(graphique.querySelector('svg') as SVGElement)
+    expect(graphique).toHaveAttribute('data-survol', 'false')
   })
 
   it('actualise en lecture seule depuis le rail', async () => {
