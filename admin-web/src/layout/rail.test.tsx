@@ -60,13 +60,12 @@ describe('rail de gauche', () => {
     expect(rail.queryByText('Actualiser')).toBeNull()
   })
 
-  it('Actualiser pose le flash visuel sur la page puis le retire, et relance toujours les requêtes', async () => {
+  it('Actualiser relance les requêtes (sans View Transition, comme dans jsdom, sans rien d’autre)', async () => {
     const rail = await ouvrirRail('/')
     const avant = vi.mocked(fetch).mock.calls.length
     await userEvent.click(rail.getByRole('button', { name: 'Actualiser' }))
-    expect(document.documentElement).toHaveAttribute('data-flash')
-    await waitFor(() => expect(document.documentElement).not.toHaveAttribute('data-flash'), { timeout: 2000 })
-    expect(vi.mocked(fetch).mock.calls.length).toBeGreaterThan(avant)
+    await waitFor(() => expect(vi.mocked(fetch).mock.calls.length).toBeGreaterThan(avant))
+    expect(document.documentElement).not.toHaveAttribute('data-flash')
   })
 
   it('pose un point rouge sur les écrans qui ont des alertes, et seulement eux', async () => {

@@ -9,7 +9,7 @@ import MenuPlus from './MenuPlus'
 import { PointAlerte } from './PointAlerte'
 import Logo from '../design/Logo'
 import { PageTransition } from '../design/animation/composants'
-import { declencherFlash } from '../design/animation/flashActualiser'
+import { actualiserEnCercle } from '../design/animation/cercleActualiser'
 import {
   IActualiser,
   IAvis,
@@ -258,10 +258,7 @@ function Rail() {
       ))}
       <div className={CAPSULE} style={{ animationDelay: `${RAIL.length * 40}ms` }}>
         <ItemRail libelle={L.coque.actualiser}>
-          <button type="button" aria-label={L.coque.actualiser} onClick={() => {
-              declencherFlash()
-              void clientRequetes.invalidateQueries()
-            }} className="mq-ric">
+          <button type="button" aria-label={L.coque.actualiser} onClick={(e) => actualiserEnCercle(e.currentTarget, () => clientRequetes.invalidateQueries())} className="mq-ric">
             <IActualiser />
           </button>
         </ItemRail>
