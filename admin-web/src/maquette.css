@@ -332,3 +332,40 @@ html.maquette body {
 @media (prefers-reduced-motion: reduce) {
   .mq-nvi-pastille[data-glisse] { transition: none; }
 }
+
+/* Rail : retours au survol et au clic, et bouton Actualiser qui se noircit en tournant. */
+.mq-ric:hover:not([aria-current="page"]) { transform: scale(1.08); }
+.mq-ric:active:not([aria-current="page"]) { transform: scale(0.94); }
+/* Onde au clic : un anneau de la couleur de marque s'élargit en s'effaçant. */
+.mq-ric::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--color-marque);
+  opacity: 0;
+  pointer-events: none;
+}
+.mq-ric:active::before { animation: rail-onde 420ms var(--ease-sortie, ease-out) both; }
+@keyframes rail-onde {
+  from { opacity: 0.55; transform: scale(0.8); }
+  to { opacity: 0; transform: scale(1.7); }
+}
+.mq-ric[data-tourne] { background: #12172b; color: #fff; }
+.mq-ric[data-tourne] svg { animation: rail-tour 620ms cubic-bezier(0.65, 0, 0.35, 1) both; }
+@keyframes rail-tour { to { transform: rotate(360deg); } }
+/* L'indicateur change aussi de hauteur : il s'étire d'une icône à l'autre. */
+.mq-ric-indicateur[data-glisse] {
+  transition: transform 200ms var(--ease-sortie, ease-out), height 200ms var(--ease-sortie, ease-out), opacity var(--duree-rapide, 150ms) ease;
+}
+/* Barre du haut : boutons ronds qui réagissent, libellés qui changent de couleur en douceur. */
+.mq-rond { transition: background-color 0.15s, transform 0.15s var(--ease-sortie, ease-out); }
+.mq-rond:hover { transform: scale(1.07); }
+.mq-rond:active { transform: scale(0.94); }
+.mq-nvi { transition: color 200ms ease; }
+@media (prefers-reduced-motion: reduce) {
+  .mq-ric:hover, .mq-ric:active, .mq-rond:hover, .mq-rond:active { transform: none; }
+  .mq-ric:active::before { animation: none; }
+  .mq-ric[data-tourne] svg { animation: none; }
+  .mq-ric-indicateur[data-glisse] { transition: none; }
+}

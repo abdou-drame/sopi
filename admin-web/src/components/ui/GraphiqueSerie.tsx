@@ -151,6 +151,19 @@ export default function GraphiqueSerie({
               style={{ opacity: survol !== null ? 0.08 : 0 }}
             />
           )}
+          {choisi && (
+            <line
+              className="serie-guide"
+              x1={0}
+              x2={0}
+              y1={MARGE.haut - 6}
+              y2={BASE}
+              stroke="var(--color-marque)"
+              strokeWidth={1.2}
+              strokeDasharray="3 4"
+              style={{ transform: `translateX(${choisi.cx}px)`, opacity: courbe && survol !== null ? 0.55 : 0 }}
+            />
+          )}
           <m.path
             className="serie-aire"
             initial={false}

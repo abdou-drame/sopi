@@ -10,6 +10,7 @@ import { PointAlerte } from './PointAlerte'
 import Logo from '../design/Logo'
 import { PageTransition } from '../design/animation/composants'
 import { actualiserEnCercle } from '../design/animation/cercleActualiser'
+import { animationsActives } from '../design/animation/usePresence'
 import {
   IActualiser,
   IAvis,
@@ -90,7 +91,7 @@ function BarreDuHaut() {
   }, [cible, glisse])
 
   return (
-    <header className="box-border flex flex-wrap items-center gap-x-5 gap-y-3 rounded-full bg-white py-2.5 pr-3.5 pl-[22px]">
+    <header className="barre-entree box-border flex flex-wrap items-center gap-x-5 gap-y-3 rounded-full bg-white py-2.5 pr-3.5 pl-[22px]">
       <Link to="/" aria-label={L.marque} className="flex items-center gap-2.5">
         <Logo />
         <span aria-hidden="true" className="text-xl font-extrabold tracking-[-0.5px] text-marque">
@@ -139,7 +140,9 @@ function BarreDuHaut() {
           aria-label={total > 0 ? `${L.coque.notifications} : ${L.coque.alertes(total)}` : L.coque.notifications}
           className="mq-rond relative grid size-11 place-items-center rounded-[22px] bg-[#f3f4f7] text-[#12172b]"
         >
-          <ICloche />
+          <span className={total > 0 ? 'cloche-secoue grid' : 'grid'}>
+            <ICloche />
+          </span>
           {total > 0 && <span aria-hidden="true" className="absolute top-[11px] right-3 box-content size-2 rounded-full border-2 border-[#f3f4f7] bg-[#e5484d]" />}
         </Link>
         <span
@@ -191,7 +194,7 @@ function ItemRail({ libelle, children }: { libelle: string; children: React.Reac
       {children}
       {visible && (
         <span aria-hidden="true" className="pointer-events-none absolute top-0 left-full z-30 flex h-full items-center pl-2.5">
-          <span className="animate-infobulle rounded-[10px] bg-marque px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(45,106,79,0.3)]">{libelle}</span>
+          <span className="infobulle-rail rounded-[10px] bg-marque px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-white shadow-[0_8px_20px_rgba(45,106,79,0.3)]">{libelle}</span>
         </span>
       )}
     </span>
@@ -206,7 +209,13 @@ function Rail() {
   const { pathname } = useLocation()
   const racine = useRef<HTMLElement>(null)
   const [cible, setCible] = useState<{ x: number; y: number; l: number; h: number } | null>(null)
+  // Ce que l'indicateur affiche : d'abord étiré sur l'ancienne ET la nouvelle icône, puis resserré sur la nouvelle.
+  const [affiche, setAfficheRail] = useState<{ x: number; y: number; l: number; h: number } | null>(null)
+  const precedente = useRef<{ x: number; y: number; l: number; h: number } | null>(null)
   const [glisse, setGlisse] = useState(false)
+  const [tourne, setTourne] = useState(false)
+  const minuteurTour = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  useEffect(() => () => clearTimeout(minuteurTour.current), [])
 
   // Position de l'indicateur : celle de l'icône marquée aria-current (rien si l'écran n'est pas dans le rail).
   const mesurer = useCallback(() => {
@@ -214,6 +223,19 @@ function Rail() {
     setCible(actif ? { x: actif.offsetLeft, y: actif.offsetTop, l: actif.offsetWidth, h: actif.offsetHeight } : null)
   }, [])
   useLayoutEffect(mesurer, [mesurer, pathname])
+  // Changement d'écran : l'indicateur s'étire jusqu'à la nouvelle icône, puis se resserre dessus (comme la vidéo de référence).
+  useLayoutEffect(() => {
+    const avant = precedente.current
+    precedente.current = cible
+    if (!cible || !avant || !glisse || !animationsActives() || (avant.y === cible.y && avant.x === cible.x)) {
+      setAfficheRail(cible)
+      return
+    }
+    const haut = Math.min(avant.y, cible.y)
+    setAfficheRail({ x: cible.x, y: haut, l: cible.l, h: Math.max(avant.y + avant.h, cible.y + cible.h) - haut })
+    const minuteur = setTimeout(() => setAfficheRail(cible), 150)
+    return () => clearTimeout(minuteur)
+  }, [cible, glisse])
   useEffect(() => {
     window.addEventListener('resize', mesurer)
     return () => window.removeEventListener('resize', mesurer)
@@ -237,7 +259,7 @@ function Rail() {
         data-testid="indicateur-rail"
         data-glisse={glisse || undefined}
         className="mq-ric-indicateur"
-        style={cible ? { opacity: 1, width: cible.l, height: cible.h, transform: `translate(${cible.x}px, ${cible.y}px)` } : undefined}
+        style={affiche ? { opacity: 1, width: affiche.l, height: affiche.h, transform: `translate(${affiche.x}px, ${affiche.y}px)` } : undefined}
       />
       {RAIL.map((groupe, g) => (
         <div key={g} className={CAPSULE} style={{ animationDelay: `${g * 40}ms` }}>
@@ -258,7 +280,19 @@ function Rail() {
       ))}
       <div className={CAPSULE} style={{ animationDelay: `${RAIL.length * 40}ms` }}>
         <ItemRail libelle={L.coque.actualiser}>
-          <button type="button" aria-label={L.coque.actualiser} onClick={(e) => actualiserEnCercle(e.currentTarget, () => clientRequetes.invalidateQueries())} className="mq-ric">
+          <button
+            type="button"
+            aria-label={L.coque.actualiser}
+            data-tourne={tourne || undefined}
+            onClick={(e) => {
+              // Le bouton se noircit et son icône fait un tour complet pendant que le cercle s'ouvre (620 ms).
+              setTourne(true)
+              clearTimeout(minuteurTour.current)
+              minuteurTour.current = setTimeout(() => setTourne(false), 700)
+              actualiserEnCercle(e.currentTarget, () => clientRequetes.invalidateQueries())
+            }}
+            className="mq-ric"
+          >
             <IActualiser />
           </button>
         </ItemRail>
