@@ -42,6 +42,18 @@ const METIERS: Entree = { chemin: '/metiers', libelle: 'Métiers', icone: <IMeti
 
 /** Barre du haut : les 7 écrans dessinés, dans l'ordre des maquettes. */
 const NAV = [TABLEAU, DOSSIERS, LITIGES, AVIS, SANCTIONS, UTILISATEURS, METIERS]
+/** Refait la mesure quand la mise en page bouge sans événement React : chargement de la police, redimensionnement du conteneur ou de ses enfants. */
+function useRemesure(ref: React.RefObject<HTMLElement | null>, mesurer: () => void) {
+  useEffect(() => {
+    void document.fonts?.ready.then(mesurer)
+    if (typeof ResizeObserver === 'undefined' || !ref.current) return
+    const observateur = new ResizeObserver(mesurer)
+    observateur.observe(ref.current)
+    ref.current.querySelectorAll('a, button').forEach((el) => observateur.observe(el))
+    return () => observateur.disconnect()
+  }, [ref, mesurer])
+}
+
 /** Rail de gauche : deux capsules d'écrans, puis la capsule d'actions. */
 const RAIL = [
   [TABLEAU, DOSSIERS, LITIGES, AVIS],
@@ -79,6 +91,7 @@ function BarreDuHaut() {
     setCible(actif ? { x: actif.offsetLeft, l: actif.offsetWidth } : null)
   }, [])
   useLayoutEffect(mesurer, [mesurer, pathname, signature])
+  useRemesure(barre, mesurer)
   useEffect(() => {
     window.addEventListener('resize', mesurer)
     return () => window.removeEventListener('resize', mesurer)
@@ -220,9 +233,19 @@ function Rail() {
   // Position de l'indicateur : celle de l'icône marquée aria-current (rien si l'écran n'est pas dans le rail).
   const mesurer = useCallback(() => {
     const actif = racine.current?.querySelector<HTMLElement>('a[aria-current="page"]')
-    setCible(actif ? { x: actif.offsetLeft, y: actif.offsetTop, l: actif.offsetWidth, h: actif.offsetHeight } : null)
+    const parent = racine.current
+    if (!actif || !parent) return setCible(null)
+    // Les icônes sont dans des spans « relative » : on additionne les décalages jusqu'au rail. Les offsets ignorent les transformations (l'entrée des capsules ne fausse pas la mesure).
+    let x = 0
+    let y = 0
+    for (let el: HTMLElement | null = actif; el && el !== parent; el = el.offsetParent as HTMLElement | null) {
+      x += el.offsetLeft
+      y += el.offsetTop
+    }
+    setCible({ x, y, l: actif.offsetWidth, h: actif.offsetHeight })
   }, [])
   useLayoutEffect(mesurer, [mesurer, pathname])
+  useRemesure(racine, mesurer)
   // Changement d'écran : l'indicateur s'étire jusqu'à la nouvelle icône, puis se resserre dessus (comme la vidéo de référence).
   useLayoutEffect(() => {
     const avant = precedente.current
