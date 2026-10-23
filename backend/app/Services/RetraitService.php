@@ -30,7 +30,7 @@ class RetraitService
     public function mouvements(Prestataire $prestataire): LengthAwarePaginator
     {
         return $prestataire->mouvementsPortefeuille()
-            ->with(['reservation.prestation:id,nom', 'retrait:id,statut,operateur'])
+            ->with(['reservation.prestation:id,nom', 'reservation.paiementActif', 'retrait:id,statut,operateur'])
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate(self::PAR_PAGE);

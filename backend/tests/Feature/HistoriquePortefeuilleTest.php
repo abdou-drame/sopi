@@ -102,9 +102,27 @@ describe('GET /prestataire/portefeuille/mouvements', function () {
             ->assertJsonCount(20, 'data')
             ->assertJsonPath('meta.total', 22)
             ->assertJsonPath('data.0.libelle', 'M22');
-        expect(array_keys($page1->json('data.0')))->toBe(['id', 'type', 'montant', 'libelle', 'soldeApres', 'reservationId', 'retraitId', 'prestation', 'operateur', 'statutRetrait', 'date']);
+        expect(array_keys($page1->json('data.0')))->toBe(['id', 'type', 'montant', 'libelle', 'soldeApres', 'reservationId', 'retraitId', 'prestation', 'acompte', 'commission', 'operateur', 'statutRetrait', 'date']);
 
         $this->getJson('/api/v1/prestataire/portefeuille/mouvements?page=2')->assertOk()->assertJsonCount(2, 'data');
+    });
+
+    it('expose l\'acompte et la commission du paiement sur un crédit, null sur les autres mouvements', function () {
+        $prestataire = prestataireAvecSolde(0);
+        $this->actingAs($prestataire->user, 'sanctum');
+        $reservation = enCoursPayee($prestataire);
+        $this->postJson("/api/v1/prestataire/reservations/{$reservation->id}/terminer")->assertOk();
+        MouvementPortefeuille::factory()->create(['prestataire_id' => $prestataire->id, 'created_at' => now()->subDay(), 'type' => TypeMouvementPortefeuille::Retrait]);
+
+        $donnees = collect($this->getJson('/api/v1/prestataire/portefeuille/mouvements')->assertOk()->json('data'));
+        $credit = $donnees->firstWhere('type', 'credit');
+        $retrait = $donnees->firstWhere('type', 'retrait');
+
+        expect($credit['montant'])->toBe(3000.0)
+            ->and($credit['acompte'])->toBe(4500.0)
+            ->and($credit['commission'])->toBe(1500.0)
+            ->and($retrait['acompte'])->toBeNull()
+            ->and($retrait['commission'])->toBeNull();
     });
 
     it('exige un prestataire : 401 sans jeton, 403 pour un client', function () {

@@ -3,6 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/format/formateurs.dart';
 import 'package:sopi/core/routing/chemins.dart';
 
+import 'package:sopi/features/prestataire/portefeuille_page.dart'
+    show formaterNombre;
+
 import '../../aide_api.dart';
 import '../auth/aide_acces.dart';
 import 'aide_prestataire.dart';
@@ -14,6 +17,8 @@ Map<String, Object?> _mouvement({
   String? prestation = 'Coupe femme',
   String? operateur,
   String? statutRetrait,
+  num? acompte,
+  num? commission,
   String libelle = 'Prestation terminée (acompte moins commission)',
   String date = '2026-10-22T08:50:00+00:00',
 }) => {
@@ -23,6 +28,8 @@ Map<String, Object?> _mouvement({
   'libelle': libelle,
   'soldeApres': 8000,
   'prestation': prestation,
+  'acompte': acompte,
+  'commission': commission,
   'operateur': operateur,
   'statutRetrait': statutRetrait,
   'date': date,
@@ -121,6 +128,34 @@ void main() {
       expect(find.text('Retrait Wave'), findsOneWidget);
       expect(find.textContaining('Effectué'), findsOneWidget);
     });
+
+    testWidgets(
+      'un crédit affiche l\'acompte et la commission, pas un retrait',
+      (tester) async {
+        final serveur = AdaptateurSimule(
+          _routes(
+            mouvements: [
+              _mouvement(montant: 1000, acompte: 1500, commission: 500),
+              _mouvement(
+                id: 'm-2',
+                type: 'retrait',
+                prestation: null,
+                operateur: 'wave',
+                statutRetrait: 'reussi',
+              ),
+            ],
+          ),
+        );
+        await _ouvrir(tester, serveur, Chemins.portefeuille);
+        expect(
+          find.text(
+            'Acompte ${formaterNombre(1500)} · Comm. ${formaterNombre(500)}',
+          ),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Comm.'), findsOneWidget);
+      },
+    );
 
     testWidgets('un retrait en cours et un échec sont libellés', (
       tester,

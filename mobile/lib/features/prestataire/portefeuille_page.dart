@@ -239,6 +239,17 @@ class LigneMouvement extends StatelessWidget {
     }
   }
 
+  /// « Acompte 1 500 · Comm. 500 » pour un crédit dont le serveur a donné les deux montants, sinon null.
+  String? get _detailGains {
+    final m = mouvement;
+    if (m.type != TypeMouvement.credit ||
+        m.acompte == null ||
+        m.commission == null) {
+      return null;
+    }
+    return 'Acompte ${formaterNombre(m.acompte!)} · Comm. ${formaterNombre(m.commission!)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -311,12 +322,23 @@ class LigneMouvement extends StatelessWidget {
                       color: CouleursSopi.texteSecondaire,
                     ),
                   ),
+                  if (_detailGains != null)
+                    Text(
+                      _detailGains!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 11,
+                        color: CouleursSopi.texteSecondaire,
+                      ),
+                    ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
             Text(
               '${augmente ? '+' : '−'} ${formaterArgent(m.montant)}',
+              softWrap: false,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,

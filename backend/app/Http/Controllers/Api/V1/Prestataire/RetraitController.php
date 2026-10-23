@@ -69,7 +69,7 @@ class RetraitController extends Controller
      *
      * @authenticated
      *
-     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","type":"credit","montant":3000.0,"libelle":"Prestation terminée (acompte moins commission)","soldeApres":8000.0,"reservationId":"0198a1b2-0000-7000-8000-000000000020","retraitId":null,"prestation":"Vidange","operateur":null,"statutRetrait":null,"date":"2030-01-15T08:50:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","last":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000080","type":"credit","montant":3000.0,"libelle":"Prestation terminée (acompte moins commission)","soldeApres":8000.0,"reservationId":"0198a1b2-0000-7000-8000-000000000020","retraitId":null,"prestation":"Vidange","acompte":4500.0,"commission":1500.0,"operateur":null,"statutRetrait":null,"date":"2030-01-15T08:50:00+00:00"}],"links":{"first":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","last":"https://api.exemple.test/api/v1/prestataire/portefeuille/mouvements?page=1","prev":null,"next":null},"meta":{"current_page":1,"last_page":1,"per_page":20,"total":1}}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
      */

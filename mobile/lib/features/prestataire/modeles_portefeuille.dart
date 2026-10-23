@@ -90,6 +90,8 @@ class MouvementPortefeuille {
     required this.date,
     this.libelle,
     this.prestation,
+    this.acompte,
+    this.commission,
     this.operateur,
     this.statutRetrait,
   });
@@ -102,6 +104,10 @@ class MouvementPortefeuille {
 
   /// Nom du service (crédit de fin de prestation).
   final String? prestation;
+
+  /// Acompte et commission du paiement (crédit de fin de prestation) ; null pour les autres mouvements.
+  final num? acompte;
+  final num? commission;
   final OperateurRetrait? operateur;
   final StatutRetrait? statutRetrait;
 
@@ -115,6 +121,8 @@ class MouvementPortefeuille {
           DateTime.tryParse('${j['date']}')?.toUtc() ?? DateTime.now().toUtc(),
       libelle: _texte(j['libelle']),
       prestation: _texte(j['prestation']),
+      acompte: _nombre(j['acompte']),
+      commission: _nombre(j['commission']),
       operateur: OperateurRetrait.depuisCode(j['operateur']),
       statutRetrait: StatutRetrait.depuisCode(j['statutRetrait']),
     );

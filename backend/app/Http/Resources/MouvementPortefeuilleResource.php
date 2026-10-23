@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\TypeMouvementPortefeuille;
 use App\Models\MouvementPortefeuille;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -17,6 +18,8 @@ class MouvementPortefeuilleResource extends JsonResource
 
     public function toArray(Request $request): array
     {
+        $paiement = $this->type === TypeMouvementPortefeuille::Credit ? $this->reservation?->paiementActif : null;
+
         return [
             'id' => $this->id,
             'type' => $this->type->value,
@@ -27,6 +30,9 @@ class MouvementPortefeuilleResource extends JsonResource
             'retraitId' => $this->retrait_id,
             // Nom du service de la réservation liée (crédit de fin de prestation), sinon null.
             'prestation' => $this->reservation?->prestation?->nom,
+            // Crédit lié à une réservation : acompte et commission du paiement réussi (le montant crédité est « montant »), sinon null.
+            'acompte' => $paiement === null ? null : (float) $paiement->montant_acompte,
+            'commission' => $paiement === null ? null : (float) $paiement->commission,
             // Pour un retrait : opérateur (`wave` ou `orange_money`, null si inconnu) et statut du retrait ; sinon null.
             'operateur' => $this->retrait?->operateur?->value,
             'statutRetrait' => $this->retrait?->statut->value,
