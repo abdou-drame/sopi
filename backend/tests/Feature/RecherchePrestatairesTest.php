@@ -213,3 +213,33 @@ it('renvoie un message d\'erreur en français pour une fourchette incohérente',
         ->assertUnprocessable()
         ->assertJsonPath('errors.prix_max.0', 'Le prix maximum doit être supérieur ou égal au prix minimum.');
 });
+
+it('filtre les prestataires ayant un créneau libre à venir', function () {
+    $libre = prestataireRecherche(['nom_entreprise' => 'Avec créneau libre']);
+    App\Models\Creneau::factory()->libre()->create(['prestataire_id' => $libre->id]);
+
+    $verrouExpire = prestataireRecherche(['nom_entreprise' => 'Verrou expiré']);
+    App\Models\Creneau::factory()->verrouille(now()->subMinute())->create(['prestataire_id' => $verrouExpire->id]);
+
+    $reserve = prestataireRecherche(['nom_entreprise' => 'Créneau réservé']);
+    App\Models\Creneau::factory()->reserve()->create(['prestataire_id' => $reserve->id]);
+
+    $verrouEnCours = prestataireRecherche(['nom_entreprise' => 'Verrou en cours']);
+    App\Models\Creneau::factory()->verrouille()->create(['prestataire_id' => $verrouEnCours->id]);
+
+    $passe = prestataireRecherche(['nom_entreprise' => 'Créneau passé']);
+    App\Models\Creneau::factory()->libre()->create([
+        'prestataire_id' => $passe->id,
+        'date_debut' => now()->subHours(3),
+        'date_fin' => now()->subHours(2),
+    ]);
+
+    prestataireRecherche(['nom_entreprise' => 'Sans créneau']);
+
+    $reponse = chercher(['disponible' => 1])->assertOk();
+    expect(nomsTrouves($reponse))->toEqualCanonicalizing(['Avec créneau libre', 'Verrou expiré']);
+
+    expect(nomsTrouves(chercher()))->toHaveCount(6);
+    expect(nomsTrouves(chercher(['disponible' => 0])))->toHaveCount(6);
+    chercher(['disponible' => 'peut-être'])->assertUnprocessable()->assertJsonValidationErrors('disponible');
+});

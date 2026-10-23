@@ -21,7 +21,7 @@ class RechercheService
     private const ECHAPPEMENT = '!';
 
     /**
-     * @param  array{metier?: ?string, quartier?: ?string, q?: ?string, prix_min?: int|float|string|null, prix_max?: int|float|string|null, note_min?: int|float|string|null, tri?: ?string}  $filtres
+     * @param  array{metier?: ?string, quartier?: ?string, q?: ?string, prix_min?: int|float|string|null, prix_max?: int|float|string|null, note_min?: int|float|string|null, disponible?: ?bool, tri?: ?string}  $filtres
      */
     public function rechercher(array $filtres): LengthAwarePaginator
     {
@@ -65,6 +65,11 @@ class RechercheService
         if (filled($filtres['note_min'] ?? null)) {
             // Même agrégat que note_moyenne (avis non masqués) ; sans avis, la moyenne est NULL donc exclue.
             $requete->whereRaw('(select avg(avis.note) from avis where avis.prestataire_id = prestataires.id and avis.masque_le is null) >= cast(? as decimal(3, 2))', [(string) $filtres['note_min']]);
+        }
+
+        if ($filtres['disponible'] ?? false) {
+            // Au moins un créneau libre (libre, ou verrou expiré) qui commence dans le futur.
+            $requete->whereHas('creneaux', fn (Builder $c) => $c->libres()->aVenir());
         }
 
         $prixMin = $filtres['prix_min'] ?? null;
