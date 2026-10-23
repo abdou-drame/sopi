@@ -203,7 +203,7 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     expect(await screen.findByText('Vidange')).toBeInTheDocument()
     expect(screen.getByText(/Garage Exemple · Awa D\./)).toBeInTheDocument()
-    expect(screen.getByText('Confirmée')).toBeInTheDocument()
+    expect(screen.getAllByText('Confirmée').length).toBeGreaterThan(0)
     expect(await screen.findByText(/4.500\s*FCFA/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Tout voir' })).toHaveAttribute('href', '/reservations')
   })
@@ -213,7 +213,7 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     expect(await screen.findByRole('link', { name: 'Ouvrir les utilisateurs' })).toHaveAttribute('href', '/utilisateurs')
     expect(await screen.findByText('Revenus par métier')).toBeInTheDocument()
-    for (const metier of ['Mécanique', 'Coiffure', 'Pressing']) expect(await screen.findByText(metier)).toBeInTheDocument()
+    for (const metier of ['Mécanique', 'Coiffure', 'Pressing']) expect((await screen.findAllByText(metier)).length).toBeGreaterThan(0)
   })
 
   it('branche la pastille « +N » des prestataires actifs sur le total de la pagination', async () => {
@@ -263,6 +263,25 @@ describe('tableau de bord', () => {
     expect(graphique).toHaveAttribute('data-survol', 'true')
     fireEvent.mouseLeave(graphique.querySelector('svg') as SVGElement)
     expect(graphique).toHaveAttribute('data-survol', 'false')
+  })
+
+  it('montre les réservations par statut et par domaine, avec les nombres réels', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    const statuts = (await screen.findByText('Réservations par statut')).closest('section') as HTMLElement
+    await waitFor(() => expect(statuts).toHaveTextContent(/Terminées*280/))
+    expect(statuts).toHaveTextContent(/En attentes*4/)
+    expect(statuts).toHaveTextContent(/Acceptées*2/)
+    expect(statuts).toHaveTextContent(/Confirmées*10/)
+    expect(statuts).toHaveTextContent(/En courss*1/)
+    expect(statuts).toHaveTextContent(/Refusées*15/)
+    expect(statuts).toHaveTextContent(/Annulées*28/)
+    expect(statuts).not.toHaveTextContent('—')
+    const domaines = screen.getByText('Réservations par domaine').closest('section') as HTMLElement
+    await waitFor(() => expect(domaines).toHaveTextContent(/Mécaniques*150/))
+    expect(domaines).toHaveTextContent(/Coiffures*120/)
+    expect(domaines).toHaveTextContent(/Pressings*70/)
+    expect(domaines).not.toHaveTextContent('—')
   })
 
   it('actualise en lecture seule depuis le rail', async () => {

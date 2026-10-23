@@ -235,6 +235,54 @@ function CarteMetiers({ parMetier }: { parMetier: Revenus['parMetier'] | undefin
   )
 }
 
+const STATUTS_RESERVATION = ['en_attente', 'acceptee', 'confirmee', 'en_cours', 'terminee', 'refusee', 'annulee'] as const
+
+function LigneCompte({ libelle, valeur, point }: { libelle: string; valeur: number | undefined; point?: string }) {
+  return (
+    <li className="flex items-center justify-between gap-3 py-2 text-sm">
+      <span className="inline-flex items-center gap-2 font-medium">
+        {point && <span aria-hidden="true" className="size-1.5 rounded-full" style={{ background: point }} />}
+        {libelle}
+      </span>
+      <span className="font-bold tabular-nums">{valeur === undefined ? ABSENT : formatNombre(valeur)}</span>
+    </li>
+  )
+}
+
+/** Réservations par statut (RF13) : une ligne par statut, avec pastille et nombre. */
+function CarteParStatut({ parStatut }: { parStatut: Record<string, number> | undefined }) {
+  return (
+    <Carte>
+      <div className="text-[15px] leading-[normal] font-bold">Réservations par statut</div>
+      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Toutes les réservations de la plateforme</div>
+      <ul className="mt-3 list-none p-0">
+        {STATUTS_RESERVATION.map((s) => (
+          <LigneCompte key={s} libelle={L.statuts[s]} valeur={parStatut?.[s]} point={POINT_STATUT[s]} />
+        ))}
+      </ul>
+    </Carte>
+  )
+}
+
+/** Réservations par domaine (métier) : une ligne par métier avec son total. */
+function CarteParDomaine({ parDomaine }: { parDomaine: Record<string, { total: number }> | undefined }) {
+  const { data } = useQuery({ queryKey: ['metiers'], queryFn: api.metiers, retry: false })
+  const libelles = new Map((data?.data ?? []).map((m) => [m.code, m.libelle]))
+  const lignes = Object.entries(parDomaine ?? {})
+  return (
+    <Carte>
+      <div className="text-[15px] leading-[normal] font-bold">Réservations par domaine</div>
+      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Total par métier</div>
+      <ul className="mt-3 list-none p-0">
+        {parDomaine === undefined && <LigneCompte libelle={ABSENT} valeur={undefined} />}
+        {lignes.map(([code, d]) => (
+          <LigneCompte key={code} libelle={libelles.get(code) ?? T.domaines[code] ?? code} valeur={d.total} />
+        ))}
+      </ul>
+    </Carte>
+  )
+}
+
 function CarteActivite() {
   const { data } = useQuery({ queryKey: ['activite-reservations'], queryFn: () => api.reservations({ page: 1 }), retry: false })
   const { data: paiements } = useQuery({ queryKey: ['derniers-paiements'], queryFn: api.derniersPaiements, retry: false })
@@ -443,6 +491,10 @@ export default function TableauDeBordPage() {
 
       <div className="flex flex-wrap items-stretch gap-3.5">
         <CarteActivite />
+        <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3.5">
+          <CarteParStatut parStatut={tableau?.reservations.parStatut} />
+          <CarteParDomaine parDomaine={tableau?.reservations.parDomaine} />
+        </div>
       </div>
     </div>
   )
