@@ -38,6 +38,7 @@ class Reservation extends Model
             'statut' => StatutReservation::class,
             'prix_applique' => 'decimal:2',
             'acceptee_le' => 'datetime',
+            'rappel_envoye_le' => 'datetime',
         ];
     }
 

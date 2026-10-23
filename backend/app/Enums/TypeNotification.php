@@ -16,6 +16,7 @@ enum TypeNotification: string
     case ReservationConfirmee = 'reservation_confirmee';
     case ReservationDemarree = 'reservation_demarree';
     case ReservationTerminee = 'reservation_terminee';
+    case RappelRendezVous = 'rappel_rendez_vous';
     case AvisRecu = 'avis_recu';
     case AvisModere = 'avis_modere';
     case LitigeOuvert = 'litige_ouvert';
@@ -67,6 +68,7 @@ enum TypeNotification: string
             self::ReservationConfirmee => 'Votre réservation est confirmée.',
             self::ReservationDemarree => 'Votre prestation a commencé.',
             self::ReservationTerminee => 'Votre prestation est terminée.',
+            self::RappelRendezVous => 'Un rendez-vous approche.',
             self::AvisRecu => 'Un client a laissé un avis sur votre travail.',
             self::AvisModere => "Un de vos avis a été examiné par l'équipe Sopi.",
             self::LitigeOuvert => 'Un litige a été ouvert sur une réservation.',

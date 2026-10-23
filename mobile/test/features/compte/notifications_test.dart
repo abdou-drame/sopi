@@ -110,6 +110,26 @@ void main() {
     expect(destinationNotification(n('type_inconnu', {})), isNull);
   });
 
+  test(
+    'rappel de rendez-vous : icône dédiée et ouverture de la réservation',
+    () {
+      expect(iconeNotification('rappel_rendez_vous'), Icons.alarm_rounded);
+      expect(
+        iconeNotification('rappel_rendez_vous'),
+        isNot(iconeNotification('type_inconnu')),
+      );
+      final rappel = NotificationClient(
+        id: 'n',
+        type: 'rappel_rendez_vous',
+        titre: '',
+        corps: '',
+        dateCreation: _maintenant,
+        donnees: const {'reservationId': 'r'},
+      );
+      expect(destinationNotification(rappel), '/reservations/r');
+    },
+  );
+
   testWidgets('liste : titre, texte, date relative et pastille non lue', (
     tester,
   ) async {

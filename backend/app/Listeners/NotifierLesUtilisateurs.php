@@ -14,6 +14,7 @@ use App\Events\DemandePrestataireAcceptee;
 use App\Events\DemandePrestataireRefusee;
 use App\Events\LitigeCloture;
 use App\Events\LitigeOuvert;
+use App\Events\Reservation\RappelRendezVous;
 use App\Events\Reservation\ReservationAcceptee;
 use App\Events\Reservation\ReservationAnnulee;
 use App\Events\Reservation\ReservationConfirmee;
@@ -157,6 +158,25 @@ class NotifierLesUtilisateurs
                 $r->client, TypeNotification::ReservationTerminee, 'Prestation terminée',
                 "La prestation « {$r->prestation->nom} » chez {$this->entreprise($r)} est terminée. Vous pouvez laisser un avis.",
                 $this->donneesReservation($r),
+            );
+        });
+    }
+
+    /** RF20 : rappel court au client et au prestataire (le prestataire voit le client par son prénom et l'initiale de son nom). */
+    public function surRappelRendezVous(RappelRendezVous $evenement): void
+    {
+        $this->proteger(function () use ($evenement) {
+            $r = $this->charger($evenement->reservation);
+            $donnees = $this->donneesReservation($r);
+            $this->notifications->creer(
+                $r->client, TypeNotification::RappelRendezVous, 'Rappel de rendez-vous',
+                "Rappel : « {$r->prestation->nom} » chez {$this->entreprise($r)} le {$this->date($r)}.",
+                $donnees,
+            );
+            $this->notifications->creer(
+                $r->creneau->prestataire->user, TypeNotification::RappelRendezVous, 'Rappel de rendez-vous',
+                "Rappel : « {$r->prestation->nom} » avec {$this->nomPublicClient($r->client)} le {$this->date($r)}.",
+                $donnees,
             );
         });
     }

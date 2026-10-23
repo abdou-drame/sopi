@@ -66,6 +66,7 @@ endpoints:
           - reservation_confirmee
           - reservation_demarree
           - reservation_terminee
+          - rappel_rendez_vous
           - avis_recu
           - avis_modere
           - litige_ouvert

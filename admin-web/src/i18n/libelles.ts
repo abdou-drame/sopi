@@ -447,6 +447,7 @@ export const L = {
       reservation_confirmee: 'Réservation confirmée',
       reservation_demarree: 'Réservation démarrée',
       reservation_terminee: 'Réservation terminée',
+      rappel_rendez_vous: 'Rappel de rendez-vous',
       avis_recu: 'Avis reçu',
       avis_modere: 'Avis modéré',
       litige_ouvert: 'Litige ouvert',

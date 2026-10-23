@@ -13,6 +13,8 @@ Artisan::command('inspire', function () {
 Schedule::command('sopi:reservations:expirer-sans-reponse')->everyMinute()->withoutOverlapping();
 Schedule::command('sopi:reservations:expirer-impayees')->everyMinute()->withoutOverlapping();
 Schedule::command('sopi:creneaux:liberer-verrous')->everyMinute()->withoutOverlapping();
+// Alertes de rendez-vous (RF20) : rappel unique 2 h avant le créneau.
+Schedule::command('sopi:reservations:rappeler')->everyMinute()->withoutOverlapping();
 
 // Reprise des remboursements en échec (M6.5), toutes les 5 minutes.
 Schedule::command('sopi:paiements:rembourser-dus')->everyFiveMinutes()->withoutOverlapping();

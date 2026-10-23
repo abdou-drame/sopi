@@ -89,6 +89,7 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(ReservationExpiree::class, [NotifierLesUtilisateurs::class, 'surReservationExpiree']);
         Event::listen(ReservationRefusee::class, [NotifierLesUtilisateurs::class, 'surReservationRefusee']);
         Event::listen(ReservationTerminee::class, [NotifierLesUtilisateurs::class, 'surReservationTerminee']);
+        Event::listen(RappelRendezVous::class, [NotifierLesUtilisateurs::class, 'surRappelRendezVous']);
         Event::listen(SanctionLevee::class, [NotifierLesUtilisateurs::class, 'surSanctionLevee']);
         Event::listen(SanctionPosee::class, [NotifierLesUtilisateurs::class, 'surSanctionPosee']);
 

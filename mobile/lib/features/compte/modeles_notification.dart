@@ -93,7 +93,9 @@ String? destinationNotification(
   final reservation = n.donnees['reservationId'];
   if (prestataire) {
     // Côté prestataire, seules les notifications de réservation ont un écran (le détail de la demande).
-    return n.type.startsWith('reservation_') && reservation != null
+    return (n.type.startsWith('reservation_') ||
+                n.type == 'rappel_rendez_vous') &&
+            reservation != null
         ? Chemins.reservationPrestataire(reservation)
         : null;
   }
@@ -104,7 +106,8 @@ String? destinationNotification(
   if (n.type.startsWith('litige_') && litige != null) {
     return Chemins.signalement(litige);
   }
-  if (n.type.startsWith('reservation_') && reservation != null) {
+  if ((n.type.startsWith('reservation_') || n.type == 'rappel_rendez_vous') &&
+      reservation != null) {
     return Chemins.detailReservation(reservation);
   }
   return null;
@@ -117,6 +120,7 @@ IconData iconeNotification(String type) => switch (type) {
   'reservation_refusee' || 'reservation_annulee' => Icons.event_busy_outlined,
   'reservation_expiree' => Icons.schedule_rounded,
   'reservation_demarree' => Icons.play_arrow_rounded,
+  'rappel_rendez_vous' => Icons.alarm_rounded,
   'reservation_terminee' ||
   'avis_recu' ||
   'avis_modere' => Icons.star_outline_rounded,
