@@ -1,6 +1,7 @@
-import { cleanup, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { aujourdhui } from '../lib/format'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
 
 // Réponses conformes aux exemples de openapi.yaml (valeurs fictives).
@@ -49,11 +50,20 @@ const REVENUS = {
   periode: { debut: '2030-01-01', fin: '2030-01-30', regroupement: 'jour' },
   totaux: { revenus: 3000, acomptesEncaisses: 30000, remboursements: 1500, retraitsVerses: 24000 },
   soldePrestataires: 50000,
-  series: [],
+  series: [
+    { debut: '2030-01-01', fin: '2030-01-01', revenus: 1000, acomptesEncaisses: 0, remboursements: 0, retraitsVerses: 0 },
+    { debut: '2030-01-02', fin: '2030-01-02', revenus: 2500, acomptesEncaisses: 0, remboursements: 0, retraitsVerses: 0 },
+    { debut: '2030-01-03', fin: '2030-01-03', revenus: 0, acomptesEncaisses: 0, remboursements: 0, retraitsVerses: 0 },
+  ],
   parMetier: [
     { metier: 'Coiffure', revenus: 2000 },
     { metier: 'Mécanique', revenus: 1000 },
   ],
+}
+// Période précédente (les 30 jours d'avant) : mêmes jours, autres montants.
+const REVENUS_PRECEDENTS = {
+  ...REVENUS,
+  series: [400, 800, 300].map((revenus, i) => ({ ...REVENUS.series[i], revenus })),
 }
 const PAIEMENT = {
   id: '0198a1b2-1111-7000-8000-000000000001',
@@ -92,7 +102,8 @@ const toutes = {
   ...base,
   'GET /admin/alertes': { corps: ALERTES_VIDES },
   'GET /admin/tableau-de-bord': { corps: TABLEAU },
-  'GET /admin/revenus': { corps: REVENUS },
+  // La période affichée se termine aujourd'hui ; la période précédente se termine avant son début.
+  'GET /admin/revenus': ({ url }) => ({ corps: url.searchParams.get('fin') === aujourdhui() ? REVENUS : REVENUS_PRECEDENTS }),
   'GET /admin/paiements': { corps: page([PAIEMENT]) },
   'GET /admin/reservations': { corps: page([RESERVATION]) },
   'GET /admin/utilisateurs': { corps: page([PRESTATAIRE]) },
@@ -107,13 +118,21 @@ describe('tableau de bord', () => {
     localStorage.clear()
   })
 
-  it('montre les revenus par métier réels, du plus élevé au plus bas', async () => {
+  it('trace la courbe des revenus réels et donne, au survol, la valeur du jour et celle de la période précédente', async () => {
     simulerApi(toutes)
     afficherApplication('/')
-    const carte = (await screen.findByText('Revenus par métier')).closest('section') as HTMLElement
-    await waitFor(() => expect(carte).toHaveTextContent(/Coiffure\s*2\D000 FCFA/))
-    expect(carte).toHaveTextContent(/Mécanique\s*1\D000 FCFA/)
-    expect(carte).toHaveTextContent(/Pressing\s*0 FCFA/)
+    const courbe = await screen.findByRole('img', { name: /Commissions Sopi par jour/ })
+    await waitFor(() => expect(courbe).toHaveAttribute('aria-label', expect.stringMatching(/2\D500 FCFA/)))
+    expect(courbe).toHaveAttribute('aria-label', expect.stringMatching(/1\D000 FCFA/))
+    courbe.getBoundingClientRect = () => ({ left: 0, top: 0, right: 360, bottom: 176, width: 360, height: 176, x: 0, y: 0, toJSON: () => ({}) })
+    // Milieu du graphique : le deuxième jour sur trois.
+    fireEvent.mouseMove(courbe, { clientX: 180 })
+    const bulle = courbe.querySelector('.courbe-bulle') as HTMLElement
+    expect(bulle).toHaveTextContent(/2 janv\./)
+    expect(bulle).toHaveTextContent(/2\D500 FCFA/)
+    expect(bulle).toHaveTextContent(/800 FCFA/)
+    fireEvent.mouseLeave(courbe)
+    expect(courbe).toHaveAttribute('data-survol', 'false')
   })
 
   it('affiche l’en-tête de bienvenue avec le prénom de l’administrateur', async () => {
@@ -204,12 +223,11 @@ describe('tableau de bord', () => {
     expect(screen.getByRole('link', { name: 'Tout voir' })).toHaveAttribute('href', '/reservations')
   })
 
-  it('montre les prestataires actifs et les métiers proposés', async () => {
+  it('montre les prestataires actifs et le titre de la carte des revenus', async () => {
     simulerApi(toutes)
     afficherApplication('/')
     expect(await screen.findByRole('link', { name: 'Ouvrir les utilisateurs' })).toHaveAttribute('href', '/utilisateurs')
-    expect(await screen.findByText('Revenus par métier')).toBeInTheDocument()
-    for (const metier of ['Mécanique', 'Coiffure', 'Pressing']) expect(await screen.findByText(metier)).toBeInTheDocument()
+    expect(await screen.findByText('Revenus Sopi')).toBeInTheDocument()
   })
 
   it('branche la pastille « +N » des prestataires actifs sur le total de la pagination', async () => {

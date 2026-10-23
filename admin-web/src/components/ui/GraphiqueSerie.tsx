@@ -18,7 +18,7 @@ const BASE = H - MARGE.bas;
 const DIAMETRE_POINT = 10;
 
 /** Arrondit le maximum à une valeur « ronde » pour que la plus haute forme ne touche pas le haut. */
-function maximumRond(max: number): number {
+export function maximumRond(max: number): number {
   if (max <= 0) return 1;
   const puissance = 10 ** Math.floor(Math.log10(max));
   const n = max / puissance;
@@ -26,7 +26,7 @@ function maximumRond(max: number): number {
 }
 
 /** Courbe lisse sans dépassement : entre deux points, les tangentes sont horizontales. */
-function trace(points: [number, number][]): string {
+export function trace(points: [number, number][]): string {
   if (points.length === 0) return "";
   return points.reduce((d, [x, y], i) => {
     if (i === 0) return `M${x},${y}`;

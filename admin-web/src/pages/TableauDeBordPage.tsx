@@ -7,6 +7,7 @@ import type { Revenus } from '../api/types'
 import { lienDeLAlerte, useAlertes } from '../api/useAlertes'
 import { useAuth } from '../auth/AuthContext'
 import NombreAnime from '../components/ui/NombreAnime'
+import CourbeRevenus from '../components/ui/CourbeRevenus'
 import GraphiqueSerie, { type ModeSerie } from '../components/ui/GraphiqueSerie'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Avatar, Carte, FOND_MARQUE, TitrePage } from '../design/composants'
@@ -27,8 +28,6 @@ const POINT_STATUT: Record<string, string> = {
   refusee: '#e5484d',
   annulee: '#9aa0b2',
 }
-
-const COULEURS_METIER = ['#2D6A4F', '#52a37c', '#a7d4bf']
 
 function LienFleche({ vers, libelle }: { vers: string; libelle: string }) {
   return (
@@ -216,33 +215,33 @@ function CarteDossiers() {
   )
 }
 
-function CarteMetiers({ parMetier }: { parMetier: Revenus['parMetier'] | undefined }) {
-  const { data } = useQuery({ queryKey: ['metiers'], queryFn: api.metiers, retry: false })
-  const montants = new Map((parMetier ?? []).map((l) => [l.metier, l.revenus]))
-  const metiers = (data?.data ?? [])
-    .filter((m) => m.actif || montants.has(m.code))
-    .map((m) => ({ ...m, revenus: parMetier === undefined ? undefined : (montants.get(m.code) ?? 0) }))
-    .sort((a, b) => (b.revenus ?? 0) - (a.revenus ?? 0))
-    .slice(0, 3)
-  const maximum = Math.max(1, ...metiers.map((m) => m.revenus ?? 0))
+function CarteRevenus({ debut, revenus }: { debut: string; revenus: Revenus | undefined }) {
+  // Période précédente : les 30 jours juste avant, alignés jour pour jour sur la période affichée.
+  const debutPrecedent = ajouterJours(debut, -30)
+  const finPrecedent = ajouterJours(debut, -1)
+  const { data: precedent } = useQuery({
+    queryKey: ['tableau-de-bord-revenus', debutPrecedent, finPrecedent],
+    queryFn: () => api.revenus({ debut: debutPrecedent, fin: finPrecedent, regroupement: 'jour' }),
+    retry: false,
+  })
+  // Tant que les données n'arrivent pas, les 30 jours restent à zéro : la courbe monte ensuite depuis la base.
+  const jours = revenus?.series.map((p) => p.debut.slice(0, 10)) ?? Array.from({ length: 30 }, (_, i) => ajouterJours(debut, i))
+  const points = jours.map((jour, i) => ({
+    libelle: formatJourCalendaire(jour, true),
+    valeur: revenus?.series[i]?.revenus ?? 0,
+    precedente: precedent?.series[i]?.revenus ?? 0,
+  }))
   return (
     <Carte>
-      <div className="text-[15px] leading-[normal] font-bold">Revenus par métier</div>
-      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Commissions Sopi, 30 derniers jours</div>
-      {metiers.map((m, i) => (
-        <div key={m.id} className="mt-3">
-          <div className="flex justify-between text-xs leading-[normal]">
-            <span className="font-semibold">{m.libelle}</span>
-            <span className="text-[#6b7287] tabular-nums">{m.revenus === undefined ? ABSENT : `${formatNombre(m.revenus)} FCFA`}</span>
-          </div>
-          <div className="mt-1.5 h-2.5 rounded-full bg-[#f3f4f7]">
-            <div
-              className="barre-metier h-full rounded-full"
-              style={{ width: `${Math.round(((m.revenus ?? 0) / maximum) * 100)}%`, background: COULEURS_METIER[i] }}
-            />
-          </div>
-        </div>
-      ))}
+      <div className="text-[15px] leading-[normal] font-bold">Revenus Sopi</div>
+      <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Commissions par jour, 30 derniers jours</div>
+      <CourbeRevenus
+        description="Commissions Sopi par jour"
+        points={points}
+        libelleSerie="Commissions"
+        libellePrecedente="30 jours précédents"
+        formatValeur={(v) => `${formatNombre(v)} FCFA`}
+      />
     </Carte>
   )
 }
@@ -448,7 +447,7 @@ export default function TableauDeBordPage() {
           <CarteLitiges />
         </div>
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3.5">
-          <CarteMetiers parMetier={data?.parMetier} />
+          <CarteRevenus debut={debut} revenus={data} />
           <CartePrestataires />
         </div>
       </div>
