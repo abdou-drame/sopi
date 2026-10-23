@@ -128,6 +128,11 @@ class DepotPrestataire {
     await _dio.delete<Object?>('/prestataire/photos/$id');
   }
 
+  /// Rendez-vous du jour, terminées du mois et planning du jour (`GET /prestataire/tableau-de-bord`).
+  Future<TableauPrestataire> tableau() async => TableauPrestataire.depuisJson(
+    await _lire('/prestataire/tableau-de-bord'),
+  );
+
   /// Une page de demandes pour un onglet de la liste (statut ou groupe selon l'onglet).
   Future<PageDemandes> demandes(OngletDemandes onglet, {int page = 1}) async {
     final corps = await _lire(
@@ -305,6 +310,13 @@ final demandesATraiterProvider = FutureProvider.autoDispose<PageDemandes>(
   (ref) =>
       ref.watch(depotPrestataireProvider).demandes(OngletDemandes.aTraiter),
 );
+
+/// Chiffres et planning du jour du tableau de bord prestataire.
+final tableauPrestataireProvider =
+    FutureProvider.autoDispose<TableauPrestataire>(
+      retry: sansRelance,
+      (ref) => ref.watch(depotPrestataireProvider).tableau(),
+    );
 
 /// Une demande relue à la demande (détail).
 final detailDemandeProvider = FutureProvider.autoDispose

@@ -326,7 +326,7 @@ class _CorpsJour extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 10),
               child: Apparition.indexee(
                 index: i,
-                child: _LigneRendezVous(demande: rendezVous[i]),
+                child: LigneRendezVous(demande: rendezVous[i]),
               ),
             ),
           if (etat.chargementSuite)
@@ -379,8 +379,8 @@ class _CorpsJour extends StatelessWidget {
 }
 
 /// Ligne d'un rendez-vous : heure et durée, trait de couleur, client, prestation et prix, statut.
-class _LigneRendezVous extends StatelessWidget {
-  const _LigneRendezVous({required this.demande});
+class LigneRendezVous extends StatelessWidget {
+  const LigneRendezVous({super.key, required this.demande});
 
   final DemandeReservation demande;
 
@@ -460,7 +460,7 @@ class _LigneRendezVous extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      _BadgeStatut(statut: d.statut),
+                      BadgeStatutReservation(statut: d.statut),
                     ],
                   ),
                 ),
@@ -473,8 +473,8 @@ class _LigneRendezVous extends StatelessWidget {
   }
 }
 
-class _BadgeStatut extends StatelessWidget {
-  const _BadgeStatut({required this.statut});
+class BadgeStatutReservation extends StatelessWidget {
+  const BadgeStatutReservation({super.key, required this.statut});
 
   final StatutReservation statut;
 

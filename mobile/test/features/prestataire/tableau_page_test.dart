@@ -14,11 +14,13 @@ Map<String, Simulee> _routes({
   int? total,
   num solde = 42500,
   int nonLues = 0,
+  Map<String, Object?>? tableau,
 }) {
   final liste = demandes ?? [demandeApi()];
   return {
     'GET /me': Simulee(200, utilisateurPrestataire()),
     'GET /prestataire/solde': Simulee(200, {'solde': solde}),
+    'GET /prestataire/tableau-de-bord': Simulee(200, tableau ?? tableauApi()),
     'GET /prestataire/reservations': Simulee(
       200,
       pageDemandesApi(liste, total: total),
@@ -80,6 +82,91 @@ void main() {
         (r) => r.path == '/prestataire/reservations',
       );
       expect(liste.queryParameters['statut'], 'en_attente');
+    });
+
+    testWidgets('trois indicateurs et planning du jour', (tester) async {
+      _vue390(tester);
+      final serveur = AdaptateurSimule(
+        _routes(
+          total: 3,
+          tableau: tableauApi(
+            rendezVous: 2,
+            terminees: 7,
+            planning: [
+              demandeApi(
+                id: 'p-1',
+                statut: 'confirmee',
+                prenom: 'Moussa',
+                initiale: 'K',
+                prestation: 'Vidange',
+                debut: '2026-10-23T09:00:00+00:00',
+                fin: '2026-10-23T10:00:00+00:00',
+              ),
+              demandeApi(
+                id: 'p-2',
+                statut: 'en_cours',
+                prenom: 'Awa',
+                initiale: 'D',
+                prestation: 'Tresses',
+                debut: '2026-10-23T11:00:00+00:00',
+                fin: '2026-10-23T12:30:00+00:00',
+                duree: 90,
+              ),
+            ],
+          ),
+        ),
+      );
+      await lancerAcces(tester, serveur, jeton: 'jeton');
+      await passerTransition(tester);
+
+      expect(find.text('Demandes à traiter'), findsOneWidget);
+      expect(find.text('Rendez-vous aujourd’hui'), findsOneWidget);
+      expect(find.text('Terminées ce mois'), findsOneWidget);
+      expect(
+        tester.getSize(find.byKey(const ValueKey('compteur-a-traiter'))).width,
+        greaterThan(0),
+      );
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('compteur-rdv-aujourdhui')))
+            .data,
+        '2',
+      );
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('compteur-terminees-mois')))
+            .data,
+        '7',
+      );
+      expect(find.text('Planning du jour'), findsOneWidget);
+      expect(find.text('Agenda'), findsOneWidget);
+      expect(find.text('Moussa K.'), findsOneWidget);
+      expect(find.text('Awa D.'), findsOneWidget);
+      expect(find.text('Confirmée'), findsOneWidget);
+      expect(find.text('En cours'), findsOneWidget);
+      expect(find.text('Aucun rendez-vous aujourd’hui'), findsNothing);
+    });
+
+    testWidgets('planning vide : message dédié', (tester) async {
+      _vue390(tester);
+      await lancerAcces(
+        tester,
+        AdaptateurSimule(
+          _routes(tableau: tableauApi(rendezVous: 0, terminees: 0)),
+        ),
+        jeton: 'jeton',
+      );
+      await passerTransition(tester);
+      expect(find.text('Aucun rendez-vous aujourd’hui'), findsOneWidget);
+    });
+
+    testWidgets('le lien Agenda ouvre l’agenda', (tester) async {
+      _vue390(tester);
+      await lancerAcces(tester, AdaptateurSimule(_routes()), jeton: 'jeton');
+      await passerTransition(tester);
+      await tester.tap(find.text('Agenda'));
+      await passerTransition(tester);
+      expect(cheminCourant(tester), Chemins.agenda);
     });
 
     testWidgets('le bouton Retirer ouvre l’écran de retrait', (tester) async {
@@ -186,6 +273,8 @@ void main() {
       _vue390(tester);
       await lancerAcces(tester, AdaptateurSimule(_routes()), jeton: 'jeton');
       await passerTransition(tester);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -800));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.tap(find.text('Refuser'));
       await passerTransition(tester);
       expect(cheminCourant(tester), Chemins.refusReservation('r-1'));
@@ -203,6 +292,8 @@ void main() {
       final serveur = AdaptateurSimule(routes);
       await lancerAcces(tester, serveur, jeton: 'jeton');
       await passerTransition(tester);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -800));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.tap(find.text('Accepter'));
       await passerTransition(tester);
       expect(

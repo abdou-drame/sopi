@@ -14,6 +14,7 @@ import '../../core/widgets/boutons.dart';
 import '../auth/session.dart';
 import '../reservation/depot_reservation.dart';
 import '../reservation/widgets/composants.dart';
+import 'agenda_page.dart' show LigneRendezVous;
 import 'depot_prestataire.dart';
 import 'widgets/composants_prestataire.dart';
 
@@ -51,12 +52,14 @@ class _TableauPageState extends ConsumerState<TableauPage>
       ref.invalidate(notificationsNonLuesProvider);
       ref.invalidate(soldeProvider);
       ref.invalidate(demandesATraiterProvider);
+      ref.invalidate(tableauPrestataireProvider);
     }
   }
 
   Future<void> _actualiser() async {
     ref.invalidate(soldeProvider);
     ref.invalidate(demandesATraiterProvider);
+    ref.invalidate(tableauPrestataireProvider);
     ref.invalidate(notificationsNonLuesProvider);
     try {
       await ref.read(demandesATraiterProvider.future);
@@ -303,6 +306,8 @@ class _CorpsTableau extends ConsumerWidget {
     final theme = Theme.of(context);
     final demandes = ref.watch(demandesATraiterProvider);
     final page = demandes.asData?.value;
+    final tableau = ref.watch(tableauPrestataireProvider);
+    final chiffres = tableau.asData?.value;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 36, 16, 0),
@@ -311,48 +316,36 @@ class _CorpsTableau extends ConsumerWidget {
         children: [
           ApparitionApresEntete(
             rang: 2,
-            child: Container(
-              height: 88,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: CouleursSopi.blanc,
-                borderRadius: BorderRadius.circular(22),
-                boxShadow: OmbresSopi.carte,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Demandes à traiter',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontSize: 11,
-                      color: CouleursSopi.texteSecondaire,
-                    ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _CarteIndicateur(
+                    libelle: 'Demandes à traiter',
+                    cleValeur: const ValueKey('compteur-a-traiter'),
+                    valeur: page?.pagination.total,
+                    erreur: demandes.hasError,
+                    couleur: CouleursSopi.bleu,
                   ),
-                  if (page != null)
-                    Text(
-                      '${page.pagination.total}',
-                      key: const ValueKey('compteur-a-traiter'),
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: CouleursSopi.bleu,
-                      ),
-                    )
-                  else if (demandes.hasError)
-                    Text(
-                      '—',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: CouleursSopi.texteSecondaire,
-                      ),
-                    )
-                  else
-                    const Squelette(largeur: 40, hauteur: 26),
-                ],
-              ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _CarteIndicateur(
+                    libelle: 'Rendez-vous aujourd’hui',
+                    cleValeur: const ValueKey('compteur-rdv-aujourdhui'),
+                    valeur: chiffres?.rendezVousAujourdhui,
+                    erreur: tableau.hasError,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _CarteIndicateur(
+                    libelle: 'Terminées ce mois',
+                    cleValeur: const ValueKey('compteur-terminees-mois'),
+                    valeur: chiffres?.terminesCeMois,
+                    erreur: tableau.hasError,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 24),
@@ -360,6 +353,43 @@ class _CorpsTableau extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ApparitionApresEntete(
               rang: 3,
+              child: TitreSection(
+                titre: 'Planning du jour',
+                lien: 'Agenda',
+                onLien: () => context.go(Chemins.agenda),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (tableau.hasError && chiffres == null)
+            _BlocErreur(
+              message: ErreurApi.depuis(tableau.error!).message,
+              onReessayer: () => ref.invalidate(tableauPrestataireProvider),
+            )
+          else if (chiffres == null)
+            const Squelette(hauteur: 88, rayon: 24)
+          else if (chiffres.planningDuJour.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                'Aucun rendez-vous aujourd’hui',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: CouleursSopi.texteSecondaire,
+                ),
+              ),
+            )
+          else
+            for (final (i, d) in chiffres.planningDuJour.indexed)
+              Padding(
+                padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
+                child: LigneRendezVous(demande: d),
+              ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: ApparitionApresEntete(
+              rang: 4,
               child: TitreSection(
                 titre: 'Nouvelles demandes',
                 lien: 'Tout voir',
@@ -392,7 +422,7 @@ class _CorpsTableau extends ConsumerWidget {
               Padding(
                 padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
                 child: ApparitionApresEntete(
-                  rang: 4 + i,
+                  rang: 5 + i,
                   child: CarteNouvelleDemande(demande: d),
                 ),
               ),
@@ -441,6 +471,69 @@ class _BlocErreur extends StatelessWidget {
           onPressed: onReessayer,
         ),
       ],
+    );
+  }
+}
+
+/// Carte d'indicateur : libellé en haut, valeur en bas (squelette pendant le chargement, « — » en cas d'erreur).
+class _CarteIndicateur extends StatelessWidget {
+  const _CarteIndicateur({
+    required this.libelle,
+    required this.cleValeur,
+    required this.valeur,
+    required this.erreur,
+    this.couleur = CouleursSopi.texte,
+  });
+
+  final String libelle;
+  final Key cleValeur;
+  final int? valeur;
+  final bool erreur;
+  final Color couleur;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style = theme.textTheme.headlineMedium?.copyWith(
+      fontSize: 26,
+      fontWeight: FontWeight.w800,
+    );
+    return Container(
+      height: 96,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: OmbresSopi.carte,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            libelle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontSize: 11,
+              color: CouleursSopi.texteSecondaire,
+            ),
+          ),
+          if (valeur != null)
+            Text(
+              '$valeur',
+              key: cleValeur,
+              style: style?.copyWith(color: couleur),
+            )
+          else if (erreur)
+            Text(
+              '—',
+              style: style?.copyWith(color: CouleursSopi.texteSecondaire),
+            )
+          else
+            const Squelette(largeur: 40, hauteur: 26),
+        ],
+      ),
     );
   }
 }

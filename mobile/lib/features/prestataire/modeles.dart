@@ -263,3 +263,30 @@ class BilanIndisponibilite {
     );
   }
 }
+
+/// Chiffres du tableau de bord (`GET /prestataire/tableau-de-bord`) : rendez-vous du jour, terminées du mois et planning du jour.
+class TableauPrestataire {
+  const TableauPrestataire({
+    required this.rendezVousAujourdhui,
+    required this.terminesCeMois,
+    required this.planningDuJour,
+  });
+
+  final int rendezVousAujourdhui;
+  final int terminesCeMois;
+  final List<DemandeReservation> planningDuJour;
+
+  factory TableauPrestataire.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    final planning = j['planningDuJour'];
+    return TableauPrestataire(
+      rendezVousAujourdhui: _nombre(j['rendezVousAujourdhui'])?.toInt() ?? 0,
+      terminesCeMois: _nombre(j['terminesCeMois'])?.toInt() ?? 0,
+      planningDuJour: [
+        if (planning is List)
+          for (final e in planning)
+            if (e is Map) DemandeReservation.depuisJson(e),
+      ],
+    );
+  }
+}

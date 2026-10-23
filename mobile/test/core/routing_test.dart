@@ -165,7 +165,7 @@ void main() {
         await lancer(tester, serveur, jeton: 'abc');
         expect(chemin(tester), Chemins.tableau);
 
-        await tester.tap(find.bySemanticsLabel('Agenda'));
+        await tester.tap(find.bySemanticsLabel('Agenda').last);
         await tester.pumpAndSettle();
         expect(chemin(tester), Chemins.agenda);
 

@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\V1\Prestataire\PhotoAtelierController;
 use App\Http\Controllers\Api\V1\Prestataire\PrestationController;
 use App\Http\Controllers\Api\V1\Prestataire\ReservationController as PrestataireReservationController;
 use App\Http\Controllers\Api\V1\Prestataire\RetraitController;
+use App\Http\Controllers\Api\V1\Prestataire\TableauDeBordController as PrestataireTableauDeBordController;
 use App\Http\Controllers\Api\V1\ProfilController;
 use App\Http\Controllers\Api\V1\QuartierController;
 use App\Http\Controllers\Api\V1\SuiviDossierController;
@@ -143,6 +144,8 @@ Route::prefix('v1')->group(function () {
 
     // Espace prestataire : jeton Sanctum + rôle prestataire (alias 'prestataire'). Aucune route de suppression.
     Route::middleware(['auth:sanctum', 'prestataire'])->prefix('prestataire')->group(function () {
+        Route::get('/tableau-de-bord', PrestataireTableauDeBordController::class);
+
         Route::get('/prestations', [PrestationController::class, 'index']);
         Route::post('/prestations', [PrestationController::class, 'store']);
         Route::patch('/prestations/{id}', [PrestationController::class, 'update'])->whereUuid('id');

@@ -71,3 +71,13 @@ Map<String, Object?> utilisateurPrestataire({String prenom = 'Fatou'}) => {
     },
   },
 };
+
+Map<String, Object?> tableauApi({
+  int rendezVous = 2,
+  int terminees = 5,
+  List<Map<String, Object?>> planning = const [],
+}) => {
+  'rendezVousAujourdhui': rendezVous,
+  'terminesCeMois': terminees,
+  'planningDuJour': planning,
+};
