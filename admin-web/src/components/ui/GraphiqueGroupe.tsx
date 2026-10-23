@@ -42,7 +42,7 @@ function compact(v: number): string {
 }
 
 /**
- * Colonnes groupées par période (une fine colonne par série, coiffée d'un trait de la couleur de la série), sur une grille
+ * Colonnes groupées par période (une fine colonne par série, dans la couleur de la série et coiffée d'un trait plus franc), sur une grille
  * graduée, avec une infobulle qui détaille la période survolée (la dernière par défaut, comme sur la vidéo de référence).
  * Les colonnes poussent depuis la base en cascade de gauche à droite à l'arrivée du graphique, puis glissent vers leurs
  * nouvelles valeurs quand les données changent. Sans animation possible (mouvement réduit), tout est posé d'emblée.
@@ -102,10 +102,12 @@ export default function GraphiqueGroupe({ description, series, groupes, formatVa
       </div>
       <svg viewBox={`0 0 ${L} ${H}`} className="mt-1 block h-auto w-full" aria-hidden="true" onMouseLeave={() => setSurvol(null)}>
         <defs>
-          <linearGradient id="groupe-colonne" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#f2f4f7" />
-            <stop offset="100%" stopColor="#fafbfc" />
-          </linearGradient>
+          {series.map((s, i) => (
+            <linearGradient key={s.libelle} id={`groupe-colonne-${i}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={s.couleur} stopOpacity="0.95" />
+              <stop offset="100%" stopColor={s.couleur} stopOpacity="0.45" />
+            </linearGradient>
+          ))}
         </defs>
         {graduations.map((g) => (
           <g key={g.y}>
@@ -140,9 +142,7 @@ export default function GraphiqueGroupe({ description, series, groupes, formatVa
                   width={LARGEUR_BARRE}
                   height={HAUTEUR_UTILE}
                   rx={1.5}
-                  fill="url(#groupe-colonne)"
-                  stroke="#e6e9ef"
-                  strokeWidth={0.8}
+                  fill={`url(#groupe-colonne-${si})`}
                   style={{
                     transformOrigin: `${x + LARGEUR_BARRE / 2}px ${BASE}px`,
                     transform: `scaleY(${ratio})`,
