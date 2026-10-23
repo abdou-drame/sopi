@@ -62,6 +62,14 @@ export default function GraphiqueSerie({
     return () => cancelAnimationFrame(image);
   }, [pret]);
 
+  // Le décalage entre formes ne sert qu'à l'arrivée du graphique ; ensuite les transitions (période, mode) restent simultanées.
+  const [entree, setEntree] = useState(anime);
+  useEffect(() => {
+    if (!entree) return;
+    const minuteur = setTimeout(() => setEntree(false), 1000);
+    return () => clearTimeout(minuteur);
+  }, [entree]);
+
   const [survol, setSurvol] = useState<number | null>(null);
   const maxValeur = Math.max(0, ...donnees.map((d) => d.valeur));
   const max = maximumRond(maxValeur);
@@ -197,7 +205,10 @@ export default function GraphiqueSerie({
                 }
                 stroke="var(--color-marque)"
                 strokeWidth={courbe ? 2.5 : 0}
-                style={{ opacity: courbe || f.valeur > 0 ? 1 : 0 }}
+                style={{
+                  opacity: courbe || f.valeur > 0 ? 1 : 0,
+                  transitionDelay: entree ? `${i * 45}ms` : undefined,
+                }}
               />
             );
           })}

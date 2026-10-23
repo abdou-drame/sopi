@@ -138,8 +138,6 @@ html.maquette .fond-sopi {
   color: #12172b;
 }
 .mq-nvi[aria-current="page"] {
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(18 23 43 / 0.1);
   color: #12172b;
   font-weight: 700;
 }
@@ -314,4 +312,23 @@ html.maquette body {
   .mq-sk {
     animation: none;
   }
+}
+
+/* Barre du haut : la pastille de l'écran actif glisse d'un écran à l'autre (le premier placement est immédiat). */
+.mq-nvi-pastille {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 36px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(18 23 43 / 0.1);
+  opacity: 0;
+  pointer-events: none;
+}
+.mq-nvi-pastille[data-glisse] {
+  transition: transform var(--duree-lente, 300ms) var(--ease-sortie, ease-out), width var(--duree-lente, 300ms) var(--ease-sortie, ease-out), opacity var(--duree-rapide, 150ms) ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mq-nvi-pastille[data-glisse] { transition: none; }
 }

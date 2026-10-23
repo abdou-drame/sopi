@@ -66,6 +66,29 @@ function BarreDuHaut() {
   const total = data?.total ?? 0
   const compteurs = compteursParEcran(data?.alertes ?? [])
   const initiales = `${utilisateur?.prenom?.charAt(0) ?? 'A'}${utilisateur?.nom?.charAt(0) ?? ''}`.toUpperCase()
+  const { pathname } = useLocation()
+  const barre = useRef<HTMLDivElement>(null)
+  const [cible, setCible] = useState<{ x: number; l: number } | null>(null)
+  const [glisse, setGlisse] = useState(false)
+  const signature = Object.entries(compteurs).join('|')
+
+  // La pastille se place sous l'écran actif (rien si la page n'est pas dans la barre) ; le premier placement est immédiat, les suivants glissent.
+  const mesurer = useCallback(() => {
+    const actif = barre.current?.querySelector<HTMLElement>('.mq-nvi[aria-current="page"]')
+    setCible(actif ? { x: actif.offsetLeft, l: actif.offsetWidth } : null)
+  }, [])
+  useLayoutEffect(mesurer, [mesurer, pathname, signature])
+  useEffect(() => {
+    window.addEventListener('resize', mesurer)
+    return () => window.removeEventListener('resize', mesurer)
+  }, [mesurer])
+  useEffect(() => {
+    if (cible && !glisse) {
+      const image = requestAnimationFrame(() => setGlisse(true))
+      return () => cancelAnimationFrame(image)
+    }
+  }, [cible, glisse])
+
   return (
     <header className="box-border flex flex-wrap items-center gap-x-5 gap-y-3 rounded-full bg-white py-2.5 pr-3.5 pl-[22px]">
       <Link to="/" aria-label={L.marque} className="flex items-center gap-2.5">
@@ -75,7 +98,14 @@ function BarreDuHaut() {
         </span>
       </Link>
       <nav aria-label={L.menu.titre} className="flex min-w-0 flex-[1_1_auto] justify-center">
-        <div className="flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-[#f3f4f7] p-1">
+        <div ref={barre} className="relative flex max-w-full gap-0.5 overflow-x-auto rounded-full bg-[#f3f4f7] p-1">
+          <span
+            aria-hidden="true"
+            data-testid="pastille-nav"
+            data-glisse={glisse || undefined}
+            className="mq-nvi-pastille"
+            style={cible ? { opacity: 1, width: cible.l, transform: `translateX(${cible.x}px)` } : undefined}
+          />
           {NAV.map((e) => {
             const compteur = compteurs[e.chemin] ?? 0
             const nombre = e === DOSSIERS || e === LITIGES
@@ -273,7 +303,7 @@ export default function Coque() {
           <BarreDuHaut />
           <div className="flex items-stretch gap-3.5">
             <Rail />
-            <main id="contenu" tabIndex={-1} className="flex min-w-0 flex-1 flex-col gap-4 outline-none">
+            <main id="contenu" tabIndex={-1} className="relative flex min-w-0 flex-1 flex-col gap-4 outline-none">
               <div ref={setHote} className="empty:hidden px-2" />
               <PageTransition>
                 <Outlet />

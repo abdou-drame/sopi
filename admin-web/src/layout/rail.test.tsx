@@ -96,4 +96,14 @@ describe('rail de gauche', () => {
     }
     expect(rail.getAllByTestId('point-alerte')).toHaveLength(2)
   })
+
+  it('vidéo de référence : une seule pastille dans la barre du haut, et un voile vert seulement quand on change d’écran', async () => {
+    const rail = await ouvrirRail('/')
+    expect(screen.getAllByTestId('pastille-nav')).toHaveLength(1)
+    expect(screen.queryByTestId('voile-page')).not.toBeInTheDocument()
+    await userEvent.click(rail.getByRole('link', { name: /^Litiges/ }))
+    expect(await screen.findByTestId('voile-page')).toBeInTheDocument()
+    expect(screen.getAllByTestId('pastille-nav')).toHaveLength(1)
+    expect(document.querySelector('h1.titre-flou')).not.toBeNull()
+  })
 })
