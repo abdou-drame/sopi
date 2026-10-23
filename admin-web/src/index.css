@@ -636,48 +636,14 @@ tr[data-selectionnee='true'] > td { background-color: #eef3ff; }
   transition: none;
 }
 
-/* Flash « Actualiser » (voir design/animation/flashActualiser.ts) : la page entière s'assombrit, le graphique s'illumine par-dessus. */
-@keyframes flash-voile {
-  0% { opacity: 0; }
-  19% { opacity: 0.88; }
-  31% { opacity: 0.88; animation-timing-function: var(--ease-sortie); }
-  100% { opacity: 0; }
+/* « Actualiser » (voir design/animation/cercleActualiser.ts) : l'ancienne page reste fixe, la nouvelle apparaît dans un cercle (clip-path piloté en JS). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
-@keyframes flash-lueur {
-  0%, 100% { filter: none; }
-  19%, 31% { filter: brightness(1.7) saturate(1.5) drop-shadow(0 0 7px var(--color-marque)) drop-shadow(0 0 14px var(--color-marque)); }
-}
-html[data-flash='plein']::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background: #12172b;
-  animation: flash-voile 800ms ease-in both;
-}
-/* Le graphique passe au-dessus du voile : on neutralise le transform final de l'entrée de page, qui l'enfermerait dans son contexte d'empilement. */
-html[data-flash='plein'] .page-entree { animation: none; }
-html[data-flash='plein'] .graphique-serie { position: relative; z-index: 50; }
-html[data-flash='plein'] .graphique-serie .serie-forme,
-html[data-flash='plein'] .graphique-serie .serie-ligne { animation: flash-lueur 800ms ease-out both; }
-/* Mouvement réduit : simple pulse léger, sans inversion sombre. */
-@keyframes flash-pulse {
-  0%, 100% { opacity: 0; }
-  40% { opacity: 0.08; }
-}
-html[data-flash='reduit']::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background: #12172b;
-  animation: flash-pulse 500ms ease-out both;
-}
-@media (prefers-reduced-motion: reduce) {
-  html[data-flash='plein']::after { animation: flash-pulse 500ms ease-out both; }
-}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
 
 /* Lignes de tableau en cascade : fondu et glissement de 8 px, décalés de 25 ms (250 ms au plus) à l'arrivée des lignes. */
 @keyframes ligne-entree {
@@ -703,4 +669,30 @@ html[data-flash='reduit']::after {
 @media (prefers-reduced-motion: reduce) {
   .lignes-cascade > tbody > tr { animation: none; }
   .mq-onglet-pastille[data-glisse] { transition: none; }
+}
+
+/* Vidéo de référence : voile vert doux au changement d'écran, titres en fondu flou. */
+@keyframes voile-passage {
+  0% { opacity: 0.95; }
+  100% { opacity: 0; }
+}
+.voile-page {
+  position: absolute;
+  inset: -8px;
+  z-index: 20;
+  border-radius: 32px;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 20% 0%, rgb(234 246 240 / 0.95), rgb(243 250 246 / 0.85) 60%, rgb(236 238 242 / 0.8));
+  animation: voile-passage 620ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+@keyframes titre-flou {
+  from { opacity: 0; filter: blur(8px); transform: translateY(8px); }
+  to { opacity: 1; filter: blur(0); transform: none; }
+}
+.titre-flou {
+  animation: titre-flou 560ms var(--ease-sortie) 90ms both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .voile-page { display: none; }
+  .titre-flou { animation: none; }
 }

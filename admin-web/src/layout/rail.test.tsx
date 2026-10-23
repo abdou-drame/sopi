@@ -60,13 +60,12 @@ describe('rail de gauche', () => {
     expect(rail.queryByText('Actualiser')).toBeNull()
   })
 
-  it('Actualiser pose le flash visuel sur la page puis le retire, et relance toujours les requêtes', async () => {
+  it('Actualiser relance les requêtes (sans View Transition, comme dans jsdom, sans rien d’autre)', async () => {
     const rail = await ouvrirRail('/')
     const avant = vi.mocked(fetch).mock.calls.length
     await userEvent.click(rail.getByRole('button', { name: 'Actualiser' }))
-    expect(document.documentElement).toHaveAttribute('data-flash')
-    await waitFor(() => expect(document.documentElement).not.toHaveAttribute('data-flash'), { timeout: 2000 })
-    expect(vi.mocked(fetch).mock.calls.length).toBeGreaterThan(avant)
+    await waitFor(() => expect(vi.mocked(fetch).mock.calls.length).toBeGreaterThan(avant))
+    expect(document.documentElement).not.toHaveAttribute('data-flash')
   })
 
   it('pose un point rouge sur les écrans qui ont des alertes, et seulement eux', async () => {
@@ -95,5 +94,15 @@ describe('rail de gauche', () => {
       expect(within(await rail.findByRole('link', { name: nom })).getByTestId('point-alerte')).toBeInTheDocument()
     }
     expect(rail.getAllByTestId('point-alerte')).toHaveLength(2)
+  })
+
+  it('vidéo de référence : une seule pastille dans la barre du haut, et un voile vert seulement quand on change d’écran', async () => {
+    const rail = await ouvrirRail('/')
+    expect(screen.getAllByTestId('pastille-nav')).toHaveLength(1)
+    expect(screen.queryByTestId('voile-page')).not.toBeInTheDocument()
+    await userEvent.click(rail.getByRole('link', { name: /^Litiges/ }))
+    expect(await screen.findByTestId('voile-page')).toBeInTheDocument()
+    expect(screen.getAllByTestId('pastille-nav')).toHaveLength(1)
+    expect(document.querySelector('h1.titre-flou')).not.toBeNull()
   })
 })
