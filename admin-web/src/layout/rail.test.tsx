@@ -105,4 +105,16 @@ describe('rail de gauche', () => {
     expect(screen.getAllByTestId('pastille-nav')).toHaveLength(1)
     expect(document.querySelector('h1.titre-flou')).not.toBeNull()
   })
+
+  it('vidéo de référence : le bouton Actualiser se noircit le temps du tour, la bulle du rail sort du flou, la barre du haut descend', async () => {
+    const rail = await ouvrirRail('/')
+    expect(document.querySelector('header.barre-entree')).not.toBeNull()
+    const bouton = rail.getByRole('button', { name: 'Actualiser' })
+    expect(bouton).not.toHaveAttribute('data-tourne')
+    await userEvent.click(bouton)
+    expect(bouton).toHaveAttribute('data-tourne')
+    await waitFor(() => expect(bouton).not.toHaveAttribute('data-tourne'), { timeout: 2000 })
+    await userEvent.hover(rail.getByRole('link', { name: 'Litiges' }))
+    expect((await rail.findByText('Litiges')).className).toContain('infobulle-rail')
+  })
 })
