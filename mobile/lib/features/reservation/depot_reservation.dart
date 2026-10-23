@@ -15,6 +15,7 @@ class FiltresPrestataires {
     this.noteMin,
     this.prixMin,
     this.prixMax,
+    this.disponible = false,
     this.tri = TriPrestataires.nom,
   });
 
@@ -23,6 +24,7 @@ class FiltresPrestataires {
   final double? noteMin;
   final int? prixMin;
   final int? prixMax;
+  final bool disponible;
   final TriPrestataires tri;
 
   bool get actifs =>
@@ -30,7 +32,8 @@ class FiltresPrestataires {
       quartier != null ||
       noteMin != null ||
       prixMin != null ||
-      prixMax != null;
+      prixMax != null ||
+      disponible;
 
   FiltresPrestataires copie({
     String? recherche,
@@ -38,6 +41,7 @@ class FiltresPrestataires {
     Object? noteMin = _inchange,
     Object? prixMin = _inchange,
     Object? prixMax = _inchange,
+    bool? disponible,
     TriPrestataires? tri,
   }) => FiltresPrestataires(
     recherche: recherche ?? this.recherche,
@@ -47,6 +51,7 @@ class FiltresPrestataires {
     noteMin: identical(noteMin, _inchange) ? this.noteMin : noteMin as double?,
     prixMin: identical(prixMin, _inchange) ? this.prixMin : prixMin as int?,
     prixMax: identical(prixMax, _inchange) ? this.prixMax : prixMax as int?,
+    disponible: disponible ?? this.disponible,
     tri: tri ?? this.tri,
   );
 
@@ -135,6 +140,7 @@ class DepotReservation {
         'note_min': ?filtres.noteMin,
         'prix_min': ?filtres.prixMin,
         'prix_max': ?filtres.prixMax,
+        if (filtres.disponible) 'disponible': 1,
         'tri': filtres.tri.valeurApi,
         'page': page,
       },

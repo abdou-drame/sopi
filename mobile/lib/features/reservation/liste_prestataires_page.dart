@@ -187,6 +187,8 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
                   onQuartier: () => _choisirQuartier(filtres),
                   onNote: () => _choisirNote(filtres),
                   onPrix: () => _choisirPrix(filtres),
+                  onDisponible: () =>
+                      _appliquer((f) => f.copie(disponible: !f.disponible)),
                 ),
               ),
               if (!etat.chargement && etat.erreur == null)
@@ -228,6 +230,7 @@ class _Entete extends StatelessWidget {
     required this.onQuartier,
     required this.onNote,
     required this.onPrix,
+    required this.onDisponible,
   });
 
   final String titre;
@@ -239,6 +242,7 @@ class _Entete extends StatelessWidget {
   final VoidCallback onQuartier;
   final VoidCallback onNote;
   final VoidCallback onPrix;
+  final VoidCallback onDisponible;
 
   String get _libelleNote => filtres.noteMin == null
       ? 'Note'
@@ -353,6 +357,13 @@ class _Entete extends StatelessWidget {
                   active: filtres.prixMin != null || filtres.prixMax != null,
                   onTap: onPrix,
                 ),
+                const SizedBox(width: 8),
+                _Pilule(
+                  libelle: 'Disponible',
+                  icone: Icons.event_available_rounded,
+                  active: filtres.disponible,
+                  onTap: onDisponible,
+                ),
               ],
             ),
           ),
@@ -367,8 +378,10 @@ class _Pilule extends StatelessWidget {
     required this.libelle,
     required this.active,
     required this.onTap,
+    this.icone,
   });
 
+  final IconData? icone;
   final String libelle;
   final bool active;
   final VoidCallback onTap;
@@ -388,13 +401,26 @@ class _Pilule extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             alignment: Alignment.center,
-            child: Text(
-              libelle,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontSize: 13,
-                fontWeight: active ? FontWeight.w700 : FontWeight.w600,
-                color: active ? CouleursSopi.blanc : CouleursSopi.texte,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (icone != null) ...[
+                  Icon(
+                    icone,
+                    size: 16,
+                    color: active ? CouleursSopi.blanc : CouleursSopi.texte,
+                  ),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  libelle,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontSize: 13,
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w600,
+                    color: active ? CouleursSopi.blanc : CouleursSopi.texte,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -121,6 +121,22 @@ void main() {
       expect(find.text('Quartier'), findsOneWidget);
     });
 
+    testWidgets('filtre disponible : puce, paramètre envoyé, puis effacé', (
+      tester,
+    ) async {
+      final serveur = AdaptateurSimule(_routes());
+      await _ouvrir(tester, serveur);
+      expect(_derniere(serveur).containsKey('disponible'), isFalse);
+      await tester.ensureVisible(find.text('Disponible'));
+      await toucher(tester, find.text('Disponible'));
+      await passerTransition(tester);
+      expect(_derniere(serveur)['disponible'].toString(), '1');
+      await tester.ensureVisible(find.text('Disponible'));
+      await toucher(tester, find.text('Disponible'));
+      await passerTransition(tester);
+      expect(_derniere(serveur).containsKey('disponible'), isFalse);
+    });
+
     testWidgets('filtre note : note_min envoyé', (tester) async {
       final serveur = AdaptateurSimule(_routes());
       await _ouvrir(tester, serveur);
