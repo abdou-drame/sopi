@@ -2,11 +2,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { AvisAdmin } from '../api/typesAdmin'
 import { ADMIN, afficherApplication, ALERTES_VIDES, simulerApi } from '../test/outils'
 import { ActionModeration } from './AvisPages'
 
 // Réponses conformes à l'API (valeurs fictives). Les écritures sont toujours simulées.
-const AVIS = {
+const AVIS: AvisAdmin = {
   id: 'a-1',
   note: 1,
   commentaire: 'Service décevant.',
@@ -23,14 +24,14 @@ const AVIS = {
   masque: false,
   masqueLe: null,
 }
-const MASQUE = { ...AVIS, id: 'a-2', statut: 'supprime', masque: true, masqueLe: '2030-01-19T09:00:00+00:00', modereLe: '2030-01-19T09:00:00+00:00', motifModeration: 'Propos injurieux.' }
+const MASQUE: AvisAdmin = { ...AVIS, id: 'a-2', statut: 'supprime', masque: true, masqueLe: '2030-01-19T09:00:00+00:00', modereLe: '2030-01-19T09:00:00+00:00', motifModeration: 'Propos injurieux.' }
 const PAGE = (data: unknown[]) => ({
   data,
   links: { first: null, last: null, prev: null, next: null },
   meta: { current_page: 1, last_page: 1, per_page: 20, total: data.length },
 })
 /** Action isolée, sans passer par la page. */
-function afficherAction(avis: typeof AVIS, mode: 'conserver' | 'retablir') {
+function afficherAction(avis: AvisAdmin, mode: 'conserver' | 'retablir') {
   const messages: string[] = []
   render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
