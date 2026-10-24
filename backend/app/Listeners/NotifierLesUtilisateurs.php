@@ -117,8 +117,11 @@ class NotifierLesUtilisateurs
 
             if ($evenement->cause === CauseAnnulation::Demande && $evenement->par === Role::Client) {
                 // Annulation par le client : le prestataire est prévenu (l'acompte n'est pas remboursé au client).
+                $credit = $evenement->montantCredite !== null
+                    ? " L'acompte n'est pas remboursé au client : {$evenement->montantCredite} FCFA (acompte moins commission) ont été crédités à votre solde."
+                    : '';
                 $this->notifications->creer($prestataire, TypeNotification::ReservationAnnulee, 'Réservation annulée',
-                    "{$this->nomPublicClient($r->client)} a annulé « {$prestation} » du {$this->date($r)}.", $donnees);
+                    "{$this->nomPublicClient($r->client)} a annulé « {$prestation} » du {$this->date($r)}.{$credit}", $donnees);
 
                 return;
             }

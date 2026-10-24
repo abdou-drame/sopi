@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
  *
  * Définition retenue (le cahier ne définit pas « revenu ») :
  *  - revenus = somme des commissions des paiements REUSSI dont le crédit au prestataire a été fait (credite_le renseigné,
- *    donc prestation terminée), datés par credite_le. Un paiement remboursé n'est jamais compté.
+ *    donc prestation terminée ou annulation par le client d'une réservation payée), datés par credite_le. Un paiement remboursé n'est jamais compté.
  *  - acomptesEncaisses = acomptes des paiements REUSSI, datés par paye_le.
  *  - remboursements = acomptes des paiements REMBOURSE, datés par rembourse_le.
  *  - retraitsVerses = montants des retraits REUSSI, datés par traite_le.

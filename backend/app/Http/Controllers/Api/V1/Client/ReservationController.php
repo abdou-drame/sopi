@@ -95,7 +95,7 @@ class ReservationController extends Controller
      * Annuler une réservation
      *
      * Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau
-     * (borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps.
+     * (borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé au client : le prestataire est crédité de l'acompte moins la commission (une seule fois, dans la même transaction que l'annulation), la plateforme garde la commission et le paiement reste `reussi`. Sans paiement réussi (`en_attente`, `acceptee`), rien n'est crédité. Aucun corps.
      *
      * @authenticated
      *

@@ -5305,7 +5305,7 @@ paths:
     get:
       summary: 'Revenus de la plateforme'
       operationId: revenusDeLaPlateforme
-      description: "Série par jour, semaine (lundi à dimanche) ou mois calendaire, sur une période de 366 jours au plus (bornes incluses, fuseau\nAfrica/Dakar). Par défaut : les 30 derniers jours, par jour. Les périodes vides sont présentes avec des zéros.\nDéfinitions : **revenus** = commissions des paiements réussis dont le crédit au prestataire est fait (prestation terminée), datées\npar ce crédit, paiements remboursés exclus ; **acomptesEncaisses** = acomptes des paiements réussis, datés par le paiement ;\n**remboursements** = acomptes remboursés, datés par le remboursement ; **retraitsVerses** = retraits réussis, datés par leur traitement.\n**soldePrestataires** est le cumul des soldes à l'instant de la demande. Montants en FCFA entiers."
+      description: "Série par jour, semaine (lundi à dimanche) ou mois calendaire, sur une période de 366 jours au plus (bornes incluses, fuseau\nAfrica/Dakar). Par défaut : les 30 derniers jours, par jour. Les périodes vides sont présentes avec des zéros.\nDéfinitions : **revenus** = commissions des paiements réussis dont le crédit au prestataire est fait (prestation terminée ou annulation par le client d'une réservation payée), datées\npar ce crédit, paiements remboursés exclus ; **acomptesEncaisses** = acomptes des paiements réussis, datés par le paiement ;\n**remboursements** = acomptes remboursés, datés par le remboursement ; **retraitsVerses** = retraits réussis, datés par leur traitement.\n**soldePrestataires** est le cumul des soldes à l'instant de la demande. Montants en FCFA entiers."
       parameters:
         -
           in: query
@@ -8740,7 +8740,7 @@ paths:
     post:
       summary: 'Annuler une réservation'
       operationId: annulerUneRservation
-      description: "Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau\n(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps."
+      description: "Possible pour une réservation `en_attente`, `acceptee` ou `confirmee`, jusqu'à 2 h avant le début du créneau\n(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé au client : le prestataire est crédité de l'acompte moins la commission (une seule fois, dans la même transaction que l'annulation), la plateforme garde la commission et le paiement reste `reussi`. Sans paiement réussi (`en_attente`, `acceptee`), rien n'est crédité. Aucun corps."
       parameters: []
       responses:
         200:

@@ -16,10 +16,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Suivi et annulation des réservations par leur client (RF06, RF07, RG13). L'acompte payé n'est pas remboursé. */
+/**
+ * Suivi et annulation des réservations par leur client (RF06, RF07, RG13). L'acompte payé n'est pas remboursé : le prestataire
+ * est crédité de l'acompte moins la commission, la plateforme garde la commission.
+ */
 class SuiviReservationService
 {
     public const PAR_PAGE = 20;
+
+    public function __construct(private readonly CreditSoldeService $credit) {}
 
     /** Sans groupe : plus récentes d'abord. Avec un groupe (onglet) : statuts et ordre du groupe, combinables avec $statut. */
     public function lister(User $client, ?StatutReservation $statut = null, ?GroupeReservation $groupe = null): LengthAwarePaginator
@@ -58,7 +63,8 @@ class SuiviReservationService
     }
 
     /**
-     * Annule la réservation et libère son créneau dans UNE transaction ; l'acompte éventuel reste acquis.
+     * Annule la réservation, libère son créneau et, si un acompte a été payé, crédite le prestataire (acompte moins commission,
+     * une seule fois grâce à paiements.credite_le), le tout dans UNE transaction ; le paiement reste REUSSI.
      *
      * @throws ReservationImpossibleException 404 (introuvable) ou 409 (statut non annulable, trop tard, créneau non libérable)
      */
@@ -67,16 +73,21 @@ class SuiviReservationService
         $reservation = $this->trouver($client, $id)
             ?? throw new ReservationImpossibleException('Réservation introuvable.', Response::HTTP_NOT_FOUND);
 
-        DB::transaction(function () use ($reservation, $client) {
+        $credite = null;
+        DB::transaction(function () use ($reservation, $client, &$credite) {
             if (! $reservation->annulerParClientSiPossible($client->id, self::limiteAnnulation())) {
                 throw $this->refus($reservation, $client);
             }
             if (! $reservation->creneau->libererPourReservation($reservation)) {
                 throw new ReservationImpossibleException('Cette réservation ne peut plus être annulée.', Response::HTTP_CONFLICT);
             }
+            // Sans paiement REUSSI (EN_ATTENTE, ACCEPTEE) : rien à créditer.
+            if ($reservation->paiements()->where('statut', StatutPaiement::Reussi->value)->exists()) {
+                $credite = $this->credit->crediterAvecDetail($reservation, CreditSoldeService::LIBELLE_ANNULATION_CLIENT)?->montantCredite;
+            }
         });
 
-        ReservationAnnulee::dispatch($reservation, Role::Client);
+        ReservationAnnulee::dispatch($reservation, Role::Client, montantCredite: $credite);
 
         return $reservation->load(['creneau', 'prestation.prestataire.user', 'paiements']);
     }

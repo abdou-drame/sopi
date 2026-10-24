@@ -12263,7 +12263,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </p>
 
 <p>Possible pour une réservation <code>en_attente</code>, <code>acceptee</code> ou <code>confirmee</code>, jusqu'à 2 h avant le début du créneau
-(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé. Aucun corps.</p>
+(borne incluse). Le créneau est libéré. L'acompte éventuellement payé n'est pas remboursé au client : le prestataire est crédité de l'acompte moins la commission (une seule fois, dans la même transaction que l'annulation), la plateforme garde la commission et le paiement reste `reussi`. Sans paiement réussi (`en_attente`, `acceptee`), rien n'est crédité. Aucun corps.</p>
 
 <span id="example-requests-POSTapi-v1-reservations--id--annuler">
 <blockquote>Example request:</blockquote>
