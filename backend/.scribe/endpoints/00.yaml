@@ -101,7 +101,7 @@ endpoints:
         custom: []
         name: email
         description: 'Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
-        required: false
+        required: true
         example: reichel.charity@example.net
         type: string
         enumValues: []

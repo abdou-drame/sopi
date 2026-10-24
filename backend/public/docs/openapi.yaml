@@ -9142,7 +9142,6 @@ paths:
                   type: string
                   description: 'Le champ value doit être une adresse e-mail valide. Le champ value ne doit pas dépasser 255 caractères.'
                   example: reichel.charity@example.net
-                  nullable: true
                 password:
                   type: string
                   description: 'Le champ value doit contenir au moins 8 caractères. Le champ value ne doit pas dépasser 255 caractères.'
@@ -9151,6 +9150,7 @@ paths:
                 - nom
                 - prenom
                 - telephone
+                - email
                 - password
       security: []
   /api/v1/auth/deconnexion:

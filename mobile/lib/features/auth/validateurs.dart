@@ -39,14 +39,7 @@ abstract final class ValidateursAcces {
     return mobileNational(valeur) == null ? messageTelephone : null;
   }
 
-  /// E-mail facultatif : vide accepté, sinon il doit être valide.
-  static String? emailFacultatif(String valeur) {
-    final v = valeur.trim();
-    if (v.isEmpty) return null;
-    return emailValide(v) ? null : "L'adresse e-mail n'est pas valide.";
-  }
-
-  /// E-mail obligatoire (mot de passe oublié).
+  /// E-mail obligatoire (inscription, mot de passe oublié).
   static String? emailObligatoire(String valeur) {
     final v = valeur.trim();
     if (v.isEmpty) return "L'adresse e-mail est obligatoire.";

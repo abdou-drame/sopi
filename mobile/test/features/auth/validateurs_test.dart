@@ -79,14 +79,6 @@ void main() {
   });
 
   group('E-mail', () {
-    test('facultatif : vide accepté, sinon valide', () {
-      expect(ValidateursAcces.emailFacultatif(''), isNull);
-      expect(ValidateursAcces.emailFacultatif('  '), isNull);
-      expect(ValidateursAcces.emailFacultatif('a@exemple.sn'), isNull);
-      expect(ValidateursAcces.emailFacultatif('a@exemple'), isNotNull);
-      expect(ValidateursAcces.emailFacultatif('a exemple.sn'), isNotNull);
-    });
-
     test('obligatoire', () {
       expect(
         ValidateursAcces.emailObligatoire(''),

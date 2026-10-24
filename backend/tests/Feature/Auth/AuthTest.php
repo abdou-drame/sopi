@@ -38,9 +38,24 @@ describe('inscription', function () {
         $this->withToken($reponse->json('token'))->getJson('/api/v1/auth/moi')->assertOk();
     });
 
-    it('accepte une inscription sans e-mail', function () {
-        $this->postJson('/api/v1/auth/inscription', donneesInscription(['email' => null]))->assertCreated();
-        expect(User::first()->email)->toBeNull();
+    it('refuse une inscription sans e-mail, vide ou invalide', function (mixed $email) {
+        $donnees = donneesInscription();
+        if ($email === 'absent') {
+            unset($donnees['email']);
+        } else {
+            $donnees['email'] = $email;
+        }
+
+        $this->postJson('/api/v1/auth/inscription', $donnees)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+        expect(User::count())->toBe(0);
+    })->with(['absent', null, '', '   ', 'pas-un-email']);
+
+    it('laisse un compte existant sans e-mail se connecter par téléphone', function () {
+        User::factory()->create(['telephone' => '+221771234567', 'email' => null, 'password' => 'motdepasse1']);
+
+        $this->postJson('/api/v1/auth/connexion', ['telephone' => '77 123 45 67', 'password' => 'motdepasse1'])->assertOk();
     });
 
     it('refuse un téléphone déjà utilisé, quel que soit son format', function () {
@@ -75,7 +90,7 @@ describe('inscription', function () {
             'telephone' => '12345',
             'password' => 'court',
         ])->assertStatus(422)
-            ->assertJsonValidationErrors(['nom', 'prenom', 'telephone', 'password'])
+            ->assertJsonValidationErrors(['nom', 'prenom', 'telephone', 'email', 'password'])
             ->assertJsonPath('errors.nom.0', 'Le champ nom est obligatoire.')
             ->assertJsonPath('errors.password.0', 'Le champ mot de passe doit contenir au moins 8 caractères.');
     });

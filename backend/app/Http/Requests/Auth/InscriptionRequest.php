@@ -29,7 +29,8 @@ class InscriptionRequest extends FormRequest
             'nom' => ['required', 'string', 'max:100'],
             'prenom' => ['required', 'string', 'max:100'],
             'telephone' => ['required', 'string', 'regex:/^\+2217[05678]\d{7}$/', 'unique:users,telephone'],
-            'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+            // Obligatoire à l'inscription (les comptes existants sans e-mail restent valides : aucune règle rétroactive).
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'max:255'],
         ];
     }

@@ -58,7 +58,7 @@ class _InscriptionPageState extends ConsumerState<InscriptionPage> {
       'prenom': ValidateursAcces.nom(_prenom.text, 'Le prénom'),
       'nom': ValidateursAcces.nom(_nom.text, 'Le nom'),
       'telephone': ValidateursAcces.telephone(_telephone.text),
-      'email': ValidateursAcces.emailFacultatif(_email.text),
+      'email': ValidateursAcces.emailObligatoire(_email.text),
       'password': ValidateursAcces.motDePasse(_motDePasse.text),
       'confirmation': ValidateursAcces.confirmation(
         _motDePasse.text,
@@ -172,8 +172,7 @@ class _InscriptionPageState extends ConsumerState<InscriptionPage> {
                   onChanged: (_) => _effacer('telephone'),
                 ),
                 ChampFormulaire(
-                  libelle:
-                      'E-mail (facultatif, utile pour récupérer votre compte)',
+                  libelle: 'E-mail (utile pour récupérer votre compte)',
                   controleur: _email,
                   hauteur: 50,
                   margeInterne: 14,

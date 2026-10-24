@@ -72,7 +72,9 @@ class CreerAdmin extends Command
 
         // Mêmes règles que l'inscription (téléphone sénégalais, mot de passe de 8 caractères minimum, e-mail unique).
         $demande = new InscriptionRequest;
-        $validateur = Validator::make($valeurs, $demande->rules(), $demande->messages());
+        // L'e-mail est obligatoire à l'inscription publique, pas pour ce compte d'administration (variable ADMIN_EMAIL facultative).
+        $regles = array_merge($demande->rules(), ['email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email']]);
+        $validateur = Validator::make($valeurs, $regles, $demande->messages());
         if ($validateur->fails()) {
             $this->error('Configuration invalide. Aucun compte créé :');
             foreach ($validateur->errors()->messages() as $champ => $messages) {

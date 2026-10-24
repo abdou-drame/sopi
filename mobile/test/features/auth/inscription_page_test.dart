@@ -19,7 +19,7 @@ Finder _bouton() => find.widgetWithText(FilledButton, 'Créer mon compte');
 Future<void> _remplir(
   WidgetTester tester, {
   String telephone = '77 123 45 67',
-  String email = '',
+  String email = 'aminata@exemple.sn',
   String confirmation = 'motdepasse',
 }) async {
   await saisir(tester, 0, 'Aminata');
@@ -51,7 +51,7 @@ void main() {
         'Prénom',
         'Nom',
         'Téléphone',
-        'E-mail (facultatif, utile pour récupérer votre compte)',
+        'E-mail (utile pour récupérer votre compte)',
         'Mot de passe',
         'Confirmer le mot de passe',
       ]) {
@@ -73,6 +73,7 @@ void main() {
         find.text('Le numéro de téléphone est obligatoire.'),
         findsOneWidget,
       );
+      expect(find.text("L'adresse e-mail est obligatoire."), findsOneWidget);
       expect(find.text('Le mot de passe est obligatoire.'), findsOneWidget);
       expect(find.text('Confirmez votre mot de passe.'), findsOneWidget);
       expect(
@@ -130,7 +131,17 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('corps envoyé : sans e-mail vide, sans confirmation', (
+    testWidgets('e-mail vide : refusé côté formulaire, aucune requête', (
+      tester,
+    ) async {
+      final serveur = await _lancer(tester);
+      await _remplir(tester, email: '');
+      await toucher(tester, _bouton());
+      expect(find.text("L'adresse e-mail est obligatoire."), findsOneWidget);
+      expect(serveur.requetes.where((r) => r.method == 'POST'), isEmpty);
+    });
+
+    testWidgets('corps envoyé : e-mail inclus, sans confirmation', (
       tester,
     ) async {
       final serveur = await _lancer(tester, {
@@ -145,6 +156,7 @@ void main() {
         'nom': 'Diallo',
         'prenom': 'Aminata',
         'telephone': '+221771234567',
+        'email': 'aminata@exemple.sn',
         'password': 'motdepasse',
       });
     });
