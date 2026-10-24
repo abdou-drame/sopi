@@ -99,12 +99,23 @@ class LitigeResource extends JsonResource
             'prestataire' => $this->coordonnees($this->prestataire->user) + [
                 'id' => $this->prestataire->user->id,
                 'nomEntreprise' => $this->prestataire->nom_entreprise,
+                'metier' => $this->prestataire->metier,
+                'quartier' => $this->prestataire->quartier,
+                'noteMoyenne' => $this->noteMoyenne(),
             ],
             'prixApplique' => (float) $this->reservation->prix_applique,
             'paiements' => $paiements,
             'decidePar' => $this->decidePar?->id,
             'sanctionId' => $this->relationLoaded('sanction') ? $this->sanction?->id : null,
         ];
+    }
+
+    /** Note moyenne du prestataire (une décimale, avis masqués exclus), null sans avis. */
+    private function noteMoyenne(): ?float
+    {
+        $moyenne = $this->prestataire->avisVisibles()->avg('note');
+
+        return $moyenne === null ? null : round((float) $moyenne, 1);
     }
 
     /** @return array{prenom: string, initialeNom: string} */

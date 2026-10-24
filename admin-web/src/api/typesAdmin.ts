@@ -42,6 +42,9 @@ export interface PartieLitige {
   telephone: string
   email: string | null
   nomEntreprise?: string
+  metier?: string
+  quartier?: string
+  noteMoyenne?: number | null
 }
 
 export interface PaiementLitige {

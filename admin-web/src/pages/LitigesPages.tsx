@@ -478,11 +478,11 @@ export function LitigeDetailPage() {
                       {l.reservation.prestation}
                     </LigneInfo>
                     <LigneInfo libelle="Métier" grise={false}>
-                      {ABSENT}
+                      {l.prestataire.metier ? (L.metiers[l.prestataire.metier] ?? l.prestataire.metier) : ABSENT}
                     </LigneInfo>
                     <LigneInfo libelle="Date prévue" grise>{`${formatDate(l.reservation.dateDebut)} · ${heureDe(l.reservation.dateDebut)}`}</LigneInfo>
                     <LigneInfo libelle="Quartier" grise={false}>
-                      {ABSENT}
+                      {l.prestataire.quartier ?? ABSENT}
                     </LigneInfo>
                   </div>
                 </CarteMq>
@@ -490,7 +490,7 @@ export function LitigeDetailPage() {
                   <TitreCarte titre="Personnes concernées" />
                   <div className="mt-3.5 flex flex-col gap-2.5">
                     <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-neutre-claire text-neutre" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
-                    <Personne nom={nomPrestataire} role={`Prestataire · note ${ABSENT}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
+                    <Personne nom={nomPrestataire} role={`Prestataire · note ${l.prestataire.noteMoyenne == null ? ABSENT : `${String(l.prestataire.noteMoyenne).replace('.', ',')} / 5`}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
                   </div>
                 </CarteMq>
               </div>

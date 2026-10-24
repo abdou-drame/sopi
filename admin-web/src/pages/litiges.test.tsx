@@ -110,6 +110,15 @@ describe('litiges', () => {
     expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
   })
 
+  it('affiche métier, quartier et note du prestataire quand l’API les fournit', async () => {
+    const detail = { ...DETAIL, prestataire: { ...DETAIL.prestataire, metier: 'mecanique', quartier: 'Malika', noteMoyenne: 4.5 } }
+    simulerApi({ ...routesDetail, [`GET /admin/litiges/${ID}`]: { corps: detail } })
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByText('Malika')).toBeInTheDocument()
+    expect(screen.getByText('Mécanique')).toBeInTheDocument()
+    expect(screen.getByText('Prestataire · note 4,5 / 5')).toBeInTheDocument()
+  })
+
   it('charge les preuves du client avec le jeton dans les emplacements dessinés', async () => {
     const { appels } = simulerApi(routesDetail)
     afficherApplication(`/litiges/${ID}`)
