@@ -37,8 +37,8 @@ use Throwable;
  * une action annulée ne notifie personne. Chaque méthode est protégée : un échec ici ne doit JAMAIS faire échouer l'action métier
  * déjà validée (la notification est perdue, l'incident est journalisé avec la classe de l'erreur seulement).
  *
- * Textes courts, sans donnée sensible : jamais de code de réservation, de montant, de téléphone ni de secret (ils partent aussi
- * par push). Le client est présenté au prestataire par son prénom et l'initiale de son nom, le prestataire par son entreprise.
+ * Textes courts, sans donnée sensible : jamais de montant, de téléphone ni de secret (ils partent aussi par push). Le code de
+ * réservation n'est communiqué qu'au client, dans la confirmation du paiement (mémoire, 3.3.4). Le client est présenté au prestataire par son prénom et l'initiale de son nom, le prestataire par son entreprise.
  * Les méthodes ne commencent pas par « handle » : l'enregistrement est explicite (AppServiceProvider), pas par découverte.
  */
 class NotifierLesUtilisateurs
@@ -134,6 +134,12 @@ class NotifierLesUtilisateurs
             $this->notifications->creer(
                 $r->creneau->prestataire->user, TypeNotification::ReservationConfirmee, 'Réservation confirmée',
                 "L'acompte est payé : la réservation « {$r->prestation->nom} » de {$this->nomPublicClient($r->client)} le {$this->date($r)} est confirmée.",
+                $this->donneesReservation($r),
+            );
+            // Mémoire 3.3.4 (étape 6) : le client reçoit la confirmation du paiement avec son code de réservation.
+            $this->notifications->creer(
+                $r->client, TypeNotification::ReservationConfirmee, 'Réservation confirmée',
+                "Votre acompte est bien reçu : « {$r->prestation->nom} » chez {$this->entreprise($r)} le {$this->date($r)} est confirmée. Votre code de réservation : {$r->code_reservation}. Donnez-le au prestataire à votre arrivée.",
                 $this->donneesReservation($r),
             );
         });

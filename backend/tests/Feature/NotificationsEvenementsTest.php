@@ -174,15 +174,19 @@ describe('réservation', function () {
         expect(notifsDe($prestataire->user))->toHaveCount(1)->and(notifsDe($client))->toHaveCount(1);
     });
 
-    it('réservation confirmée : le prestataire est prévenu, sans le code ni le montant', function () {
+    it('réservation confirmée : le prestataire est prévenu sans le code ; le client reçoit la confirmation avec son code', function () {
         [$client, $prestataire, $reservation] = decorNotifs('confirmee');
         $code = $reservation->code_reservation;
 
         ReservationConfirmee::dispatch($reservation);
 
         $n = unSeul($prestataire->user, TypeNotification::ReservationConfirmee);
-        expect($n->corps)->toContain('acompte est payé')->toContain('Awa D.')->and(notifsDe($client))->toHaveCount(0);
+        expect($n->corps)->toContain('acompte est payé')->toContain('Awa D.');
         verifierSansDonneeSensible($n, $code);
+
+        $pourClient = unSeul($client, TypeNotification::ReservationConfirmee);
+        expect($pourClient->corps)->toContain('Garage Sow')->toContain($code)
+            ->and($pourClient->donnees)->toBe(['reservationId' => $reservation->id]);
     });
 
     it('prestation démarrée puis terminée : le client est prévenu', function () {
@@ -418,9 +422,12 @@ describe('bout en bout par les vraies routes', function () {
         test()->actingAs($prestataire->user, 'sanctum')->postJson("/api/v1/prestataire/reservations/$id/demarrer", ['code' => $code])->assertOk();
         test()->postJson("/api/v1/prestataire/reservations/$id/terminer")->assertOk();
 
-        expect(notifsDe($client)->pluck('type')->all())->toBe([TypeNotification::ReservationAcceptee, TypeNotification::ReservationDemarree, TypeNotification::ReservationTerminee])
+        expect(notifsDe($client)->pluck('type')->all())->toBe([TypeNotification::ReservationAcceptee, TypeNotification::ReservationConfirmee, TypeNotification::ReservationDemarree, TypeNotification::ReservationTerminee])
             ->and(notifsDe($prestataire->user)->pluck('type')->all())->toBe([TypeNotification::ReservationNouvelleDemande, TypeNotification::ReservationConfirmee])
             ->and(Notification::query()->where('user_id', $admin->id)->count())->toBe(0);
-        Notification::all()->each(fn (Notification $n) => verifierSansDonneeSensible($n, $code));
+        // Seule la confirmation adressée au client porte le code (mémoire, 3.3.4) ; toutes les autres en sont exemptes.
+        Notification::all()
+            ->reject(fn (Notification $n) => $n->user_id === $client->id && $n->type === TypeNotification::ReservationConfirmee)
+            ->each(fn (Notification $n) => verifierSansDonneeSensible($n, $code));
     });
 });
