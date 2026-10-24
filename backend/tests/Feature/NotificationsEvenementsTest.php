@@ -116,14 +116,14 @@ describe('réservation', function () {
         verifierSansDonneeSensible($n);
     });
 
-    it('demande refusée : le client est prévenu, sans le motif', function () {
+    it('demande refusée : le client est prévenu, avec le motif du prestataire (mémoire, 3.3.3)', function () {
         [$client, $prestataire, $reservation] = decorNotifs();
-        DB::table('reservations')->where('id', $reservation->id)->update(['motif_refus' => 'Motif très privé du prestataire']);
+        DB::table('reservations')->where('id', $reservation->id)->update(['motif_refus' => 'Atelier fermé ce jour-là']);
 
         ReservationRefusee::dispatch($reservation->fresh());
 
         $n = unSeul($client, TypeNotification::ReservationRefusee);
-        expect($n->corps)->toContain('Garage Sow')->not->toContain('privé')
+        expect($n->corps)->toContain('Garage Sow')->toContain('Motif : Atelier fermé ce jour-là')
             ->and(notifsDe($prestataire->user))->toHaveCount(0);
     });
 

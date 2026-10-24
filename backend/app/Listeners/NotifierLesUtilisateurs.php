@@ -77,7 +77,8 @@ class NotifierLesUtilisateurs
             $r = $this->charger($evenement->reservation);
             $this->notifications->creer(
                 $r->client, TypeNotification::ReservationRefusee, 'Demande refusée',
-                "{$this->entreprise($r)} ne peut pas assurer « {$r->prestation->nom} » le {$this->date($r)}. Choisissez un autre créneau.",
+                "{$this->entreprise($r)} ne peut pas assurer « {$r->prestation->nom} » le {$this->date($r)}."
+                    .(filled($r->motif_refus) ? " Motif : {$r->motif_refus}" : '').' Choisissez un autre créneau.',
                 $this->donneesReservation($r),
             );
         });
