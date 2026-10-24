@@ -11,8 +11,9 @@ enum SourceJustificatif { galerie, appareil, fichier }
 typedef SelecteurJustificatif =
     Future<FichierJustificatif?> Function(SourceJustificatif source);
 
-const messageFormatJustificatif =
-    'Format non accepté. Choisissez un PDF, une photo JPEG ou PNG.';
+/// Mémoire, Table 2.8, scénario alternatif 2a : un seul message, pour un document manquant comme pour un format invalide.
+const messageJustificatifInvalide =
+    'Veuillez joindre un fichier PDF ou image valide';
 const messageTailleJustificatif =
     'Ce fichier est trop lourd. La taille maximale est de 5 Mo.';
 
@@ -29,7 +30,7 @@ String typeMimeDepuisNom(String nom) {
 /// Renvoie le message à afficher, ou null si le fichier convient.
 String? controlerJustificatif(FichierJustificatif f) {
   if (!typesJustificatifAcceptes.contains(f.typeMime)) {
-    return messageFormatJustificatif;
+    return messageJustificatifInvalide;
   }
   if (f.octets.length > tailleMaxJustificatif) {
     return messageTailleJustificatif;

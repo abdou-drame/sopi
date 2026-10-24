@@ -194,7 +194,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Le dossier doit contenir une copie de votre CNI.","errors":{"justificatifs":["Le dossier doit contenir une copie de votre CNI."]}}'
+        content: '{"message":"Veuillez joindre un fichier PDF ou image valide","errors":{"justificatifs":["Veuillez joindre un fichier PDF ou image valide"]}}'
         headers: []
         description: ''
       -

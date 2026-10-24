@@ -9684,21 +9684,21 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Le dossier doit contenir une copie de votre CNI.'
+                  message: 'Veuillez joindre un fichier PDF ou image valide'
                   errors:
                     justificatifs:
-                      - 'Le dossier doit contenir une copie de votre CNI.'
+                      - 'Veuillez joindre un fichier PDF ou image valide'
                 properties:
                   message:
                     type: string
-                    example: 'Le dossier doit contenir une copie de votre CNI.'
+                    example: 'Veuillez joindre un fichier PDF ou image valide'
                   errors:
                     type: object
                     properties:
                       justificatifs:
                         type: array
                         example:
-                          - 'Le dossier doit contenir une copie de votre CNI.'
+                          - 'Veuillez joindre un fichier PDF ou image valide'
                         items:
                           type: string
         429:

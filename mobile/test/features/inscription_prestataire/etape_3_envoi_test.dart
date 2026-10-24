@@ -164,7 +164,7 @@ void main() {
         choix: () => _fichier('image.gif', mime: 'image/gif'),
       );
       await _ajouter(tester, TypeJustificatif.cni);
-      expect(find.text(messageFormatJustificatif), findsOneWidget);
+      expect(find.text(messageJustificatifInvalide), findsOneWidget);
       expect(find.textContaining('· ajouté'), findsNothing);
     });
 
@@ -195,11 +195,15 @@ void main() {
     testWidgets('pièces obligatoires manquantes : aucun envoi', (tester) async {
       final c = await _lancer(tester);
       await toucher(tester, _envoyer());
-      expect(
-        find.text('Ajoutez ce document pour envoyer votre dossier.'),
-        findsNWidgets(2),
-      );
+      expect(find.text(messageJustificatifInvalide), findsNWidgets(2));
       expect(c.envois, isEmpty);
+    });
+
+    test('le message est celui du mémoire (Table 2.8, scénario 2a)', () {
+      expect(
+        messageJustificatifInvalide,
+        'Veuillez joindre un fichier PDF ou image valide',
+      );
     });
   });
 

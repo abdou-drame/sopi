@@ -15,6 +15,9 @@ class InscriptionPrestataireRequest extends FormRequest
 
     public const NB_MAX_JUSTIFICATIFS = 5;
 
+    /** Message du mémoire (Table 2.8, scénario 2a) : document manquant ou format invalide. */
+    public const MESSAGE_JUSTIFICATIF_INVALIDE = 'Veuillez joindre un fichier PDF ou image valide';
+
     public function authorize(): bool
     {
         return true;
@@ -56,11 +59,12 @@ class InscriptionPrestataireRequest extends FormRequest
         return [
             'telephone.regex' => 'Le numéro de téléphone doit être un mobile sénégalais valide (ex. : 77 123 45 67).',
             'metier.*' => "Le métier choisi est invalide ou n'est plus proposé.",
-            'justificatifs.required' => 'Veuillez joindre vos justificatifs.',
-            'justificatifs.min' => 'Le dossier doit contenir au moins une CNI et un justificatif professionnel (diplôme ou attestation).',
+            // Document manquant ou format invalide : un seul message, celui du mémoire (Table 2.8, 2a).
+            'justificatifs.required' => self::MESSAGE_JUSTIFICATIF_INVALIDE,
+            'justificatifs.min' => self::MESSAGE_JUSTIFICATIF_INVALIDE,
             'justificatifs.max' => 'Vous pouvez joindre 5 fichiers au maximum.',
             'justificatifs.*.type_document.*' => 'Le type de document est invalide (cni, diplome ou attestation).',
-            'justificatifs.*.fichier.required' => 'Veuillez joindre un fichier PDF ou image valide',
+            'justificatifs.*.fichier.required' => self::MESSAGE_JUSTIFICATIF_INVALIDE,
             'justificatifs.*.fichier.max' => 'Le fichier ne doit pas dépasser 5 Mo.',
         ];
     }
@@ -77,10 +81,10 @@ class InscriptionPrestataireRequest extends FormRequest
             $types = collect($justificatifs)->map(fn ($j) => is_array($j) ? ($j['type_document'] ?? null) : null);
 
             if (! $types->contains(TypeDocument::Cni->value)) {
-                $validateur->errors()->add('justificatifs', 'Le dossier doit contenir une copie de votre CNI.');
+                $validateur->errors()->add('justificatifs', self::MESSAGE_JUSTIFICATIF_INVALIDE);
             }
             if (! $types->contains(TypeDocument::Diplome->value) && ! $types->contains(TypeDocument::Attestation->value)) {
-                $validateur->errors()->add('justificatifs', 'Le dossier doit contenir au moins un justificatif professionnel (diplôme ou attestation).');
+                $validateur->errors()->add('justificatifs', self::MESSAGE_JUSTIFICATIF_INVALIDE);
             }
         }];
     }
