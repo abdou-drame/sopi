@@ -147,9 +147,8 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
       corps = SizedBox(
         height: 320,
         child: EtatVide(
-          message: !filtres.actifs
-              ? 'Aucun prestataire disponible dans cette catégorie'
-              : 'Aucun prestataire ne correspond.',
+          // Mémoire, tableau 2.5 (scénario 3a) : « Aucun résultat » affiche toujours ce message, avec ou sans mot-clé ou filtre.
+          message: 'Aucun prestataire disponible dans cette catégorie',
           icone: Icons.search_off_rounded,
           libelleAction: filtres.actifs ? 'Effacer les filtres' : null,
           onAction: filtres.actifs ? _effacer : null,
