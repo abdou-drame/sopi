@@ -47,8 +47,7 @@ type Mode = 'masquer' | 'conserver' | 'retablir'
 
 /**
  * Une action de modération avec sa confirmation. Masquer exige un motif, conserver le propose, rétablir n'en a pas.
- * « Conserver » et « Rétablir » restent fonctionnels mais ne sont pas affichés : la maquette ne les dessine pas encore
- * (voir maquettes/A-DESSINER.md).
+ * « Conserver » (avis signalé) et « Masquer » sont les deux décisions de la modération (RF15) ; « Rétablir » republie un avis masqué.
  */
 export function ActionModeration({ avis, mode, onFait }: { avis: AvisAdmin; mode: Mode; onFait: (message: string) => void }) {
   const [ouverte, setOuverte] = useState(false)
@@ -231,6 +230,18 @@ function LigneAvis({ a, retour, ctx }: { a: AvisAdmin; retour: ReturnType<typeof
       </td>
       <td className="max-w-[300px] text-[#3c4257]">
         <span className="line-clamp-1">{a.commentaire ? `« ${a.commentaire} »` : '—'}</span>
+        {a.signaleLe && (
+          <span className="mt-0.5 block text-xs text-[#983705]">
+            {T.signaleLe(formatDate(a.signaleLe))}
+            {a.motifSignalement ? ` : « ${a.motifSignalement} »` : ''}
+          </span>
+        )}
+        {a.modereLe && (
+          <span className="mt-0.5 block text-xs text-[#6b7287]">
+            {T.modereLe(formatDate(a.modereLe))}
+            {a.motifModeration ? ` : « ${a.motifModeration} »` : ''}
+          </span>
+        )}
       </td>
       <td className="whitespace-nowrap text-[#6b7287]">{formatDate(a.dateCreation)}</td>
       <td>
@@ -238,6 +249,7 @@ function LigneAvis({ a, retour, ctx }: { a: AvisAdmin; retour: ReturnType<typeof
       </td>
       <td>
         <div className="flex items-center justify-end gap-2">
+          {a.statut === 'signale' && !a.masque && <ActionModeration avis={a} mode="conserver" onFait={retour.succes} />}
           <ActionModeration avis={a} mode={a.masque ? 'retablir' : 'masquer'} onFait={retour.succes} />
           <Link to={`/reservations/${a.reservationId}`} aria-label="Voir la réservation" title="Voir la réservation" className="mq-rond grid size-8 shrink-0 place-items-center rounded-full border border-[#e6e8ee] bg-white text-[#12172b]">
             <IFlecheHautDroite />

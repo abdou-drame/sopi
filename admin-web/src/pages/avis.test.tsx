@@ -29,7 +29,7 @@ const PAGE = (data: unknown[]) => ({
   links: { first: null, last: null, prev: null, next: null },
   meta: { current_page: 1, last_page: 1, per_page: 20, total: data.length },
 })
-/** « Conserver » et « Rétablir » ne sont pas dessinés : on les teste isolément, sans passer par la page. */
+/** Action isolée, sans passer par la page. */
 function afficherAction(avis: typeof AVIS, mode: 'conserver' | 'retablir') {
   const messages: string[] = []
   render(
@@ -54,6 +54,25 @@ describe('modération des avis', () => {
     expect(recherche?.has('vue')).toBe(false)
     await userEvent.click(screen.getByRole('tab', { name: /Masqués/ }))
     expect(screen.getByTestId('lieu')).toHaveTextContent('/avis?vue=masques')
+  })
+
+  it('propose Conserver et Masquer sur un avis signalé, avec le motif du signalement (RF15)', async () => {
+    const { appels } = simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS]) }, 'POST /admin/avis/a-1/conserver': { corps: AVIS } })
+    afficherApplication('/avis')
+    expect(await screen.findByText(/Avis injuste\./)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Masquer l’avis de Awa Diallo' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Conserver l’avis de Awa Diallo' }))
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Conserver' }))
+    expect(await screen.findByText('L’avis a été conservé.')).toBeInTheDocument()
+    expect(appels.filter((a) => a.methode === 'POST')).toHaveLength(1)
+  })
+
+  it('ne propose pas Conserver sur un avis masqué et montre la trace de la modération', async () => {
+    simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([MASQUE]) } })
+    afficherApplication('/avis?vue=masques')
+    expect(await screen.findByText(/Propos injurieux\./)).toBeInTheDocument()
+    expect(screen.getByText(/Modéré le/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
   })
 
   it('masque un avis : motif obligatoire, corps conforme (appel simulé)', async () => {
@@ -90,13 +109,13 @@ describe('modération des avis', () => {
     expect(appels.filter((a) => a.methode === 'POST')).toHaveLength(1)
   })
 
-  it('affiche « Masquer » sur un avis publié, « Republier » sur un avis masqué, et un lien vers la réservation (pas de « Conserver »)', async () => {
+  it('affiche « Masquer » (et « Conserver » si signalé), « Republier » sur un avis masqué, et un lien vers la réservation', async () => {
     simulerApi({ ...base, 'GET /admin/avis': { corps: PAGE([AVIS, MASQUE]) } })
     afficherApplication('/avis')
     expect(await screen.findByRole('button', { name: 'Masquer l’avis de Awa Diallo' })).toHaveTextContent('Masquer')
     expect(screen.getByRole('button', { name: 'Rétablir l’avis de Awa Diallo' })).toHaveTextContent('Republier')
     expect(screen.getAllByRole('link', { name: 'Voir la réservation' })).toHaveLength(2)
-    expect(screen.queryByRole('button', { name: /Conserver l’avis/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /Conserver l’avis/ })).toHaveLength(1)
   })
 
   it('calcule les 4 cartes depuis le tableau de bord (publiés déduit du total) et réinitialise les filtres sans quitter la vue', async () => {
