@@ -108,7 +108,9 @@ class Creneau extends Model
     }
 
     /**
-     * Libère en une seule requête tous les créneaux dont le verrou a expiré (RG09) : VERROUILLE vers LIBRE, verrou vidé.
+     * Libère en une seule requête tous les créneaux dont le verrou a expiré (RG09) : VERROUILLE vers LIBRE, échéance vidée.
+     * Le dernier détenteur (verrouille_par) est conservé : tant qu'un autre client ne reprend pas le créneau, la demande de
+     * réservation de ce client reçoit « Délai dépassé » (mémoire, tableau 2.6, scénario 3b) et non « créneau indisponible ».
      * Un verrou encore valide, un créneau réservé ou indisponible ne sont jamais touchés. Renvoie le nombre libéré.
      */
     public static function libererVerrousExpires(): int
@@ -116,7 +118,25 @@ class Creneau extends Model
         return static::query()
             ->where('statut', StatutCreneau::Verrouille->value)
             ->where('verrou_expire_a', '<', now())
-            ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null, 'verrouille_par' => null]);
+            ->update(['statut' => StatutCreneau::Libre->value, 'verrou_expire_a' => null]);
+    }
+
+    /**
+     * Vrai si ce client tenait le verrou de ce créneau et qu'il a expiré : soit le verrou est encore posé mais périmé,
+     * soit le balayage de la minute l'a déjà levé en gardant le client comme dernier détenteur. Faux dans tous les
+     * autres cas (jamais verrouillé par lui, repris par un autre client, créneau réservé ou indisponible).
+     */
+    public function verrouExpireDuClient(string $clientId): bool
+    {
+        if ($this->verrouille_par !== $clientId) {
+            return false;
+        }
+
+        return match ($this->statut) {
+            StatutCreneau::Verrouille => $this->verrou_expire_a !== null && $this->verrou_expire_a->lte(now()),
+            StatutCreneau::Libre => true,
+            default => false,
+        };
     }
 
     /**

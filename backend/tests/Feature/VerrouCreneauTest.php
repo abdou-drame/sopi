@@ -224,6 +224,32 @@ describe('modèle Creneau', function () {
             ->and($c->fresh()->statut)->toBe(StatutCreneau::Verrouille);
     });
 
+    it('libererVerrousExpires garde le dernier détenteur ; verrouExpireDuClient ne reconnaît que le verrou expiré du client', function () {
+        [$a, $b] = [User::factory()->create(), User::factory()->create()];
+        $perime = verrouPose(creneauVerrou(), $a, -1);
+        $valide = verrouPose(creneauVerrou(jours: 3), $a);
+        $libre = creneauVerrou(jours: 4);
+        $reserve = creneauVerrou('reserve', jours: 5);
+
+        // Verrou périmé mais pas encore balayé : reconnu pour son détenteur seulement.
+        expect($perime->verrouExpireDuClient($a->id))->toBeTrue()
+            ->and($perime->verrouExpireDuClient($b->id))->toBeFalse()
+            ->and($valide->verrouExpireDuClient($a->id))->toBeFalse()
+            ->and($libre->verrouExpireDuClient($a->id))->toBeFalse()
+            ->and($reserve->verrouExpireDuClient($a->id))->toBeFalse();
+
+        expect(Creneau::libererVerrousExpires())->toBe(1);
+
+        // Après le balayage : créneau libre, échéance vidée, mais le dernier détenteur reste reconnu.
+        $perime = $perime->fresh();
+        expect($perime->statut)->toBe(StatutCreneau::Libre)
+            ->and($perime->verrou_expire_a)->toBeNull()
+            ->and($perime->verrouille_par)->toBe($a->id)
+            ->and($perime->verrouExpireDuClient($a->id))->toBeTrue()
+            ->and($perime->verrouExpireDuClient($b->id))->toBeFalse()
+            ->and($valide->fresh()->statut)->toBe(StatutCreneau::Verrouille);
+    });
+
     it('verrouillerSiLibre n\'exécute qu\'une seule requête UPDATE, sans lecture préalable', function () {
         $c = creneauVerrou();
         $client = User::factory()->create();
