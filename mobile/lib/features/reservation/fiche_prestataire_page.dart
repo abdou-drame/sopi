@@ -8,6 +8,7 @@ import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
 import '../../core/theme/disposition.dart';
+import '../../core/widgets/boutons.dart';
 import '../../core/widgets/en_tete_ecran.dart';
 import '../../core/widgets/etats.dart';
 import '../compte/modeles_notification.dart' show dateRelative;
@@ -62,9 +63,17 @@ class Etoiles extends StatelessWidget {
 
 /// Une ligne d'avis (carte blanche : auteur, étoiles, commentaire).
 class CarteAvis extends StatelessWidget {
-  const CarteAvis({super.key, required this.avis, this.maintenant});
+  const CarteAvis({
+    super.key,
+    required this.avis,
+    this.maintenant,
+    this.onSignaler,
+  });
 
   final Avis avis;
+
+  /// Si fourni et que l'avis est signalable, un bouton « Signaler » s'affiche (écran « Mes avis » du prestataire).
+  final VoidCallback? onSignaler;
 
   /// Heure actuelle : quand elle est fournie, la date de l’avis s’affiche sous l’auteur (« Il y a 2 h »).
   final DateTime? maintenant;
@@ -119,6 +128,19 @@ class CarteAvis extends StatelessWidget {
                 fontSize: 13,
                 height: 19 / 13,
                 color: CouleursSopi.texteSecondaire,
+              ),
+            ),
+          ],
+          if (onSignaler != null && avis.peutSignaler) ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerRight,
+              child: BoutonCompact(
+                libelle: 'Signaler',
+                ton: TonBoutonCompact.contour,
+                hauteur: 36,
+                taille: 12,
+                onPressed: onSignaler,
               ),
             ),
           ],

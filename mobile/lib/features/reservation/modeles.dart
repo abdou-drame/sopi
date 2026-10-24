@@ -201,6 +201,7 @@ class Avis {
     required this.auteur,
     this.commentaire,
     this.dateCreation,
+    this.peutSignaler = false,
   });
 
   final String id;
@@ -209,12 +210,24 @@ class Avis {
   final String? commentaire;
   final DateTime? dateCreation;
 
+  /// Vrai pour le prestataire noté tant que l'avis n'a été ni signalé ni modéré (RF20).
+  final bool peutSignaler;
+
+  Avis sansSignalement() => Avis(
+    id: id,
+    note: note,
+    auteur: auteur,
+    commentaire: commentaire,
+    dateCreation: dateCreation,
+  );
+
   factory Avis.depuisJson(Map<String, dynamic> j) => Avis(
     id: j['id'].toString(),
     note: _nombre(j['note'])?.toInt() ?? 0,
     auteur: (j['auteur'] ?? '').toString(),
     commentaire: j['commentaire'] as String?,
     dateCreation: j['dateCreation'] == null ? null : _date(j['dateCreation']),
+    peutSignaler: j['peutSignaler'] == true,
   );
 }
 

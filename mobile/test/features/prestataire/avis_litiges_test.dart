@@ -7,12 +7,17 @@ import '../../aide_api.dart';
 import '../auth/aide_acces.dart';
 import 'aide_prestataire.dart';
 
-Map<String, Object?> _avis(String id, {String auteur = 'Awa D.'}) => {
+Map<String, Object?> _avis(
+  String id, {
+  String auteur = 'Awa D.',
+  bool peutSignaler = false,
+}) => {
   'id': id,
   'note': 5,
   'commentaire': 'Très bien $id',
   'auteur': auteur,
   'dateCreation': '2026-10-10T08:00:00+00:00',
+  'peutSignaler': peutSignaler,
 };
 
 Map<String, Object?> _pageAvis(
@@ -120,6 +125,55 @@ void main() {
       expect(find.text('Très bien a-1'), findsOneWidget);
       expect(find.text('Moussa K.'), findsOneWidget);
       expect(find.text("Voir plus d'avis"), findsNothing);
+    });
+
+    testWidgets('signaler un avis : motif de 10 caractères minimum puis envoi', (
+      tester,
+    ) async {
+      final serveur = AdaptateurSimule(
+        _base({
+          'GET /prestataire/avis': Simulee(
+            200,
+            _pageAvis([
+              _avis('a-1', peutSignaler: true),
+              _avis('a-2', auteur: 'Moussa K.'),
+            ]),
+          ),
+          'POST /prestataire/avis/a-1/signaler': const Simulee(200, {
+            'id': 'a-1',
+            'signale': true,
+          }),
+        }),
+      );
+      await _ouvrir(tester, serveur, Chemins.avisRecus);
+      expect(find.text('Signaler'), findsOneWidget);
+
+      await tester.ensureVisible(find.text('Signaler'));
+      await tester.tap(find.text('Signaler'));
+      await avancer(tester, 300);
+      await tester.enterText(
+        find.byKey(const ValueKey('motif-signalement')),
+        'trop court',
+      );
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const ValueKey('motif-signalement')),
+        'court',
+      );
+      await tester.pump();
+      expect(serveur.requetes.where((r) => r.method == 'POST'), isEmpty);
+      await tester.enterText(
+        find.byKey(const ValueKey('motif-signalement')),
+        'Propos injurieux sans rapport.',
+      );
+      await tester.pump();
+      await tester.tap(find.widgetWithText(TextButton, 'Signaler'));
+      await avancer(tester, 300);
+
+      final envoi = serveur.requetes.singleWhere((r) => r.method == 'POST');
+      expect(envoi.path, '/prestataire/avis/a-1/signaler');
+      expect(envoi.data, {'motif': 'Propos injurieux sans rapport.'});
+      expect(find.text('Signaler'), findsNothing);
     });
 
     testWidgets('« Voir plus d’avis » charge la page suivante', (tester) async {

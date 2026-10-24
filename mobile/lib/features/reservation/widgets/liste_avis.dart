@@ -21,12 +21,16 @@ class ListeAvisPage extends ConsumerStatefulWidget {
     required this.titreLigne2,
     required this.chargerPage,
     required this.onRetour,
+    this.signaler,
   });
 
   final String titreLigne1;
   final String titreLigne2;
   final Future<PageAvis> Function(int page) chargerPage;
   final VoidCallback onRetour;
+
+  /// Fourni côté prestataire : signale l'avis `id` avec son motif (RF20). Sans lui, aucun bouton « Signaler ».
+  final Future<void> Function(String id, String motif)? signaler;
 
   @override
   ConsumerState<ListeAvisPage> createState() => _ListeAvisPageState();
@@ -71,6 +75,36 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
         _erreur = ErreurApi.depuis(e).message;
         _chargement = false;
       });
+    }
+  }
+
+  Future<void> _signaler(Avis avis) async {
+    final envoyer = widget.signaler;
+    if (envoyer == null) return;
+    final motif = await showDialog<String>(
+      context: context,
+      builder: (_) => const _DialogueMotifSignalement(),
+    );
+    if (motif == null || !mounted) return;
+    final messager = ScaffoldMessenger.of(context);
+    try {
+      await envoyer(avis.id, motif);
+      if (!mounted) return;
+      setState(() {
+        final i = _avis.indexWhere((a) => a.id == avis.id);
+        if (i >= 0) _avis[i] = _avis[i].sansSignalement();
+      });
+      messager.showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Avis signalé. L'administrateur va l'examiner.",
+          ),
+        ),
+      );
+    } catch (e) {
+      messager.showSnackBar(
+        SnackBar(content: Text(ErreurApi.depuis(e).message)),
+      );
     }
   }
 
@@ -142,7 +176,13 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
             for (final a in _avis)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: CarteAvis(avis: a, maintenant: maintenant),
+                child: CarteAvis(
+                  avis: a,
+                  maintenant: maintenant,
+                  onSignaler: widget.signaler == null
+                      ? null
+                      : () => _signaler(a),
+                ),
               ),
             if (_erreurSuite != null) ...[
               Text(_erreurSuite!, textAlign: TextAlign.center),
@@ -189,6 +229,58 @@ class _ListeAvisPageState extends ConsumerState<ListeAvisPage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Saisie du motif d'un signalement d'avis : 10 à 500 caractères (mêmes bornes que l'API).
+class _DialogueMotifSignalement extends StatefulWidget {
+  const _DialogueMotifSignalement();
+
+  @override
+  State<_DialogueMotifSignalement> createState() =>
+      _DialogueMotifSignalementState();
+}
+
+class _DialogueMotifSignalementState extends State<_DialogueMotifSignalement> {
+  static const _min = 10;
+  static const _max = 500;
+  final _controleur = TextEditingController();
+
+  @override
+  void dispose() {
+    _controleur.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final longueur = _controleur.text.trim().length;
+    final valide = longueur >= _min && longueur <= _max;
+    return AlertDialog(
+      title: const Text('Signaler cet avis ?'),
+      content: TextField(
+        key: const ValueKey('motif-signalement'),
+        controller: _controleur,
+        maxLines: 4,
+        maxLength: _max,
+        onChanged: (_) => setState(() {}),
+        decoration: const InputDecoration(
+          hintText: "Pourquoi cet avis doit-il être examiné ? ($_min caractères minimum)",
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        TextButton(
+          onPressed: valide
+              ? () => Navigator.of(context).pop(_controleur.text.trim())
+              : null,
+          child: const Text('Signaler'),
+        ),
+      ],
     );
   }
 }

@@ -17,6 +17,8 @@ class AvisRecusPage extends ConsumerWidget {
       titreLigne2: 'avis',
       chargerPage: (page) =>
           ref.read(depotPrestataireProvider).avisRecus(page: page),
+      signaler: (id, motif) =>
+          ref.read(depotPrestataireProvider).signalerAvis(id, motif),
       onRetour: () => context.canPop()
           ? context.pop()
           : context.go(Chemins.profilPrestataire),
