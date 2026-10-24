@@ -19,5 +19,14 @@ export default defineConfig({
     globals: true,
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
     setupFiles: ['./src/test/setup.ts'],
+    // Poste chargé (processeur partagé avec d'autres programmes) : chaque fichier de tests lance son propre processus et son propre
+    // jsdom, ce qui prend parfois plus de 10 s, et le premier rendu de l'application plus de 5 s. Les délais par défaut de Vitest
+    // (5 s par test, 10 s pour fermer un processus) donnaient alors de faux échecs (« Test timed out », « Timeout terminating forks worker »).
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
+    teardownTimeout: 60_000,
+    // Moitié des cœurs au plus : plus il y a de processus en même temps sur un petit processeur, plus chacun démarre lentement
+    // (et le délai de démarrage de 90 s de Vitest, « Timeout starting forks runner », n'est pas réglable).
+    maxWorkers: '50%',
   },
 })
