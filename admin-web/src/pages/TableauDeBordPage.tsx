@@ -467,6 +467,8 @@ export default function TableauDeBordPage() {
 
       <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
         <CarteChiffre degrade titre="Revenus Sopi (commissions)" valeur={t?.revenus} unite="FCFA" pastille="30 j" note="30 derniers jours" />
+        <CarteChiffre titre="Acomptes encaissés" valeur={t?.acomptesEncaisses} unite="FCFA" pastille="30 j" note="30 derniers jours" />
+        <CarteChiffre titre="Montants retirés" valeur={t?.retraitsVerses} unite="FCFA" pastille="30 j" note="Retraits versés, 30 derniers jours" />
         <CarteChiffre titre="Utilisateurs" valeur={clients?.meta.total} pastille="Clients" note="Clients actifs" />
         <CarteChiffre titre="Artisans" valeur={artisans?.meta.total} pastille="Prestataires" note="Prestataires actifs" />
         <CarteChiffre
