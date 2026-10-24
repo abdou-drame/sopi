@@ -157,7 +157,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "Le compte passe \u00e0 `actif` (le prestataire peut se connecter) et ses justificatifs \u00e0 `valide`.\nSeule une demande `en_attente` peut \u00eatre d\u00e9cid\u00e9e. Aucune notification n'est envoy\u00e9e : le prestataire consulte son lien de suivi."
+                        "description": "Le compte passe \u00e0 `actif` (le prestataire peut se connecter) et ses justificatifs \u00e0 `valide`.\nSeule une demande `en_attente` peut \u00eatre d\u00e9cid\u00e9e. Le prestataire en est inform\u00e9 par notification (e-mail et push) et peut aussi consulter son lien de suivi."
                     },
                     "response": [
                         {

@@ -437,7 +437,7 @@ paths:
     post:
       summary: 'Accepter une demande'
       operationId: accepterUneDemande
-      description: "Le compte passe à `actif` (le prestataire peut se connecter) et ses justificatifs à `valide`.\nSeule une demande `en_attente` peut être décidée. Aucune notification n'est envoyée : le prestataire consulte son lien de suivi."
+      description: "Le compte passe à `actif` (le prestataire peut se connecter) et ses justificatifs à `valide`.\nSeule une demande `en_attente` peut être décidée. Le prestataire en est informé par notification (e-mail et push) et peut aussi consulter son lien de suivi."
       parameters: []
       responses:
         200:

@@ -23,7 +23,7 @@ class DecisionDemandeController extends Controller
      * Accepter une demande
      *
      * Le compte passe à `actif` (le prestataire peut se connecter) et ses justificatifs à `valide`.
-     * Seule une demande `en_attente` peut être décidée. Aucune notification n'est envoyée : le prestataire consulte son lien de suivi.
+     * Seule une demande `en_attente` peut être décidée. Le prestataire en est informé par notification (e-mail et push) et peut aussi consulter son lien de suivi.
      *
      * @authenticated
      *
