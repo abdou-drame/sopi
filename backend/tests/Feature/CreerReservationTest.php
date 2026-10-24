@@ -165,6 +165,33 @@ describe('verrou', function () {
         expect(Reservation::count())->toBe(0)->and($s['creneau']->fresh()->statut)->toBe(StatutCreneau::Verrouille);
     });
 
+    it('refuse en 409 « Délai dépassé » même quand le balayage de la minute a déjà libéré le verrou du client', function () {
+        $client = User::factory()->create();
+        $s = scenarioReservation($client, -1);
+        expect(Creneau::libererVerrousExpires())->toBe(1)
+            ->and($s['creneau']->fresh()->statut)->toBe(StatutCreneau::Libre);
+        $this->actingAs($client, 'sanctum');
+
+        $this->postJson(URL_RESERVATIONS, corpsReservation($s))
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'Délai dépassé. Veuillez sélectionner de nouveau un créneau.');
+
+        expect(Reservation::count())->toBe(0)->and($s['creneau']->fresh()->statut)->toBe(StatutCreneau::Libre);
+    });
+
+    it('refuse en 409 « plus disponible » quand un autre client a repris le créneau après le balayage', function () {
+        $client = User::factory()->create();
+        $s = scenarioReservation($client, -1);
+        Creneau::libererVerrousExpires();
+        $autre = User::factory()->create();
+        expect($s['creneau']->fresh()->verrouillerSiLibre(300, $autre->id))->toBeTrue();
+        $this->actingAs($client, 'sanctum');
+
+        $this->postJson(URL_RESERVATIONS, corpsReservation($s))->assertStatus(409)->assertJsonPath('message', 'Ce créneau n\'est plus disponible.');
+
+        expect(Reservation::count())->toBe(0)->and($s['creneau']->fresh()->verrouille_par)->toBe($autre->id);
+    });
+
     it('refuse en 409 un verrou expiré repris par un autre client', function () {
         $client = User::factory()->create();
         $s = scenarioReservation($client, -1);

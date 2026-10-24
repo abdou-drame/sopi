@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\StatutCompte;
-use App\Enums\StatutCreneau;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationCreee;
 use App\Exceptions\ReservationImpossibleException;
@@ -85,14 +84,16 @@ class ReservationService
             ->find($id);
     }
 
-    /** Explique l'échec de marquerReserve (lecture APRÈS l'écriture refusée, jamais pour décider du verrou). */
+    /**
+     * Explique l'échec de marquerReserve (lecture APRÈS l'écriture refusée, jamais pour décider du verrou).
+     * « Délai dépassé » (mémoire, tableau 2.6, 3b) quand c'est le verrou de ce client qui a expiré, qu'il soit encore posé
+     * ou déjà levé par le balayage de la minute ; « plus disponible » quand un autre client a pris le créneau.
+     */
     private function refus(Creneau $creneau, User $client): ReservationImpossibleException
     {
         $actuel = Creneau::query()->find($creneau->id);
 
-        $verrouExpire = $actuel?->statut === StatutCreneau::Verrouille
-            && $actuel->verrouille_par === $client->id
-            && $actuel->verrou_expire_a?->lte(now());
+        $verrouExpire = $actuel?->verrouExpireDuClient($client->id) ?? false;
 
         return $verrouExpire
             ? new ReservationImpossibleException('Délai dépassé. Veuillez sélectionner de nouveau un créneau.', Response::HTTP_CONFLICT)

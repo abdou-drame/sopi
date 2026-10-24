@@ -89,7 +89,7 @@ void main() {
       expect(find.textContaining('délai limité pour répondre'), findsOneWidget);
       expect(find.text('Annuler la demande'), findsOneWidget);
       expect(find.textContaining('Payer'), findsNothing);
-      expect(find.text('Code de démarrage'), findsNothing);
+      expect(find.text('Code de réservation'), findsNothing);
       expect(find.text('Suivi'), findsOneWidget);
     });
 
@@ -137,7 +137,7 @@ void main() {
         ),
       );
       expect(find.text('Confirmée'), findsOneWidget);
-      expect(find.text('Code de démarrage'), findsOneWidget);
+      expect(find.text('Code de réservation'), findsOneWidget);
       for (final c in ['K', '7', 'M', 'Q', '4', 'Z']) {
         expect(find.text(c), findsOneWidget);
       }
@@ -159,7 +159,7 @@ void main() {
         _serveur(_res(statut: 'en_cours', code: 'K7MQ4Z', paiement: _paye)),
       );
       expect(find.text('En cours'), findsOneWidget);
-      expect(find.text('Code de démarrage'), findsOneWidget);
+      expect(find.text('Code de réservation'), findsOneWidget);
       expect(find.text('Prestation en cours'), findsOneWidget);
       expect(find.text('Annuler'), findsNothing);
     });
@@ -177,7 +177,7 @@ void main() {
         ),
       );
       expect(find.text('Terminée'), findsOneWidget);
-      expect(find.text('Code de démarrage'), findsNothing);
+      expect(find.text('Code de réservation'), findsNothing);
       expect(find.text('Laisser un avis'), findsOneWidget);
       expect(find.text('Signaler un problème'), findsOneWidget);
       await toucher(tester, find.text('Laisser un avis'));
@@ -376,7 +376,7 @@ void main() {
       );
       await passerTransition(tester);
       expect(tester.takeException(), isNull);
-      expect(find.text('Code de démarrage'), findsOneWidget);
+      expect(find.text('Code de réservation'), findsOneWidget);
     });
   });
 

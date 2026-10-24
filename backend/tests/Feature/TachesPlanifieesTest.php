@@ -221,14 +221,19 @@ describe('b) réservations acceptées non payées (2 h depuis acceptee_le)', fun
 });
 
 describe('c) verrous de créneaux expirés', function () {
-    it('libère le verrou expiré, laisse intact le verrou valide, sans événement', function () {
+    it('libère le verrou expiré en gardant le dernier détenteur, laisse intact le verrou valide, sans événement', function () {
         Event::fake([ReservationExpiree::class]);
         $expire = creneauVerrouleExpirant(-1);
+        $detenteur = $expire->verrouille_par;
         $valide = creneauVerrouleExpirant(3);
 
         $this->artisan('sopi:creneaux:liberer-verrous')->expectsOutput('1 créneau(x) libéré(s).')->assertSuccessful();
 
-        expect_creneau_libre($expire);
+        // Le dernier détenteur reste connu : sa demande tardive recevra « Délai dépassé » (mémoire, tableau 2.6, 3b).
+        $expire->refresh();
+        expect($expire->statut)->toBe(StatutCreneau::Libre)
+            ->and($expire->verrou_expire_a)->toBeNull()
+            ->and($expire->verrouille_par)->toBe($detenteur);
         expect($valide->fresh()->statut)->toBe(StatutCreneau::Verrouille)->and($valide->fresh()->verrouille_par)->not->toBeNull();
         Event::assertNothingDispatched();
     });
@@ -254,7 +259,9 @@ describe('c) verrous de créneaux expirés', function () {
         $this->artisan('sopi:creneaux:liberer-verrous')->expectsOutput('1 créneau(x) libéré(s).');
         $this->artisan('sopi:creneaux:liberer-verrous')->expectsOutput('0 créneau(x) libéré(s).');
 
-        expect($creneau->fresh()->verrouillerSiLibre(300, User::factory()->create()->id))->toBeTrue();
+        $autre = User::factory()->create();
+        expect($creneau->fresh()->verrouillerSiLibre(300, $autre->id))->toBeTrue()
+            ->and($creneau->fresh()->verrouille_par)->toBe($autre->id);
     });
 
     it('rend un créneau annulé automatiquement réservable par un autre client', function () {

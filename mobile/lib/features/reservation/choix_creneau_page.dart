@@ -22,6 +22,9 @@ const joursProposes = 14;
 const messageDelaiDepasse =
     'Délai dépassé. Veuillez sélectionner de nouveau un créneau.';
 
+/// Libellé du bouton qui envoie la demande de réservation (mémoire, tableau 2.6, étape 3).
+const libelleConfirmerReservation = 'Confirmer la réservation';
+
 /// Choix du créneau (maquette Creneau) : jours, heures libres, verrou de 5 minutes avec compte à rebours.
 class ChoixCreneauPage extends ConsumerStatefulWidget {
   const ChoixCreneauPage({
@@ -298,7 +301,7 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
               etiquette: c == null ? null : formaterJourCourt(c.debut),
               valeur: c == null ? null : formaterHeure(c.debut),
               texteVide: 'Choisissez une heure',
-              libelleBouton: 'Continuer',
+              libelleBouton: libelleConfirmerReservation,
               chargement: _envoi,
               onPressed: c == null || _verrou == null || _envoi
                   ? null

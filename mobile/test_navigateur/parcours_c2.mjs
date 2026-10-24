@@ -56,7 +56,7 @@ export default async function parcoursC2() {
     await s.attendre(1500);
     await s.capture(P, 'creneau-jour-sans-creneau');
     a = await s.arbre();
-    note('C', 'créneau : jour sans créneau → message, « Continuer » désactivé', /Aucun créneau libre ce jour-là/.test(a) && /Continuer" \[disabled\]/.test(a));
+    note('C', 'créneau : jour sans créneau → message, « Confirmer la réservation » désactivé', /Aucun créneau libre ce jour-là/.test(a) && /Confirmer la réservation" \[disabled\]/.test(a));
     await s.cliquer(etiqJour(1));
     await s.attendre(1500);
     await s.cliquer('10h00');
@@ -64,7 +64,7 @@ export default async function parcoursC2() {
     await s.capture(P, 'creneau-retenu');
     a = await s.arbre();
     note('C', 'créneau : créneau retenu avec compte à rebours (verrou)', /Créneau retenu pour vous \d\d:\d\d/.test(a) && /Lun\. 19 oct\. 10h00/.test(a), (a.match(/Créneau retenu pour vous \d\d:\d\d/) ?? [''])[0]);
-    await s.cliquer('Continuer');
+    await s.cliquer('Confirmer la réservation');
     await s.texte('Demande envoyée', 12000);
     await s.attendre(1000);
     await s.capture(P, 'demande-envoyee');
@@ -153,7 +153,7 @@ export default async function parcoursC2() {
     await s.attendre(3000);
     await s.capture(P, 'reservation-confirmee');
     a = await s.arbre();
-    note('C', 'détail : statut Confirmée et code de réservation affiché', /Confirmée/.test(a) && /Code de démarrage/.test(a), a.split('\n').slice(0, 5).join(' | '));
+    note('C', 'détail : statut Confirmée et code de réservation affiché', /Confirmée/.test(a) && /Code de réservation/.test(a), a.split('\n').slice(0, 5).join(' | '));
     const detail = await api(`/reservations/${reservationId}`, { jeton: await connexion(C.client.email, C.client.password) });
     const dossier = join(ICI, '.jetable');
     writeFileSync(join(dossier, 'etat.json'), JSON.stringify({ reservationId, code: detail.codeReservation ?? detail.code ?? null, statut: detail.statut ?? detail.data?.statut }, null, 2));

@@ -638,7 +638,7 @@ class _BlocAcceptee extends StatelessWidget {
   }
 }
 
-/// Code de démarrage à donner au prestataire (maquette DetailReservation).
+/// Code de réservation à donner au prestataire (maquette DetailReservation ; « code de réservation » dans le mémoire).
 class _BlocCode extends StatelessWidget {
   const _BlocCode({
     required this.code,
@@ -668,7 +668,7 @@ class _BlocCode extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Code de démarrage',
+                  'Code de réservation',
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: CouleursSopi.blanc,
                     fontWeight: FontWeight.w700,

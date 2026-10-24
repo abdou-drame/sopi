@@ -222,7 +222,12 @@ void main() {
       await tester.enterText(find.byType(TextField), 'zzz');
       await avancer(tester, 500);
       await passerTransition(tester);
-      expect(find.text('Aucun prestataire ne correspond.'), findsOneWidget);
+      // Avec un mot-clé : même message (mémoire, tableau 2.5, scénario 3a), plus l'action « Effacer les filtres ».
+      expect(
+        find.text('Aucun prestataire disponible dans cette catégorie'),
+        findsOneWidget,
+      );
+      expect(find.text('Aucun prestataire ne correspond.'), findsNothing);
       expect(find.text('Effacer les filtres'), findsOneWidget);
       await toucher(tester, find.text('Effacer les filtres'));
       await passerTransition(tester);
