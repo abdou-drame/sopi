@@ -214,11 +214,15 @@ void main() {
     ) async {
       final serveur = AdaptateurSimule(_routes(elements: []));
       await _ouvrir(tester, serveur);
-      expect(find.text('Aucun prestataire ne correspond.'), findsOneWidget);
+      expect(
+        find.text('Aucun prestataire disponible dans cette catégorie'),
+        findsOneWidget,
+      );
       expect(find.text('Effacer les filtres'), findsNothing);
       await tester.enterText(find.byType(TextField), 'zzz');
       await avancer(tester, 500);
       await passerTransition(tester);
+      expect(find.text('Aucun prestataire ne correspond.'), findsOneWidget);
       expect(find.text('Effacer les filtres'), findsOneWidget);
       await toucher(tester, find.text('Effacer les filtres'));
       await passerTransition(tester);

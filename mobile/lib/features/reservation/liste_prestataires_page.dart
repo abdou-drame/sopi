@@ -147,7 +147,9 @@ class _ListePrestatairesPageState extends ConsumerState<ListePrestatairesPage> {
       corps = SizedBox(
         height: 320,
         child: EtatVide(
-          message: 'Aucun prestataire ne correspond.',
+          message: !filtres.actifs
+              ? 'Aucun prestataire disponible dans cette catégorie'
+              : 'Aucun prestataire ne correspond.',
           icone: Icons.search_off_rounded,
           libelleAction: filtres.actifs ? 'Effacer les filtres' : null,
           onAction: filtres.actifs ? _effacer : null,
