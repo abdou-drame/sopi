@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../compte/modeles_litige.dart';
 import '../compte/selecteur_photo.dart';
 import 'modeles.dart';
 
@@ -62,10 +63,22 @@ final selecteurJustificatifProvider = Provider<SelecteurJustificatif>((ref) {
         final choisi = resultat?.files.firstOrNull;
         final octets = choisi?.bytes;
         if (choisi == null || octets == null) return null;
+        final typeMime = typeMimeDepuisNom(choisi.name);
+        if (typeMime == 'application/pdf') {
+          return FichierJustificatif(
+            nom: choisi.name,
+            octets: octets,
+            typeMime: typeMime,
+          );
+        }
+        // Les images sont compressées comme les photos ; les PDF ne sont pas touchés.
+        final photo = await compresserPhoto(
+          PhotoChoisie(nom: choisi.name, octets: octets, typeMime: typeMime),
+        );
         return FichierJustificatif(
-          nom: choisi.name,
-          octets: octets,
-          typeMime: typeMimeDepuisNom(choisi.name),
+          nom: photo.nom,
+          octets: photo.octets,
+          typeMime: photo.typeMime,
         );
     }
   };

@@ -294,6 +294,21 @@ describe('preuves', function () {
         expect(Litige::count())->toBe(0)->and(Storage::disk('local')->allFiles())->toBe([]);
     });
 
+    it('refuse une preuve de plus de 512 Ko', function () {
+        Storage::fake('local');
+        $client = User::factory()->create();
+        $reservation = reservationDe($client);
+
+        $reponse = $this->actingAs($client, 'sanctum')->post('/api/v1/reservations/'.$reservation->id.'/litiges', [
+            'motif' => motifLitige(),
+            'description' => descriptionLitige(),
+            'preuves' => [UploadedFile::fake()->image('gros.png')->size(600)],
+        ], ['Accept' => 'application/json'])->assertStatus(422);
+        expect($reponse->json('errors')['preuves.0'][0])->toBe('Chaque preuve ne doit pas dépasser 512 Ko.');
+
+        expect(Litige::count())->toBe(0);
+    });
+
     it('répond 404 pour une preuve inconnue', function () {
         $litige = Litige::factory()->create();
 

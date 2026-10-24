@@ -17,8 +17,8 @@ class OuvrirLitigeRequest extends FormRequest
 
     public const PREUVES_MAX = 3;
 
-    /** Taille maximale d'une preuve, en Ko (5 Mo). */
-    public const TAILLE_MAX_KO = 5120;
+    /** Taille maximale d'une preuve, en Ko (512 Ko ; l'application compresse avant l'envoi). */
+    public const TAILLE_MAX_KO = 512;
 
     public function authorize(): bool
     {
@@ -52,7 +52,7 @@ class OuvrirLitigeRequest extends FormRequest
             'preuves.*.file' => 'Chaque preuve doit être un fichier valide.',
             'preuves.*.uploaded' => 'L\'envoi d\'une preuve a échoué (fichier trop volumineux ou interrompu).',
             'preuves.*.mimetypes' => 'Chaque preuve doit être une image JPG, PNG ou WebP.',
-            'preuves.*.max' => 'Chaque preuve ne doit pas dépasser 5 Mo.',
+            'preuves.*.max' => 'Chaque preuve ne doit pas dépasser 512 Ko.',
         ];
     }
 
@@ -61,7 +61,7 @@ class OuvrirLitigeRequest extends FormRequest
         return [
             'motif' => ['description' => 'Raison du litige en quelques mots, de '.self::MOTIF_MIN.' à '.self::MOTIF_MAX.' caractères.', 'example' => 'Prestataire absent'],
             'description' => ['description' => 'Description du problème, de '.self::DESCRIPTION_MIN.' à '.self::DESCRIPTION_MAX.' caractères.', 'example' => 'Le prestataire ne s\'est pas présenté au rendez-vous.'],
-            'preuves' => ['description' => 'Facultatif : '.self::PREUVES_MAX.' photos JPG, PNG ou WebP au plus (5 Mo chacune, type vérifié sur le contenu), en multipart.', 'required' => false],
+            'preuves' => ['description' => 'Facultatif : '.self::PREUVES_MAX.' photos JPG, PNG ou WebP au plus (512 Ko chacune, type vérifié sur le contenu), en multipart.', 'required' => false],
         ];
     }
 

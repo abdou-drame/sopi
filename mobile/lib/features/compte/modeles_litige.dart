@@ -13,7 +13,7 @@ const motifsLitige = <String>[
 const descriptionLitigeMin = 10;
 const descriptionLitigeMax = 1000;
 const preuvesLitigeMax = 3;
-const tailleMaxPreuve = 5 * 1024 * 1024;
+const tailleMaxPreuve = 512 * 1024;
 
 /// Types d'image acceptés par l'API pour les preuves.
 const typesPreuveAcceptes = <String>{'image/jpeg', 'image/png', 'image/webp'};

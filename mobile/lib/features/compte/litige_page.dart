@@ -20,7 +20,7 @@ import 'selecteur_photo.dart';
 
 const messageFormatPhoto =
     'Format non accepté : choisissez une photo JPEG, PNG ou WebP.';
-const messageTaillePhoto = 'Cette photo dépasse 5 Mo.';
+const messageTaillePhoto = 'Cette photo dépasse 512 Ko.';
 const messageTropDePhotos = 'Vous pouvez joindre 3 photos au plus.';
 const messageSignalementEnvoye =
     'Signalement envoyé. Un administrateur examinera votre dossier.';
@@ -72,6 +72,10 @@ class _EtatLitige extends ConsumerState<LitigePage> {
     final PhotoChoisie? photo;
     try {
       photo = await ref.read(selecteurPhotoProvider)(source);
+    } on ImageTropLourdeException catch (e) {
+      if (!mounted) return;
+      setState(() => _erreurPhotos = e.message);
+      return;
     } catch (_) {
       if (!mounted) return;
       setState(

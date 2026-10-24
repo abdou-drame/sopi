@@ -53,6 +53,10 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
     final PhotoChoisie? photo;
     try {
       photo = await ref.read(selecteurPhotoProvider)(source);
+    } on ImageTropLourdeException catch (e) {
+      if (!mounted) return;
+      setState(() => _erreur = e.message);
+      return;
     } catch (_) {
       if (!mounted) return;
       setState(

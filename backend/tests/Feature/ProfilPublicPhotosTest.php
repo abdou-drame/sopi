@@ -117,7 +117,7 @@ describe('photos du prestataire', function () {
         'pdf' => ['pdf', 'plan.pdf', null, 'La photo doit être une image JPG, PNG ou WebP.'],
         'texte déguisé en jpg' => ['texte', 'faux.jpg', null, 'La photo doit être une image JPG, PNG ou WebP.'],
         'pdf déguisé en png' => ['pdf', 'faux.png', null, 'La photo doit être une image JPG, PNG ou WebP.'],
-        'trop gros' => ['png', 'gros.png', 6 * 1024 * 1024, 'La photo ne doit pas dépasser 5 Mo.'],
+        'trop gros' => ['png', 'gros.png', 600 * 1024, 'La photo ne doit pas dépasser 512 Ko.'],
     ]);
 
     it('refuse l\'absence de photo', function () {

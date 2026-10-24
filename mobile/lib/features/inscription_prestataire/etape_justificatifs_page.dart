@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
+import '../compte/selecteur_photo.dart';
 import 'depot_inscription.dart';
 import 'formulaire_inscription.dart';
 import 'mise_en_page_etape.dart';
@@ -50,6 +51,10 @@ class _EtapeJustificatifsPageState
     final FichierJustificatif? fichier;
     try {
       fichier = await ref.read(selecteurJustificatifProvider)(source);
+    } on ImageTropLourdeException catch (e) {
+      if (!mounted) return;
+      setState(() => _erreursLignes[type] = e.message);
+      return;
     } catch (_) {
       if (!mounted) return;
       setState(
