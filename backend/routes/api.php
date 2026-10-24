@@ -157,7 +157,8 @@ Route::prefix('v1')->group(function () {
 
         Route::get('/agenda', [AgendaController::class, 'consulter']);
         Route::post('/agenda/plages', [AgendaController::class, 'configurer']);
-        Route::post('/agenda/indisponibilites', [AgendaController::class, 'declarerIndisponibilite']);
+        Route::get('/agenda/indisponibilites/apercu', [AgendaController::class, 'apercuIndisponibilite']);
+        Route::post('/agenda/indisponibilites',[AgendaController::class, 'declarerIndisponibilite']);
         Route::delete('/agenda/creneaux/{id}', [AgendaController::class, 'supprimerCreneau'])->whereUuid('id');
 
         // Demandes de réservation reçues (pas de whereUuid : un identifiant invalide répond comme un inconnu).

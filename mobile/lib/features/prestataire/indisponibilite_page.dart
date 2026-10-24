@@ -14,6 +14,7 @@ import '../../core/theme/couleurs.dart';
 import '../reservation/depot_reservation.dart' show horlogeProvider;
 import 'actions_demande.dart';
 import 'depot_prestataire.dart';
+import 'modeles.dart';
 import 'widgets/composants_agenda.dart';
 
 /// Déclarer une indisponibilité (maquette Conge) : une période pendant laquelle le prestataire ne travaille pas.
@@ -34,9 +35,17 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
   Map<String, String> _erreurs = {};
   bool _enCours = false;
 
+  /// Réservations de la période saisie (aperçu serveur) et choix du prestataire à leur sujet.
+  List<ReservationConcernee> _concernees = const [];
+  bool _annuler = true;
+  int _versionApercu = 0;
+
   @override
   void initState() {
     super.initState();
+    Future.microtask(() {
+      if (mounted) _chargerApercu();
+    });
     final j = ref.read(horlogeProvider)().toUtc();
     final aujourdhui =
         '${j.day.toString().padLeft(2, '0')}/${j.month.toString().padLeft(2, '0')}/${j.year}';
@@ -56,8 +65,35 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
   void _retour() =>
       context.canPop() ? context.pop() : context.go(Chemins.disponibilites);
 
-  void _effacer(String champ) =>
-      setState(() => _erreurs = {..._erreurs}..remove(champ));
+  void _effacer(String champ) {
+    setState(() => _erreurs = {..._erreurs}..remove(champ));
+    _chargerApercu();
+  }
+
+  /// Relit les réservations de la période dès que les deux dates sont complètes ; une réponse périmée est ignorée.
+  /// Un échec de l'aperçu n'empêche pas de déclarer : la carte est simplement absente.
+  Future<void> _chargerApercu() async {
+    final version = ++_versionApercu;
+    final debut = _valeur(_jourDebut, _heureDebut);
+    final fin = _valeur(_jourFin, _heureFin);
+    List<ReservationConcernee> liste = const [];
+    if (debut != null && fin != null) {
+      try {
+        liste = await ref
+            .read(depotPrestataireProvider)
+            .apercuIndisponibilite(debut: debut, fin: fin);
+      } catch (_) {
+        liste = const [];
+      }
+    }
+    if (!mounted || version != _versionApercu) return;
+    setState(() {
+      _concernees = liste;
+      if (liste.isEmpty) _annuler = true;
+    });
+  }
+
+  bool get _garder => _concernees.isNotEmpty && !_annuler;
 
   /// « AAAA-MM-JJ HH:MM », le format attendu par l'API ; null si la saisie n'est pas une date et une heure.
   String? _valeur(TextEditingController jour, TextEditingController heure) {
@@ -85,14 +121,13 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
       setState(() => _erreurs = locales);
       return;
     }
+    final garder = _garder;
     final confirme = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("Déclarer l'indisponibilité ?"),
         content: Text(
-          'Du ${_lisible(debut!)} au ${_lisible(fin!)}.\n\n'
-          'Les réservations déjà prises sur cette période seront annulées '
-          'et les clients remboursés.',
+          'Du ${_lisible(debut!)} au ${_lisible(fin!)}.\n\n${garder ? 'Les réservations déjà prises sur cette période sont conservées ; seuls les créneaux libres seront bloqués.' : 'Les réservations déjà prises sur cette période seront annulées et les clients remboursés.'}',
         ),
         actions: [
           TextButton(
@@ -116,14 +151,20 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
     try {
       final bilan = await ref
           .read(depotPrestataireProvider)
-          .declarerIndisponibilite(debut: debut!, fin: fin!);
+          .declarerIndisponibilite(
+            debut: debut!,
+            fin: fin!,
+            annulerReservations: !garder,
+          );
       ref.invalidate(creneauxProvider);
       rafraichirDemandes(ref);
       final annulees = bilan.reservationsAnnulees;
       messager.showSnackBar(
         SnackBar(
           content: Text(
-            annulees > 0
+            garder
+                ? 'Indisponibilité enregistrée. Les réservations existantes sont conservées.'
+                : annulees > 0
                 ? "Indisponibilité enregistrée. $annulees réservation${annulees > 1 ? 's' : ''} annulée${annulees > 1 ? 's' : ''}, clients remboursés."
                 : 'Indisponibilité enregistrée.',
           ),
@@ -198,6 +239,102 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
     );
   }
 
+  /// Carte « Réservations concernées (N) » : liste, puis choix d'annuler (par défaut) ou de garder.
+  Widget _carteReservations(BuildContext context) {
+    final theme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: OmbresSopi.carte,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Réservations concernées (${_concernees.length})',
+            style: theme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          for (final r in _concernees)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                '${r.client} · ${r.prestation} · ${formaterDate(r.debut)}',
+                style: theme.bodyMedium,
+              ),
+            ),
+          const SizedBox(height: 8),
+          _choix(
+            context,
+            libelle: 'Annuler ces réservations',
+            detail: 'Les clients sont remboursés',
+            choisi: _annuler,
+            onTap: () => setState(() => _annuler = true),
+          ),
+          _choix(
+            context,
+            libelle: 'Garder ces réservations',
+            detail: 'Seuls les créneaux libres sont bloqués',
+            choisi: !_annuler,
+            onTap: () => setState(() => _annuler = false),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _choix(
+    BuildContext context, {
+    required String libelle,
+    required String detail,
+    required bool choisi,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context).textTheme;
+    return Semantics(
+      button: true,
+      selected: choisi,
+      child: InkWell(
+        onTap: _enCours ? null : onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      libelle,
+                      style: theme.bodyLarge?.copyWith(
+                        fontWeight: choisi ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      detail,
+                      style: theme.bodySmall?.copyWith(
+                        color: CouleursSopi.texteSecondaire,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                choisi
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                color: choisi ? CouleursSopi.bleu : CouleursSopi.iconeInactive,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,13 +377,19 @@ class _IndisponibilitePageState extends ConsumerState<IndisponibilitePage> {
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(16, 6, 16, 16),
-                  child: BandeauErreur.alerte(
-                    message:
-                        'Attention : les réservations déjà prises sur cette période seront annulées et les clients remboursés.',
+                if (_concernees.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: _carteReservations(context),
                   ),
-                ),
+                if (!_garder)
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 6, 16, 16),
+                    child: BandeauErreur.alerte(
+                      message:
+                          'Attention : les réservations déjà prises sur cette période seront annulées et les clients remboursés.',
+                    ),
+                  ),
               ],
             ),
           ),

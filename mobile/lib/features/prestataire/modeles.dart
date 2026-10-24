@@ -245,6 +245,32 @@ class PlageHoraire {
   };
 }
 
+/// Réservation touchée par une indisponibilité (`GET /prestataire/agenda/indisponibilites/apercu`) :
+/// client (prénom et initiale), prestation et début.
+class ReservationConcernee {
+  const ReservationConcernee({
+    required this.id,
+    required this.client,
+    required this.prestation,
+    required this.debut,
+  });
+
+  final String id;
+  final String client;
+  final String prestation;
+  final DateTime debut;
+
+  factory ReservationConcernee.depuisJson(Object? brut) {
+    final j = _objet(brut);
+    return ReservationConcernee(
+      id: '${j['id']}',
+      client: '${j['client'] ?? ''}',
+      prestation: '${j['prestation'] ?? ''}',
+      debut: DateTime.parse('${j['debut']}').toUtc(),
+    );
+  }
+}
+
 /// Bilan d'une indisponibilité déclarée, tel que renvoyé par le serveur.
 class BilanIndisponibilite {
   const BilanIndisponibilite({

@@ -12,6 +12,7 @@ use App\Exceptions\ReservationImpossibleException;
 use App\Models\Prestataire;
 use App\Models\Reservation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,9 +36,11 @@ class IndisponibiliteService
      * @return array{bloques: int, reserves: int, verrouilles: int, reservationsAnnulees: int}
      *                                                                                         `bloques` = libres (verrous expirés compris), `verrouilles` = verrous valides supprimés, `reserves` = créneaux réservés rendus indisponibles
      *
+     * Avec `$annulerReservations` à false, seuls les créneaux libres et les verrous sont bloqués : les réservations et leurs créneaux restent inchangés.
+     *
      * @throws ReservationImpossibleException 409 si une prestation est en cours ou si la situation a changé en cours de route
      */
-    public function declarer(Prestataire $prestataire, Carbon $debut, Carbon $fin): array
+    public function declarer(Prestataire $prestataire, Carbon $debut, Carbon $fin, bool $annulerReservations = true): array
     {
         $dansLaPlage = fn () => $prestataire->creneaux()
             ->where('date_debut', '<', $fin)
@@ -46,9 +49,9 @@ class IndisponibiliteService
         $evenements = [];
         $aRembourser = [];
 
-        $bilan = DB::transaction(function () use ($prestataire, $debut, $fin, $dansLaPlage, &$evenements, &$aRembourser) {
+        $bilan = DB::transaction(function () use ($prestataire, $debut, $fin, $dansLaPlage, $annulerReservations, &$evenements, &$aRembourser) {
             // Réservations actives des créneaux réservés de la plage : simple liste de pistes, chaque écriture est conditionnelle.
-            $reservations = Reservation::query()
+            $reservations = ! $annulerReservations ? new Collection : Reservation::query()
                 ->whereIn('statut', [...array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'), StatutReservation::EnCours->value])
                 ->whereHas('creneau', fn (Builder $q) => $q
                     ->where('prestataire_id', $prestataire->id)
@@ -96,5 +99,24 @@ class IndisponibiliteService
         $this->remboursements->tenterTous($aRembourser);
 
         return $bilan;
+    }
+
+    /**
+     * Réservations EN_ATTENTE, ACCEPTEE ou CONFIRMEE dont le créneau chevauche la plage (aperçu avant déclaration), triées par début.
+     *
+     * @return Collection<int, Reservation>
+     */
+    public function apercu(Prestataire $prestataire, Carbon $debut, Carbon $fin): Collection
+    {
+        return Reservation::query()
+            ->whereIn('statut', array_column(StatutReservation::ANNULABLES_PAR_CLIENT, 'value'))
+            ->whereHas('creneau', fn (Builder $q) => $q
+                ->where('prestataire_id', $prestataire->id)
+                ->where('date_debut', '<', $fin)
+                ->where('date_fin', '>', $debut))
+            ->with(['creneau', 'client', 'prestation'])
+            ->get()
+            ->sortBy(fn (Reservation $r) => $r->creneau->date_debut)
+            ->values();
     }
 }

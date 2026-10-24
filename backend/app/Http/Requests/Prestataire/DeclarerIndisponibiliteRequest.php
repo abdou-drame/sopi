@@ -20,6 +20,7 @@ class DeclarerIndisponibiliteRequest extends FormRequest
             'debut' => ['required', 'date_format:Y-m-d H:i'],
             'fin' => ['required', 'date_format:Y-m-d H:i'],
             'motif' => ['nullable', 'string', 'max:255'],
+            'annuler_reservations' => ['nullable', 'boolean'],
         ];
     }
 
@@ -49,6 +50,7 @@ class DeclarerIndisponibiliteRequest extends FormRequest
             'fin.required' => 'La fin est obligatoire.',
             'fin.date_format' => 'La fin doit être au format AAAA-MM-JJ HH:MM.',
             'motif.max' => 'Le motif ne peut pas dépasser 255 caractères.',
+            'annuler_reservations.boolean' => 'Le choix d\'annuler les réservations doit être vrai ou faux.',
         ];
     }
 
@@ -58,7 +60,14 @@ class DeclarerIndisponibiliteRequest extends FormRequest
             'debut' => ['description' => 'Début (AAAA-MM-JJ HH:MM, fuseau Africa/Dakar). Peut être passé ou présent.', 'example' => '2030-01-15 08:00'],
             'fin' => ['description' => 'Fin (AAAA-MM-JJ HH:MM), après le début et dans le futur. Plage de '.IndisponibiliteService::DUREE_MAX_JOURS.' jours au maximum.', 'example' => '2030-01-20 18:00'],
             'motif' => ['description' => 'Motif (congé, urgence...). Facultatif, non conservé.', 'example' => 'Congé', 'required' => false],
+            'annuler_reservations' => ['description' => 'true (défaut) : les réservations de la plage sont annulées et remboursées. false : seuls les créneaux libres sont bloqués, les réservations restent inchangées.', 'example' => true, 'required' => false],
         ];
+    }
+
+    /** Annuler (et rembourser) les réservations de la plage ? Vrai par défaut. */
+    public function annulerReservations(): bool
+    {
+        return $this->boolean('annuler_reservations', true);
     }
 
     /** @return array{0: Carbon, 1: Carbon} */

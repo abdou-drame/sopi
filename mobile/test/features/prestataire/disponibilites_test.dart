@@ -432,6 +432,7 @@ void main() {
       expect(envoi.data, {
         'debut': '2026-10-27 08:00',
         'fin': '2026-10-28 18:00',
+        'annuler_reservations': true,
       });
       expect(
         find.text(
@@ -440,6 +441,113 @@ void main() {
         findsOneWidget,
       );
       expect(cheminCourant(tester), Chemins.disponibilites);
+    });
+
+    const urlApercu = 'GET /prestataire/agenda/indisponibilites/apercu';
+    const urlDeclarer = 'POST /prestataire/agenda/indisponibilites';
+    final concernees = Simulee(200, {
+      'data': [
+        {
+          'id': 'r-1',
+          'client': 'Awa D.',
+          'prestation': 'Vidange',
+          'debut': '2026-10-27T09:00:00+00:00',
+        },
+        {
+          'id': 'r-2',
+          'client': 'Moussa S.',
+          'prestation': 'Freinage',
+          'debut': '2026-10-28T10:00:00+00:00',
+        },
+      ],
+    });
+
+    testWidgets('aucune réservation : pas de carte, aperçu demandé', (
+      tester,
+    ) async {
+      final serveur = await ouvrir(
+        tester,
+        enPlus: {urlApercu: const Simulee(200, {'data': []})},
+      );
+      await remplir(tester);
+      await avancer(tester, 300);
+      expect(find.textContaining('Réservations concernées'), findsNothing);
+      final apercu = serveur.requetes.where(
+        (r) => r.path == '/prestataire/agenda/indisponibilites/apercu',
+      );
+      expect(apercu.last.queryParameters, {
+        'debut': '2026-10-27 08:00',
+        'fin': '2026-10-28 18:00',
+      });
+    });
+
+    testWidgets('réservations : carte, annuler par défaut', (tester) async {
+      final serveur = await ouvrir(
+        tester,
+        enPlus: {
+          urlApercu: concernees,
+          urlDeclarer: const Simulee(200, {
+            'creneauxBloques': 3,
+            'creneauxReserves': 2,
+            'creneauxVerrouilles': 0,
+            'reservationsAnnulees': 2,
+          }),
+        },
+      );
+      await remplir(tester);
+      await avancer(tester, 300);
+      expect(find.text('Réservations concernées (2)'), findsOneWidget);
+      expect(find.textContaining('Awa D. · Vidange'), findsOneWidget);
+      expect(find.textContaining('Moussa S. · Freinage'), findsOneWidget);
+      expect(find.text('Annuler ces réservations'), findsOneWidget);
+      expect(find.text('Les clients sont remboursés'), findsOneWidget);
+      expect(find.text('Garder ces réservations'), findsOneWidget);
+      await tester.tap(find.text("Déclarer l'indisponibilité"));
+      await avancer(tester, 500);
+      await tester.tap(find.text('Oui, déclarer'));
+      await passerTransition(tester);
+      expect(_ecritures(serveur).single.data['annuler_reservations'], true);
+      expect(
+        find.text(
+          'Indisponibilité enregistrée. 2 réservations annulées, clients remboursés.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('garder : annuler_reservations false, message adapté', (
+      tester,
+    ) async {
+      final serveur = await ouvrir(
+        tester,
+        enPlus: {
+          urlApercu: concernees,
+          urlDeclarer: const Simulee(200, {
+            'creneauxBloques': 3,
+            'creneauxReserves': 0,
+            'creneauxVerrouilles': 0,
+            'reservationsAnnulees': 0,
+          }),
+        },
+      );
+      await remplir(tester);
+      await avancer(tester, 300);
+      await tester.ensureVisible(find.text('Garder ces réservations'));
+      await tester.pump();
+      await tester.tap(find.text('Garder ces réservations'));
+      await tester.pump();
+      await tester.tap(find.text("Déclarer l'indisponibilité"));
+      await avancer(tester, 500);
+      expect(find.textContaining('sont conservées'), findsOneWidget);
+      await tester.tap(find.text('Oui, déclarer'));
+      await passerTransition(tester);
+      expect(_ecritures(serveur).single.data['annuler_reservations'], false);
+      expect(
+        find.text(
+          'Indisponibilité enregistrée. Les réservations existantes sont conservées.',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('« Non » à la confirmation : rien n\'est envoyé', (

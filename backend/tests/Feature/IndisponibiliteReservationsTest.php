@@ -246,3 +246,72 @@ describe('périmètre et confidentialité', function () {
             ->assertJsonFragment(['id' => $reservation->id, 'statut' => 'annulee']);
     });
 });
+
+describe('option annuler_reservations', function () {
+    it('garde les réservations et leurs créneaux quand annuler_reservations vaut false, et bloque seulement les créneaux libres', function () {
+        Event::fake([ReservationAnnulee::class]);
+        $p = prestataireAvecReservations();
+        $this->actingAs($p->user, 'sanctum');
+        $libre = creneauDeLaPlage($p, '08:00');
+        $reservation = reservationDeLaPlage($p, '09:00', 'confirmee');
+
+        $this->postJson(URL_INDISPO_RESERVATIONS, [...corpsPlageDuJour(), 'annuler_reservations' => false])->assertOk()->assertExactJson([
+            'creneauxBloques' => 1, 'creneauxReserves' => 0, 'creneauxVerrouilles' => 0, 'reservationsAnnulees' => 0,
+        ]);
+
+        expect($reservation->fresh()->statut)->toBe(StatutReservation::Confirmee)
+            ->and(etatCreneau($reservation->creneau))->toBe(StatutCreneau::Reserve)
+            ->and(etatCreneau($libre))->toBe(StatutCreneau::Indisponible);
+        Event::assertNothingDispatched();
+    });
+
+    it('annule par défaut et refuse une valeur non booléenne', function () {
+        Event::fake([ReservationAnnulee::class]);
+        $p = prestataireAvecReservations();
+        $this->actingAs($p->user, 'sanctum');
+        $reservation = reservationDeLaPlage($p, '09:00', 'acceptee');
+
+        $this->postJson(URL_INDISPO_RESERVATIONS, [...corpsPlageDuJour(), 'annuler_reservations' => 'peut-etre'])->assertUnprocessable()->assertJsonValidationErrors('annuler_reservations');
+        expect($reservation->fresh()->statut)->toBe(StatutReservation::Acceptee);
+
+        $this->postJson(URL_INDISPO_RESERVATIONS, [...corpsPlageDuJour(), 'annuler_reservations' => true])->assertOk()->assertJsonPath('reservationsAnnulees', 1);
+        expect($reservation->fresh()->statut)->toBe(StatutReservation::Annulee);
+    });
+});
+
+describe('aperçu', function () {
+
+    it('liste les réservations EN_ATTENTE, ACCEPTEE et CONFIRMEE de la plage, sans modifier ni exposer le client', function () {
+        $p = prestataireAvecReservations();
+        $client = User::factory()->create(['prenom' => 'Awa', 'nom' => 'Diop', 'email' => 'awa.secret@example.test']);
+        $a = reservationDeLaPlage($p, '09:00', 'enAttente', $client);
+        $b = reservationDeLaPlage($p, '10:00', 'acceptee');
+        $c = reservationDeLaPlage($p, '11:00', 'confirmee');
+        reservationDeLaPlage($p, '12:00', 'enCours');
+        reservationDeLaPlage($p, '13:00', 'refusee');
+        reservationDeLaPlage(prestataireAvecReservations(), '09:00', 'confirmee');
+        $this->actingAs($p->user, 'sanctum');
+
+        $reponse = $this->getJson(URL_INDISPO_RESERVATIONS.'/apercu?'.http_build_query(corpsPlageDuJour()))->assertOk()->assertJsonCount(3, 'data');
+
+        expect(array_column($reponse->json('data'), 'id'))->toBe([$a->id, $b->id, $c->id])
+            ->and($reponse->json('data.0'))->toHaveKeys(['id', 'client', 'prestation', 'debut'])
+            ->and($reponse->json('data.0.client'))->toBe('Awa D.')
+            ->and($reponse->getContent())->not->toContain('awa.secret');
+        expect($a->fresh()->statut)->toBe(StatutReservation::EnAttente);
+    });
+
+    it('renvoie une liste vide hors plage, 422 si la plage est invalide, 401 et 403', function () {
+        $p = prestataireAvecReservations();
+        reservationDeLaPlage($p, '09:00', 'confirmee');
+        $this->getJson(URL_INDISPO_RESERVATIONS.'/apercu?'.http_build_query(corpsPlageDuJour()))->assertUnauthorized();
+
+        $this->actingAs(User::factory()->create(), 'sanctum');
+        $this->getJson(URL_INDISPO_RESERVATIONS.'/apercu?'.http_build_query(corpsPlageDuJour()))->assertForbidden();
+
+        $this->actingAs($p->user, 'sanctum');
+        $this->getJson(URL_INDISPO_RESERVATIONS.'/apercu?'.http_build_query(['debut' => now()->addDays(10)->format('Y-m-d').' 08:00', 'fin' => now()->addDays(10)->format('Y-m-d').' 18:00']))
+            ->assertOk()->assertExactJson(['data' => []]);
+        $this->getJson(URL_INDISPO_RESERVATIONS.'/apercu')->assertUnprocessable()->assertJsonValidationErrors(['debut', 'fin']);
+    });
+});

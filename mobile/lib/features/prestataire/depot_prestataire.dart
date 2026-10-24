@@ -264,15 +264,38 @@ class DepotPrestataire {
 
   /// Déclare une indisponibilité (dates « AAAA-MM-JJ HH:MM »). Le serveur annule et rembourse les réservations de la période ;
   /// 409 si une prestation est en cours.
+  /// Avec [annulerReservations] à false, seuls les créneaux libres sont bloqués et les réservations restent inchangées.
   Future<BilanIndisponibilite> declarerIndisponibilite({
     required String debut,
     required String fin,
+    bool annulerReservations = true,
   }) async {
     final reponse = await _dio.post<Object?>(
       '/prestataire/agenda/indisponibilites',
-      data: {'debut': debut, 'fin': fin},
+      data: {
+        'debut': debut,
+        'fin': fin,
+        'annuler_reservations': annulerReservations,
+      },
     );
     return BilanIndisponibilite.depuisJson(reponse.data);
+  }
+
+  /// Réservations en attente, acceptées ou confirmées de la plage (dates « AAAA-MM-JJ HH:MM »), sans rien modifier.
+  Future<List<ReservationConcernee>> apercuIndisponibilite({
+    required String debut,
+    required String fin,
+  }) async {
+    final reponse = await _dio.get<Object?>(
+      '/prestataire/agenda/indisponibilites/apercu',
+      queryParameters: {'debut': debut, 'fin': fin},
+    );
+    final corps = reponse.data;
+    final liste = corps is Map ? corps['data'] : null;
+    return [
+      if (liste is List)
+        for (final e in liste) ReservationConcernee.depuisJson(e),
+    ];
   }
 }
 

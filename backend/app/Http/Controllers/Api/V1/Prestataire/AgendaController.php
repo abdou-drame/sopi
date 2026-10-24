@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Prestataire;
 
 use App\Exceptions\ReservationImpossibleException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Prestataire\ApercuIndisponibiliteRequest;
 use App\Http\Requests\Prestataire\ConfigurerAgendaRequest;
 use App\Http\Requests\Prestataire\ConsulterAgendaRequest;
 use App\Http\Requests\Prestataire\DeclarerIndisponibiliteRequest;
@@ -108,6 +109,8 @@ class AgendaController extends Controller
      * Le client sera remboursé intégralement et prévenu (paiements et notifications : pas encore disponibles).
      * Si une prestation est en cours dans la plage, rien n'est modifié (409). Un créneau réservé dont la prestation est terminée reste inchangé.
      * Réponse : `creneauxBloques` (libres), `creneauxVerrouilles` (verrous supprimés), `creneauxReserves` et `reservationsAnnulees` (réservations annulées).
+     * Avec `annuler_reservations` à `false`, seuls les créneaux libres (et les verrous) sont bloqués : les réservations de la plage
+     * et leurs créneaux restent inchangés, rien n'est remboursé (`creneauxReserves` et `reservationsAnnulees` valent 0).
      * Idempotent. Plage de 90 jours au maximum. Il n'existe pas encore de route pour lever une indisponibilité.
      *
      * @authenticated
@@ -123,7 +126,7 @@ class AgendaController extends Controller
         [$debut, $fin] = $request->plage();
 
         try {
-            $bilan = $this->indisponibilites->declarer($this->prestataire($request), $debut, $fin);
+            $bilan = $this->indisponibilites->declarer($this->prestataire($request), $debut, $fin, $request->annulerReservations());
         } catch (ReservationImpossibleException $e) {
             return response()->json(['message' => $e->getMessage()], $e->statut);
         }
@@ -134,6 +137,33 @@ class AgendaController extends Controller
             'creneauxVerrouilles' => $bilan['verrouilles'],
             'reservationsAnnulees' => $bilan['reservationsAnnulees'],
         ]);
+    }
+
+    /**
+     * Aperçu d'une indisponibilité
+     *
+     * Réservations en attente, acceptées ou confirmées dont le créneau chevauche la plage `debut` / `fin`, triées par début.
+     * Le client n'est identifié que par son prénom et l'initiale de son nom. Rien n'est modifié.
+     *
+     * @authenticated
+     *
+     * @response 200 {"data":[{"id":"0198a1b2-0000-7000-8000-000000000090","client":"Awa D.","prestation":"Vidange","debut":"2030-01-16T09:00:00+00:00"}]}
+     * @response 401 {"message":"Authentification requise."}
+     * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
+     * @response 422 {"message":"La fin doit être après le début.","errors":{"fin":["La fin doit être après le début."]}}
+     */
+    public function apercuIndisponibilite(ApercuIndisponibiliteRequest $request): JsonResponse
+    {
+        [$debut, $fin] = $request->plage();
+
+        $reservations = $this->indisponibilites->apercu($this->prestataire($request), $debut, $fin);
+
+        return response()->json(['data' => $reservations->map(fn ($r) => [
+            'id' => $r->id,
+            'client' => trim($r->client->prenom.' '.mb_strtoupper(mb_substr(trim($r->client->nom), 0, 1)).'.'),
+            'prestation' => $r->prestation->nom,
+            'debut' => $r->creneau->date_debut->toIso8601String(),
+        ])->all()]);
     }
 
     private function prestataire(Request $request): Prestataire
