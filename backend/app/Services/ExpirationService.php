@@ -6,6 +6,7 @@ use App\Enums\CauseExpiration;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationExpiree;
 use App\Models\Creneau;
+use App\Models\Paiement;
 use App\Models\Reservation;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,10 @@ class ExpirationService
         );
     }
 
-    /** Annule les réservations ACCEPTEE non payées depuis plus de 2 h après acceptee_le. Renvoie le nombre annulé. */
+    /**
+     * Annule les réservations ACCEPTEE non payées depuis plus de 2 h après acceptee_le. Renvoie le nombre annulé.
+     * Un paiement resté EN_ATTENTE est alors abandonné : il passe à ECHOUE (mémoire, tableau 2.7, 3a).
+     */
     public function expirerImpayees(): int
     {
         $limite = now()->subHours((int) config('sopi.reservations.delai_paiement_heures'));
@@ -77,11 +81,28 @@ class ExpirationService
 
                     if ($annulee) {
                         $traitees++;
+                        if ($cause === CauseExpiration::Impayee) {
+                            $this->abandonnerPaiementsEnAttente($reservation);
+                        }
                         ReservationExpiree::dispatch($reservation, $cause);
                     }
                 }
             });
 
         return $traitees;
+    }
+
+    /**
+     * Délai de paiement dépassé : un paiement encore EN_ATTENTE est abandonné et passe à ECHOUE (mémoire, tableau 2.7, 3a).
+     * Hors de la transaction d'annulation : le webhook verrouille le paiement puis la réservation, il ne faut donc pas
+     * prendre ces deux verrous dans l'ordre inverse. Une erreur est journalisée et n'arrête ni l'événement ni les autres réservations.
+     */
+    private function abandonnerPaiementsEnAttente(Reservation $reservation): void
+    {
+        try {
+            Paiement::abandonnerLesEnAttenteDe($reservation->id);
+        } catch (Throwable $e) {
+            Log::error('Abandon du paiement en attente échoué', ['reservation_id' => $reservation->id, 'erreur' => $e::class]);
+        }
     }
 }

@@ -204,10 +204,37 @@ describe('solde insuffisant', function () {
         $prestataire = prestataireRetirant(4999);
 
         demanderRetrait(['montant' => 5000])->assertUnprocessable()
-            ->assertJsonPath('message', 'Solde insuffisant.')
-            ->assertJsonPath('errors.montant.0', 'Solde insuffisant.');
+            ->assertJsonPath('message', 'Solde insuffisant. Votre solde disponible est de 4 999 FCFA.')
+            ->assertJsonPath('errors.montant.0', 'Solde insuffisant. Votre solde disponible est de 4 999 FCFA.');
 
         expect($prestataire->fresh()->solde)->toBe('4999.00')->and(Retrait::query()->count())->toBe(0);
+    });
+
+    // Mémoire, tableau 2.10, étape 3a : « le système refuse la demande et affiche le solde ».
+    it('affiche le solde disponible du prestataire dans le refus, avec le séparateur de milliers', function () {
+        prestataireRetirant(12500);
+
+        demanderRetrait(['montant' => 20000])->assertUnprocessable()
+            ->assertJsonPath('errors.montant.0', 'Solde insuffisant. Votre solde disponible est de 12 500 FCFA.');
+    });
+
+    it('affiche un solde nul quand le prestataire n\'a encore rien gagné', function () {
+        prestataireRetirant(0);
+
+        demanderRetrait(['montant' => 5000])->assertUnprocessable()
+            ->assertJsonPath('errors.montant.0', 'Solde insuffisant. Votre solde disponible est de 0 FCFA.');
+    });
+
+    it('affiche le solde réel de la base et non celui d\'un autre prestataire ni une lecture périmée', function () {
+        Prestataire::factory()->avoirSolde(900000)->create();
+        $prestataire = prestataireRetirant(7000);
+        $copiePerimee = Prestataire::query()->findOrFail($prestataire->id);
+
+        app(RetraitService::class)->demander($prestataire, 5000, '+221771234567', OperateurRetrait::Wave);
+
+        // La copie lue avant le premier retrait croit encore avoir 7 000 : le message annonce les 2 000 réellement disponibles.
+        expect(fn () => app(RetraitService::class)->demander($copiePerimee, 5000, '+221771234567', OperateurRetrait::Wave))
+            ->toThrow(ValidationException::class, 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.');
     });
 
     it('n\'appelle pas le prestataire de paiement', function () {
@@ -223,7 +250,8 @@ describe('solde insuffisant', function () {
         $prestataire = prestataireRetirant(7000);
 
         demanderRetrait(['montant' => 5000])->assertCreated();
-        demanderRetrait(['montant' => 5000])->assertUnprocessable()->assertJsonPath('errors.montant.0', 'Solde insuffisant.');
+        demanderRetrait(['montant' => 5000])->assertUnprocessable()
+            ->assertJsonPath('errors.montant.0', 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.');
 
         expect($prestataire->fresh()->solde)->toBe('2000.00')->and(Retrait::query()->count())->toBe(1);
     });

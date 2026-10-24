@@ -9,6 +9,7 @@ use App\Models\Notification;
 use App\Models\Prestataire;
 use App\Models\User;
 use App\Services\Notification\NotificationService;
+use App\Services\SuiviDossierService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -217,3 +218,115 @@ it('refuse de composer un e-mail sans lien lisible', function () {
 
     expect(fn () => (new NotificationMail($notification, $user))->render())->toThrow(RuntimeException::class, 'Lien de suivi indisponible');
 });
+
+// Mémoire, 3.2.2 : l'e-mail « résultat de l'examen d'un dossier de prestataire » porte le lien de suivi.
+
+/** Chemin « /suivi/… » du lien lu dans la version texte de l'e-mail (null si l'e-mail n'en contient pas). */
+function cheminDeSuiviDans(NotificationMail $mail): ?string
+{
+    $texte = view($mail->content()->text, $mail->content()->with)->render();
+
+    return preg_match('#/suivi/\S+#', $texte, $trouve) === 1 ? $trouve[0] : null;
+}
+
+/** Dossier en attente que l'administrateur accepte ou refuse. Renvoie [prestataire, chemin du lien de suivi de l'e-mail de résultat]. */
+function resultatExamenDossier(string $action, array $corps = []): array
+{
+    configurerSmtp();
+    Mail::fake();
+    $prestataire = Prestataire::factory()
+        ->for(User::factory()->prestataire()->statut(StatutCompte::EnAttenteValidation)->state(['prenom' => 'Moussa', 'email' => 'moussa@exemple.test']), 'user')
+        ->create(['nom_entreprise' => 'Garage Moussa']);
+
+    test()->actingAs(User::factory()->administrateur()->create(), 'sanctum')
+        ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/$action", $corps)->assertOk();
+
+    $chemin = null;
+    Mail::assertSent(NotificationMail::class, function (NotificationMail $mail) use (&$chemin) {
+        $chemin = cheminDeSuiviDans($mail);
+
+        return $mail->hasTo('moussa@exemple.test');
+    });
+
+    return [$prestataire, $chemin];
+}
+
+it('joint le lien de suivi à l\'e-mail du résultat de l\'examen, dossier validé comme refusé', function (string $action, array $corps, string $statut, string $titre, string $detail) {
+    [$prestataire, $chemin] = resultatExamenDossier($action, $corps);
+
+    expect($chemin)->not->toBeNull()->toStartWith('/suivi/'.$prestataire->id.'.');
+    $this->get($chemin)->assertOk()->assertSee('Garage Moussa')->assertSee($titre)->assertSee($detail);
+    $this->getJson('/api/v1'.$chemin)->assertOk()->assertJsonPath('statutCompte', $statut)->assertJsonPath('nomEntreprise', 'Garage Moussa');
+
+    // Comme au dépôt : le lien n'est conservé ni en clair ni chiffré une fois l'e-mail parti.
+    $notification = Notification::sole();
+    expect($notification->canal_email_statut)->toBe(StatutEnvoi::Envoye)
+        ->and($notification->secret_chiffre)->toBeNull()
+        ->and(contenuDeLaBase())->not->toContain(explode('.', $chemin)[1]);
+})->with([
+    'dossier validé' => ['accepter', [], 'actif', 'Dossier accepté, vous pouvez vous connecter', 'Votre compte prestataire est actif'],
+    'dossier refusé' => ['refuser', ['motif' => 'La photocopie de la CNI est illisible.'], 'refuse', 'Dossier refusé', 'La photocopie de la CNI est illisible.'],
+]);
+
+it('garde valide le jeton remis à l\'inscription, à côté du lien de l\'e-mail de résultat', function () {
+    configurerSmtp();
+    Mail::fake();
+    $jeton = depotDossier()->assertCreated()->json('jeton_suivi');
+
+    $this->actingAs(User::factory()->administrateur()->create(), 'sanctum')
+        ->postJson('/api/v1/admin/prestataires/'.Prestataire::sole()->id.'/accepter')->assertOk();
+
+    $chemins = [];
+    Mail::assertSent(NotificationMail::class, function (NotificationMail $mail) use (&$chemins) {
+        $chemins[$mail->notification->type->value] = cheminDeSuiviDans($mail);
+
+        return true;
+    });
+    expect($chemins)->toHaveCount(2)
+        ->and($chemins['dossier_depose'])->toBe('/suivi/'.$jeton)
+        ->and($chemins['demande_acceptee'])->not->toBeNull()->not->toBe($chemins['dossier_depose']);
+
+    // Le mobile garde le jeton de l'inscription : les deux liens ouvrent le même suivi.
+    foreach ($chemins as $chemin) {
+        $this->getJson('/api/v1'.$chemin)->assertOk()->assertJsonPath('statutCompte', 'actif');
+    }
+});
+
+it('ne reconnaît le jeton signé que pour son dossier et avec la clé de l\'application', function () {
+    $dossier = Prestataire::factory()->refuse('La photocopie de la CNI est illisible.')->create(['nom_entreprise' => 'Garage Moussa']);
+    $autre = Prestataire::factory()->create();
+    $service = app(SuiviDossierService::class);
+    $jeton = $service->jetonDuResultat($dossier);
+    [, $signature] = explode('.', $jeton);
+
+    expect($service->jetonDuResultat($dossier))->toBe($jeton)
+        ->and($service->trouverParJeton($jeton)?->id)->toBe($dossier->id);
+    // Sans authentification, comme le lien reçu par e-mail.
+    $this->get('/suivi/'.$jeton)->assertOk()->assertSee('Dossier refusé')->assertSee('La photocopie de la CNI est illisible.');
+
+    foreach ([
+        $autre->id.'.'.$signature,                // signature d'un autre dossier
+        $dossier->id.'.'.strrev($signature),      // signature altérée
+        $dossier->id.'.',                         // signature vide
+        $jeton.'0',                               // signature rallongée
+        $dossier->id,                             // identifiant seul
+        'pas-un-identifiant.'.$signature,         // identifiant qui n'est pas un UUID
+    ] as $faux) {
+        $this->getJson('/api/v1/suivi/'.$faux)->assertNotFound()->assertExactJson(['message' => 'Lien de suivi invalide ou expiré.']);
+        expect($service->trouverParJeton($faux))->toBeNull();
+    }
+
+    // Une autre clé d'application, ou une clé vide, ne valide plus rien et ne permet pas de signer.
+    config(['app.key' => 'base64:'.base64_encode(str_repeat('x', 32))]);
+    expect($service->trouverParJeton($jeton))->toBeNull();
+    config(['app.key' => '']);
+    expect($service->trouverParJeton($jeton))->toBeNull()
+        ->and(fn () => $service->jetonDuResultat($dossier))->toThrow(RuntimeException::class, 'APP_KEY est vide');
+});
+
+it('refuse de composer l\'e-mail de résultat sans lien lisible', function (TypeNotification $type) {
+    $user = User::factory()->prestataire()->create(['email' => 'moussa@exemple.test']);
+    $notification = app(NotificationService::class)->creer($user, $type, 'Dossier examiné', 'Texte', [], [Canal::Email]);
+
+    expect(fn () => (new NotificationMail($notification, $user))->render())->toThrow(RuntimeException::class, 'Lien de suivi indisponible');
+})->with([TypeNotification::DemandeAcceptee, TypeNotification::DemandeRefusee]);

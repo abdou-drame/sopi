@@ -15,7 +15,7 @@ uses(RefreshDatabase::class);
 describe('table reservations', function () {
     it('a les colonnes prévues', function () {
         expect(Schema::getColumnListing('reservations'))->toEqualCanonicalizing([
-            'id', 'client_id', 'creneau_id', 'prestation_id', 'prix_applique', 'statut', 'motif_refus', 'code_reservation', 'acceptee_le', 'created_at', 'updated_at',
+            'id', 'client_id', 'creneau_id', 'prestation_id', 'prix_applique', 'statut', 'motif_refus', 'code_reservation', 'acceptee_le', 'rappel_envoye_le', 'created_at', 'updated_at',
         ]);
     });
 

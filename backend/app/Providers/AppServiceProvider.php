@@ -8,6 +8,7 @@ use App\Events\DemandePrestataireAcceptee;
 use App\Events\DemandePrestataireRefusee;
 use App\Events\LitigeCloture;
 use App\Events\LitigeOuvert;
+use App\Events\Reservation\RappelRendezVous;
 use App\Events\Reservation\ReservationAcceptee;
 use App\Events\Reservation\ReservationAnnulee;
 use App\Events\Reservation\ReservationConfirmee;

@@ -102,6 +102,20 @@ class Paiement extends Model
         return $modifies === 1 && $this->refresh() !== null;
     }
 
+    /**
+     * Passe à ECHOUE les paiements EN_ATTENTE d'une réservation dont le délai de paiement est dépassé : le paiement est
+     * abandonné (mémoire, tableau 2.7, 3a : « refusé, échoué ou abandonné » est enregistré « Échoué »). Un paiement réussi ou
+     * remboursé n'est jamais touché. Une session encore ouverte chez le prestataire de paiement et réglée plus tard reste
+     * traitée par le webhook (REUSSI puis remboursement). Une seule mise à jour conditionnelle ; renvoie le nombre de lignes changées.
+     */
+    public static function abandonnerLesEnAttenteDe(string $reservationId): int
+    {
+        return static::query()
+            ->where('reservation_id', $reservationId)
+            ->where('statut', StatutPaiement::EnAttente->value)
+            ->update(['statut' => StatutPaiement::Echoue->value, 'updated_at' => now()]);
+    }
+
     /** Passe EN_ATTENTE à ECHOUE (événement « échoué » du webhook) ; jamais un paiement réussi ou remboursé. */
     public function echouerSiEnAttente(): bool
     {

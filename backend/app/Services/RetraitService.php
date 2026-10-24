@@ -65,7 +65,7 @@ class RetraitService
      *   versement accepté) : AUCUN recrédit, le retrait reste EN_COURS (montant déjà débité), car le versement a pu partir.
      *   La commande de signalement (M7.5) le fait remonter.
      *
-     * @throws ValidationException solde insuffisant (clé « montant »)
+     * @throws ValidationException solde insuffisant (clé « montant ») : le message affiche le solde disponible (mémoire, tableau 2.10, 3a)
      * @throws RetraitEchoueException refus définitif du prestataire de paiement
      */
     public function demander(Prestataire $prestataire, int $montant, string $telephone, OperateurRetrait $operateur): Retrait
@@ -78,7 +78,7 @@ class RetraitService
                 ->update(['solde' => DB::raw('solde - '.$montant)]);
 
             if ($debites !== 1) {
-                throw ValidationException::withMessages(['montant' => ['Solde insuffisant.']]);
+                throw ValidationException::withMessages(['montant' => [$this->messageSoldeInsuffisant($prestataire)]]);
             }
 
             $retrait = Retrait::ouvrir($prestataire->getKey(), $montant, $telephone, $operateur);
@@ -184,6 +184,18 @@ class RetraitService
             $retrait->prestataire_id, TypeMouvementPortefeuille::RemboursementRetrait, (int) $retrait->montant, 'Retrait échoué : montant recrédité',
             Prestataire::query()->whereKey($retrait->prestataire_id)->value('solde'), retraitId: $retrait->id,
         );
+    }
+
+    /**
+     * Refus pour solde insuffisant : « le système refuse la demande et affiche le solde » (mémoire, tableau 2.10, 3a).
+     * Le solde est relu en base (la copie en mémoire du prestataire peut être périmée), arrondi à l'entier de FCFA inférieur
+     * pour ne jamais annoncer plus que ce qui peut être retiré. Même mise en forme que les limites (« 1 000 FCFA »).
+     */
+    private function messageSoldeInsuffisant(Prestataire $prestataire): string
+    {
+        $solde = (int) floor((float) Prestataire::query()->whereKey($prestataire->getKey())->value('solde'));
+
+        return 'Solde insuffisant. Votre solde disponible est de '.number_format($solde, 0, ',', ' ').' FCFA.';
     }
 
     /** Résultat ambigu : pas de recrédit ; journal sans donnée sensible (ni numéro, ni montant) ; le retrait reste EN_COURS. */

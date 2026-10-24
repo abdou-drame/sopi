@@ -35,10 +35,13 @@ enum TypeNotification: string
         return in_array($this, [self::DossierDepose, self::DemandeAcceptee, self::DemandeRefusee, self::LitigeCloture, self::SanctionPosee, self::SanctionLevee], true);
     }
 
-    /** Vrai si l'e-mail contient un lien secret (transmis chiffré, jamais stocké en clair). */
+    /**
+     * Vrai si l'e-mail contient un lien secret (transmis chiffré, jamais stocké en clair). Le résultat de l'examen du dossier
+     * porte le lien de suivi (mémoire, 3.2.2), pour que le prestataire refusé, qui ne peut pas se connecter, en lise le motif.
+     */
     public function aUnLien(): bool
     {
-        return in_array($this, [self::DossierDepose, self::ReinitialisationMotDePasse], true);
+        return in_array($this, [self::DossierDepose, self::DemandeAcceptee, self::DemandeRefusee, self::ReinitialisationMotDePasse], true);
     }
 
     public function libelleLien(): string

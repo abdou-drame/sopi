@@ -4139,7 +4139,7 @@
                                     "id": "jeton",
                                     "key": "jeton",
                                     "value": "jeton-de-suivi-exemple-0123456789-abcdefghijklmnop",
-                                    "description": "Jeton de suivi re\u00e7u \u00e0 l'inscription."
+                                    "description": "Jeton de suivi re\u00e7u \u00e0 l'inscription ou dans l'e-mail du r\u00e9sultat de l'examen."
                                 }
                             ]
                         },
@@ -4155,7 +4155,7 @@
                             }
                         ],
                         "body": null,
-                        "description": "Route publique : le prestataire non encore actif suit son dossier avec le lien personnel re\u00e7u \u00e0 l'inscription.\nNe renvoie aucune donn\u00e9e personnelle. Le motif de refus n'est renseign\u00e9 que si le dossier est refus\u00e9.\nUn jeton inconnu renvoie toujours la m\u00eame r\u00e9ponse 404. Limit\u00e9 \u00e0 30 requ\u00eates par minute et par adresse IP.",
+                        "description": "Route publique : le prestataire non encore actif suit son dossier avec le lien personnel re\u00e7u \u00e0 l'inscription, puis dans l'e-mail du r\u00e9sultat de l'examen.\nNe renvoie aucune donn\u00e9e personnelle. Le motif de refus n'est renseign\u00e9 que si le dossier est refus\u00e9.\nUn jeton inconnu renvoie toujours la m\u00eame r\u00e9ponse 404. Limit\u00e9 \u00e0 30 requ\u00eates par minute et par adresse IP.",
                         "auth": {
                             "type": "noauth"
                         }
@@ -5925,7 +5925,7 @@
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\"message\":\"Solde insuffisant.\",\"errors\":{\"montant\":[\"Solde insuffisant.\"]}}",
+                            "body": "{\"message\":\"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.\",\"errors\":{\"montant\":[\"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.\"]}}",
                             "name": ""
                         },
                         {
