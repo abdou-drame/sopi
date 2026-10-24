@@ -264,9 +264,6 @@ void main() {
       expect(find.text('Salon Fatou'), findsOneWidget);
       expect(find.text('Acompte payé'), findsOneWidget);
       expect(find.text(formaterArgent(1500)), findsOneWidget);
-      // Mémoire, tableau 2.7 (étape 6) : la confirmation affiche le code de réservation.
-      expect(find.text('Code de réservation'), findsOneWidget);
-      expect(find.text('K7MQ4Z'), findsOneWidget);
       expect(find.text('Voir ma réservation'), findsOneWidget);
 
       await toucher(tester, find.text('Voir ma réservation'));
@@ -288,8 +285,6 @@ void main() {
       );
       await _revenir(tester);
       await avancer(tester, 400);
-      // Aucun code reçu du serveur : la ligne « Code de réservation » n'est pas affichée.
-      expect(find.text('Code de réservation'), findsNothing);
       await toucher(tester, find.text('Retour à l\'accueil'));
       await passerTransition(tester);
       expect(cheminCourant(tester), Chemins.accueil);

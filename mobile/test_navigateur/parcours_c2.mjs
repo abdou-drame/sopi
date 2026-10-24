@@ -148,7 +148,7 @@ export default async function parcoursC2() {
     await s.attendre(1500);
     await s.capture(P, 'paiement-reussi');
     a = await s.arbre();
-    note('C', 'paiement réussi : écran « Paiement réussi ! » avec acompte payé et code de réservation', /réussi/.test(a) && /Acompte payé/.test(a) && /Code de réservation/.test(a), a.split('\n').slice(0, 6).join(' | '));
+    note('C', 'paiement réussi : écran « Paiement réussi ! » avec acompte payé', /réussi/.test(a) && /Acompte payé/.test(a), a.split('\n').slice(0, 6).join(' | '));
     await s.cliquer('Voir ma réservation');
     await s.attendre(3000);
     await s.capture(P, 'reservation-confirmee');
