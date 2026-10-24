@@ -814,6 +814,8 @@ class _Succes extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = reservation;
     final acompte = r?.paiement?.montantAcompte ?? session?.montantAcompte;
+    // Mémoire, tableau 2.7 (étape 6) : la confirmation affiche le code de réservation généré au paiement.
+    final code = r?.codeReservation;
     return _MiseEnPageResultat(
       entete: const _EnTeteResultat(
         fond: CouleursSopi.bleu,
@@ -841,6 +843,14 @@ class _Succes extends StatelessWidget {
               acompte == null ? '—' : formaterArgent(acompte),
               couleur: CouleursSopi.bleu,
             ),
+            if (code != null) ...[
+              const SizedBox(height: 10),
+              _LigneRecap(
+                'Code de réservation',
+                code,
+                couleur: CouleursSopi.bleu,
+              ),
+            ],
           ],
         ),
       ),
