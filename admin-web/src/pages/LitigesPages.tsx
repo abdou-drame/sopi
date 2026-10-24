@@ -11,7 +11,8 @@ import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import { ChampJour, ChampSelect } from '../design/champs'
 import Fenetre from '../design/Fenetre'
 import { Avatar, Badge, Carte as CarteMq, FOND_MARQUE, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PaginationRonde, TitreCarte, TitreDetail, TitrePage } from '../design/composants'
-import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
+import { IHorloge, IImage, IMessage, IRecherche, IUtilisateur } from '../design/icones'
+import { HistoriqueSanctions } from './UtilisateursPages'
 import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { CartesSquelette } from '../design/etats'
@@ -455,6 +456,18 @@ export function LitigeDetailPage() {
                         ))}
                   </div>
                 </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IUtilisateur />} titre="Sanctions du client" sousTitre={nomComplet(l.client)} />
+                  <div className="mt-3.5">
+                    <HistoriqueSanctions id={l.client.id} onFait={retour.succes} />
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IUtilisateur />} titre="Sanctions du prestataire" sousTitre={nomPrestataire} />
+                  <div className="mt-3.5">
+                    <HistoriqueSanctions id={l.prestataire.id} onFait={retour.succes} />
+                  </div>
+                </CarteMq>
               </div>
               <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
                 <CarteMq>
@@ -478,11 +491,11 @@ export function LitigeDetailPage() {
                       {l.reservation.prestation}
                     </LigneInfo>
                     <LigneInfo libelle="Métier" grise={false}>
-                      {ABSENT}
+                      {l.prestataire.metier ? (L.metiers[l.prestataire.metier] ?? l.prestataire.metier) : ABSENT}
                     </LigneInfo>
                     <LigneInfo libelle="Date prévue" grise>{`${formatDate(l.reservation.dateDebut)} · ${heureDe(l.reservation.dateDebut)}`}</LigneInfo>
                     <LigneInfo libelle="Quartier" grise={false}>
-                      {ABSENT}
+                      {l.prestataire.quartier ?? ABSENT}
                     </LigneInfo>
                   </div>
                 </CarteMq>
@@ -490,7 +503,7 @@ export function LitigeDetailPage() {
                   <TitreCarte titre="Personnes concernées" />
                   <div className="mt-3.5 flex flex-col gap-2.5">
                     <Personne nom={nomComplet(l.client)} role="Client" couleur="bg-neutre-claire text-neutre" lien={`/utilisateurs/${l.client.id}`} libelleLien="Voir le profil du client" />
-                    <Personne nom={nomPrestataire} role={`Prestataire · note ${ABSENT}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
+                    <Personne nom={nomPrestataire} role={`Prestataire · note ${l.prestataire.noteMoyenne == null ? ABSENT : `${String(l.prestataire.noteMoyenne).replace('.', ',')} / 5`}`} couleur="bg-[#fff0d4] text-[#983705]" lien={`/utilisateurs/${l.prestataire.id}`} libelleLien="Voir le profil du prestataire" />
                   </div>
                 </CarteMq>
               </div>

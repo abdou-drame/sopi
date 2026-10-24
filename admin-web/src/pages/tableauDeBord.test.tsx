@@ -126,6 +126,15 @@ describe('tableau de bord', () => {
     expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/Bonjour,\s*Fatou/)
   })
 
+  it('montre les acomptes encaissés et les montants retirés de la période (RF13)', async () => {
+    simulerApi(toutes)
+    afficherApplication('/')
+    const acomptes = (await screen.findByText('Acomptes encaissés')).closest('section') as HTMLElement
+    await waitFor(() => expect(acomptes).toHaveTextContent(/30\D000\s*FCFA/))
+    const retraits = screen.getByText('Montants retirés').closest('section') as HTMLElement
+    await waitFor(() => expect(retraits).toHaveTextContent(/24\D000\s*FCFA/))
+  })
+
   it('garde la carte commission en FCFA et montre les effectifs d’utilisateurs, d’artisans et de réservations', async () => {
     simulerApi({
       ...toutes,

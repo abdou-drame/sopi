@@ -41,6 +41,8 @@ const base = { 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps:
 const routesDetail = {
   ...base,
   [`GET /admin/litiges/${ID}`]: { corps: DETAIL },
+  'GET /admin/utilisateurs/c-1/sanctions': { corps: { data: [] } },
+  'GET /admin/utilisateurs/p-1/sanctions': { corps: { data: [] } },
   [`GET /admin/litiges/${ID}/preuves/pr-1`]: { binaire: { type: 'image/jpeg' } },
   [`GET /admin/litiges/${ID}/preuves/pr-2`]: { binaire: { type: 'image/png' } },
 }
@@ -100,7 +102,7 @@ describe('litiges', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /Litige/ })).toBeInTheDocument()
     expect(screen.getByText(/Le prestataire ne s’est pas présenté/)).toBeInTheDocument()
     expect(screen.getByText('Aucune réponse écrite du prestataire pour le moment')).toBeInTheDocument()
-    expect(screen.getByText('Garage Exemple')).toBeInTheDocument()
+    expect(screen.getAllByText('Garage Exemple').length).toBeGreaterThan(0)
     expect(screen.getByText('Vidange')).toBeInTheDocument()
     expect(screen.getByText(/4.500/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Voir le profil du client' })).toHaveAttribute('href', '/utilisateurs/c-1')
@@ -108,6 +110,28 @@ describe('litiges', () => {
     expect(screen.getByRole('button', { name: 'Trancher le litige' })).toBeEnabled()
     expect(screen.queryByRole('button', { name: /Rembourser/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
+  })
+
+  it('affiche métier, quartier et note du prestataire quand l’API les fournit', async () => {
+    const detail = { ...DETAIL, prestataire: { ...DETAIL.prestataire, metier: 'mecanique', quartier: 'Malika', noteMoyenne: 4.5 } }
+    simulerApi({ ...routesDetail, [`GET /admin/litiges/${ID}`]: { corps: detail } })
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByText('Malika')).toBeInTheDocument()
+    expect(screen.getByText('Mécanique')).toBeInTheDocument()
+    expect(screen.getByText('Prestataire · note 4,5 / 5')).toBeInTheDocument()
+  })
+
+  it('montre l’historique des sanctions du client et du prestataire dans le détail', async () => {
+    const sanction = {
+      id: 's-1', utilisateurId: 'p-1', type: 'avertissement', motif: 'Retards répétés', dateFin: null, litigeId: null, avisId: null,
+      posePar: 'a-1', dateCreation: '2030-01-10T10:00:00+00:00', active: false, leveeLe: null, leveePar: null,
+    }
+    simulerApi({ ...routesDetail, 'GET /admin/utilisateurs/p-1/sanctions': { corps: { data: [sanction] } } })
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByText('Retards répétés')).toBeInTheDocument()
+    expect(screen.getByText('Sanctions du client')).toBeInTheDocument()
+    expect(screen.getByText('Sanctions du prestataire')).toBeInTheDocument()
+    expect(await screen.findByText('Aucune sanction enregistrée.')).toBeInTheDocument()
   })
 
   it('charge les preuves du client avec le jeton dans les emplacements dessinés', async () => {

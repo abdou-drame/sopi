@@ -357,6 +357,17 @@ describe('consultation par le client', function () {
         }
     });
 
+    it('donne à l\'administrateur le métier, le quartier et la note moyenne du prestataire', function () {
+        $litige = Litige::factory()->create();
+        $prestataire = $litige->prestataire;
+
+        $this->actingAs(User::factory()->administrateur()->create(), 'sanctum')->getJson('/api/v1/admin/litiges/'.$litige->id)
+            ->assertOk()
+            ->assertJsonPath('prestataire.metier', $prestataire->metier)
+            ->assertJsonPath('prestataire.quartier', $prestataire->quartier)
+            ->assertJsonPath('prestataire.noteMoyenne', null);
+    });
+
     it('ne montre rien aux prestataires et administrateurs sur les routes client', function () {
         foreach ([User::factory()->prestataire()->create(), User::factory()->administrateur()->create()] as $user) {
             $this->actingAs($user, 'sanctum')->getJson('/api/v1/litiges')->assertForbidden();

@@ -175,7 +175,7 @@ function ActionSanctionner({ utilisateur, onFait }: { utilisateur: UtilisateurDe
 }
 
 /** Historique des sanctions du compte : tableau Type, Motif, Début, Fin, État, avec « Lever » sur la sanction active. */
-function HistoriqueSanctions({ id, onFait }: { id: string; onFait: (message: string) => void }) {
+export function HistoriqueSanctions({ id, onFait }: { id: string; onFait: (message: string) => void }) {
   const requete = useQuery({ queryKey: ['sanctions-utilisateur', id], queryFn: () => api.sanctionsUtilisateur(id) })
   if (requete.isPending) return <p className="m-0 text-sm text-[#8a90a2]">{L.commun.chargement}</p>
   if (requete.isError) return <EtatErreur texte={messageDErreur(requete.error)} onReessayer={() => void requete.refetch()} />
