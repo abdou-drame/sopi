@@ -25,7 +25,7 @@ class InscriptionPrestataireController extends Controller
      * @unauthenticated
      *
      * @response 201 {"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","nomEntreprise":"Garage Moussa","metier":"mecanique","statutCompte":"en_attente","jeton_suivi":"jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","lien_suivi":"https://api.exemple.test/suivi/jeton-de-suivi-exemple-0123456789-abcdefghijklmnop","justificatifs":[{"type":"cni","statut":"en_attente"},{"type":"diplome","statut":"en_attente"}]}
-     * @response 422 {"message":"Le dossier doit contenir une copie de votre CNI.","errors":{"justificatifs":["Le dossier doit contenir une copie de votre CNI."]}}
+     * @response 422 {"message":"Veuillez joindre un fichier PDF ou image valide","errors":{"justificatifs":["Veuillez joindre un fichier PDF ou image valide"]}}
      * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
      */
     public function __invoke(InscriptionPrestataireRequest $request, InscriptionPrestataireService $service): JsonResponse

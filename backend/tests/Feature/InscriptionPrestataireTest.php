@@ -13,6 +13,9 @@ uses(RefreshDatabase::class);
 
 const URL_INSCRIPTION_PRESTATAIRE = '/api/v1/prestataires/inscription';
 
+/** Mémoire, Table 2.8, scénario alternatif 2a : message unique pour un document manquant ou un format invalide. */
+const MESSAGE_MEMOIRE_JUSTIFICATIF = 'Veuillez joindre un fichier PDF ou image valide';
+
 beforeEach(function () {
     Storage::fake('local');
 });
@@ -112,7 +115,7 @@ describe('POST /prestataires/inscription', function () {
             ],
         ]))->assertUnprocessable()
             ->assertJsonValidationErrors('justificatifs')
-            ->assertJsonPath('errors.justificatifs.0', 'Le dossier doit contenir une copie de votre CNI.');
+            ->assertJsonPath('errors.justificatifs', [MESSAGE_MEMOIRE_JUSTIFICATIF]);
 
         expect(User::count())->toBe(0)->and(fichiersJustificatifsStockes())->toBeEmpty();
     });
@@ -124,7 +127,33 @@ describe('POST /prestataires/inscription', function () {
                 ['type_document' => 'cni', 'fichier' => fichierJustificatif('pdf')],
             ],
         ]))->assertUnprocessable()
-            ->assertJsonValidationErrors('justificatifs');
+            ->assertJsonValidationErrors('justificatifs')
+            ->assertJsonPath('errors.justificatifs', [MESSAGE_MEMOIRE_JUSTIFICATIF]);
+
+        expect(User::count())->toBe(0)->and(fichiersJustificatifsStockes())->toBeEmpty();
+    });
+
+    it('affiche le message du mémoire quand le dossier est vide ou ne contient qu\'une pièce', function () {
+        $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire(['justificatifs' => []]))
+            ->assertUnprocessable()
+            ->assertJsonPath('errors.justificatifs', [MESSAGE_MEMOIRE_JUSTIFICATIF]);
+
+        $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire([
+            'justificatifs' => [['type_document' => 'cni', 'fichier' => fichierJustificatif('png')]],
+        ]))->assertUnprocessable()
+            ->assertJsonPath('errors.justificatifs', [MESSAGE_MEMOIRE_JUSTIFICATIF]);
+
+        expect(User::count())->toBe(0)->and(fichiersJustificatifsStockes())->toBeEmpty();
+    });
+
+    it('affiche le message du mémoire quand une ligne du dossier n\'a pas de fichier', function () {
+        $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire([
+            'justificatifs' => [
+                ['type_document' => 'cni'],
+                ['type_document' => 'diplome', 'fichier' => fichierJustificatif('pdf')],
+            ],
+        ]))->assertUnprocessable()
+            ->assertJsonPath('errors', fn ($erreurs) => ($erreurs['justificatifs.0.fichier'] ?? []) === [MESSAGE_MEMOIRE_JUSTIFICATIF]);
 
         expect(User::count())->toBe(0)->and(fichiersJustificatifsStockes())->toBeEmpty();
     });
@@ -160,7 +189,7 @@ describe('POST /prestataires/inscription', function () {
             ],
         ]))->assertUnprocessable()
             ->assertJsonPath('errors', fn ($erreurs) => in_array(
-                'Veuillez joindre un fichier PDF ou image valide',
+                MESSAGE_MEMOIRE_JUSTIFICATIF,
                 $erreurs['justificatifs.0.fichier'] ?? [],
             ));
 

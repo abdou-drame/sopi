@@ -4115,7 +4115,7 @@
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\"message\":\"Le dossier doit contenir une copie de votre CNI.\",\"errors\":{\"justificatifs\":[\"Le dossier doit contenir une copie de votre CNI.\"]}}",
+                            "body": "{\"message\":\"Veuillez joindre un fichier PDF ou image valide\",\"errors\":{\"justificatifs\":[\"Veuillez joindre un fichier PDF ou image valide\"]}}",
                             "name": ""
                         },
                         {

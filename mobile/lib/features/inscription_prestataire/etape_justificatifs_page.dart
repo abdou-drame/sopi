@@ -97,7 +97,7 @@ class _EtapeJustificatifsPageState
     final manquants = {
       for (final t in TypeJustificatif.values)
         if (t.obligatoire && !dossier.fichiers.containsKey(t))
-          t: 'Ajoutez ce document pour envoyer votre dossier.',
+          t: messageJustificatifInvalide,
     };
     if (manquants.isNotEmpty) {
       setState(() {
