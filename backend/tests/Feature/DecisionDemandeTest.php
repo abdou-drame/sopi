@@ -203,3 +203,108 @@ describe('règles communes', function () {
         expect($brut)->not->toContain('chemin_fichier')->not->toContain('justificatifs/');
     });
 });
+
+describe('POST /admin/prestataires/{id}/refuser — motif par document (mémoire, tableau 2.8)', function () {
+    it('rejette seulement le document désigné avec son motif et valide les autres', function () {
+        [$prestataire] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+        [$refuse, $accepte] = $prestataire->justificatifs()->get()->all();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/refuser", [
+                'justificatifs' => [['id' => $refuse->id, 'motif' => 'Photo floue : le numéro est illisible.']],
+            ])
+            ->assertOk()
+            ->assertJsonPath('statutCompte', 'refuse')
+            ->assertJsonPath('motifRefus', null);
+
+        expect($refuse->fresh()->statut->value)->toBe('rejete')
+            ->and($refuse->fresh()->motif_rejet)->toBe('Photo floue : le numéro est illisible.')
+            ->and($accepte->fresh()->statut->value)->toBe('valide')
+            ->and($accepte->fresh()->motif_rejet)->toBeNull()
+            ->and($accepte->fresh()->verifie_par)->toBe($admin->id);
+    });
+
+    it('accepte le motif global et les motifs par document ensemble, et les montre au prestataire', function () {
+        [$prestataire, $jeton] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+        $refuse = $prestataire->justificatifs()->first();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/refuser", [
+                'motif' => 'Dossier à compléter, merci de renvoyer.',
+                'justificatifs' => [['id' => $refuse->id, 'motif' => 'Document périmé depuis 2024.']],
+            ])
+            ->assertOk()
+            ->assertJsonPath('motifRefus', 'Dossier à compléter, merci de renvoyer.');
+
+        $suivi = $this->getJson("/api/v1/suivi/{$jeton}")->assertOk()->json();
+        $motifs = collect($suivi['justificatifs'])->pluck('motifRejet')->filter()->values()->all();
+        expect($motifs)->toBe(['Document périmé depuis 2024.']);
+        $this->get('/suivi/'.$jeton)->assertSee('Document périmé depuis 2024.')->assertSee('Dossier à compléter, merci de renvoyer.');
+    });
+
+    it('garde le comportement historique sans liste de documents : tous rejetés, aucun motif par document', function () {
+        [$prestataire] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/refuser", ['motif' => 'Dossier incomplet, pièces illisibles.'])
+            ->assertOk()
+            ->assertJsonPath('justificatifs.0.motifRejet', null);
+
+        foreach ($prestataire->justificatifs()->get() as $j) {
+            expect($j->statut->value)->toBe('rejete')->and($j->motif_rejet)->toBeNull();
+        }
+    });
+
+    it('refuse un document étranger au dossier sans rien modifier', function () {
+        [$prestataire] = demandeEnAttenteAvecJeton();
+        [$autre] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+        $etranger = $autre->justificatifs()->first();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/refuser", [
+                'justificatifs' => [['id' => $etranger->id, 'motif' => 'Motif suffisamment long.']],
+            ])
+            ->assertUnprocessable()->assertJsonValidationErrors('justificatifs');
+
+        expect($prestataire->user->fresh()->statut)->toBe(StatutCompte::EnAttenteValidation)
+            ->and($etranger->fresh()->statut->value)->toBe('en_attente');
+    });
+
+    it('exige un motif valide pour chaque document refusé et au moins un motif au total', function () {
+        [$prestataire] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+        $j = $prestataire->justificatifs()->first();
+        $url = "/api/v1/admin/prestataires/{$prestataire->id}/refuser";
+
+        $this->actingAs($admin, 'sanctum')->postJson($url, ['justificatifs' => [['id' => $j->id, 'motif' => 'court']]])
+            ->assertUnprocessable()->assertJsonValidationErrors('justificatifs.0.motif');
+        $this->actingAs($admin, 'sanctum')->postJson($url, ['justificatifs' => [['id' => $j->id]]])
+            ->assertUnprocessable()->assertJsonValidationErrors('justificatifs.0.motif');
+        $this->actingAs($admin, 'sanctum')->postJson($url, [])
+            ->assertUnprocessable()->assertJsonValidationErrors(['motif', 'justificatifs']);
+        $this->actingAs($admin, 'sanctum')->postJson($url, ['justificatifs' => [
+            ['id' => $j->id, 'motif' => 'Motif suffisamment long.'],
+            ['id' => $j->id, 'motif' => 'Motif suffisamment long.'],
+        ]])->assertUnprocessable()->assertJsonValidationErrors('justificatifs.0.id');
+
+        expect($prestataire->user->fresh()->statut)->toBe(StatutCompte::EnAttenteValidation);
+    });
+
+    it('met le motif de chaque document refusé dans la notification du prestataire', function () {
+        [$prestataire] = demandeEnAttenteAvecJeton();
+        $admin = User::factory()->administrateur()->create();
+        $j = $prestataire->justificatifs()->first();
+
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/v1/admin/prestataires/{$prestataire->id}/refuser", [
+                'justificatifs' => [['id' => $j->id, 'motif' => 'Le diplôme est une copie illisible.']],
+            ])->assertOk();
+
+        $notification = \App\Models\Notification::query()->where('user_id', $prestataire->user_id)->latest('created_at')->first();
+        expect($notification->corps)->toContain('Le diplôme est une copie illisible.')->toContain('Documents refusés');
+    });
+});

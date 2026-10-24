@@ -28,8 +28,8 @@ const DETAIL = {
   adresse: 'Rue 10, près du marché',
   motifRefus: null,
   justificatifs: [
-    { id: 'j-1', typeDocument: 'cni', statut: 'en_attente', nomOriginal: 'cni.png', typeMime: 'image/png', taille: 184320 },
-    { id: 'j-2', typeDocument: 'diplome', statut: 'en_attente', nomOriginal: 'diplome.pdf', typeMime: 'application/pdf', taille: 90000 },
+    { id: 'j-1', typeDocument: 'cni', statut: 'en_attente', nomOriginal: 'cni.png', typeMime: 'image/png', taille: 184320, motifRejet: null },
+    { id: 'j-2', typeDocument: 'diplome', statut: 'en_attente', nomOriginal: 'diplome.pdf', typeMime: 'application/pdf', taille: 90000, motifRejet: null },
   ],
 }
 const base = { 'GET /auth/moi': { corps: ADMIN }, 'GET /admin/alertes': { corps: ALERTES_VIDES } }
@@ -154,6 +154,86 @@ describe('dossiers prestataires', () => {
     expect(await screen.findByText('Le dossier a été refusé.')).toBeInTheDocument()
     const envoi = appels.find((a) => a.methode === 'POST')
     expect(envoi?.corps).toEqual({ motif: 'Trop cour : pièces illisibles' })
+  })
+
+  it('refuse une pièce précise avec son motif : le corps envoyé contient « justificatifs » et le motif général devient facultatif', async () => {
+    const { appels } = simulerApi({ ...routesDetail, 'POST /admin/prestataires/0198a1b2-0000-7000-8000-000000000002/refuser': { corps: {} } })
+    afficherApplication(ADRESSE_DETAIL)
+    await userEvent.click(await screen.findByRole('button', { name: 'Refuser cette pièce : Diplôme' }))
+    const piece = screen.getByRole('dialog', { name: 'Refuser cette pièce ?' })
+    await userEvent.type(within(piece).getByLabelText(/Motif du refus de la pièce/), 'Trop cour')
+    await userEvent.click(within(piece).getByRole('button', { name: 'Refuser cette pièce' }))
+    // Motif trop court : la fenêtre reste ouverte et rien n'est mémorisé ni envoyé.
+    expect(within(piece).getByText('Le motif doit contenir au moins 10 caractères.')).toBeInTheDocument()
+    await userEvent.type(within(piece).getByLabelText(/Motif du refus de la pièce/), ' : scan illisible')
+    await userEvent.click(within(piece).getByRole('button', { name: 'Refuser cette pièce' }))
+    expect(await screen.findByText(/scan illisible/)).toBeInTheDocument()
+    expect(screen.getByText('Sera refusée :')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Refuser le dossier' }))
+    const modale = screen.getByRole('dialog', { name: 'Refuser ce dossier ?' })
+    // Une pièce est refusée avec son motif : le motif général n'est plus obligatoire.
+    expect(within(modale).getByLabelText(/Motif général du refus/)).toBeInTheDocument()
+    await userEvent.click(within(modale).getByRole('button', { name: 'Refuser le dossier' }))
+    expect(await screen.findByText('Le dossier a été refusé.')).toBeInTheDocument()
+    const envoi = appels.find((a) => a.methode === 'POST')
+    expect(envoi?.corps).toEqual({ justificatifs: [{ id: 'j-2', motif: 'Trop cour : scan illisible' }] })
+  })
+
+  it('envoie ensemble le motif général et la pièce refusée, et refuse un motif général trop court', async () => {
+    const { appels } = simulerApi({ ...routesDetail, 'POST /admin/prestataires/0198a1b2-0000-7000-8000-000000000002/refuser': { corps: {} } })
+    afficherApplication(ADRESSE_DETAIL)
+    await userEvent.click(await screen.findByRole('button', { name: 'Refuser cette pièce : Carte d’identité' }))
+    const piece = screen.getByRole('dialog', { name: 'Refuser cette pièce ?' })
+    await userEvent.type(within(piece).getByLabelText(/Motif du refus de la pièce/), 'Photo floue et coupée')
+    await userEvent.click(within(piece).getByRole('button', { name: 'Refuser cette pièce' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Refuser le dossier' }))
+    const modale = screen.getByRole('dialog', { name: 'Refuser ce dossier ?' })
+    await userEvent.type(within(modale).getByLabelText(/Motif général/), 'Court')
+    await userEvent.click(within(modale).getByRole('button', { name: 'Refuser le dossier' }))
+    expect(within(modale).getByText('Le motif doit contenir au moins 10 caractères.')).toBeInTheDocument()
+    expect(appels.some((a) => a.methode === 'POST')).toBe(false)
+    await userEvent.type(within(modale).getByLabelText(/Motif général/), ' : dossier incomplet')
+    await userEvent.click(within(modale).getByRole('button', { name: 'Refuser le dossier' }))
+    expect(await screen.findByText('Le dossier a été refusé.')).toBeInTheDocument()
+    expect(appels.find((a) => a.methode === 'POST')?.corps).toEqual({
+      motif: 'Court : dossier incomplet',
+      justificatifs: [{ id: 'j-1', motif: 'Photo floue et coupée' }],
+    })
+  })
+
+  it('permet de retirer le refus d’une pièce : le motif général redevient obligatoire', async () => {
+    simulerApi(routesDetail)
+    afficherApplication(ADRESSE_DETAIL)
+    await userEvent.click(await screen.findByRole('button', { name: 'Refuser cette pièce : Diplôme' }))
+    const piece = screen.getByRole('dialog', { name: 'Refuser cette pièce ?' })
+    await userEvent.type(within(piece).getByLabelText(/Motif du refus de la pièce/), 'Diplôme non conforme')
+    await userEvent.click(within(piece).getByRole('button', { name: 'Refuser cette pièce' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Retirer ce refus : Diplôme' }))
+    expect(screen.queryByText('Sera refusée :')).not.toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Refuser le dossier' }))
+    expect(within(screen.getByRole('dialog')).getByLabelText(/^Motif du refus/)).toBeInTheDocument()
+  })
+
+  it('affiche le motif de chaque pièce refusée d’un dossier déjà décidé', async () => {
+    simulerApi({
+      ...routesDetail,
+      'GET /admin/prestataires/0198a1b2-0000-7000-8000-000000000002': {
+        corps: {
+          ...DETAIL,
+          statutCompte: 'refuse',
+          motifRefus: null,
+          justificatifs: [
+            { ...DETAIL.justificatifs[0], statut: 'valide' },
+            { ...DETAIL.justificatifs[1], statut: 'rejete', motifRejet: 'Diplôme expiré depuis 2020.' },
+          ],
+        },
+      },
+    })
+    afficherApplication(ADRESSE_DETAIL)
+    expect(await screen.findByText('Diplôme expiré depuis 2020.')).toBeInTheDocument()
+    expect(screen.getByText('Refusée :')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Refuser cette pièce/ })).not.toBeInTheDocument()
   })
 
   it('affiche l’erreur du serveur dans la modale (409)', async () => {

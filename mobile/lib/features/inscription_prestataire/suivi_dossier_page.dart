@@ -411,21 +411,41 @@ class _CarteDetails extends StatelessWidget {
       if (avecDetails && dossier.justificatifs.isNotEmpty)
         const Divider(height: 1, color: CouleursSopi.separateur),
       for (final j in dossier.justificatifs)
-        Row(
-          key: ValueKey('document-${j.type?.valeurApi ?? 'autre'}'),
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Flexible(
-              child: Text(
-                j.type?.libelle ?? 'Document',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  color: CouleursSopi.texte,
+            Row(
+              key: ValueKey('document-${j.type?.valeurApi ?? 'autre'}'),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    j.type?.libelle ?? 'Document',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      color: CouleursSopi.texte,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                _PastilleStatut(statut: j.statut),
+              ],
+            ),
+            if (j.statut == StatutJustificatif.rejete && j.motifRejet != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  j.motifRejet!,
+                  key: ValueKey(
+                    'motif-document-${j.type?.valeurApi ?? 'autre'}',
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontSize: 13,
+                    height: 18 / 13,
+                    color: CouleursSopi.texteSecondaire,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            _PastilleStatut(statut: j.statut),
           ],
         ),
     ];

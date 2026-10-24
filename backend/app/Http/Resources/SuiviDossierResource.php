@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\StatutCompte;
+use App\Enums\StatutJustificatif;
 use App\Models\Prestataire;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -29,6 +30,7 @@ class SuiviDossierResource extends JsonResource
             'justificatifs' => $this->justificatifs->sortBy('date_soumission')->map(fn ($justificatif) => [
                 'typeDocument' => $justificatif->type_document->value,
                 'statut' => $justificatif->statut->value,
+                'motifRejet' => $justificatif->statut === StatutJustificatif::Rejete ? $justificatif->motif_rejet : null,
             ])->values(),
         ];
     }

@@ -7,6 +7,7 @@ use App\Enums\CauseAnnulation;
 use App\Enums\CauseExpiration;
 use App\Enums\Role;
 use App\Enums\StatutCompte;
+use App\Enums\StatutJustificatif;
 use App\Enums\TypeNotification;
 use App\Enums\TypeSanction;
 use App\Events\AvisDepose;
@@ -302,13 +303,27 @@ class NotifierLesUtilisateurs
     public function surDemandePrestataireRefusee(DemandePrestataireRefusee $evenement): void
     {
         $this->proteger(function () use ($evenement) {
-            $prestataire = $evenement->prestataire->loadMissing('user');
+            $prestataire = $evenement->prestataire->loadMissing(['user', 'justificatifs']);
             $this->notifications->creer(
                 $prestataire->user, TypeNotification::DemandeRefusee, 'Dossier refusé',
-                'Votre dossier n\'a pas été retenu. Le motif est visible dans le suivi de votre dossier.',
+                $this->texteDossierRefuse($prestataire),
                 [], [Canal::Email, Canal::Push], $this->lienDeSuivi($prestataire),
             );
         });
+    }
+
+    /** Texte du refus : motif de chaque document refusé (mémoire, tableau 2.8) ; le motif global et le détail restent dans le suivi. */
+    private function texteDossierRefuse(Prestataire $prestataire): string
+    {
+        $texte = 'Votre dossier n\'a pas été retenu.';
+        $parDocument = $prestataire->justificatifs
+            ->filter(fn ($j) => $j->statut === StatutJustificatif::Rejete && filled($j->motif_rejet))
+            ->map(fn ($j) => '- '.ucfirst(str_replace('_', ' ', $j->type_document->value)).' : '.$j->motif_rejet);
+        if ($parDocument->isNotEmpty()) {
+            $texte .= "\nDocuments refusés :\n".$parDocument->implode("\n");
+        }
+
+        return $texte.' Retrouvez le détail dans le suivi de votre dossier.';
     }
 
     /** Lien de suivi joint à l'e-mail du résultat de l'examen (mémoire, 3.2.2). Secret : la notification le chiffre et l'efface après l'envoi. */

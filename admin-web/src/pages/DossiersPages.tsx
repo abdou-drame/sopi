@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { messageDErreur, telecharger } from '../api/client'
 import { api } from '../api/endpoints'
-import type { DemandeDetail } from '../api/typesAdmin'
+import type { CorpsRefusDemande, DemandeDetail, Justificatif } from '../api/typesAdmin'
 import { useAction } from '../api/useAction'
 import { useAlertes } from '../api/useAlertes'
 import { useRetours } from '../components/ui/Alertes'
@@ -255,10 +255,15 @@ export function DossiersListePage() {
   )
 }
 
-function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: string) => void }) {
+/** Pièces refusées en cours de saisie : identifiant du justificatif -> motif propre à la pièce. */
+type PiecesRefusees = Record<string, string>
+
+function ActionsDossier({ d, piecesRefusees, onFait }: { d: DemandeDetail; piecesRefusees: PiecesRefusees; onFait: (message: string) => void }) {
   const [modale, setModale] = useState<'accepter' | 'refuser' | null>(null)
   const accepter = useAction(() => api.accepterDemande(d.id))
-  const refuser = useAction((motif: string) => api.refuserDemande(d.id, motif))
+  const refuser = useAction((corps: CorpsRefusDemande) => api.refuserDemande(d.id, corps))
+  const idsRefuses = Object.keys(piecesRefusees)
+  const piecesRefuseesPresentes = idsRefuses.length > 0
   const fermer = () => {
     setModale(null)
     accepter.reset()
@@ -294,22 +299,27 @@ function ActionsDossier({ d, onFait }: { d: DemandeDetail; onFait: (message: str
         titre={T.refuserTitre}
         description={T.refuserTexte}
         libelleConfirmer={T.refuser}
-        libelleMotif={T.motifRefusLibelle}
+        libelleMotif={piecesRefuseesPresentes ? T.motifGlobalFacultatifLibelle : T.motifRefusLibelle}
         danger
-        motifObligatoire
+        motifObligatoire={!piecesRefuseesPresentes}
+        motifFacultatif={piecesRefuseesPresentes}
         motifMin={MOTIF_MIN}
         motifMax={MOTIF_MAX}
         enCours={refuser.isPending}
         erreur={refuser.isError ? messageDErreur(refuser.error) : undefined}
         onAnnuler={fermer}
-        onConfirmer={(motif) =>
-          refuser.mutate(motif, {
+        onConfirmer={(motif) => {
+          // `justificatifs` n'est envoyé que s'il y a au moins une pièce refusée ; le motif général vide est omis.
+          const corps: CorpsRefusDemande = {}
+          if (motif) corps.motif = motif
+          if (piecesRefuseesPresentes) corps.justificatifs = idsRefuses.map((id) => ({ id, motif: piecesRefusees[id] }))
+          refuser.mutate(corps, {
             onSuccess: () => {
               fermer()
               onFait(T.refuseMessage)
             },
           })
-        }
+        }}
       />
     </>
   )
@@ -344,100 +354,149 @@ const ABSENT = '—'
 export function DossierDetailPage() {
   const { id = '' } = useParams()
   const requete = useQuery({ queryKey: ['demande', id], queryFn: () => api.demande(id) })
-  const retour = useRetours()
-  const [maintenant] = useState(() => Date.now())
   return (
     <PageDetailMq requete={requete} retour="/dossiers-prestataires" libelleRetour="Retour aux dossiers">
-      {(d) => {
-        const recu = Math.max(0, (maintenant - new Date(d.dateSoumission).getTime()) / 60000)
-        const complet = d.justificatifs.length >= PIECES_ATTENDUES
-        const statut = L.statuts[d.statutCompte] ?? d.statutCompte
-        const pluriel = d.justificatifs.length > 1 ? 's' : ''
-        return (
-          <>
-            <TitreDetail
-              retour="/dossiers-prestataires"
-              libelleRetour="Retour aux dossiers"
-              titre={d.prenom}
-              suite={d.nom}
-              badge={
-                <Badge ton={TON_STATUT[d.statutCompte] ?? 'neutre'} gras>
-                  {statut}
+      {(d) => <DossierContenu d={d} />}
+    </PageDetailMq>
+  )
+}
+
+function DossierContenu({ d }: { d: DemandeDetail }) {
+  const retour = useRetours()
+  const [maintenant] = useState(() => Date.now())
+  // Pièces que l'administrateur a choisi de refuser (avec leur motif), envoyées lors du refus du dossier.
+  const [piecesRefusees, setPiecesRefusees] = useState<PiecesRefusees>({})
+  const [pieceEnCours, setPieceEnCours] = useState<Justificatif | null>(null)
+  const enAttente = d.statutCompte === 'en_attente'
+  const retirerRefusPiece = (idPiece: string) =>
+    setPiecesRefusees((courant) => {
+      const reste = { ...courant }
+      delete reste[idPiece]
+      return reste
+    })
+  const recu = Math.max(0, (maintenant - new Date(d.dateSoumission).getTime()) / 60000)
+  const complet = d.justificatifs.length >= PIECES_ATTENDUES
+  const statut = L.statuts[d.statutCompte] ?? d.statutCompte
+  const pluriel = d.justificatifs.length > 1 ? 's' : ''
+  return (
+    <>
+      <TitreDetail
+        retour="/dossiers-prestataires"
+        libelleRetour="Retour aux dossiers"
+        titre={d.prenom}
+        suite={d.nom}
+        badge={
+          <Badge ton={TON_STATUT[d.statutCompte] ?? 'neutre'} gras>
+            {statut}
+          </Badge>
+        }
+        infos={`Dossier reçu le ${formatDate(d.dateSoumission)} · ${L.metiers[d.metier] ?? d.metier} · ${d.quartier}`}
+      >
+        {enAttente && <ActionsDossier d={d} piecesRefusees={piecesRefusees} onFait={retour.succes} />}
+      </TitreDetail>
+      {d.statutCompte === 'actif' && <BanniereDecision ton="succes">Ce dossier a déjà été accepté.</BanniereDecision>}
+      {d.statutCompte === 'refuse' && <BanniereDecision ton="danger">Ce dossier a déjà été refusé.</BanniereDecision>}
+      <div className="flex flex-wrap items-start gap-3.5">
+        <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
+          <CarteMq>
+            <EnteteCarte icone={<IUtilisateur />} titre="Informations du prestataire" sousTitre="Saisies lors de l'inscription" />
+            <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2">
+              <Tuile libelle="Nom complet">{nomComplet(d)}</Tuile>
+              <Tuile libelle="Téléphone">{d.telephone}</Tuile>
+              <Tuile libelle="Métier">{L.metiers[d.metier] ?? d.metier}</Tuile>
+              <Tuile libelle="Quartier">{d.quartier}</Tuile>
+            </div>
+          </CarteMq>
+          <CarteMq>
+            <EnteteCarte
+              icone={<IDocument />}
+              titre="Pièces justificatives"
+              sousTitre={`${d.justificatifs.length} pièce${pluriel} reçue${pluriel} sur ${PIECES_ATTENDUES}`}
+              droite={
+                <Badge ton={complet ? 'succes' : 'attention'} gras>
+                  {complet ? 'Complet' : 'Incomplet'}
                 </Badge>
               }
-              infos={`Dossier reçu le ${formatDate(d.dateSoumission)} · ${L.metiers[d.metier] ?? d.metier} · ${d.quartier}`}
-            >
-              {d.statutCompte === 'en_attente' && <ActionsDossier d={d} onFait={retour.succes} />}
-            </TitreDetail>
-            {d.statutCompte === 'actif' && <BanniereDecision ton="succes">Ce dossier a déjà été accepté.</BanniereDecision>}
-            {d.statutCompte === 'refuse' && <BanniereDecision ton="danger">Ce dossier a déjà été refusé.</BanniereDecision>}
-            <div className="flex flex-wrap items-start gap-3.5">
-              <div className="flex min-w-0 flex-[2_1_560px] flex-col gap-3.5">
-                <CarteMq>
-                  <EnteteCarte icone={<IUtilisateur />} titre="Informations du prestataire" sousTitre="Saisies lors de l'inscription" />
-                  <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-2">
-                    <Tuile libelle="Nom complet">{nomComplet(d)}</Tuile>
-                    <Tuile libelle="Téléphone">{d.telephone}</Tuile>
-                    <Tuile libelle="Métier">{L.metiers[d.metier] ?? d.metier}</Tuile>
-                    <Tuile libelle="Quartier">{d.quartier}</Tuile>
-                  </div>
-                </CarteMq>
-                <CarteMq>
-                  <EnteteCarte
-                    icone={<IDocument />}
-                    titre="Pièces justificatives"
-                    sousTitre={`${d.justificatifs.length} pièce${pluriel} reçue${pluriel} sur ${PIECES_ATTENDUES}`}
-                    droite={
-                      <Badge ton={complet ? 'succes' : 'attention'} gras>
-                        {complet ? 'Complet' : 'Incomplet'}
-                      </Badge>
-                    }
-                  />
-                  <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
-                    {d.justificatifs.map((j) => {
-                      const nom = T.documents[j.typeDocument] ?? j.typeDocument
-                      return (
-                        <div key={j.id} className="rounded-[22px] bg-[#f3f4f7] p-2.5">
-                          <div className="flex h-[120px] items-center justify-center overflow-hidden rounded-2xl bg-marque-claire">
-                            <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={nom} className="h-[120px] w-full rounded-2xl!" />
-                          </div>
-                          <div className="flex items-center justify-between px-1.5 pt-2.5 pb-1">
-                            <span className="text-[13px] font-semibold">{nom}</span>
-                            <LienVoirPiece chemin={`/admin/justificatifs/${j.id}/telecharger`} nom={nom} />
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </CarteMq>
-              </div>
-              <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
-                <CarteMq>
-                  <TitreCarte titre="Décision" sousTitre="Le prestataire est prévenu par e-mail et notification" />
-                  <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: FOND_MARQUE }}>
-                    <div className="text-xs font-semibold opacity-80">Statut actuel</div>
-                    <div className="mt-1.5 text-[28px] leading-[34px] font-bold tracking-[-0.6px]">{statut}</div>
-                    <div className="mt-[18px] flex items-center justify-between text-xs">
-                      <span className="opacity-80">Reçu il y a {dureeMinutes(recu)}</span>
+            />
+            <div className="mt-[18px] grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3">
+              {d.justificatifs.map((j) => {
+                const nom = T.documents[j.typeDocument] ?? j.typeDocument
+                const aRefuser = j.id in piecesRefusees
+                const motifPiece = aRefuser ? piecesRefusees[j.id] : j.motifRejet
+                return (
+                  <div key={j.id} className="rounded-[22px] bg-[#f3f4f7] p-2.5">
+                    <div className="flex h-[120px] items-center justify-center overflow-hidden rounded-2xl bg-marque-claire">
+                      <FichierProtege chemin={`/admin/justificatifs/${j.id}/telecharger`} alt={nom} className="h-[120px] w-full rounded-2xl!" />
                     </div>
-                  </div>
-                </CarteMq>
-                <CarteMq>
-                  <TitreCarte titre="Historique du dossier" />
-                  <div className="mt-4 flex flex-col">
-                    <EtapeChrono couleur="var(--color-neutre)" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
-                    {d.statutCompte === 'en_attente' ? (
-                      <EtapeChrono couleur="#CBD5E1" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
-                    ) : (
-                      <EtapeChrono couleur={d.statutCompte === 'actif' ? '#0e6245' : 'var(--color-neutre)'} titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
+                    <div className="flex items-center justify-between px-1.5 pt-2.5 pb-1">
+                      <span className="text-[13px] font-semibold">{nom}</span>
+                      <LienVoirPiece chemin={`/admin/justificatifs/${j.id}/telecharger`} nom={nom} />
+                    </div>
+                    {motifPiece && (
+                      <div className="px-1.5 pb-1.5 text-xs leading-4 text-[#b0161b]">
+                        <strong className="font-semibold">{aRefuser ? T.pieceARefuser : T.pieceRefusee} :</strong> {motifPiece}
+                      </div>
+                    )}
+                    {enAttente && (
+                      <div className="px-1.5 pb-1.5">
+                        {aRefuser ? (
+                          <button type="button" aria-label={`${T.retirerRefusPiece} : ${nom}`} onClick={() => retirerRefusPiece(j.id)} className="cursor-pointer border-none bg-transparent p-0 text-xs font-bold text-[#6b7287]">
+                            {T.retirerRefusPiece}
+                          </button>
+                        ) : (
+                          <button type="button" aria-label={`${T.refuserPiece} : ${nom}`} onClick={() => setPieceEnCours(j)} className="cursor-pointer border-none bg-transparent p-0 text-xs font-bold text-[#b0161b]">
+                            {T.refuserPiece}
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
-                </CarteMq>
+                )
+              })}
+            </div>
+          </CarteMq>
+        </div>
+        <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3.5">
+          <CarteMq>
+            <TitreCarte titre="Décision" sousTitre="Le prestataire est prévenu par e-mail et notification" />
+            <div className="mt-[18px] box-border rounded-[22px] p-5 text-white" style={{ background: FOND_MARQUE }}>
+              <div className="text-xs font-semibold opacity-80">Statut actuel</div>
+              <div className="mt-1.5 text-[28px] leading-[34px] font-bold tracking-[-0.6px]">{statut}</div>
+              <div className="mt-[18px] flex items-center justify-between text-xs">
+                <span className="opacity-80">Reçu il y a {dureeMinutes(recu)}</span>
               </div>
             </div>
-          </>
-        )
-      }}
-    </PageDetailMq>
+          </CarteMq>
+          <CarteMq>
+            <TitreCarte titre="Historique du dossier" />
+            <div className="mt-4 flex flex-col">
+              <EtapeChrono couleur="var(--color-neutre)" titre="Dossier déposé" detail={formatDateHeure(d.dateSoumission)} />
+              {d.statutCompte === 'en_attente' ? (
+                <EtapeChrono couleur="#CBD5E1" titre="En attente d'une décision" detail="Aucune action pour le moment" derniere />
+              ) : (
+                <EtapeChrono couleur={d.statutCompte === 'actif' ? '#0e6245' : 'var(--color-neutre)'} titre={d.statutCompte === 'actif' ? 'Dossier accepté' : 'Dossier refusé'} detail={d.motifRefus ?? ABSENT} derniere />
+              )}
+            </div>
+          </CarteMq>
+        </div>
+      </div>
+      <Fenetre
+        ouverte={pieceEnCours !== null}
+        titre={T.refuserPieceTitre}
+        sousTitre={pieceEnCours ? (T.documents[pieceEnCours.typeDocument] ?? pieceEnCours.typeDocument) : undefined}
+        description={T.refuserPieceTexte}
+        libelleConfirmer={T.refuserPiece}
+        libelleMotif={T.motifPieceLibelle}
+        danger
+        motifObligatoire
+        motifMin={MOTIF_MIN}
+        motifMax={MOTIF_MAX}
+        onAnnuler={() => setPieceEnCours(null)}
+        onConfirmer={(motif) => {
+          if (pieceEnCours) setPiecesRefusees((courant) => ({ ...courant, [pieceEnCours.id]: motif }))
+          setPieceEnCours(null)
+        }}
+      />
+    </>
   )
 }

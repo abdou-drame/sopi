@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Exceptions\DemandeDejaTraitee;
+use App\Exceptions\JustificatifHorsDossier;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RefuserDemandeRequest;
 use App\Http\Resources\DemandePrestataireDetailResource;
@@ -41,21 +42,28 @@ class DecisionDemandeController extends Controller
     /**
      * Refuser une demande
      *
-     * Le compte passe à `refuse`, ses justificatifs à `rejete` et le motif est enregistré (visible sur le lien de suivi du prestataire).
-     * Seule une demande `en_attente` peut être décidée.
+     * Le compte passe à `refuse`. Deux façons de refuser, combinables : un motif global du dossier (`motif`) et/ou le refus de
+     * documents précis, chacun avec son propre motif (`justificatifs`). Si des documents sont désignés, ils passent à `rejete` avec
+     * leur motif et les autres à `valide` ; sinon tous les documents passent à `rejete`. Les motifs sont visibles sur le lien de suivi
+     * et dans l'e-mail du prestataire. Au moins un motif (global ou par document) est obligatoire. Seule une demande `en_attente` peut être décidée.
      *
      * @authenticated
      *
      * @urlParam id string required Identifiant du prestataire. Example: 0198a1b2-0000-7000-8000-000000000002
      *
-     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"refuse","motifRefus":"La photocopie de la CNI est illisible.","dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"rejete","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}
+     * @response 200 {"id":"0198a1b2-0000-7000-8000-000000000002","nom":"Diop","prenom":"Moussa","telephone":"+221771234567","email":"moussa@example.com","nomEntreprise":"Garage Moussa","metier":"mecanique","quartier":"Malika","adresse":"Rue 10, près du marché","statutCompte":"refuse","motifRefus":"La photocopie de la CNI est illisible.","dateSoumission":"2026-10-12T09:30:00+00:00","justificatifs":[{"id":"0198a1b2-0000-7000-8000-000000000010","typeDocument":"cni","statut":"rejete","motifRejet":"Photo floue : le numéro est illisible.","nomOriginal":"cni.png","typeMime":"image/png","taille":184320}]}
      * @response 404 {"message":"Demande introuvable."}
      * @response 409 {"message":"Cette demande a déjà été traitée."}
      * @response 422 {"message":"Le motif du refus doit contenir au moins 10 caractères.","errors":{"motif":["Le motif du refus doit contenir au moins 10 caractères."]}}
      */
     public function refuser(RefuserDemandeRequest $request, string $id): JsonResponse|DemandePrestataireDetailResource
     {
-        return $this->repondre(fn () => $this->service->refuser($id, $request->validated('motif'), $request->user()));
+        return $this->repondre(fn () => $this->service->refuser(
+            $id,
+            $request->validated('motif'),
+            $request->user(),
+            collect($request->validated('justificatifs') ?? [])->pluck('motif', 'id')->all(),
+        ));
     }
 
     private function repondre(callable $decision): JsonResponse|DemandePrestataireDetailResource
@@ -64,6 +72,8 @@ class DecisionDemandeController extends Controller
             return new DemandePrestataireDetailResource($decision());
         } catch (ModelNotFoundException) {
             return response()->json(['message' => 'Demande introuvable.'], Response::HTTP_NOT_FOUND);
+        } catch (JustificatifHorsDossier $e) {
+            return response()->json(['message' => $e->getMessage(), 'errors' => ['justificatifs' => [$e->getMessage()]]], Response::HTTP_UNPROCESSABLE_ENTITY);
         } catch (DemandeDejaTraitee $e) {
             return response()->json(['message' => $e->getMessage()], Response::HTTP_CONFLICT);
         }

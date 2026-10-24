@@ -3,6 +3,7 @@ import type { PaiementAdmin, Page, ReponseAlertes, ReponseConnexion, Regroupemen
 import type {
   AvisAdmin,
   CorpsSanction,
+  CorpsRefusDemande,
   CorpsTrancher,
   DemandeDetail,
   DemandeListe,
@@ -39,8 +40,7 @@ export const api = {
   demandes: (params: Params) => requete<Page<DemandeListe>>('GET', '/admin/prestataires/demandes', { params }),
   demande: (id: string) => requete<DemandeDetail>('GET', `/admin/prestataires/${id}`),
   accepterDemande: (id: string) => requete<unknown>('POST', `/admin/prestataires/${id}/accepter`),
-  refuserDemande: (id: string, motif: string) =>
-    requete<unknown>('POST', `/admin/prestataires/${id}/refuser`, { corps: { motif } }),
+  refuserDemande: (id: string, corps: CorpsRefusDemande) => requete<unknown>('POST', `/admin/prestataires/${id}/refuser`, { corps }),
 
   litiges: (params: Params) => requete<Page<Litige>>('GET', '/admin/litiges', { params }),
   litige: (id: string) => requete<LitigeDetail>('GET', `/admin/litiges/${id}`),

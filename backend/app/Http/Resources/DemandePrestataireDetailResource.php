@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Enums\StatutCompte;
+use App\Enums\StatutJustificatif;
 use App\Models\Prestataire;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -37,6 +38,7 @@ class DemandePrestataireDetailResource extends JsonResource
                 'id' => $justificatif->id,
                 'typeDocument' => $justificatif->type_document->value,
                 'statut' => $justificatif->statut->value,
+                'motifRejet' => $justificatif->statut === StatutJustificatif::Rejete ? $justificatif->motif_rejet : null,
                 'nomOriginal' => $justificatif->nom_original,
                 'typeMime' => $justificatif->type_mime,
                 'taille' => $justificatif->taille,

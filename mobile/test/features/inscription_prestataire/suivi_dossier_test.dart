@@ -124,6 +124,32 @@ void main() {
       expect(find.text('Actualiser'), findsNothing);
     });
 
+    testWidgets(
+      'refusé : motif propre à chaque document rejeté, motif global conservé',
+      (tester) async {
+        await _arriver(tester, {
+          _suivi: Simulee(200, {
+            ..._dossier(statut: 'refuse', motif: 'Dossier incomplet.'),
+            'justificatifs': [
+              {'typeDocument': 'cni', 'statut': 'valide', 'motifRejet': null},
+              {
+                'typeDocument': 'diplome',
+                'statut': 'rejete',
+                'motifRejet': 'Photo floue.',
+              },
+            ],
+          }),
+        });
+        expect(find.text('Dossier incomplet.'), findsOneWidget);
+        expect(find.text('Photo floue.'), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('motif-document-diplome')),
+          findsOneWidget,
+        );
+        expect(find.byKey(const ValueKey('motif-document-cni')), findsNothing);
+      },
+    );
+
     testWidgets('refusé sans SUPPORT_EMAIL : pas de bouton support', (
       tester,
     ) async {

@@ -120,6 +120,11 @@ class DossierInscription {
 
 const Object _inchange = Object();
 
+String? _motifOuNull(Object? valeur) {
+  final texte = valeur?.toString().trim();
+  return texte == null || texte.isEmpty ? null : texte;
+}
+
 /// Statut d'un justificatif (`en_attente`, `valide`, `rejete`).
 enum StatutJustificatif {
   enAttente('En attente'),
@@ -138,11 +143,18 @@ enum StatutJustificatif {
 }
 
 class JustificatifSuivi {
-  const JustificatifSuivi({required this.type, required this.statut});
+  const JustificatifSuivi({
+    required this.type,
+    required this.statut,
+    this.motifRejet,
+  });
 
   /// Null si l'API envoie un type que l'application ne connaît pas.
   final TypeJustificatif? type;
   final StatutJustificatif statut;
+
+  /// Motif du refus de ce document (renseigné seulement si le statut est « rejeté »).
+  final String? motifRejet;
 }
 
 /// Réponse de `GET /suivi/{jeton}`.
@@ -186,6 +198,7 @@ class SuiviDossier {
             JustificatifSuivi(
               type: TypeJustificatif.depuisApi(e['typeDocument']?.toString()),
               statut: StatutJustificatif.depuisApi(e['statut']),
+              motifRejet: _motifOuNull(e['motifRejet']),
             ),
       ],
     );

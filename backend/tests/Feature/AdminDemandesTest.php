@@ -131,7 +131,7 @@ describe('GET /admin/prestataires/{id}', function () {
             ->assertJsonPath('adresse', 'Rue 10, Malika')
             ->assertJsonPath('motifRefus', null)
             ->assertJsonPath('justificatifs.0', [
-                'id' => $justificatif->id, 'typeDocument' => 'cni', 'statut' => 'en_attente',
+                'id' => $justificatif->id, 'typeDocument' => 'cni', 'statut' => 'en_attente', 'motifRejet' => null,
                 'nomOriginal' => 'ma-cni.pdf', 'typeMime' => 'application/pdf', 'taille' => strlen(CONTENU_PDF_ADMIN),
             ]);
 

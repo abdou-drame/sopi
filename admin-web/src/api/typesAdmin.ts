@@ -25,6 +25,8 @@ export interface Justificatif {
   nomOriginal: string
   typeMime: string
   taille: number
+  /** Motif de rejet de cette pièce, renseigné quand l'administrateur l'a refusée. */
+  motifRejet: string | null
 }
 
 export interface DemandeDetail extends Omit<DemandeListe, 'nombreJustificatifs'> {
@@ -81,6 +83,12 @@ export interface Litige {
 
 export interface LitigeDetail extends Litige {
   preuves: { id: string; url: string }[]
+}
+
+/** Corps du refus d'un dossier : motif général et/ou pièces refusées avec leur propre motif (au moins l'un des deux). */
+export interface CorpsRefusDemande {
+  motif?: string
+  justificatifs?: { id: string; motif: string }[]
 }
 
 export interface CorpsTrancher {

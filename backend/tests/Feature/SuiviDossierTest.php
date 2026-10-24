@@ -35,13 +35,13 @@ describe('GET /suivi/{jeton}', function () {
             ->assertOk()
             ->assertExactJsonStructure([
                 'nomEntreprise', 'metier', 'statutCompte', 'motifRefus', 'dateSoumission',
-                'justificatifs' => ['*' => ['typeDocument', 'statut']],
+                'justificatifs' => ['*' => ['typeDocument', 'statut', 'motifRejet']],
             ])
             ->assertJsonPath('nomEntreprise', 'Garage Moussa')
             ->assertJsonPath('statutCompte', 'en_attente')
             ->assertJsonPath('motifRefus', null)
             ->assertJsonCount(2, 'justificatifs')
-            ->assertJsonPath('justificatifs.0', ['typeDocument' => 'cni', 'statut' => 'en_attente']);
+            ->assertJsonPath('justificatifs.0', ['typeDocument' => 'cni', 'statut' => 'en_attente', 'motifRejet' => null]);
     });
 
     it('renvoie le statut actif après validation', function () {
