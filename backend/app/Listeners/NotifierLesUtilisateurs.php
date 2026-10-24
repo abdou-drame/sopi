@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Enums\Canal;
 use App\Enums\CauseAnnulation;
 use App\Enums\CauseExpiration;
 use App\Enums\Role;
@@ -26,9 +27,11 @@ use App\Events\Reservation\ReservationTerminee;
 use App\Events\SanctionLevee;
 use App\Events\SanctionPosee;
 use App\Models\Litige;
+use App\Models\Prestataire;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\Notification\NotificationService;
+use App\Services\SuiviDossierService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -287,9 +290,11 @@ class NotifierLesUtilisateurs
     public function surDemandePrestataireAcceptee(DemandePrestataireAcceptee $evenement): void
     {
         $this->proteger(function () use ($evenement) {
+            $prestataire = $evenement->prestataire->loadMissing('user');
             $this->notifications->creer(
-                $evenement->prestataire->loadMissing('user')->user, TypeNotification::DemandeAcceptee, 'Dossier validé',
+                $prestataire->user, TypeNotification::DemandeAcceptee, 'Dossier validé',
                 'Votre dossier est validé : votre compte prestataire est actif. Vous pouvez vous connecter.',
+                [], [Canal::Email, Canal::Push], $this->lienDeSuivi($prestataire),
             );
         });
     }
@@ -297,11 +302,19 @@ class NotifierLesUtilisateurs
     public function surDemandePrestataireRefusee(DemandePrestataireRefusee $evenement): void
     {
         $this->proteger(function () use ($evenement) {
+            $prestataire = $evenement->prestataire->loadMissing('user');
             $this->notifications->creer(
-                $evenement->prestataire->loadMissing('user')->user, TypeNotification::DemandeRefusee, 'Dossier refusé',
+                $prestataire->user, TypeNotification::DemandeRefusee, 'Dossier refusé',
                 'Votre dossier n\'a pas été retenu. Le motif est visible dans le suivi de votre dossier.',
+                [], [Canal::Email, Canal::Push], $this->lienDeSuivi($prestataire),
             );
         });
+    }
+
+    /** Lien de suivi joint à l'e-mail du résultat de l'examen (mémoire, 3.2.2). Secret : la notification le chiffre et l'efface après l'envoi. */
+    private function lienDeSuivi(Prestataire $prestataire): string
+    {
+        return SuiviDossierService::lien(app(SuiviDossierService::class)->jetonDuResultat($prestataire));
     }
 
     private function proteger(callable $creation): void

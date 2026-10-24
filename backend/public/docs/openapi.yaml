@@ -9797,7 +9797,7 @@ paths:
     get:
       summary: "Suivi du dossier d'inscription"
       operationId: suiviDuDossierDinscription
-      description: "Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription.\nNe renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.\nUn jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP."
+      description: "Route publique : le prestataire non encore actif suit son dossier avec le lien personnel reçu à l'inscription, puis dans l'e-mail du résultat de l'examen.\nNe renvoie aucune donnée personnelle. Le motif de refus n'est renseigné que si le dossier est refusé.\nUn jeton inconnu renvoie toujours la même réponse 404. Limité à 30 requêtes par minute et par adresse IP."
       parameters: []
       responses:
         200:
@@ -9885,7 +9885,7 @@ paths:
       -
         in: path
         name: jeton
-        description: "Jeton de suivi reçu à l'inscription."
+        description: "Jeton de suivi reçu à l'inscription ou dans l'e-mail du résultat de l'examen."
         example: jeton-de-suivi-exemple-0123456789-abcdefghijklmnop
         required: true
         schema:
