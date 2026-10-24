@@ -11,7 +11,8 @@ import FichierProtege, { cheminApi } from '../components/ui/FichierProtege'
 import { ChampJour, ChampSelect } from '../design/champs'
 import Fenetre from '../design/Fenetre'
 import { Avatar, Badge, Carte as CarteMq, FOND_MARQUE, EnteteCarte, EtapeChrono, LienRond, LigneLien, Onglets, PaginationRonde, TitreCarte, TitreDetail, TitrePage } from '../design/composants'
-import { IHorloge, IImage, IMessage, IRecherche } from '../design/icones'
+import { IHorloge, IImage, IMessage, IRecherche, IUtilisateur } from '../design/icones'
+import { HistoriqueSanctions } from './UtilisateursPages'
 import { CarteBleue, CarteStat, ICoche, IFiltre, Pastille, sansAccent } from '../design/synthese'
 import PageDetailMq from '../design/PageDetailMq'
 import { CartesSquelette } from '../design/etats'
@@ -453,6 +454,18 @@ export function LitigeDetailPage() {
                             Photo {n} · {ABSENT}
                           </div>
                         ))}
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IUtilisateur />} titre="Sanctions du client" sousTitre={nomComplet(l.client)} />
+                  <div className="mt-3.5">
+                    <HistoriqueSanctions id={l.client.id} onFait={retour.succes} />
+                  </div>
+                </CarteMq>
+                <CarteMq>
+                  <EnteteCarte icone={<IUtilisateur />} titre="Sanctions du prestataire" sousTitre={nomPrestataire} />
+                  <div className="mt-3.5">
+                    <HistoriqueSanctions id={l.prestataire.id} onFait={retour.succes} />
                   </div>
                 </CarteMq>
               </div>
