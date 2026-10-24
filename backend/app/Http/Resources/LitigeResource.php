@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\StatutReservation;
 use App\Models\Litige;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -103,11 +104,27 @@ class LitigeResource extends JsonResource
                 'quartier' => $this->prestataire->quartier,
                 'noteMoyenne' => $this->noteMoyenne(),
             ],
+            'reservationCode' => $this->reservation->code_reservation,
+            'prestationTermineeLe' => $this->prestationTermineeLe(),
             'prixApplique' => (float) $this->reservation->prix_applique,
             'paiements' => $paiements,
             'decidePar' => $this->decidePar?->id,
             'sanctionId' => $this->relationLoaded('sanction') ? $this->sanction?->id : null,
         ];
+    }
+
+    /**
+     * Fin de prestation : la base ne stocke pas de date « terminée le ». Le crédit du portefeuille est posé dans la même
+     * transaction que le passage à TERMINEE, donc `credite_le` en est l'horodatage fidèle. Null si la réservation n'est
+     * pas terminée ou n'a pas été créditée (rien n'est inventé).
+     */
+    private function prestationTermineeLe(): ?string
+    {
+        if ($this->reservation->statut !== StatutReservation::Terminee || ! $this->reservation->relationLoaded('paiements')) {
+            return null;
+        }
+
+        return $this->reservation->paiements->pluck('credite_le')->filter()->sort()->first()?->toIso8601String();
     }
 
     /** Note moyenne du prestataire (une décimale, avis masqués exclus), null sans avis. */

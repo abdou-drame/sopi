@@ -112,6 +112,22 @@ describe('litiges', () => {
     expect(screen.queryByRole('button', { name: 'Rejeter le litige' })).not.toBeInTheDocument()
   })
 
+  it('affiche la référence du litige, le code de réservation et la fin de prestation fournis par l’API', async () => {
+    const detail = { ...DETAIL, reservationCode: 'AB12CD', prestationTermineeLe: '2030-01-16T11:00:00+00:00' }
+    simulerApi({ ...routesDetail, [`GET /admin/litiges/${ID}`]: { corps: detail } })
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByRole('heading', { level: 1, name: /#AB12CD/ })).toBeInTheDocument()
+    expect(screen.getByText('Réservation AB12CD')).toBeInTheDocument()
+    const etape = screen.getByText('Prestation terminée par le prestataire').parentElement as HTMLElement
+    expect(etape).not.toHaveTextContent('—')
+  })
+
+  it('sans code ni date de fin, la référence retombe sur l’identifiant du litige', async () => {
+    simulerApi(routesDetail)
+    afficherApplication(`/litiges/${ID}`)
+    expect(await screen.findByRole('heading', { level: 1, name: /#0198A1B2/ })).toBeInTheDocument()
+  })
+
   it('affiche métier, quartier et note du prestataire quand l’API les fournit', async () => {
     const detail = { ...DETAIL, prestataire: { ...DETAIL.prestataire, metier: 'mecanique', quartier: 'Malika', noteMoyenne: 4.5 } }
     simulerApi({ ...routesDetail, [`GET /admin/litiges/${ID}`]: { corps: detail } })

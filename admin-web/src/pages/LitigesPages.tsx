@@ -398,13 +398,15 @@ export function LitigeDetailPage() {
             .filter(Boolean)
             .join(' · ') || ABSENT
         const nomPrestataire = l.prestataire.nomEntreprise ?? nomComplet(l.prestataire)
+        // Référence lisible : code de la réservation s'il existe, sinon début de l'identifiant du litige.
+        const reference = `#${l.reservationCode ?? l.id.slice(0, 8).toUpperCase()}`
         return (
           <>
             <TitreDetail
               retour="/litiges"
               libelleRetour="Retour aux litiges"
               titre="Litige"
-              suite={ABSENT}
+              suite={reference}
               badge={
                 <Badge ton={ouvert ? 'danger' : l.decision === 'rejet' ? 'neutre' : 'succes'} gras>
                   {libelleStatut(l.statut, l.decision)}
@@ -424,7 +426,7 @@ export function LitigeDetailPage() {
                   <EnteteCarte icone={<IHorloge />} titre="Chronologie" sousTitre="Du début de la réservation à aujourd'hui" />
                   <div className="mt-5 flex flex-col">
                     <EtapeChrono grand couleur="var(--color-neutre)" titre="Réservation confirmée" detail={paiement?.payeLe ? `${formatDate(paiement.payeLe)} · acompte payé` : ABSENT} />
-                    <EtapeChrono grand couleur="var(--color-neutre)" titre="Prestation terminée par le prestataire" detail={ABSENT} />
+                    <EtapeChrono grand couleur="var(--color-neutre)" titre="Prestation terminée par le prestataire" detail={l.prestationTermineeLe ? `${formatDate(l.prestationTermineeLe)} · ${heureDe(l.prestationTermineeLe)}` : ABSENT} />
                     <EtapeChrono grand couleur="#e5484d" titre="Litige ouvert par le client" detail={`${formatDate(l.dateCreation)} · ${heureDe(l.dateCreation)}`} />
                     {ouvert ? (
                       <EtapeChrono
@@ -479,7 +481,7 @@ export function LitigeDetailPage() {
                       <span className="text-sm font-semibold opacity-85">FCFA</span>
                     </div>
                     <div className="mt-[18px] flex items-center justify-between text-xs">
-                      <span className="opacity-80">Réservation {ABSENT}</span>
+                      <span className="opacity-80">Réservation {l.reservationCode ?? ABSENT}</span>
                       <span className="rounded-full bg-white/20 px-2.5 py-1 font-bold">{paiement ? (L.statuts[paiement.statut] ?? paiement.statut) : ABSENT}</span>
                     </div>
                   </div>

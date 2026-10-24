@@ -368,6 +368,24 @@ describe('consultation par le client', function () {
             ->assertJsonPath('prestataire.noteMoyenne', null);
     });
 
+    it('donne à l\'administrateur le code de réservation et la fin de prestation (crédit du portefeuille), sans rien inventer', function () {
+        $reservation = Reservation::factory()->terminee()->create();
+        $litige = Litige::factory()->create(['reservation_id' => $reservation->id]);
+        $admin = User::factory()->administrateur()->create();
+
+        // Pas encore de crédit : aucune date de fin de prestation.
+        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/litiges/'.$litige->id)
+            ->assertOk()
+            ->assertJsonPath('reservationCode', $reservation->code_reservation)
+            ->assertJsonPath('prestationTermineeLe', null);
+
+        \App\Models\Paiement::factory()->reussi()->create(['reservation_id' => $reservation->id, 'credite_le' => '2030-01-16T11:00:00+00:00']);
+
+        $this->actingAs($admin, 'sanctum')->getJson('/api/v1/admin/litiges/'.$litige->id)
+            ->assertOk()
+            ->assertJsonPath('prestationTermineeLe', '2030-01-16T11:00:00+00:00');
+    });
+
     it('ne montre rien aux prestataires et administrateurs sur les routes client', function () {
         foreach ([User::factory()->prestataire()->create(), User::factory()->administrateur()->create()] as $user) {
             $this->actingAs($user, 'sanctum')->getJson('/api/v1/litiges')->assertForbidden();

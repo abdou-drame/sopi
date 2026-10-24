@@ -71,6 +71,8 @@ export interface Litige {
   clotureLe: string | null
   client: PartieLitige
   prestataire: PartieLitige
+  reservationCode?: string | null
+  prestationTermineeLe?: string | null
   prixApplique: number
   paiements: PaiementLitige[]
   decidePar: string | null
