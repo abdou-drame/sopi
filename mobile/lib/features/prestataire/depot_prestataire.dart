@@ -63,6 +63,14 @@ class DepotPrestataire {
     await _lire('/prestataire/avis', requete: {'page': page}),
   );
 
+  /// Signale un avis reçu à l'administrateur avec son motif (10 à 500 caractères, `POST /prestataire/avis/{id}/signaler`).
+  Future<void> signalerAvis(String id, String motif) async {
+    await _dio.post<Object?>(
+      '/prestataire/avis/$id/signaler',
+      data: {'motif': motif},
+    );
+  }
+
   /// Une page des signalements (litiges) qui me visent, du plus récent au plus ancien.
   Future<PageListe<LitigeRecu>> litiges({int page = 1}) async =>
       LitigeRecu.pageDepuisJson(

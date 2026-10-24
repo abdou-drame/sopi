@@ -127,17 +127,19 @@ describe('réservation', function () {
             ->and(notifsDe($prestataire->user))->toHaveCount(0);
     });
 
-    it('expiration : le client est prévenu selon la cause', function (CauseExpiration $cause, string $extrait) {
+    it('expiration : le client et le prestataire sont prévenus selon la cause', function (CauseExpiration $cause, string $extrait, string $extraitPrestataire) {
         [$client, $prestataire, $reservation] = decorNotifs();
 
         ReservationExpiree::dispatch($reservation, $cause);
 
         $n = unSeul($client, TypeNotification::ReservationExpiree);
-        expect($n->corps)->toContain($extrait)->and(notifsDe($prestataire->user))->toHaveCount(0);
+        $np = unSeul($prestataire->user, TypeNotification::ReservationExpiree);
+        expect($n->corps)->toContain($extrait)->and($np->corps)->toContain($extraitPrestataire)->toContain('Awa D.');
         verifierSansDonneeSensible($n);
+        verifierSansDonneeSensible($np);
     })->with([
-        'sans réponse' => [CauseExpiration::SansReponse, 'n\'a pas répondu'],
-        'impayée' => [CauseExpiration::Impayee, 'acompte n\'a pas été payé'],
+        'sans réponse' => [CauseExpiration::SansReponse, 'n\'a pas répondu', 'Vous n\'avez pas répondu'],
+        'impayée' => [CauseExpiration::Impayee, 'acompte n\'a pas été payé', 'n\'a pas payé l\'acompte'],
     ]);
 
     it('annulation par le client : le prestataire est prévenu', function () {

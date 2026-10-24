@@ -93,6 +93,13 @@ class NotifierLesUtilisateurs
                 CauseExpiration::Impayee => "L'acompte n'a pas été payé à temps : votre réservation « {$r->prestation->nom} » du {$this->date($r)} est annulée.",
             };
             $this->notifications->creer($r->client, TypeNotification::ReservationExpiree, 'Réservation expirée', $corps, $this->donneesReservation($r));
+
+            // Le prestataire est aussi prévenu : la demande est annulée et son créneau libéré.
+            $corpsPrestataire = match ($evenement->cause) {
+                CauseExpiration::SansReponse => "Vous n'avez pas répondu à temps : la demande « {$r->prestation->nom} » de {$this->nomPublicClient($r->client)} du {$this->date($r)} est annulée.",
+                CauseExpiration::Impayee => "{$this->nomPublicClient($r->client)} n'a pas payé l'acompte à temps : la réservation « {$r->prestation->nom} » du {$this->date($r)} est annulée.",
+            };
+            $this->notifications->creer($r->creneau->prestataire->user, TypeNotification::ReservationExpiree, 'Réservation expirée', $corpsPrestataire, $this->donneesReservation($r));
         });
     }
 
