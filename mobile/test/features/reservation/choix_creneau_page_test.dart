@@ -106,6 +106,9 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Choisissez une heure'), findsOneWidget);
+      // Libellé du mémoire (tableau 2.6, étape 3), présent mais inactif tant qu'aucune heure n'est retenue.
+      expect(find.text('Confirmer la réservation'), findsOneWidget);
+      expect(find.text('Continuer'), findsNothing);
       final agenda = serveur.requetes.firstWhere(
         (r) => r.path == '/prestataires/p-1/agenda',
       );
@@ -154,7 +157,7 @@ void main() {
       expect(find.text('Sam. 17 oct.'), findsNothing);
       expect(find.text('Ven. 16 oct.'), findsOneWidget);
       expect(find.text('Choisissez une heure'), findsNothing);
-      expect(find.text('Continuer'), findsOneWidget);
+      expect(find.text('Confirmer la réservation'), findsOneWidget);
       await _fermer(tester);
     });
 
@@ -231,33 +234,36 @@ void main() {
       expect(find.text('Choisissez une heure'), findsOneWidget);
     });
 
-    testWidgets('Continuer crée la demande et ouvre « Demande envoyée »', (
+    testWidgets(
+      'Confirmer la réservation crée la demande et ouvre « Demande envoyée »',
+      (tester) async {
+        final routes = _routes(
+          enPlus: {
+            'POST /reservations': Simulee(
+              201,
+              reservationApi('r-1', debut: DateTime.utc(2026, 10, 16, 10)),
+            ),
+          },
+        );
+        final serveur = AdaptateurSimule(routes);
+        await _ouvrir(tester, serveur);
+        await toucher(tester, find.text('10h00'));
+        await avancer(tester, 200);
+        await toucher(tester, find.text('Confirmer la réservation'));
+        await passerTransition(tester);
+        final envoi = serveur.requetes.firstWhere(
+          (r) => r.method == 'POST' && r.path == '/reservations',
+        );
+        expect(envoi.data, {'creneau_id': 'c-1', 'prestation_id': 'sv-1'});
+        expect(cheminCourant(tester), Chemins.demandeEnvoyee('r-1'));
+        // Le créneau est consommé par la demande : pas de libération.
+        expect(_compte(serveur, 'DELETE', '/creneaux/c-1/verrou'), 0);
+      },
+    );
+
+    testWidgets('Confirmer la réservation : 422 sur la prestation', (
       tester,
     ) async {
-      final routes = _routes(
-        enPlus: {
-          'POST /reservations': Simulee(
-            201,
-            reservationApi('r-1', debut: DateTime.utc(2026, 10, 16, 10)),
-          ),
-        },
-      );
-      final serveur = AdaptateurSimule(routes);
-      await _ouvrir(tester, serveur);
-      await toucher(tester, find.text('10h00'));
-      await avancer(tester, 200);
-      await toucher(tester, find.text('Continuer'));
-      await passerTransition(tester);
-      final envoi = serveur.requetes.firstWhere(
-        (r) => r.method == 'POST' && r.path == '/reservations',
-      );
-      expect(envoi.data, {'creneau_id': 'c-1', 'prestation_id': 'sv-1'});
-      expect(cheminCourant(tester), Chemins.demandeEnvoyee('r-1'));
-      // Le créneau est consommé par la demande : pas de libération.
-      expect(_compte(serveur, 'DELETE', '/creneaux/c-1/verrou'), 0);
-    });
-
-    testWidgets('Continuer : 422 sur la prestation', (tester) async {
       final routes = _routes(
         enPlus: {
           'POST /reservations': const Simulee(422, {
@@ -273,7 +279,7 @@ void main() {
       await _ouvrir(tester, AdaptateurSimule(routes));
       await toucher(tester, find.text('10h00'));
       await avancer(tester, 200);
-      await toucher(tester, find.text('Continuer'));
+      await toucher(tester, find.text('Confirmer la réservation'));
       await avancer(tester, 300);
       expect(
         find.text("Cette prestation n'est pas proposée sur ce créneau."),
@@ -283,7 +289,9 @@ void main() {
       await _fermer(tester);
     });
 
-    testWidgets('Continuer : 409, le créneau est perdu', (tester) async {
+    testWidgets('Confirmer la réservation : 409, le créneau est perdu', (
+      tester,
+    ) async {
       final routes = _routes(
         enPlus: {
           'POST /reservations': const Simulee(409, {
@@ -294,13 +302,13 @@ void main() {
       await _ouvrir(tester, AdaptateurSimule(routes));
       await toucher(tester, find.text('10h00'));
       await avancer(tester, 200);
-      await toucher(tester, find.text('Continuer'));
+      await toucher(tester, find.text('Confirmer la réservation'));
       await avancer(tester, 300);
       expect(find.text(messageDelaiDepasse), findsOneWidget);
       expect(find.text('Créneau retenu pour vous'), findsNothing);
     });
 
-    testWidgets('Continuer : 429', (tester) async {
+    testWidgets('Confirmer la réservation : 429', (tester) async {
       final routes = _routes(
         enPlus: {
           'POST /reservations': const Simulee(
@@ -313,7 +321,7 @@ void main() {
       await _ouvrir(tester, AdaptateurSimule(routes));
       await toucher(tester, find.text('10h00'));
       await avancer(tester, 200);
-      await toucher(tester, find.text('Continuer'));
+      await toucher(tester, find.text('Confirmer la réservation'));
       await avancer(tester, 300);
       expect(find.text('Trop de tentatives.'), findsOneWidget);
       await _fermer(tester);
