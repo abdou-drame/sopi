@@ -321,10 +321,10 @@ describe('POST /prestataires/inscription : quartier', function () {
     it('accepte un quartier libre, puis le propose dans la liste complète une fois le compte actif', function () {
         $reponse = $this->postJson(URL_INSCRIPTION_PRESTATAIRE, donneesDossierPrestataire(['quartier' => 'Quartier Libre']))->assertCreated();
 
-        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Keur Massar Nord', 'Keur Massar Sud']]);
+        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Jaxaay', 'Keur Massar Nord', 'Keur Massar Sud']]);
 
         Prestataire::findOrFail($reponse->json('id'))->user->forceFill(['statut' => StatutCompte::Actif])->save();
 
-        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Keur Massar Nord', 'Keur Massar Sud', 'Quartier Libre']]);
+        $this->getJson('/api/v1/quartiers?tous=1')->assertExactJson(['data' => ['Jaxaay', 'Keur Massar Nord', 'Keur Massar Sud', 'Quartier Libre']]);
     });
 });

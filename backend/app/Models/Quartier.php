@@ -18,8 +18,8 @@ class Quartier extends Model
 
     protected $table = 'quartiers';
 
-    /** Quartiers de départ (la plateforme ne couvre d'abord que Keur Massar). La migration les insère aussi. */
-    public const NOMS_DE_DEPART = ['Keur Massar Nord', 'Keur Massar Sud'];
+    /** Quartiers de départ (la plateforme ne couvre d'abord que Keur Massar). Les migrations les insèrent aussi. */
+    public const NOMS_DE_DEPART = ['Keur Massar Nord', 'Keur Massar Sud', 'Jaxaay'];
 
     protected $fillable = ['nom'];
 }
