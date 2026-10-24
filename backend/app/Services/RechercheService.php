@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StatutCompte;
+use App\Models\Metier;
 use App\Models\Prestataire;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -56,7 +57,12 @@ class RechercheService
             $like = 'lower(%s) like ? escape \''.self::ECHAPPEMENT.'\'';
 
             $requete->where(function (Builder $q) use ($motif, $like) {
-                $q->whereRaw(sprintf($like, 'prestataires.nom_entreprise'), [$motif])
+                // Le mot saisi peut être un domaine de métier (« coiffure ») : mémoire, tableau 2.5, étape 2.
+                $q->whereIn('prestataires.metier', Metier::query()
+                    ->where(fn (Builder $m) => $m->whereRaw(sprintf($like, 'metiers.libelle'), [$motif])
+                        ->orWhereRaw(sprintf($like, 'metiers.code'), [$motif]))
+                    ->select('metiers.code'))
+                    ->orWhereRaw(sprintf($like, 'prestataires.nom_entreprise'), [$motif])
                     ->orWhereHas('prestations', fn (Builder $p) => $p->where('actif', true)
                         ->whereRaw(sprintf($like, 'prestations.nom'), [$motif]));
             });

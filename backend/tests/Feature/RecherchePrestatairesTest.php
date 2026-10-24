@@ -124,6 +124,14 @@ it('cherche dans le nom d\'entreprise ou le nom d\'une prestation active', funct
         ->and(nomsTrouves(chercher(['q' => 'vidange'])))->toBe(['Chez Awa']);
 });
 
+it('trouve les prestataires d\'un domaine de métier saisi comme mot-clé', function () {
+    prestataireRecherche(['nom_entreprise' => 'Chez Awa'], 10000, StatutCompte::Actif, 'coiffure');
+    prestataireRecherche(['nom_entreprise' => 'Garage Moussa'], 10000, StatutCompte::Actif, 'mecanique');
+
+    expect(nomsTrouves(chercher(['q' => 'Coiffure'])))->toBe(['Chez Awa'])
+        ->and(nomsTrouves(chercher(['q' => 'mecanique'])))->toBe(['Garage Moussa']);
+});
+
 it('traite % et _ comme des caractères ordinaires dans q', function () {
     prestataireRecherche(['nom_entreprise' => 'Promo 100% auto']);
     prestataireRecherche(['nom_entreprise' => 'Garage_Test']);
