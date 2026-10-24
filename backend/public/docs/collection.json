@@ -5925,7 +5925,7 @@
                         {
                             "header": [],
                             "code": 422,
-                            "body": "{\"message\":\"Solde insuffisant.\",\"errors\":{\"montant\":[\"Solde insuffisant.\"]}}",
+                            "body": "{\"message\":\"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.\",\"errors\":{\"montant\":[\"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.\"]}}",
                             "name": ""
                         },
                         {

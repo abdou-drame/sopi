@@ -13435,21 +13435,21 @@ paths:
               schema:
                 type: object
                 example:
-                  message: 'Solde insuffisant.'
+                  message: 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.'
                   errors:
                     montant:
-                      - 'Solde insuffisant.'
+                      - 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.'
                 properties:
                   message:
                     type: string
-                    example: 'Solde insuffisant.'
+                    example: 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.'
                   errors:
                     type: object
                     properties:
                       montant:
                         type: array
                         example:
-                          - 'Solde insuffisant.'
+                          - 'Solde insuffisant. Votre solde disponible est de 2 000 FCFA.'
                         items:
                           type: string
         429:

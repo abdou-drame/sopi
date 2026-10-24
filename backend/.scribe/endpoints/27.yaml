@@ -344,7 +344,7 @@ endpoints:
       -
         custom: []
         status: 422
-        content: '{"message":"Solde insuffisant.","errors":{"montant":["Solde insuffisant."]}}'
+        content: '{"message":"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.","errors":{"montant":["Solde insuffisant. Votre solde disponible est de 2 000 FCFA."]}}'
         headers: []
         description: ''
       -

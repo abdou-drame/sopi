@@ -114,7 +114,7 @@ class RetraitController extends Controller
      * @response 201 {"id":"0198a1b2-0000-7000-8000-000000000070","montant":5000.0,"statut":"reussi","operateur":"wave","telephoneVersement":"+221******567","dateDemande":"2030-01-15T08:50:00+00:00","dateTraitement":"2030-01-15T08:50:02+00:00"}
      * @response 401 {"message":"Authentification requise."}
      * @response 403 {"message":"Vous n'avez pas le droit d'effectuer cette action."}
-     * @response 422 {"message":"Solde insuffisant.","errors":{"montant":["Solde insuffisant."]}}
+     * @response 422 {"message":"Solde insuffisant. Votre solde disponible est de 2 000 FCFA.","errors":{"montant":["Solde insuffisant. Votre solde disponible est de 2 000 FCFA."]}}
      * @response 429 {"message":"Trop de tentatives. Réessayez dans quelques instants."}
      * @response 503 {"message":"Le versement n'a pas pu être effectué. Votre solde n'a pas été débité. Veuillez réessayer."}
      */
