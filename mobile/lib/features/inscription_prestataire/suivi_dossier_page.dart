@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/api/erreurs.dart';
+import '../../core/config/environnement.dart';
 import '../../core/config/support.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
@@ -50,6 +52,8 @@ class SuiviDossierPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final suivi = ref.watch(suiviDossierProvider);
     final metiers = ref.watch(metiersProvider).value ?? const <Metier>[];
+    final jeton = ref.watch(jetonSuiviProvider);
+    final lien = jeton == null ? null : '${urlApi()}/suivi/$jeton';
 
     String nomMetier(String code) {
       for (final m in metiers) {
@@ -98,7 +102,7 @@ class SuiviDossierPage extends ConsumerWidget {
           );
         }
         if (dossier.refuse) {
-          return _DossierRefuse(dossier: dossier);
+          return _DossierRefuse(dossier: dossier, lien: lien);
         }
         if (dossier.accepte) {
           return _EcranDossier(
@@ -107,6 +111,7 @@ class SuiviDossierPage extends ConsumerWidget {
             titre2: 'accepté',
             texte:
                 'Félicitations, votre dossier a été accepté. Vous pouvez maintenant vous connecter avec votre e-mail et votre mot de passe.',
+            lien: lien,
             boutons: [
               BoutonPrimaire(
                 libelle: 'Retour à la connexion',
@@ -127,6 +132,7 @@ class SuiviDossierPage extends ConsumerWidget {
               metier: nomMetier(dossier.metier),
               avecDetails: true,
             ),
+            lien: lien,
             boutons: [
               BoutonPrimaire(
                 libelle: 'Actualiser',
@@ -154,9 +160,10 @@ class SuiviDossierPage extends ConsumerWidget {
 }
 
 class _DossierRefuse extends ConsumerWidget {
-  const _DossierRefuse({required this.dossier});
+  const _DossierRefuse({required this.dossier, this.lien});
 
   final SuiviDossier dossier;
+  final String? lien;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -169,6 +176,7 @@ class _DossierRefuse extends ConsumerWidget {
       texte: "Votre demande d'inscription n'a pas été acceptée.",
       motif: dossier.motifRefus,
       carte: _CarteDetails(dossier: dossier, metier: '', avecDetails: false),
+      lien: lien,
       boutons: [
         if (aSupport)
           BoutonPrimaire(
@@ -211,6 +219,7 @@ class _EcranDossier extends StatelessWidget {
     required this.boutons,
     this.motif,
     this.carte,
+    this.lien,
     this.erreurIcone = false,
   });
 
@@ -220,6 +229,9 @@ class _EcranDossier extends StatelessWidget {
   final String texte;
   final String? motif;
   final Widget? carte;
+
+  /// Lien de suivi personnel, affiché dans une carte sous les détails ; null : pas de carte.
+  final String? lien;
   final bool erreurIcone;
   final List<Widget> boutons;
 
@@ -315,6 +327,16 @@ class _EcranDossier extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: carte,
+                      ),
+                    if (lien != null)
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          16,
+                          carte != null ? 12 : 0,
+                          16,
+                          0,
+                        ),
+                        child: _CarteLienSuivi(lien: lien!),
                       ),
                   ],
                 ),
@@ -421,6 +443,68 @@ class _CarteDetails extends StatelessWidget {
             if (i > 0) const SizedBox(height: 12),
             enfants[i],
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Carte blanche « Votre lien de suivi personnel » : l'URL complète (tronquée) et un bouton qui la copie.
+class _CarteLienSuivi extends StatelessWidget {
+  const _CarteLienSuivi({required this.lien});
+
+  final String lien;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      key: const ValueKey('carte-lien-suivi'),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: CouleursSopi.blanc,
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: OmbresSopi.carte,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Votre lien de suivi personnel',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: CouleursSopi.texte,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  lien,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 12,
+                    color: CouleursSopi.texteSecondaire,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              BoutonSecondaire(
+                libelle: 'Copier',
+                pleineLargeur: false,
+                onPressed: () async {
+                  final messenger = ScaffoldMessenger.of(context);
+                  await Clipboard.setData(ClipboardData(text: lien));
+                  messenger.showSnackBar(
+                    const SnackBar(content: Text('Lien copié')),
+                  );
+                },
+              ),
+            ],
+          ),
         ],
       ),
     );

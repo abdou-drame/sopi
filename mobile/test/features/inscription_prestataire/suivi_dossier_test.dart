@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sopi/core/format/formateurs.dart';
 import 'package:sopi/core/routing/chemins.dart';
@@ -65,6 +66,35 @@ void main() {
       expect(find.text('Actualiser'), findsOneWidget);
       expect(find.text('Retour à la connexion'), findsOneWidget);
     });
+
+    testWidgets(
+      'lien de suivi : affiché sous les détails, Copier le place dans le presse-papiers',
+      (tester) async {
+        String? copie;
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          (appel) async {
+            if (appel.method == 'Clipboard.setData') {
+              copie = (appel.arguments as Map)['text'] as String?;
+            }
+            return null;
+          },
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            SystemChannels.platform,
+            null,
+          ),
+        );
+        await _arriver(tester, {_suivi: Simulee(200, _dossier())});
+        expect(find.text('Votre lien de suivi personnel'), findsOneWidget);
+        expect(find.textContaining('/suivi/jeton-abc'), findsOneWidget);
+        await toucher(tester, find.text('Copier'));
+        await avancer(tester, 300);
+        expect(copie, endsWith('/suivi/jeton-abc'));
+        expect(find.text('Lien copié'), findsOneWidget);
+      },
+    );
 
     testWidgets('Actualiser relit le dossier', (tester) async {
       final serveur = AdaptateurSimule({
