@@ -293,7 +293,7 @@ class _RetraitPageState extends ConsumerState<RetraitPage> {
                             borderRadius: BorderRadius.circular(22),
                           ),
                           child: Text(
-                            "Le versement est envoyé automatiquement. Vous êtes prévenu dès qu'il est effectué.",
+                            "Le versement est envoyé automatiquement. Suivez son état dans l'historique des retraits.",
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontSize: 13,
                               height: 19 / 13,
@@ -478,7 +478,7 @@ class _Confirmation extends StatelessWidget {
                         Text(
                           termine
                               ? 'Le versement a été effectué.'
-                              : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; vous êtes prévenu dès que le versement est terminé.",
+                              : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; l'état du versement est visible dans l'historique des retraits.",
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             fontSize: 13,
