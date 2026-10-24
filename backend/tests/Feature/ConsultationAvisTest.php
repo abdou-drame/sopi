@@ -219,9 +219,19 @@ describe('mes avis (prestataire)', function () {
 
         expect($reponse->json('data.*.id'))->toBe([$mien->id])
             ->and($reponse->json('data.0.auteur'))->toBe('Awa D.')
+            ->and($reponse->json('data.0.peutSignaler'))->toBeTrue()
             ->and($reponse->json('noteMoyenne'))->toEqual(4)
             ->and($reponse->json('nombreAvis'))->toBe(1)
             ->and($reponse->getContent())->not->toContain('Diallo');
+    });
+
+    it('n\'autorise plus à signaler un avis déjà signalé', function () {
+        $moi = prestataireNote();
+        $avis = avisSur($moi, 2);
+        DB::table('avis')->where('id', $avis->id)->update(['signale_le' => now(), 'motif_signalement' => 'Avis injuste.']);
+        Sanctum::actingAs($moi->user);
+
+        $this->getJson('/api/v1/prestataire/avis')->assertOk()->assertJsonPath('data.0.peutSignaler', false);
     });
 
     it('renvoie une liste vide et une note nulle sans avis', function () {
