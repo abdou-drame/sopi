@@ -2,9 +2,11 @@
 
 use App\Enums\CauseExpiration;
 use App\Enums\StatutCreneau;
+use App\Enums\StatutPaiement;
 use App\Enums\StatutReservation;
 use App\Events\Reservation\ReservationExpiree;
 use App\Models\Creneau;
+use App\Models\Paiement;
 use App\Models\Prestataire;
 use App\Models\Reservation;
 use App\Models\User;
@@ -156,6 +158,40 @@ describe('b) réservations acceptées non payées (2 h depuis acceptee_le)', fun
         expect_creneau_libre($impayee->creneau);
         Event::assertDispatchedTimes(ReservationExpiree::class, 1);
         Event::assertDispatched(ReservationExpiree::class, fn ($e) => $e->reservation->is($impayee) && $e->cause === CauseExpiration::Impayee);
+    });
+
+    it('abandonne le paiement resté en attente à l\'expiration : il passe à échoué (mémoire, tableau 2.7, 3a)', function () {
+        Event::fake([ReservationExpiree::class]);
+        $abandonnee = reservationAgee(StatutReservation::Acceptee, 121);
+        $sessionOuverte = Paiement::factory()->enAttente()->create(['reservation_id' => $abandonnee->id, 'reference_dexpay' => 'DXP-SESSION-OUVERTE']);
+        $dansLeDelai = reservationAgee(StatutReservation::Acceptee, 119);
+        $enCours = Paiement::factory()->enAttente()->create(['reservation_id' => $dansLeDelai->id, 'reference_dexpay' => 'DXP-DANS-LE-DELAI']);
+
+        $this->artisan('sopi:reservations:expirer-impayees')->expectsOutput('1 réservation(s) annulée(s) faute de paiement.')->assertSuccessful();
+
+        // Dans le délai, le client peut encore payer : son paiement reste en attente.
+        expect($abandonnee->fresh()->statut)->toBe(StatutReservation::Annulee)
+            ->and($sessionOuverte->fresh()->statut)->toBe(StatutPaiement::Echoue)
+            ->and($dansLeDelai->fresh()->statut)->toBe(StatutReservation::Acceptee)
+            ->and($enCours->fresh()->statut)->toBe(StatutPaiement::EnAttente);
+    });
+
+    it('n\'abandonne que le paiement en attente de la réservation, jamais un paiement réussi ou remboursé', function () {
+        $retentee = reservationAgee(StatutReservation::Acceptee, 121);
+        $premierEssai = Paiement::factory()->echoue()->create(['reservation_id' => $retentee->id]);
+        $deuxiemeEssai = Paiement::factory()->enAttente()->create(['reservation_id' => $retentee->id, 'reference_dexpay' => 'DXP-DEUXIEME-ESSAI']);
+        $payee = reservationAgee(StatutReservation::Confirmee, 121);
+        $reussi = Paiement::factory()->reussi()->create(['reservation_id' => $payee->id]);
+        $annulee = reservationAgee(StatutReservation::Annulee, 121);
+        $rembourse = Paiement::factory()->rembourse()->create(['reservation_id' => $annulee->id]);
+
+        expect(Paiement::abandonnerLesEnAttenteDe($retentee->id))->toBe(1)
+            ->and(Paiement::abandonnerLesEnAttenteDe($payee->id))->toBe(0)
+            ->and(Paiement::abandonnerLesEnAttenteDe($annulee->id))->toBe(0)
+            ->and($premierEssai->fresh()->statut)->toBe(StatutPaiement::Echoue)
+            ->and($deuxiemeEssai->fresh()->statut)->toBe(StatutPaiement::Echoue)
+            ->and($reussi->fresh()->statut)->toBe(StatutPaiement::Reussi)
+            ->and($rembourse->fresh()->statut)->toBe(StatutPaiement::Rembourse);
     });
 
     it('compte le délai depuis acceptee_le, pas depuis la création', function () {
