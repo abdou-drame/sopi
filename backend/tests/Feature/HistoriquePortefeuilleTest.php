@@ -118,9 +118,10 @@ describe('GET /prestataire/portefeuille/mouvements', function () {
         $credit = $donnees->firstWhere('type', 'credit');
         $retrait = $donnees->firstWhere('type', 'retrait');
 
-        expect($credit['montant'])->toBe(3000.0)
-            ->and($credit['acompte'])->toBe(4500.0)
-            ->and($credit['commission'])->toBe(1500.0)
+        // Le JSON écrit 3000.0 sous la forme 3000 : une fois décodé c'est un entier, d'où toEqual (pas toBe).
+        expect($credit['montant'])->toEqual(3000.0)
+            ->and($credit['acompte'])->toEqual(4500.0)
+            ->and($credit['commission'])->toEqual(1500.0)
             ->and($retrait['acompte'])->toBeNull()
             ->and($retrait['commission'])->toBeNull();
     });
