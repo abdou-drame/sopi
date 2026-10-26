@@ -1,0 +1,38 @@
+LANDING PAGE SOPI
+=================
+
+Page statique (landing/index.html) servie par nginx (Dockerfile + nginx.conf).
+Aucun JavaScript, aucune clé, aucun secret.
+
+DEUX VALEURS A REMPLACER AVANT LA MISE EN LIGNE
+-----------------------------------------------
+Dans index.html, remplacer (en gardant le reste de la ligne intact) :
+
+1. [LIEN DE L'APK]       (1 occurrence, bouton « Télécharger l'APK »)
+   -> l'adresse de téléchargement du dernier fichier .apk dans les Releases
+      GitHub du dépôt. Pour la trouver : dépôt GitHub > Releases > dernière
+      release > clic droit sur le fichier sopi-v0.1.N.apk > « Copier
+      l'adresse du lien ». Elle ressemble à :
+      https://github.com/<compte>/<dépôt>/releases/download/mobile-v0.1.N/sopi-v0.1.N.apk
+      Le numéro change à chaque release. Pour avoir toujours la dernière :
+      https://github.com/<compte>/<dépôt>/releases/latest
+      (page de la dernière release, d'où l'on télécharge le fichier ; ce lien
+      ne change pas mais ne lance pas le téléchargement directement).
+
+2. [E-MAIL DE SUPPORT]   (2 occurrences, pied de page : le lien et le texte)
+   -> l'e-mail de support de Sopi, par exemple support@votre-domaine.sn.
+      Remplacer les deux occurrences, y compris celle après « mailto: ».
+
+Vérification après remplacement : plus aucun crochet ne doit rester.
+      grep -n "\[LIEN DE\|\[E-MAIL" index.html     (ne doit rien afficher)
+
+TEST EN LOCAL (avec Docker)
+---------------------------
+      docker build -t sopi-landing landing
+      docker run --rm -p 8080:80 sopi-landing
+      puis ouvrir http://localhost:8080
+
+DEPLOIEMENT (Dokploy)
+---------------------
+Nouvelle application, source = ce dépôt GitHub, branche main, build path
+« landing », type de build « Dockerfile », port 80, domaine + HTTPS.
