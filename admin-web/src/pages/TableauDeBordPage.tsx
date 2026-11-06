@@ -9,25 +9,15 @@ import { useAuth } from '../auth/AuthContext'
 import NombreAnime from '../components/ui/NombreAnime'
 import JaugeMetier from '../components/ui/JaugeMetier'
 import GraphiqueGroupe from '../components/ui/GraphiqueGroupe'
+import { GraphiqueCourbe } from '../components/ui/Graphiques'
 import { BanniereAlerteMq } from '../design/bannieres'
-import { Avatar, Carte, FOND_MARQUE, TitrePage } from '../design/composants'
+import { Carte, FOND_MARQUE, TitrePage } from '../design/composants'
 import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
 import { L, dureeMinutes } from '../i18n/libelles'
-import { ajouterJours, aujourdhui, formatDate, formatHeureDuJour, formatJourCalendaire, formatNombre } from '../lib/format'
+import { ajouterJours, aujourdhui, formatJourCalendaire, formatNombre } from '../lib/format'
 
 const T = L.tableauDeBord
 const ABSENT = '—'
-
-/** Couleur du point de statut d'une réservation (statuts du backend). */
-const POINT_STATUT: Record<string, string> = {
-  en_attente: '#f59e0b',
-  acceptee: 'var(--color-neutre)',
-  confirmee: 'var(--color-neutre)',
-  en_cours: 'var(--color-neutre)',
-  terminee: '#16a34a',
-  refusee: '#e5484d',
-  annulee: '#9aa0b2',
-}
 
 function LienFleche({ vers, libelle }: { vers: string; libelle: string }) {
   return (
@@ -249,17 +239,26 @@ function LigneCompte({ libelle, valeur, point }: { libelle: string; valeur: numb
   )
 }
 
-/** Réservations par statut (RF13) : une ligne par statut, avec pastille et nombre. */
+/** Réservations par statut (RF13) : une courbe animée dont chaque point est un statut, avec son nombre. */
 function CarteParStatut({ parStatut }: { parStatut: Record<string, number> | undefined }) {
+  const libelles = STATUTS_RESERVATION.map((st) => L.statuts[st])
+  const valeurs = STATUTS_RESERVATION.map((st) => parStatut?.[st] ?? 0)
   return (
     <Carte>
       <div className="text-[15px] leading-[normal] font-bold">Réservations par statut</div>
       <div className="mt-0.5 text-xs leading-[normal] text-[#8a90a2]">Toutes les réservations de la plateforme</div>
-      <ul className="mt-3 list-none p-0">
-        {STATUTS_RESERVATION.map((s) => (
-          <LigneCompte key={s} libelle={L.statuts[s]} valeur={parStatut?.[s]} point={POINT_STATUT[s]} />
-        ))}
-      </ul>
+      <div className="mt-3">
+        {parStatut === undefined ? (
+          <div className="py-8 text-center text-sm text-[#8a90a2]">{ABSENT}</div>
+        ) : (
+          <GraphiqueCourbe
+            description={`Réservations par statut : ${STATUTS_RESERVATION.map((_, i) => `${libelles[i]} ${valeurs[i]}`).join(', ')}`}
+            libelles={libelles}
+            series={[{ nom: 'Réservations', couleur: '#4b6fd6', valeurs }]}
+            formatValeur={formatNombre}
+          />
+        )}
+      </div>
     </Carte>
   )
 }
@@ -283,55 +282,47 @@ function CarteParDomaine({ parDomaine }: { parDomaine: Record<string, { total: n
   )
 }
 
+/** Sept derniers jours, aujourd'hui en dernier. */
+function derniersJours(): Tranche[] {
+  const fin = aujourdhui()
+  return Array.from({ length: 7 }, (_, i) => {
+    const jour = ajouterJours(fin, -(6 - i))
+    return { libelle: formatJourCalendaire(jour, true), debut: jour, fin: jour }
+  })
+}
+
+const SERIES_ACTIVITE = [
+  { nom: 'Réservations', couleur: '#4b6fd6' },
+  { nom: 'Terminées', couleur: '#2d9d6a' },
+]
+
+/** Activité récente : courbes animées des réservations et des prestations terminées, jour par jour (créneaux du jour). */
 function CarteActivite() {
-  const { data } = useQuery({ queryKey: ['activite-reservations'], queryFn: () => api.reservations({ page: 1 }), retry: false })
-  const { data: paiements } = useQuery({ queryKey: ['derniers-paiements'], queryFn: api.derniersPaiements, retry: false })
-  const acomptes = new Map((paiements?.data ?? []).map((p) => [p.reservationId, p.montantAcompte]))
-  const lignes = (data?.data ?? []).slice(0, 4)
+  const jours = useMemo(() => derniersJours(), [])
+  const statuts = [undefined, 'terminee'] as const
+  const resultats = useQueries({
+    queries: jours.flatMap((j) =>
+      statuts.map((statut) => ({
+        queryKey: ['activite-jour', j.debut, statut ?? 'toutes'],
+        queryFn: () => api.reservations({ debut: j.debut, fin: j.fin, ...(statut ? { statut } : {}) }),
+        retry: false,
+        staleTime: 60_000,
+      })),
+    ),
+  })
+  const valeurs = (k: number) => jours.map((_, i) => resultats[i * statuts.length + k].data?.meta.total ?? 0)
+  const series = SERIES_ACTIVITE.map((st, k) => ({ ...st, valeurs: valeurs(k) }))
+  const libelles = jours.map((j) => j.libelle)
   return (
     <section className="box-border min-w-0 flex-[2_1_560px] rounded-[32px] bg-white p-[18px]">
-      <EnTeteSimple titre="Activité récente" sousTitre="Dernières réservations de la plateforme" vers="/reservations" libelle="Tout voir" />
-      <div className="mt-3.5 overflow-x-auto">
-        <table className="mq-table min-w-[620px]">
-          <thead>
-            <tr className="text-left text-xs text-[#9aa0b2]">
-              <th>Réservation</th>
-              <th>Date</th>
-              <th>Heure</th>
-              <th>Statut</th>
-              <th style={{ textAlign: "right" }}>Acompte</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lignes.map((r) => {
-              const acompte = acomptes.get(r.id)
-              return (
-                <tr key={r.id} className="rang">
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <Avatar nom={r.prestataire.nomEntreprise} taille={36} />
-                      <span>
-                        <span className="block font-semibold">{r.prestation.nom}</span>
-                        <span className="mt-px block text-[11px] text-[#9aa0b2]">
-                          {r.prestataire.nomEntreprise} · {r.client.prenom} {r.client.initialeNom}.
-                        </span>
-                      </span>
-                    </div>
-                  </td>
-                  <td>{formatDate(r.creneau.debut)}</td>
-                  <td className="tabular-nums">{formatHeureDuJour(r.creneau.debut)}</td>
-                  <td>
-                    <span className="inline-flex items-center gap-1.5 font-medium">
-                      <span className="size-1.5 rounded-full" style={{ background: POINT_STATUT[r.statut] ?? '#9aa0b2' }} />
-                      {L.statuts[r.statut as keyof typeof L.statuts] ?? r.statut}
-                    </span>
-                  </td>
-                  <td><span className="font-semibold tabular-nums">{acompte === undefined ? ABSENT : `${formatNombre(acompte)} FCFA`}</span></td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+      <EnTeteSimple titre="Activité récente" sousTitre="Réservations et prestations terminées, 7 derniers jours" vers="/reservations" libelle="Tout voir" />
+      <div className="mt-3.5">
+        <GraphiqueCourbe
+          description={`Activité récente : ${libelles.map((l, i) => `${l} ${series.map((st) => `${st.nom} ${st.valeurs[i]}`).join(', ')}`).join(' ; ')}`}
+          libelles={libelles}
+          series={series}
+          formatValeur={formatNombre}
+        />
       </div>
     </section>
   )

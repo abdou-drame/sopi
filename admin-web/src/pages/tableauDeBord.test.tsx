@@ -191,7 +191,7 @@ describe('tableau de bord', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Masquer l’alerte' }))
     unmount()
     afficherApplication('/')
-    await screen.findByText('Vidange')
+    await screen.findByText('Activité récente')
     expect(screen.queryByText('2 dossiers en attente.')).not.toBeInTheDocument()
     localStorage.setItem('sopi.admin.alertes-masquees', JSON.stringify({ dossiers_en_attente: 1 }))
     cleanup()
@@ -207,13 +207,24 @@ describe('tableau de bord', () => {
     await waitFor(() => expect(screen.getByText('Litiges ouverts').closest('div.box-border, section')).toHaveTextContent(/2/))
   })
 
-  it('liste l’activité récente avec l’acompte du paiement correspondant', async () => {
-    simulerApi(toutes)
+  it('trace l’activité récente en courbes animées, jour par jour, avec les totaux réels', async () => {
+    simulerApi({
+      ...toutes,
+      'GET /admin/reservations': ({ url }) => {
+        const total = url.searchParams.get('statut') === 'terminee' ? 3 : 8
+        return { corps: { data: [], links: {}, meta: { current_page: 1, last_page: 1, per_page: 20, total } } }
+      },
+    })
     afficherApplication('/')
-    expect(await screen.findByText('Vidange')).toBeInTheDocument()
-    expect(screen.getByText(/Garage Exemple · Awa D\./)).toBeInTheDocument()
-    expect(screen.getAllByText('Confirmée').length).toBeGreaterThan(0)
-    expect(await screen.findByText(/4.500\s*FCFA/)).toBeInTheDocument()
+    const carte = (await screen.findByText('Activité récente')).closest('section') as HTMLElement
+    const courbe = await waitFor(() => {
+      const el = carte.querySelector('svg[role="img"]') as SVGElement
+      expect(el.getAttribute('aria-label')).toContain('Réservations 8, Terminées 3')
+      return el
+    })
+    expect(courbe.getAttribute('aria-label')).toMatch(/^Activité récente : /)
+    expect(carte.querySelectorAll('path.animate-trace')).toHaveLength(2)
+    expect(carte).toHaveTextContent('Terminées')
     expect(screen.getByRole('link', { name: 'Tout voir' })).toHaveAttribute('href', '/reservations')
   })
 
@@ -274,18 +285,20 @@ describe('tableau de bord', () => {
     expect(graphique).toHaveAttribute('data-survol', 'false')
   })
 
-  it('montre les réservations par statut et par domaine, avec les nombres réels', async () => {
+  it('trace les réservations par statut en courbe animée et par domaine, avec les nombres réels', async () => {
     simulerApi(toutes)
     afficherApplication('/')
     const statuts = (await screen.findByText('Réservations par statut')).closest('section') as HTMLElement
-    await waitFor(() => expect(statuts).toHaveTextContent(/Terminées*280/))
-    expect(statuts).toHaveTextContent(/En attentes*4/)
-    expect(statuts).toHaveTextContent(/Acceptées*2/)
-    expect(statuts).toHaveTextContent(/Confirmées*10/)
-    expect(statuts).toHaveTextContent(/En courss*1/)
-    expect(statuts).toHaveTextContent(/Refusées*15/)
-    expect(statuts).toHaveTextContent(/Annulées*28/)
-    expect(statuts).not.toHaveTextContent('—')
+    const courbe = await waitFor(() => {
+      const el = statuts.querySelector('svg[role="img"]') as SVGElement
+      expect(el.getAttribute('aria-label')).toContain('Terminée 280')
+      return el
+    })
+    const texte = courbe.getAttribute('aria-label') ?? ''
+    for (const attendu of ['En attente 4', 'Acceptée 2', 'Confirmée 10', 'En cours 1', 'Refusée 15', 'Annulée 28']) {
+      expect(texte).toContain(attendu)
+    }
+    expect(statuts.querySelectorAll('path.animate-trace')).toHaveLength(1)
     const domaines = screen.getByText('Réservations par domaine').closest('section') as HTMLElement
     await waitFor(() => expect(domaines).toHaveTextContent(/Mécaniques*150/))
     expect(domaines).toHaveTextContent(/Coiffures*120/)
@@ -296,7 +309,7 @@ describe('tableau de bord', () => {
   it('actualise en lecture seule depuis le rail', async () => {
     const { appels } = simulerApi(toutes)
     afficherApplication('/')
-    await screen.findByText('Vidange')
+    await screen.findByText('Activité récente')
     const avant = appels.length
     await userEvent.click(screen.getByRole('button', { name: 'Actualiser' }))
     await waitFor(() => expect(appels.length).toBeGreaterThan(avant))
@@ -318,7 +331,7 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     const carte = (await screen.findByText('Revenus Sopi (commissions)')).closest('section') as HTMLElement
     await waitFor(() => expect(carte).toHaveTextContent('— FCFA'))
-    expect(await screen.findByText('Vidange')).toBeInTheDocument()
+    expect(await screen.findByText('Activité récente')).toBeInTheDocument()
     expect(screen.queryByText(/SQLSTATE/)).not.toBeInTheDocument()
   })
 
@@ -333,7 +346,7 @@ describe('tableau de bord', () => {
   it('ne montre aucune donnée sensible (code de réservation, référence DexPay, jeton)', async () => {
     simulerApi({ ...toutes, 'GET /admin/alertes': { corps: ALERTES } })
     afficherApplication('/')
-    await screen.findByText('Vidange')
+    await screen.findByText('Activité récente')
     const texte = document.body.textContent ?? ''
     expect(texte).not.toMatch(/jeton-factice|mot de passe|code de réservation|dexpay|\+221/i)
   })
