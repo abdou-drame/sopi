@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animation/apparition.dart';
 import '../theme/couleurs.dart';
 
 /// Onglets segmentés des maquettes : pilule #e9ecf3 de 48 px (rayon 24, marge 4), onglet actif en bleu
@@ -34,45 +35,70 @@ class OngletsSegmentes<T> extends StatelessWidget {
         color: CouleursSopi.fondSecondaire,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: Row(
+      // La pastille bleue glisse sous l'onglet choisi ; les onglets restent au-dessus.
+      child: Stack(
         children: [
-          for (var i = 0; i < valeurs.length; i++) ...[
-            if (i > 0) const SizedBox(width: 4),
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: valeurs[i] == actif,
-                label: libelle(valeurs[i]),
-                excludeSemantics: true,
-                child: Material(
-                  color: valeurs[i] == actif
-                      ? CouleursSopi.bleu
-                      : Colors.transparent,
+          AnimatedAlign(
+            duration: animationsActives(context)
+                ? const Duration(milliseconds: 300)
+                : Duration.zero,
+            curve: Curves.easeOutCubic,
+            alignment: Alignment(
+              valeurs.length < 2
+                  ? 0
+                  : -1 + 2 * valeurs.indexOf(actif) / (valeurs.length - 1),
+              0,
+            ),
+            child: FractionallySizedBox(
+              widthFactor: 1 / valeurs.length,
+              heightFactor: 1,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: CouleursSopi.bleu,
                   borderRadius: BorderRadius.circular(20),
-                  child: InkWell(
-                    key: cle?.call(valeurs[i]),
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => onChange(valeurs[i]),
-                    child: Center(
-                      child: Text(
-                        libelle(valeurs[i]),
-                        maxLines: 1,
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontSize: tailleTexte,
-                          fontWeight: valeurs[i] == actif
-                              ? FontWeight.w700
-                              : FontWeight.w600,
-                          color: valeurs[i] == actif
-                              ? CouleursSopi.blanc
-                              : CouleursSopi.texteSecondaire,
+                ),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              for (var i = 0; i < valeurs.length; i++) ...[
+                if (i > 0) const SizedBox(width: 4),
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: valeurs[i] == actif,
+                    label: libelle(valeurs[i]),
+                    excludeSemantics: true,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      child: InkWell(
+                        key: cle?.call(valeurs[i]),
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () => onChange(valeurs[i]),
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 250),
+                            style: theme.textTheme.labelLarge!.copyWith(
+                              fontSize: tailleTexte,
+                              fontWeight: valeurs[i] == actif
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                              color: valeurs[i] == actif
+                                  ? CouleursSopi.blanc
+                                  : CouleursSopi.texteSecondaire,
+                            ),
+                            child: Text(libelle(valeurs[i]), maxLines: 1),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            ],
+          ),
         ],
       ),
     );

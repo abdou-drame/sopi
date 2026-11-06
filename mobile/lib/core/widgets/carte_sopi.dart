@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animation/effets.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
 
@@ -22,7 +23,7 @@ class CarteSopi extends StatelessWidget {
   Widget build(BuildContext context) {
     final forme = BorderRadius.circular(rayon);
     final contenu = Padding(padding: padding, child: child);
-    return DecoratedBox(
+    final carte = DecoratedBox(
       decoration: BoxDecoration(
         color: CouleursSopi.blanc,
         borderRadius: forme,
@@ -35,5 +36,7 @@ class CarteSopi extends StatelessWidget {
               child: InkWell(borderRadius: forme, onTap: onTap, child: contenu),
             ),
     );
+    // Légère réduction à l'appui pour les cartes touchables.
+    return onTap == null ? carte : Appui(echelle: 0.985, child: carte);
   }
 }

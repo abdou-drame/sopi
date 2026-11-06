@@ -396,8 +396,9 @@ class _ChoixCreneauPageState extends ConsumerState<ChoixCreneauPage> {
                   runSpacing: ecart,
                   children: [
                     for (var i = 0; i < heures.length; i++)
-                      Apparition.indexee(
-                        index: i,
+                      Pop(
+                        delai: Duration(milliseconds: 30 * (i < 9 ? i : 9)),
+                        echelleDepart: 0.85,
                         child: SizedBox(
                           width: largeur,
                           child: _BoutonHeure(

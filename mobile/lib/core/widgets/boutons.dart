@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animation/effets.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
 
@@ -85,11 +86,14 @@ class _BoutonPilule extends StatelessWidget {
             ],
           );
 
-    return FilledButton(
-      onPressed: actif ? onPressed : null,
-      style: style,
-      // Pendant le chargement le bouton garde son fond (pas l'aspect « désactivé »).
-      child: contenu,
+    return Appui(
+      actif: actif,
+      child: FilledButton(
+        onPressed: actif ? onPressed : null,
+        style: style,
+        // Pendant le chargement le bouton garde son fond (pas l'aspect « désactivé »).
+        child: contenu,
+      ),
     );
   }
 }

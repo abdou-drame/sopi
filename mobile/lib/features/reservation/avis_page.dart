@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/animation/effets.dart';
 import '../../core/api/erreurs.dart';
 import '../../core/routing/chemins.dart';
 import '../../core/theme/couleurs.dart';
@@ -350,14 +351,17 @@ class _CarteAvis extends StatelessWidget {
                     behavior: HitTestBehavior.opaque,
                     key: ValueKey('etoile-$i'),
                     onTap: enCours ? null : () => onNote(i),
-                    child: Icon(
-                      i <= note
-                          ? Icons.star_rounded
-                          : Icons.star_outline_rounded,
-                      size: 40,
-                      color: i <= note
-                          ? CouleursSopi.bleu
-                          : CouleursSopi.iconeInactive,
+                    child: Impulsion(
+                      valeur: i <= note,
+                      child: Icon(
+                        i <= note
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
+                        size: 40,
+                        color: i <= note
+                            ? CouleursSopi.bleu
+                            : CouleursSopi.iconeInactive,
+                      ),
                     ),
                   ),
                 ),

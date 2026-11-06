@@ -178,3 +178,89 @@ class ApparitionEnCascade extends StatelessWidget {
           );
   }
 }
+
+/// Apparition « pop » (vidéos de référence) : l'élément grossit de [echelleDepart] à 1 avec un léger rebond
+/// et apparaît en fondu. Ne joue qu'une fois ; sans animation (accessibilité), le contenu est affiché tout de suite.
+class Pop extends StatefulWidget {
+  const Pop({
+    super.key,
+    required this.child,
+    this.delai = Duration.zero,
+    this.duree = const Duration(milliseconds: 320),
+    this.echelleDepart = 0.7,
+    this.alignement = Alignment.center,
+  });
+
+  final Widget child;
+  final Duration delai;
+  final Duration duree;
+  final double echelleDepart;
+  final Alignment alignement;
+
+  @override
+  State<Pop> createState() => _PopState();
+}
+
+class _PopState extends State<Pop> with SingleTickerProviderStateMixin {
+  late final AnimationController _controleur;
+  late final Animation<double> _echelle;
+  late final Animation<double> _fondu;
+  bool _initialise = false;
+  bool _anime = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final total = widget.delai + widget.duree;
+    _controleur = AnimationController(vsync: this, duration: total);
+    final debut = widget.delai.inMicroseconds / total.inMicroseconds;
+    _echelle = CurvedAnimation(
+      parent: _controleur,
+      curve: Interval(debut, 1, curve: Curves.easeOutBack),
+    );
+    _fondu = CurvedAnimation(
+      parent: _controleur,
+      curve: Interval(debut, debut + (1 - debut) * 0.6, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialise) return;
+    _initialise = true;
+    _anime = animationsActives(context);
+    if (_anime) {
+      _controleur.forward();
+    } else {
+      _controleur.value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controleur.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_anime) return widget.child;
+    return AnimatedBuilder(
+      animation: _controleur,
+      child: widget.child,
+      builder: (context, enfant) {
+        final e =
+            widget.echelleDepart + (1 - widget.echelleDepart) * _echelle.value;
+        return Opacity(
+          opacity: _fondu.value.clamp(0.0, 1.0),
+          child: Transform.scale(
+            scale: e,
+            alignment: widget.alignement,
+            child: enfant,
+          ),
+        );
+      },
+    );
+  }
+}

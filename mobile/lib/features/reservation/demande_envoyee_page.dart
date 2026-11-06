@@ -44,17 +44,22 @@ class DemandeEnvoyeePage extends StatelessWidget {
                         Apparition(
                           child: Column(
                             children: [
-                              Container(
-                                width: 104,
-                                height: 104,
-                                decoration: const BoxDecoration(
-                                  color: CouleursSopi.bleuPale,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.send_rounded,
-                                  size: 46,
-                                  color: CouleursSopi.bleu,
+                              Pop(
+                                delai: const Duration(milliseconds: 120),
+                                duree: const Duration(milliseconds: 520),
+                                echelleDepart: 0.3,
+                                child: Container(
+                                  width: 104,
+                                  height: 104,
+                                  decoration: const BoxDecoration(
+                                    color: CouleursSopi.bleuPale,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.send_rounded,
+                                    size: 46,
+                                    color: CouleursSopi.bleu,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 20),

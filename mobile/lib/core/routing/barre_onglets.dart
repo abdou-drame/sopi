@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../animation/apparition.dart';
+import '../animation/effets.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
 
@@ -44,17 +46,44 @@ class BarreOnglets extends StatelessWidget {
               DimensionsSopi.rayonBarreOnglets,
             ),
           ),
-          child: Row(
-            children: [
-              for (var i = 0; i < onglets.length; i++)
-                Expanded(
-                  child: _Onglet(
-                    onglet: onglets[i],
-                    actif: i == indexActif,
-                    onTap: () => onSelection(i),
+          // La pastille bleue glisse d'un onglet à l'autre ; les onglets restent au-dessus.
+          child: LayoutBuilder(
+            builder: (context, contraintes) {
+              final largeur = contraintes.maxWidth / onglets.length;
+              final duree = animationsActives(context)
+                  ? const Duration(milliseconds: 320)
+                  : Duration.zero;
+              return Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: duree,
+                    curve: Curves.easeOutCubic,
+                    left: indexActif * largeur + 2,
+                    top: 10,
+                    width: largeur - 4,
+                    height: 48,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: CouleursSopi.bleu,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
                   ),
-                ),
-            ],
+                  Row(
+                    children: [
+                      for (var i = 0; i < onglets.length; i++)
+                        Expanded(
+                          child: _Onglet(
+                            onglet: onglets[i],
+                            actif: i == indexActif,
+                            onTap: () => onSelection(i),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -83,23 +112,22 @@ class _Onglet extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
+          child: Container(
             height: 48,
             padding: EdgeInsets.symmetric(horizontal: actif ? 14 : 10),
-            decoration: BoxDecoration(
-              color: actif ? CouleursSopi.bleu : Colors.transparent,
-              borderRadius: BorderRadius.circular(24),
-            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  onglet.icone,
-                  size: 22,
-                  color: actif
-                      ? CouleursSopi.blanc
-                      : CouleursSopi.iconeInactive,
+                // L'icône rebondit quand son onglet devient actif.
+                Impulsion(
+                  valeur: actif,
+                  child: Icon(
+                    onglet.icone,
+                    size: 22,
+                    color: actif
+                        ? CouleursSopi.blanc
+                        : CouleursSopi.iconeInactive,
+                  ),
                 ),
                 if (actif) ...[
                   const SizedBox(width: 6),

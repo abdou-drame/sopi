@@ -25,6 +25,13 @@ abstract final class ThemeSopi {
       colorScheme: schema,
       scaffoldBackgroundColor: CouleursSopi.fond,
       fontFamily: policeGoogle ? null : policeRepli,
+      // Les écrans glissent depuis la droite (même rendu sur Android et iOS).
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
     );
     final texte = _texte(
       policeGoogle
