@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { animationsActives } from "../../design/animation/usePresence";
 
 export interface SerieGroupe {
@@ -49,6 +49,8 @@ function compact(v: number): string {
  */
 export default function GraphiqueGroupe({ description, series, groupes, formatValeur = (v) => String(v) }: Props) {
   const anime = animationsActives();
+  // Identifiant propre à chaque graphique : deux graphiques sur la même page ne doivent pas partager leurs dégradés.
+  const uid = useId().replace(/:/g, "");
   const [pret, setPret] = useState(!anime);
   useEffect(() => {
     if (pret) return;
@@ -103,7 +105,7 @@ export default function GraphiqueGroupe({ description, series, groupes, formatVa
       <svg viewBox={`0 0 ${L} ${H}`} className="mt-1 block h-auto w-full" aria-hidden="true" onMouseLeave={() => setSurvol(null)}>
         <defs>
           {series.map((s, i) => (
-            <linearGradient key={s.libelle} id={`groupe-colonne-${i}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient key={s.libelle} id={`groupe-colonne-${uid}-${i}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={s.couleur} stopOpacity="0.95" />
               <stop offset="100%" stopColor={s.couleur} stopOpacity="0.45" />
             </linearGradient>
@@ -142,7 +144,7 @@ export default function GraphiqueGroupe({ description, series, groupes, formatVa
                   width={LARGEUR_BARRE}
                   height={HAUTEUR_UTILE}
                   rx={1.5}
-                  fill={`url(#groupe-colonne-${si})`}
+                  fill={`url(#groupe-colonne-${uid}-${si})`}
                   style={{
                     transformOrigin: `${x + LARGEUR_BARRE / 2}px ${BASE}px`,
                     transform: `scaleY(${ratio})`,

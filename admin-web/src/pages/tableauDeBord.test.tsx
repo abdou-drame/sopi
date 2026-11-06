@@ -218,12 +218,12 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     const carte = (await screen.findByText('Activité récente')).closest('section') as HTMLElement
     const courbe = await waitFor(() => {
-      const el = carte.querySelector('svg[role="img"]') as SVGElement
+      const el = carte.querySelector('[role="img"]') as HTMLElement
       expect(el.getAttribute('aria-label')).toContain('Réservations 8, Terminées 3')
       return el
     })
     expect(courbe.getAttribute('aria-label')).toMatch(/^Activité récente : /)
-    expect(carte.querySelectorAll('path.animate-trace')).toHaveLength(2)
+    expect(carte.querySelectorAll('.groupe-colonne')).toHaveLength(14)
     expect(carte).toHaveTextContent('Terminées')
     expect(screen.getByRole('link', { name: 'Tout voir' })).toHaveAttribute('href', '/reservations')
   })
@@ -290,15 +290,15 @@ describe('tableau de bord', () => {
     afficherApplication('/')
     const statuts = (await screen.findByText('Réservations par statut')).closest('section') as HTMLElement
     const courbe = await waitFor(() => {
-      const el = statuts.querySelector('svg[role="img"]') as SVGElement
-      expect(el.getAttribute('aria-label')).toContain('Terminée 280')
+      const el = statuts.querySelector('[role="img"]') as HTMLElement
+      expect(el.getAttribute('aria-label')).toContain('Terminée Réservations 280')
       return el
     })
     const texte = courbe.getAttribute('aria-label') ?? ''
-    for (const attendu of ['En attente 4', 'Acceptée 2', 'Confirmée 10', 'En cours 1', 'Refusée 15', 'Annulée 28']) {
+    for (const attendu of ['En attente Réservations 4', 'Acceptée Réservations 2', 'Confirmée Réservations 10', 'En cours Réservations 1', 'Refusée Réservations 15', 'Annulée Réservations 28']) {
       expect(texte).toContain(attendu)
     }
-    expect(statuts.querySelectorAll('path.animate-trace')).toHaveLength(1)
+    expect(statuts.querySelectorAll('.groupe-colonne')).toHaveLength(7)
     const domaines = screen.getByText('Réservations par domaine').closest('section') as HTMLElement
     await waitFor(() => expect(domaines).toHaveTextContent(/Mécaniques*150/))
     expect(domaines).toHaveTextContent(/Coiffures*120/)

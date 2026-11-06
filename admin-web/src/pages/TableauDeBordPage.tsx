@@ -9,7 +9,6 @@ import { useAuth } from '../auth/AuthContext'
 import NombreAnime from '../components/ui/NombreAnime'
 import JaugeMetier from '../components/ui/JaugeMetier'
 import GraphiqueGroupe from '../components/ui/GraphiqueGroupe'
-import { GraphiqueCourbe } from '../components/ui/Graphiques'
 import { BanniereAlerteMq } from '../design/bannieres'
 import { Carte, FOND_MARQUE, TitrePage } from '../design/composants'
 import { ICalendrier, IFlecheHautDroite, IGraphique, ILitiges } from '../design/icones'
@@ -251,10 +250,10 @@ function CarteParStatut({ parStatut }: { parStatut: Record<string, number> | und
         {parStatut === undefined ? (
           <div className="py-8 text-center text-sm text-[#8a90a2]">{ABSENT}</div>
         ) : (
-          <GraphiqueCourbe
-            description={`Réservations par statut : ${STATUTS_RESERVATION.map((_, i) => `${libelles[i]} ${valeurs[i]}`).join(', ')}`}
-            libelles={libelles}
-            series={[{ nom: 'Réservations', couleur: '#4b6fd6', valeurs }]}
+          <GraphiqueGroupe
+            description="Réservations par statut"
+            series={[{ libelle: 'Réservations', couleur: '#4b6fd6' }]}
+            groupes={libelles.map((libelle, i) => ({ libelle, valeurs: [valeurs[i]] }))}
             formatValeur={formatNombre}
           />
         )}
@@ -292,8 +291,8 @@ function derniersJours(): Tranche[] {
 }
 
 const SERIES_ACTIVITE = [
-  { nom: 'Réservations', couleur: '#4b6fd6' },
-  { nom: 'Terminées', couleur: '#2d9d6a' },
+  { libelle: 'Réservations', couleur: '#4b6fd6' },
+  { libelle: 'Terminées', couleur: '#2d9d6a' },
 ]
 
 /** Activité récente : courbes animées des réservations et des prestations terminées, jour par jour (créneaux du jour). */
@@ -311,16 +310,16 @@ function CarteActivite() {
     ),
   })
   const valeurs = (k: number) => jours.map((_, i) => resultats[i * statuts.length + k].data?.meta.total ?? 0)
-  const series = SERIES_ACTIVITE.map((st, k) => ({ ...st, valeurs: valeurs(k) }))
+  const series = SERIES_ACTIVITE.map((_, k) => ({ valeurs: valeurs(k) }))
   const libelles = jours.map((j) => j.libelle)
   return (
     <section className="box-border min-w-0 flex-[2_1_560px] rounded-[32px] bg-white p-[18px]">
       <EnTeteSimple titre="Activité récente" sousTitre="Réservations et prestations terminées, 7 derniers jours" vers="/reservations" libelle="Tout voir" />
-      <div className="mt-3.5">
-        <GraphiqueCourbe
-          description={`Activité récente : ${libelles.map((l, i) => `${l} ${series.map((st) => `${st.nom} ${st.valeurs[i]}`).join(', ')}`).join(' ; ')}`}
-          libelles={libelles}
-          series={series}
+      <div className="mx-auto mt-3.5 max-w-[560px]">
+        <GraphiqueGroupe
+          description="Activité récente"
+          series={SERIES_ACTIVITE}
+          groupes={libelles.map((libelle, i) => ({ libelle, valeurs: series.map((st) => st.valeurs[i]) }))}
           formatValeur={formatNombre}
         />
       </div>
