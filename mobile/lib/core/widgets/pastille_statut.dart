@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animation/apparition.dart';
 import '../theme/couleurs.dart';
 
 enum TonStatut { info, succes, erreur, neutre, indigo, ardoise }
@@ -31,7 +32,12 @@ class PastilleStatut extends StatelessWidget {
         CouleursSopi.ardoiseTexte,
       ),
     };
-    return Container(
+    // Quand le statut change, le fond et le texte fondent d'une couleur à l'autre.
+    final duree = animationsActives(context)
+        ? const Duration(milliseconds: 400)
+        : Duration.zero;
+    return AnimatedContainer(
+      duration: duree,
       height: 26,
       alignment: Alignment.center,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -39,13 +45,14 @@ class PastilleStatut extends StatelessWidget {
         color: fond,
         borderRadius: BorderRadius.circular(13),
       ),
-      child: Text(
-        libelle,
-        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+      child: AnimatedDefaultTextStyle(
+        duration: duree,
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(
           color: texte,
           fontSize: 12,
           fontWeight: FontWeight.w700,
         ),
+        child: Text(libelle),
       ),
     );
   }

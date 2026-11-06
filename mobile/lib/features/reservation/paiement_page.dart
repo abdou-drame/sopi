@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/animation/apparition.dart';
+import '../../core/animation/effets.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/api/erreurs.dart';
 import '../../core/config/support.dart';
@@ -428,8 +429,10 @@ class _Contenu extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 65),
-              Apparition.indexee(
-                index: 1,
+              Pop(
+                delai: const Duration(milliseconds: 160),
+                echelleDepart: 0.92,
+                alignement: Alignment.topCenter,
                 child: Container(
                   constraints: const BoxConstraints(minHeight: 92),
                   padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -453,13 +456,26 @@ class _Contenu extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            Text(
-                              formaterArgent(montant),
-                              style: theme.textTheme.headlineMedium?.copyWith(
-                                color: CouleursSopi.blanc,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 28,
-                                height: 34 / 28,
+                            // Le montant monte de 0 jusqu'à l'acompte calculé par le serveur.
+                            TweenAnimationBuilder<double>(
+                              tween: Tween(
+                                begin: animationsActives(context)
+                                    ? 0
+                                    : montant.toDouble(),
+                                end: montant.toDouble(),
+                              ),
+                              duration: animationsActives(context)
+                                  ? const Duration(milliseconds: 900)
+                                  : Duration.zero,
+                              curve: Curves.easeOutCubic,
+                              builder: (context, valeur, _) => Text(
+                                formaterArgent(valeur),
+                                style: theme.textTheme.headlineMedium?.copyWith(
+                                  color: CouleursSopi.blanc,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 28,
+                                  height: 34 / 28,
+                                ),
                               ),
                             ),
                           ],
@@ -706,11 +722,30 @@ class _EnTeteResultat extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Container(
-          width: 112,
-          height: 112,
-          decoration: BoxDecoration(color: fond, shape: BoxShape.circle),
-          child: Icon(icone, size: tailleIcone, color: couleurIcone),
+        Pop(
+          delai: const Duration(milliseconds: 120),
+          duree: const Duration(milliseconds: 520),
+          echelleDepart: 0.3,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              if (icone == Icons.check_rounded) const Confettis(),
+              Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(color: fond, shape: BoxShape.circle),
+                child: icone == Icons.check_rounded
+                    ? Center(
+                        child: CocheDessinee(
+                          taille: tailleIcone,
+                          couleur: couleurIcone,
+                        ),
+                      )
+                    : Icon(icone, size: tailleIcone, color: couleurIcone),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 22),
         Text(

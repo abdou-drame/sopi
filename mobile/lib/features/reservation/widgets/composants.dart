@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/animation/apparition.dart';
@@ -311,6 +313,33 @@ class PastilleDecompte extends StatefulWidget {
 
 class _EtatPastilleDecompte extends State<PastilleDecompte> {
   bool _expire = false;
+  Timer? _minuteur;
+
+  @override
+  void initState() {
+    super.initState();
+    // Sert uniquement à faire virer la couleur (ambre puis rouge) quand le délai approche.
+    _minuteur = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted && !_expire) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _minuteur?.cancel();
+    super.dispose();
+  }
+
+  Color _fond() {
+    final reste = widget.expiration.difference(widget.maintenant());
+    if (reste <= const Duration(minutes: 5)) {
+      return const Color(0xFFE5484D).withValues(alpha: .9);
+    }
+    if (reste <= const Duration(minutes: 15)) {
+      return const Color(0xFFF59E0B).withValues(alpha: .9);
+    }
+    return CouleursSopi.blanc.withValues(alpha: .18);
+  }
 
   @override
   void didUpdateWidget(PastilleDecompte ancienne) {
@@ -332,12 +361,15 @@ class _EtatPastilleDecompte extends State<PastilleDecompte> {
       fontWeight: FontWeight.w700,
       color: CouleursSopi.blanc,
     );
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 600),
       height: widget.hauteur,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: CouleursSopi.blanc.withValues(alpha: .18),
+        color: _expire
+            ? const Color(0xFFE5484D).withValues(alpha: .9)
+            : _fond(),
         borderRadius: BorderRadius.circular(widget.hauteur / 2),
       ),
       child: _expire

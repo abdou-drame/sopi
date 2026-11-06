@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/animation/apparition.dart';
+import '../../core/animation/effets.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
@@ -155,8 +156,10 @@ class _CorpsListe extends StatelessWidget {
           for (var i = 0; i < etat.elements.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Apparition.indexee(
-                index: i,
+              child: Pop(
+                delai: Duration(milliseconds: 60 * (i < 6 ? i : 6)),
+                echelleDepart: 0.94,
+                alignement: Alignment.topCenter,
                 child: CarteReservation(reservation: etat.elements[i]),
               ),
             ),
@@ -334,7 +337,18 @@ class _PiedCarte extends ConsumerWidget {
         );
       case StatutReservation.enAttente:
         return ligne(
-          Text('Le prestataire doit répondre à votre demande.', style: texte),
+          Row(
+            children: [
+              const PointPulsant(),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Le prestataire doit répondre à votre demande.',
+                  style: texte,
+                ),
+              ),
+            ],
+          ),
           null,
         );
       case StatutReservation.enCours:

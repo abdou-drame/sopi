@@ -158,8 +158,10 @@ class _CorpsListe extends StatelessWidget {
           for (var i = 0; i < etat.elements.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: Apparition.indexee(
-                index: i,
+              child: Pop(
+                delai: Duration(milliseconds: 60 * (i < 6 ? i : 6)),
+                echelleDepart: 0.94,
+                alignement: Alignment.topCenter,
                 child: CarteDemande(demande: etat.elements[i]),
               ),
             ),

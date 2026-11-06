@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/animation/apparition.dart';
+import '../../core/animation/effets.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/format/formateurs.dart';
 import '../../core/routing/chemins.dart';
@@ -51,11 +53,19 @@ class _PortefeuillePageState extends ConsumerState<PortefeuillePage> {
         titreLigne1: 'Mon',
         titreLigne2: 'portefeuille',
         avecRetour: false,
-        enfantEntete: const _CarteSoldePortefeuille(),
+        enfantEntete: const Pop(
+          delai: Duration(milliseconds: 100),
+          echelleDepart: 0.92,
+          alignement: Alignment.topCenter,
+          child: _CarteSoldePortefeuille(),
+        ),
         ecartEntete: 38,
         margeEntete: 16,
         charger: _charger,
-        construire: (context, m) => LigneMouvement(mouvement: m),
+        construire: (context, m) => Apparition(
+          decalage: const Offset(24, 0),
+          child: LigneMouvement(mouvement: m),
+        ),
         messageVide: 'Aucun mouvement pour le moment.',
         iconeVide: Icons.account_balance_wallet_outlined,
         margeBasse: margeBarreOnglets(context),
@@ -89,24 +99,40 @@ class _CarteSoldePortefeuille extends ConsumerWidget {
 
     Widget montant;
     if (solde.hasValue) {
-      final texte = formaterArgent(solde.value!.solde);
-      final coupure = texte.lastIndexOf(' ');
-      montant = Text.rich(
-        TextSpan(
-          text: texte.substring(0, coupure + 1),
-          children: [
+      // Le montant monte de 0 jusqu'au solde à l'ouverture ; au repos, c'est exactement le solde du serveur.
+      montant = TweenAnimationBuilder<double>(
+        tween: Tween(
+          begin: animationsActives(context) ? 0 : solde.value!.solde.toDouble(),
+          end: solde.value!.solde.toDouble(),
+        ),
+        duration: animationsActives(context)
+            ? const Duration(milliseconds: 1100)
+            : Duration.zero,
+        curve: Curves.easeOutCubic,
+        builder: (context, valeur, _) {
+          final texte = formaterArgent(valeur);
+          final coupure = texte.lastIndexOf(' ');
+          return Text.rich(
             TextSpan(
-              text: texte.substring(coupure + 1),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              text: texte.substring(0, coupure + 1),
+              children: [
+                TextSpan(
+                  text: texte.substring(coupure + 1),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        style: theme.textTheme.headlineMedium?.copyWith(
-          color: CouleursSopi.blanc,
-          fontSize: 36,
-          height: 42 / 36,
-          fontWeight: FontWeight.w800,
-        ),
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: CouleursSopi.blanc,
+              fontSize: 36,
+              height: 42 / 36,
+              fontWeight: FontWeight.w800,
+            ),
+          );
+        },
       );
     } else if (solde.hasError) {
       montant = InkWell(
@@ -153,7 +179,7 @@ class _CarteSoldePortefeuille extends ConsumerWidget {
             'Solde disponible',
             style: discret?.copyWith(fontWeight: FontWeight.w500),
           ),
-          montant,
+          Impulsion(valeur: solde.value?.solde, child: montant),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

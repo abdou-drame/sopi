@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/animation/effets.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/api/erreurs.dart';
 import '../../core/config/support.dart';
@@ -721,18 +722,21 @@ class _BlocCode extends StatelessWidget {
               for (var i = 0; i < code.length; i++) ...[
                 if (i > 0) const SizedBox(width: 6),
                 Expanded(
-                  child: Container(
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: CouleursSopi.blanc,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      code[i],
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: CouleursSopi.texte,
-                        fontWeight: FontWeight.w800,
+                  child: CaractereRetourne(
+                    delai: Duration(milliseconds: 80 * i),
+                    child: Container(
+                      height: 40,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: CouleursSopi.blanc,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        code[i],
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: CouleursSopi.texte,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),

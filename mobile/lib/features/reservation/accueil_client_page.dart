@@ -191,41 +191,50 @@ class _EnteteAccueil extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                BoutonRond(
-                  libelle: 'Menu',
-                  icone: Icons.menu_rounded,
-                  onPressed: () => context.go(Chemins.profil),
+                Pop(
+                  child: BoutonRond(
+                    libelle: 'Menu',
+                    icone: Icons.menu_rounded,
+                    onPressed: () => context.go(Chemins.profil),
+                  ),
                 ),
                 Row(
                   children: [
-                    _RondBlanc(
-                      libelle: 'Notifications',
-                      icone: Icons.notifications_none_rounded,
-                      pastille:
-                          (ref.watch(notificationsNonLuesProvider).value ?? 0) >
-                          0,
-                      onTap: () => context.push(Chemins.notifications),
+                    Pop(
+                      delai: const Duration(milliseconds: 60),
+                      child: _RondBlanc(
+                        libelle: 'Notifications',
+                        icone: Icons.notifications_none_rounded,
+                        pastille:
+                            (ref.watch(notificationsNonLuesProvider).value ??
+                                0) >
+                            0,
+                        onTap: () => context.push(Chemins.notifications),
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Semantics(
-                      button: true,
-                      label: 'Mon profil',
-                      child: GestureDetector(
-                        onTap: () => context.go(Chemins.profil),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: CouleursSopi.bleu,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            initiale,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: CouleursSopi.blanc,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                    Pop(
+                      delai: const Duration(milliseconds: 120),
+                      child: Semantics(
+                        button: true,
+                        label: 'Mon profil',
+                        child: GestureDetector(
+                          onTap: () => context.go(Chemins.profil),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: CouleursSopi.bleu,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              initiale,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: CouleursSopi.blanc,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
@@ -253,33 +262,40 @@ class _EnteteAccueil extends ConsumerWidget {
                             Squelette(largeur: 170, hauteur: 28),
                           ],
                         )
-                      : Text.rich(
-                          TextSpan(
-                            text: 'Bonjour\n',
-                            children: [
-                              TextSpan(
-                                text: prenom == null || prenom!.isEmpty
-                                    ? '!'
-                                    : '$prenom !',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w800,
+                      : Apparition(
+                          delai: const Duration(milliseconds: 80),
+                          decalage: const Offset(-24, 0),
+                          child: Text.rich(
+                            TextSpan(
+                              text: 'Bonjour\n',
+                              children: [
+                                TextSpan(
+                                  text: prenom == null || prenom!.isEmpty
+                                      ? '!'
+                                      : '$prenom !',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w800,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            fontSize: DimensionsSopi.tailleTitreEcran,
-                            height:
-                                DimensionsSopi.interligneTitreEcran /
-                                DimensionsSopi.tailleTitreEcran,
-                            fontWeight: FontWeight.w400,
+                              ],
+                            ),
+                            style: theme.textTheme.headlineMedium?.copyWith(
+                              fontSize: DimensionsSopi.tailleTitreEcran,
+                              height:
+                                  DimensionsSopi.interligneTitreEcran /
+                                  DimensionsSopi.tailleTitreEcran,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                 ),
-                BoutonRond(
-                  libelle: 'Rechercher',
-                  icone: Icons.search_rounded,
-                  onPressed: () => context.push(Chemins.prestataires),
+                Pop(
+                  delai: const Duration(milliseconds: 120),
+                  child: BoutonRond(
+                    libelle: 'Rechercher',
+                    icone: Icons.search_rounded,
+                    onPressed: () => context.push(Chemins.prestataires),
+                  ),
                 ),
               ],
             ),
@@ -288,10 +304,15 @@ class _EnteteAccueil extends ConsumerWidget {
             const SizedBox(height: 26),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _CarteProchaine(
-                reservation: prochaine!,
-                metier: metierProchaine,
-                maintenant: ref.read(horlogeProvider)(),
+              child: Pop(
+                delai: const Duration(milliseconds: 160),
+                echelleDepart: 0.92,
+                alignement: Alignment.topCenter,
+                child: _CarteProchaine(
+                  reservation: prochaine!,
+                  metier: metierProchaine,
+                  maintenant: ref.read(horlogeProvider)(),
+                ),
               ),
             ),
             const SizedBox(height: 16),
@@ -505,7 +526,11 @@ class _RangeeMetiers extends StatelessWidget {
                 if (i > 0) const SizedBox(width: 10),
                 SizedBox(
                   width: largeur,
-                  child: _TuileMetier(metier: metiers[i]),
+                  // Les tuiles « pop » l'une après l'autre.
+                  child: Pop(
+                    delai: Duration(milliseconds: 100 + 60 * i),
+                    child: _TuileMetier(metier: metiers[i]),
+                  ),
                 ),
               ],
             ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../core/animation/apparition.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -428,65 +430,74 @@ class _Confirmation extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 26, 16, 0),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      color: CouleursSopi.blanc,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: OmbresSopi.carte,
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: termine
-                                ? CouleursSopi.bleuPastel
-                                : CouleursSopi.ardoisePastel,
-                            shape: BoxShape.circle,
+                  child: Pop(
+                    echelleDepart: 0.94,
+                    alignement: Alignment.topCenter,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: CouleursSopi.blanc,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: OmbresSopi.carte,
+                      ),
+                      child: Column(
+                        children: [
+                          Pop(
+                            delai: const Duration(milliseconds: 150),
+                            duree: const Duration(milliseconds: 520),
+                            echelleDepart: 0.3,
+                            child: Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: termine
+                                    ? CouleursSopi.bleuPastel
+                                    : CouleursSopi.ardoisePastel,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                termine
+                                    ? Icons.check_rounded
+                                    : Icons.schedule_rounded,
+                                size: 32,
+                                color: termine
+                                    ? CouleursSopi.bleu
+                                    : CouleursSopi.ardoiseTexte,
+                              ),
+                            ),
                           ),
-                          child: Icon(
-                            termine
-                                ? Icons.check_rounded
-                                : Icons.schedule_rounded,
-                            size: 32,
-                            color: termine
-                                ? CouleursSopi.bleu
-                                : CouleursSopi.ardoiseTexte,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          formaterArgent(retrait.montant),
-                          key: const ValueKey('montant-retrait'),
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        if (vers.isNotEmpty) ...[
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 16),
                           Text(
-                            vers,
+                            formaterArgent(retrait.montant),
+                            key: const ValueKey('montant-retrait'),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (vers.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              vers,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: CouleursSopi.texteSecondaire,
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 14),
+                          Text(
+                            termine
+                                ? 'Le versement a été effectué.'
+                                : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; l'état du versement est visible dans l'historique des retraits.",
+                            textAlign: TextAlign.center,
                             style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 13,
+                              height: 19 / 13,
                               color: CouleursSopi.texteSecondaire,
                             ),
                           ),
                         ],
-                        const SizedBox(height: 14),
-                        Text(
-                          termine
-                              ? 'Le versement a été effectué.'
-                              : "Votre demande est prise en compte. Le montant est déjà retiré de votre solde ; l'état du versement est visible dans l'historique des retraits.",
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 13,
-                            height: 19 / 13,
-                            color: CouleursSopi.texteSecondaire,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),

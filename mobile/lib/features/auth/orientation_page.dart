@@ -9,6 +9,8 @@ import '../../core/theme/couleurs.dart';
 import '../../core/theme/dimensions.dart';
 import '../../core/theme/disposition.dart';
 import '../../core/widgets/sopi_logo.dart';
+import 'widgets/apercu_paiement.dart';
+import 'widgets/fond_blocs_anime.dart';
 import 'widgets/mise_en_page_acces.dart';
 
 /// Orange des illustrations (épingle, pastille de validation).
@@ -21,77 +23,165 @@ const _fondClair = Color(0xFFE8EEFC);
 const _texteArtisan = Color(0xFFC9D6F5);
 
 /// Écran d'orientation : premier écran sans session. Le client et l'artisan choisissent leur parcours.
-class OrientationPage extends StatelessWidget {
+class OrientationPage extends StatefulWidget {
   const OrientationPage({super.key});
+
+  @override
+  State<OrientationPage> createState() => _OrientationPageState();
+}
+
+class _OrientationPageState extends State<OrientationPage>
+    with TickerProviderStateMixin {
+  /// Entrée unique : blocs qui se lèvent, calendrier, épingle, coche (2,6 s).
+  late final AnimationController _entree = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2600),
+  );
+
+  /// Boucle de 8 s : respiration du fond, anneau, métiers qui changent, scène de paiement.
+  late final AnimationController _boucle = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 8),
+  );
+
+  bool _initialise = false;
+  bool _anime = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialise) return;
+    _initialise = true;
+    _anime = animationsActives(context);
+    if (_anime) {
+      _entree.forward();
+      // Trois tours, puis la scène se fige sur son état final (acompte payé, portefeuille crédité) :
+      // rien ne tourne indéfiniment.
+      _boucle.repeat(count: 3).whenComplete(() {
+        if (!mounted) return;
+        _boucle
+          ..value = 0
+          ..animateTo(
+            0.85,
+            duration: const Duration(milliseconds: 6800),
+            curve: Curves.linear,
+          );
+      });
+    } else {
+      // Animations désactivées : état final, rien ne bouge.
+      _entree.value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _entree.dispose();
+    _boucle.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      body: EcranAcces(
-        margePied: 28,
-        entete: const _EnteteOrientation(),
-        corps: [
-          // Entrée discrète : 100 ms de délai + 300 ms, soit 400 ms au plus.
-          Apparition(
-            delai: const Duration(milliseconds: 100),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: DimensionsSopi.margeCarte,
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: _CarteChoix(
-                        titre: 'Je cherche un artisan',
-                        texte:
-                            'Mécanique, coiffure, pressing près de chez vous.',
-                        artisan: false,
-                        illustration: const _PeintureClient(),
-                        onTap: () => context.push(Chemins.inscription),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: _CarteChoix(
-                        titre: 'Je suis artisan',
-                        texte: 'Recevez des clients et gérez vos réservations.',
-                        artisan: true,
-                        illustration: const _PeintureArtisan(),
-                        onTap: () =>
-                            context.push(Chemins.inscriptionPrestataire),
-                      ),
-                    ),
-                  ],
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: ExcludeSemantics(
+                child: RepaintBoundary(
+                  child: FondBlocsAnime(progression: _entree, boucle: _boucle),
                 ),
               ),
             ),
           ),
-        ],
-        pied: Apparition(
-          delai: const Duration(milliseconds: 100),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 6,
-            children: [
-              Text(
-                'Vous avez déjà un compte ?',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: CouleursSopi.texteSecondaire,
+          EcranAcces(
+            margePied: 20,
+            entete: _EnteteOrientation(animer: _anime),
+            corps: [
+              // Entrée discrète : les deux cartes « sortent » l'une après l'autre (100 ms de délai au plus).
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: DimensionsSopi.margeCarte,
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Apparition(
+                          delai: const Duration(milliseconds: 40),
+                          child: _CarteChoix(
+                            titre: 'Je cherche un artisan',
+                            texte:
+                                'Mécanique, coiffure, pressing près de chez vous.',
+                            artisan: false,
+                            illustration: _Illustration(
+                              peintre: _CalendrierEpingle(
+                                entree: _entree,
+                                boucle: _boucle,
+                              ),
+                            ),
+                            apercu: ApercuPaiementClient(
+                              boucle: _anime ? _boucle : null,
+                            ),
+                            onTap: () => context.push(Chemins.inscription),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Apparition(
+                          delai: const Duration(milliseconds: 100),
+                          child: _CarteChoix(
+                            titre: 'Je suis artisan',
+                            texte:
+                                'Recevez des clients et gérez vos réservations.',
+                            artisan: true,
+                            illustration: _Illustration(
+                              peintre: _CleEngrenage(
+                                entree: _entree,
+                                boucle: _boucle,
+                                anime: _anime,
+                              ),
+                            ),
+                            apercu: ApercuCreditArtisan(
+                              boucle: _anime ? _boucle : null,
+                            ),
+                            onTap: () =>
+                                context.push(Chemins.inscriptionPrestataire),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              LienTexte(
-                texte: 'Se connecter',
-                onTap: () => context.push(Chemins.connexion),
-              ),
             ],
+            pied: Apparition(
+              delai: const Duration(milliseconds: 100),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 6,
+                children: [
+                  Text(
+                    'Vous avez déjà un compte ?',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: CouleursSopi.texteSecondaire,
+                    ),
+                  ),
+                  LienTexte(
+                    texte: 'Se connecter',
+                    onTap: () => context.push(Chemins.connexion),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -99,20 +189,23 @@ class OrientationPage extends StatelessWidget {
 
 /// En-tête sur fond uni : logo, pastille « Keur Massar », titre et sous-titre.
 class _EnteteOrientation extends StatelessWidget {
-  const _EnteteOrientation();
+  const _EnteteOrientation({required this.animer});
+
+  /// Faux quand les animations sont désactivées : le trait d'accent est tracé tout de suite.
+  final bool animer;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final haut = hautEcran(context) - hautMaquette;
-    return Apparition(
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(28, haut + 64, 24, 26),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
+    return Padding(
+      padding: EdgeInsets.fromLTRB(28, haut + 52, 24, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Apparition(
+            child: Row(
               children: [
                 const SopiLogo(taille: 48, ombre: true),
                 const SizedBox(width: 12),
@@ -128,8 +221,12 @@ class _EnteteOrientation extends StatelessWidget {
                 const Expanded(child: _PastilleQuartier()),
               ],
             ),
-            const SizedBox(height: 36),
-            Semantics(
+          ),
+          const SizedBox(height: 28),
+          Apparition(
+            delai: const Duration(milliseconds: 50),
+            decalage: const Offset(0, 24),
+            child: Semantics(
               header: true,
               child: Text.rich(
                 const TextSpan(
@@ -152,8 +249,28 @@ class _EnteteOrientation extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            Padding(
+          ),
+          const SizedBox(height: 6),
+          // Trait d'accent qui se trace sous le titre, comme dans la vidéo de référence.
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: animer ? 0 : 1, end: 1),
+            duration: animer
+                ? const Duration(milliseconds: 700)
+                : Duration.zero,
+            curve: Curves.easeOutCubic,
+            builder: (context, t, _) => Container(
+              width: 56 * t,
+              height: 4,
+              decoration: BoxDecoration(
+                color: _orange,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Apparition(
+            delai: const Duration(milliseconds: 100),
+            child: Padding(
               padding: const EdgeInsets.only(right: 36),
               child: Text(
                 "Choisissez comment vous souhaitez utiliser l'application.",
@@ -165,8 +282,8 @@ class _EnteteOrientation extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -223,6 +340,7 @@ class _CarteChoix extends StatelessWidget {
     required this.texte,
     required this.artisan,
     required this.illustration,
+    required this.apercu,
     required this.onTap,
   });
 
@@ -230,6 +348,9 @@ class _CarteChoix extends StatelessWidget {
   final String texte;
   final bool artisan;
   final Widget illustration;
+
+  /// Petite scène décorative (paiement de l'acompte / crédit du portefeuille), sous le texte.
+  final Widget apercu;
   final VoidCallback onTap;
 
   @override
@@ -291,6 +412,10 @@ class _CarteChoix extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: ExcludeSemantics(child: apercu),
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 12, 8, 6),
                     child: Row(
@@ -356,24 +481,36 @@ class _Illustration extends StatelessWidget {
   }
 }
 
-class _PeintureClient extends StatelessWidget {
-  const _PeintureClient();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _Illustration(peintre: _CalendrierEpingle());
+/// Avancement 0 → 1 de [t] entre [debut] et [fin], avec la courbe [c].
+double _iv(
+  double t,
+  double debut,
+  double fin, [
+  Curve c = Curves.easeOutCubic,
+]) {
+  if (t <= debut) return 0;
+  if (t >= fin) return 1;
+  return c.transform((t - debut) / (fin - debut));
 }
 
-class _PeintureArtisan extends StatelessWidget {
-  const _PeintureArtisan();
-
-  @override
-  Widget build(BuildContext context) =>
-      const _Illustration(peintre: _CleEngrenage());
+/// Tracé progressif d'un chemin : de 0 (rien) à 1 (tout).
+Path _tracer(Path chemin, double t) {
+  final sortie = Path();
+  for (final m in chemin.computeMetrics()) {
+    sortie.addPath(m.extractPath(0, m.length * t), Offset.zero);
+  }
+  return sortie;
 }
 
 abstract class _Peinture extends CustomPainter {
-  const _Peinture();
+  _Peinture({required this.entree, required this.boucle})
+    : super(repaint: Listenable.merge([entree, boucle]));
+
+  /// 0 → 1, une seule fois à l'ouverture.
+  final Animation<double> entree;
+
+  /// 0 → 1 en boucle (8 s).
+  final Animation<double> boucle;
 
   static const largeur = 150.0;
   static const hauteur = 176.0;
@@ -399,11 +536,12 @@ abstract class _Peinture extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _Peinture ancien) =>
+      ancien.entree != entree || ancien.boucle != boucle;
 }
 
 class _CalendrierEpingle extends _Peinture {
-  const _CalendrierEpingle();
+  _CalendrierEpingle({required super.entree, required super.boucle});
 
   @override
   Shader fond(Rect zone) => const LinearGradient(
@@ -414,17 +552,59 @@ class _CalendrierEpingle extends _Peinture {
 
   @override
   void dessiner(Canvas canvas) {
+    final e = entree.value;
+    final b = boucle.value;
+
+    final halo = _iv(e, 0, 0.25);
     canvas.drawCircle(
       const Offset(118, 40),
-      44,
+      44 * halo,
       Paint()..color = _bleuClair.withValues(alpha: 0.7),
     );
     canvas.drawCircle(
       const Offset(22, 150),
-      34,
+      34 * halo,
       Paint()..color = _indigoClair.withValues(alpha: 0.6),
     );
 
+    // Le calendrier monte en rebondissant légèrement et apparaît en fondu.
+    final monte = _iv(e, 0, 0.32, Curves.easeOutBack);
+    final visible = _iv(e, 0, 0.18, Curves.easeOut);
+    canvas.saveLayer(
+      const Rect.fromLTWH(-20, -20, 200, 240),
+      Paint()..color = Color.fromRGBO(255, 255, 255, visible),
+    );
+    canvas.translate(0, (1 - monte) * 40);
+    _calendrier(canvas, e);
+    canvas.restore();
+
+    // L'épingle tombe, rebondit, puis flotte doucement.
+    final chute = _iv(e, 0.24, 0.56, Curves.bounceOut);
+    final flotte = e >= 1 ? math.sin(b * 8 * math.pi) * 2 : 0.0;
+    final epingle = _iv(e, 0.24, 0.3, Curves.easeOut);
+    if (epingle > 0) {
+      canvas.save();
+      canvas.translate(92, 14 - (1 - chute) * 70 + flotte);
+      canvas.drawPath(
+        Path()
+          ..moveTo(22, 0)
+          ..cubicTo(10, 0, 0, 10, 0, 22)
+          ..relativeCubicTo(0, 16, 22, 38, 22, 38)
+          ..relativeCubicTo(0, 0, 22, -22, 22, -38)
+          ..cubicTo(44, 10, 34, 0, 22, 0)
+          ..close(),
+        Paint()..color = _orange.withValues(alpha: epingle),
+      );
+      canvas.drawCircle(
+        const Offset(22, 22),
+        9,
+        Paint()..color = CouleursSopi.blanc.withValues(alpha: epingle),
+      );
+      canvas.restore();
+    }
+  }
+
+  void _calendrier(Canvas canvas, double e) {
     final corps = RRect.fromRectAndRadius(
       const Rect.fromLTWH(22, 50, 96, 92),
       const Radius.circular(16),
@@ -458,62 +638,84 @@ class _CalendrierEpingle extends _Peinture {
         anneau,
       );
     }
-    final cellule = Paint()..color = CouleursSopi.bleuPastel;
-    for (final c in const [
+
+    // Les cases apparaissent l'une après l'autre.
+    const cases = [
       Rect.fromLTWH(34, 88, 18, 14),
       Rect.fromLTWH(60, 88, 18, 14),
       Rect.fromLTWH(34, 110, 18, 14),
       Rect.fromLTWH(60, 110, 18, 14),
-    ]) {
+    ];
+    for (var i = 0; i < cases.length; i++) {
+      final p = _iv(e, 0.22 + i * 0.05, 0.38 + i * 0.05, Curves.easeOutBack);
+      if (p <= 0) continue;
+      canvas.save();
+      canvas.translate(cases[i].center.dx, cases[i].center.dy);
+      canvas.scale(p);
       canvas.drawRRect(
-        RRect.fromRectAndRadius(c, const Radius.circular(5)),
-        cellule,
+        RRect.fromRectAndRadius(
+          cases[i].shift(-cases[i].center),
+          const Radius.circular(5),
+        ),
+        Paint()..color = CouleursSopi.bleuPastel,
+      );
+      canvas.restore();
+    }
+
+    // La case choisie « pop », puis la coche se trace.
+    const choisie = Rect.fromLTWH(86, 88, 18, 14);
+    final pop = _iv(e, 0.5, 0.68, Curves.elasticOut);
+    if (pop > 0) {
+      canvas.save();
+      canvas.translate(choisie.center.dx, choisie.center.dy);
+      canvas.scale(pop);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          choisie.shift(-choisie.center),
+          const Radius.circular(5),
+        ),
+        Paint()..color = CouleursSopi.bleu,
+      );
+      canvas.restore();
+    }
+    final coche = _iv(e, 0.64, 0.82, Curves.easeInOut);
+    if (coche > 0) {
+      canvas.drawPath(
+        _tracer(
+          Path()
+            ..moveTo(91, 95)
+            ..relativeLineTo(3, 3)
+            ..relativeLineTo(6, -6),
+          coche,
+        ),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.4
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = CouleursSopi.blanc,
       );
     }
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        const Rect.fromLTWH(86, 88, 18, 14),
-        const Radius.circular(5),
-      ),
-      Paint()..color = CouleursSopi.bleu,
-    );
-    canvas.drawPath(
-      Path()
-        ..moveTo(91, 95)
-        ..relativeLineTo(3, 3)
-        ..relativeLineTo(6, -6),
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.4
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..color = CouleursSopi.blanc,
-    );
-
-    // Épingle orange (translate 92, 14).
-    canvas.save();
-    canvas.translate(92, 14);
-    canvas.drawPath(
-      Path()
-        ..moveTo(22, 0)
-        ..cubicTo(10, 0, 0, 10, 0, 22)
-        ..relativeCubicTo(0, 16, 22, 38, 22, 38)
-        ..relativeCubicTo(0, 0, 22, -22, 22, -38)
-        ..cubicTo(44, 10, 34, 0, 22, 0)
-        ..close(),
-      Paint()..color = _orange,
-    );
-    canvas.drawCircle(
-      const Offset(22, 22),
-      9,
-      Paint()..color = CouleursSopi.blanc,
-    );
-    canvas.restore();
   }
 }
 
 class _CleEngrenage extends _Peinture {
-  const _CleEngrenage();
+  _CleEngrenage({
+    required super.entree,
+    required super.boucle,
+    required this.anime,
+  });
+
+  /// Faux quand les animations sont désactivées : la clé reste affichée, sans métier qui change.
+  final bool anime;
+
+  /// Métiers de Sopi qui se relaient dans l'anneau : mécanique (la clé tracée), coiffure, pressing, auto.
+  static const _icones = [
+    null,
+    Icons.content_cut,
+    Icons.dry_cleaning_outlined,
+    Icons.directions_car_outlined,
+  ];
 
   @override
   Shader fond(Rect zone) => const LinearGradient(
@@ -525,13 +727,22 @@ class _CleEngrenage extends _Peinture {
 
   @override
   void dessiner(Canvas canvas) {
-    final voile = Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.08);
-    canvas.drawCircle(const Offset(30, 30), 46, voile);
-    canvas.drawCircle(const Offset(128, 150), 40, voile);
+    final e = entree.value;
+    final b = boucle.value;
 
-    // Couronne de dents : cercle de rayon 40, trait de 12, tirets de 9,4 séparés de 9,4.
+    final voile = Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.08);
+    final halo = _iv(e, 0, 0.25);
+    canvas.drawCircle(const Offset(30, 30), 46 * halo, voile);
+    canvas.drawCircle(const Offset(128, 150), 40 * halo, voile);
+
+    // Couronne de dents qui tourne lentement : cercle de rayon 40, trait de 12, tirets de 9,4.
     const centre = Offset(75, 84);
     const rayon = 40.0;
+    final apparition = _iv(e, 0.05, 0.4, Curves.easeOutBack);
+    canvas.save();
+    canvas.translate(centre.dx, centre.dy);
+    canvas.rotate(b * 2 * math.pi + (1 - apparition) * -1.2);
+    canvas.scale(apparition);
     final dent = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 12
@@ -540,23 +751,100 @@ class _CleEngrenage extends _Peinture {
     final perimetre = 2 * math.pi * rayon;
     for (var debut = 0.0; debut < perimetre; debut += 2 * tiret) {
       canvas.drawArc(
-        Rect.fromCircle(center: centre, radius: rayon),
+        Rect.fromCircle(center: Offset.zero, radius: rayon),
         debut / rayon,
         math.min(tiret, perimetre - debut) / rayon,
         false,
         dent,
       );
     }
+    canvas.restore();
     canvas.drawCircle(
       centre,
-      30,
+      30 * apparition,
       Paint()..color = CouleursSopi.blanc.withValues(alpha: 0.16),
     );
 
-    // Clé à molette (tracé 24 × 24, translate 34, 43, échelle 3,4).
+    _metier(canvas, centre, e, b);
+
+    // Pastille de validation : elle « pop », sa coche se trace, puis elle pulse doucement.
+    final pop = _iv(e, 0.5, 0.7, Curves.elasticOut);
+    if (pop > 0) {
+      final pulse = e >= 1 ? 1 + 0.05 * math.sin(b * 16 * math.pi) : 1.0;
+      canvas.save();
+      canvas.translate(112, 138);
+      canvas.scale(pop * pulse);
+      canvas.drawCircle(Offset.zero, 20, Paint()..color = _orange);
+      canvas.restore();
+    }
+    final coche = _iv(e, 0.66, 0.86, Curves.easeInOut);
+    if (coche > 0) {
+      canvas.drawPath(
+        _tracer(
+          Path()
+            ..moveTo(103, 138)
+            ..relativeLineTo(7, 7)
+            ..relativeLineTo(12, -14),
+          coche,
+        ),
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 4
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = CouleursSopi.blanc,
+      );
+    }
+  }
+
+  /// Logo du métier au centre de l'anneau : arrive en grossissant, reste, puis s'efface vers le suivant.
+  void _metier(Canvas canvas, Offset centre, double e, double b) {
+    final entreeMetier = _iv(e, 0.1, 0.4, Curves.easeOutBack);
+    var echelle = entreeMetier;
+    var alpha = 1.0;
+    var indice = 0;
+    if (anime) {
+      final phase = b * _icones.length;
+      indice = phase.floor() % _icones.length;
+      final p = phase - phase.floor();
+      echelle *= p < 0.25
+          ? Curves.easeOutBack.transform(p / 0.25)
+          : p > 0.8
+          ? 1 - 0.4 * Curves.easeIn.transform((p - 0.8) / 0.2)
+          : 1;
+      if (p > 0.8) alpha = 1 - Curves.easeIn.transform((p - 0.8) / 0.2);
+    }
+    if (echelle <= 0) return;
+
     canvas.save();
-    canvas.translate(34, 43);
+    canvas.translate(centre.dx, centre.dy);
+    canvas.scale(echelle);
+    final icone = _icones[indice];
+    if (icone == null) {
+      _cle(canvas, alpha);
+    } else {
+      final texte = TextPainter(
+        text: TextSpan(
+          text: String.fromCharCode(icone.codePoint),
+          style: TextStyle(
+            fontFamily: icone.fontFamily,
+            package: icone.fontPackage,
+            fontSize: 82,
+            color: CouleursSopi.blanc.withValues(alpha: alpha),
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      texte.paint(canvas, Offset(-texte.width / 2, -texte.height / 2));
+    }
+    canvas.restore();
+  }
+
+  /// Clé à molette (tracé 24 × 24 mis à l'échelle 3,4), centrée sur l'origine.
+  void _cle(Canvas canvas, double alpha) {
+    canvas.save();
     canvas.scale(3.4);
+    canvas.translate(-12, -12);
     final cle = Path()
       ..moveTo(14.7, 6.3)
       ..relativeArcToPoint(
@@ -595,22 +883,8 @@ class _CleEngrenage extends _Peinture {
         ..strokeWidth = 1.7
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
-        ..color = CouleursSopi.blanc,
+        ..color = CouleursSopi.blanc.withValues(alpha: alpha),
     );
     canvas.restore();
-
-    canvas.drawCircle(const Offset(112, 138), 20, Paint()..color = _orange);
-    canvas.drawPath(
-      Path()
-        ..moveTo(103, 138)
-        ..relativeLineTo(7, 7)
-        ..relativeLineTo(12, -14),
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 4
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..color = CouleursSopi.blanc,
-    );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/animation/apparition.dart';
+import '../../core/animation/effets.dart';
 import '../../core/animation/chargement.dart';
 import '../../core/api/erreurs.dart';
 import '../../core/format/formateurs.dart';
@@ -113,41 +114,50 @@ class _EnteteTableau extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                PilulePleine(
-                  libelle: 'Menu',
-                  icone: Icons.menu_rounded,
-                  onTap: () => context.go(Chemins.profilPrestataire),
+                Pop(
+                  child: PilulePleine(
+                    libelle: 'Menu',
+                    icone: Icons.menu_rounded,
+                    onTap: () => context.go(Chemins.profilPrestataire),
+                  ),
                 ),
                 Row(
                   children: [
-                    RondBlanc(
-                      libelle: 'Notifications',
-                      icone: Icons.notifications_none_rounded,
-                      pastille:
-                          (ref.watch(notificationsNonLuesProvider).value ?? 0) >
-                          0,
-                      onTap: () => context.push(Chemins.notifications),
+                    Pop(
+                      delai: const Duration(milliseconds: 60),
+                      child: RondBlanc(
+                        libelle: 'Notifications',
+                        icone: Icons.notifications_none_rounded,
+                        pastille:
+                            (ref.watch(notificationsNonLuesProvider).value ??
+                                0) >
+                            0,
+                        onTap: () => context.push(Chemins.notifications),
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    Semantics(
-                      button: true,
-                      label: 'Mon profil',
-                      child: GestureDetector(
-                        onTap: () => context.go(Chemins.profilPrestataire),
-                        child: Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: CouleursSopi.bleu,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Text(
-                            initiale,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: CouleursSopi.blanc,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                    Pop(
+                      delai: const Duration(milliseconds: 120),
+                      child: Semantics(
+                        button: true,
+                        label: 'Mon profil',
+                        child: GestureDetector(
+                          onTap: () => context.go(Chemins.profilPrestataire),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              color: CouleursSopi.bleu,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              initiale,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: CouleursSopi.blanc,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
@@ -162,6 +172,7 @@ class _EnteteTableau extends ConsumerWidget {
               padding: const EdgeInsets.only(left: 4),
               child: Apparition(
                 delai: apresEntete(0),
+                decalage: const Offset(-24, 0),
                 child: Text.rich(
                   TextSpan(
                     text: 'Bonjour\n',
@@ -183,7 +194,15 @@ class _EnteteTableau extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 26),
-            const ApparitionApresEntete(rang: 1, child: _CarteSolde()),
+            const ApparitionApresEntete(
+              rang: 1,
+              child: Pop(
+                delai: Duration(milliseconds: 100),
+                echelleDepart: 0.92,
+                alignement: Alignment.topCenter,
+                child: _CarteSolde(),
+              ),
+            ),
           ],
         ),
       ),
@@ -202,26 +221,43 @@ class _CarteSolde extends ConsumerWidget {
 
     Widget montant;
     if (solde.hasValue) {
-      final texte = formaterArgent(solde.value!.solde);
-      final coupure = texte.lastIndexOf(' ');
-      montant = Text.rich(
-        TextSpan(
-          text: texte.substring(0, coupure + 1),
-          children: [
+      // Le montant monte de 0 jusqu'au solde à l'ouverture (vidéo de référence) ; le chiffre affiché au
+      // repos est exactement le solde du serveur.
+      montant = TweenAnimationBuilder<double>(
+        tween: Tween(
+          begin: animationsActives(context) ? 0 : solde.value!.solde.toDouble(),
+          end: solde.value!.solde.toDouble(),
+        ),
+        duration: animationsActives(context)
+            ? const Duration(milliseconds: 1100)
+            : Duration.zero,
+        curve: Curves.easeOutCubic,
+        builder: (context, valeur, _) {
+          final texte = formaterArgent(valeur);
+          final coupure = texte.lastIndexOf(' ');
+          return Text.rich(
             TextSpan(
-              text: texte.substring(coupure + 1),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              text: texte.substring(0, coupure + 1),
+              children: [
+                TextSpan(
+                  text: texte.substring(coupure + 1),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        style: theme.textTheme.headlineMedium?.copyWith(
-          color: CouleursSopi.blanc,
-          fontSize: DimensionsSopi.tailleTitreEcran,
-          height:
-              DimensionsSopi.interligneTitreEcran /
-              DimensionsSopi.tailleTitreEcran,
-          fontWeight: FontWeight.w800,
-        ),
+            style: theme.textTheme.headlineMedium?.copyWith(
+              color: CouleursSopi.blanc,
+              fontSize: DimensionsSopi.tailleTitreEcran,
+              height:
+                  DimensionsSopi.interligneTitreEcran /
+                  DimensionsSopi.tailleTitreEcran,
+              fontWeight: FontWeight.w800,
+            ),
+          );
+        },
       );
     } else if (solde.hasError) {
       montant = InkWell(
@@ -261,7 +297,9 @@ class _CarteSolde extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(child: montant),
+              Flexible(
+                child: Impulsion(valeur: solde.value?.solde, child: montant),
+              ),
               const SizedBox(width: 8),
               Semantics(
                 button: true,
@@ -319,30 +357,39 @@ class _CorpsTableau extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _CarteIndicateur(
-                    libelle: 'Demandes à traiter',
-                    cleValeur: const ValueKey('compteur-a-traiter'),
-                    valeur: page?.pagination.total,
-                    erreur: demandes.hasError,
-                    couleur: CouleursSopi.bleu,
+                  child: Pop(
+                    delai: const Duration(milliseconds: 100),
+                    child: _CarteIndicateur(
+                      libelle: 'Demandes à traiter',
+                      cleValeur: const ValueKey('compteur-a-traiter'),
+                      valeur: page?.pagination.total,
+                      erreur: demandes.hasError,
+                      couleur: CouleursSopi.bleu,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _CarteIndicateur(
-                    libelle: 'Rendez-vous aujourd’hui',
-                    cleValeur: const ValueKey('compteur-rdv-aujourdhui'),
-                    valeur: chiffres?.rendezVousAujourdhui,
-                    erreur: tableau.hasError,
+                  child: Pop(
+                    delai: const Duration(milliseconds: 160),
+                    child: _CarteIndicateur(
+                      libelle: 'Rendez-vous aujourd’hui',
+                      cleValeur: const ValueKey('compteur-rdv-aujourdhui'),
+                      valeur: chiffres?.rendezVousAujourdhui,
+                      erreur: tableau.hasError,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _CarteIndicateur(
-                    libelle: 'Terminées ce mois',
-                    cleValeur: const ValueKey('compteur-terminees-mois'),
-                    valeur: chiffres?.terminesCeMois,
-                    erreur: tableau.hasError,
+                  child: Pop(
+                    delai: const Duration(milliseconds: 220),
+                    child: _CarteIndicateur(
+                      libelle: 'Terminées ce mois',
+                      cleValeur: const ValueKey('compteur-terminees-mois'),
+                      valeur: chiffres?.terminesCeMois,
+                      erreur: tableau.hasError,
+                    ),
                   ),
                 ),
               ],

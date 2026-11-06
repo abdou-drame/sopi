@@ -324,8 +324,9 @@ class _CorpsJour extends StatelessWidget {
           for (var i = 0; i < rendezVous.length; i++)
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
-              child: Apparition.indexee(
-                index: i,
+              child: Apparition(
+                delai: Duration(milliseconds: 60 * (i < 6 ? i : 6)),
+                decalage: const Offset(24, 0),
                 child: LigneRendezVous(demande: rendezVous[i]),
               ),
             ),

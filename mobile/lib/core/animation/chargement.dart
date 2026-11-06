@@ -4,7 +4,7 @@ import '../theme/couleurs.dart';
 import 'apparition.dart';
 
 /// Rectangle gris arrondi qui tient la place d'un contenu en cours de chargement.
-class Squelette extends StatelessWidget {
+class Squelette extends StatefulWidget {
   const Squelette({
     super.key,
     this.largeur,
@@ -17,16 +17,71 @@ class Squelette extends StatelessWidget {
   final double rayon;
 
   @override
+  State<Squelette> createState() => _EtatSquelette();
+}
+
+/// Un reflet clair balaie le rectangle. Le balayage est fini (6 passages) pour ne jamais bloquer les tests.
+class _EtatSquelette extends State<Squelette>
+    with SingleTickerProviderStateMixin {
+  static const _passages = 6;
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1300 * _passages),
+  );
+  bool _lance = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_lance && animationsActives(context)) {
+      _lance = true;
+      _c.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      width: largeur,
-      height: hauteur,
-      decoration: BoxDecoration(
-        color: CouleursSopi.squelette,
-        borderRadius: BorderRadius.circular(rayon),
-      ),
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final p = (_c.value * _passages) % 1.0;
+        return Container(
+          width: widget.largeur,
+          height: widget.hauteur,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.rayon),
+            gradient: _c.isAnimating
+                ? LinearGradient(
+                    colors: const [
+                      CouleursSopi.squelette,
+                      CouleursSopi.squeletteClair,
+                      CouleursSopi.squelette,
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
+                    transform: _Glisse(p),
+                  )
+                : null,
+            color: _c.isAnimating ? null : CouleursSopi.squelette,
+          ),
+        );
+      },
     );
   }
+}
+
+class _Glisse extends GradientTransform {
+  const _Glisse(this.p);
+  final double p;
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) =>
+      Matrix4.translationValues(bounds.width * (2 * p - 1), 0, 0);
 }
 
 /// Squelette d'une carte de données (titre + deux lignes).
