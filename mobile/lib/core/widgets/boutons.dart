@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../animation/apparition.dart';
 import '../animation/effets.dart';
 import '../theme/couleurs.dart';
 import '../theme/dimensions.dart';
@@ -92,7 +93,16 @@ class _BoutonPilule extends StatelessWidget {
         onPressed: actif ? onPressed : null,
         style: style,
         // Pendant le chargement le bouton garde son fond (pas l'aspect « désactivé »).
-        child: contenu,
+        child: AnimatedSwitcher(
+          duration: animationsActives(context)
+              ? const Duration(milliseconds: 250)
+              : Duration.zero,
+          transitionBuilder: (enfant, anim) => FadeTransition(
+            opacity: anim,
+            child: ScaleTransition(scale: anim, child: enfant),
+          ),
+          child: KeyedSubtree(key: ValueKey(chargement), child: contenu),
+        ),
       ),
     );
   }

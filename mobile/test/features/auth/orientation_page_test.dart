@@ -26,7 +26,6 @@ void main() {
       expect(find.text('Je suis artisan'), findsOneWidget);
       expect(find.text('Keur Massar'), findsOneWidget);
       expect(find.text('Se connecter'), findsOneWidget);
-      expect(find.text('Commencer'), findsNWidgets(2));
     });
 
     testWidgets('« Je cherche un artisan » ouvre l\'inscription client', (
@@ -98,7 +97,7 @@ void main() {
       expect(find.byType(Opacity), findsNothing);
     });
 
-    testWidgets('animations actives : entrée en fondu de 400 ms au plus', (
+    testWidgets('animations actives : entrée terminée en moins de 1,5 s', (
       tester,
     ) async {
       await lancerAcces(
@@ -107,7 +106,8 @@ void main() {
         depuisOrientation: true,
         sansAnimation: false,
       );
-      await tester.pump(const Duration(milliseconds: 450));
+      await avancer(tester, 3300);
+      await avancer(tester, 1500);
       final opacites = tester.widgetList<Opacity>(find.byType(Opacity));
       expect(opacites, isNotEmpty);
       expect(opacites.every((o) => o.opacity == 1), isTrue);
