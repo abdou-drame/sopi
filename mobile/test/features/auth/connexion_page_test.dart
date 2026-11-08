@@ -24,19 +24,20 @@ void main() {
   group('Connexion', () {
     testWidgets('affiche les éléments de la maquette', (tester) async {
       await lancerAcces(tester, AdaptateurSimule({}));
-      expect(find.textContaining('Heureux de'), findsOneWidget);
-      expect(find.textContaining('vous revoir !'), findsOneWidget);
+      expect(find.textContaining('Bon retour.'), findsOneWidget);
       expect(
-        find.text(
-          'Réservez un mécanicien, un coiffeur ou un pressing dans votre quartier.',
-        ),
+        find.text('Retrouvez vos réservations et vos artisans de Keur Massar.'),
         findsOneWidget,
       );
+      expect(find.text('Keur Massar'), findsOneWidget);
+      expect(find.text('Vidange'), findsOneWidget);
+      expect(find.text('Acompte 30 %'), findsOneWidget);
+      expect(find.text('Connexion sécurisée'), findsOneWidget);
       expect(find.text('E-mail ou téléphone'), findsOneWidget);
       expect(find.text('Mot de passe'), findsOneWidget);
       expect(find.text('Mot de passe oublié ?'), findsOneWidget);
       expect(_bouton('Se connecter'), findsOneWidget);
-      expect(find.text('Pas encore de compte ?'), findsOneWidget);
+      expect(find.text('Nouveau sur Sopi ?'), findsOneWidget);
       expect(find.text('Créer un compte'), findsOneWidget);
       expect(find.text('Vous êtes professionnel ?'), findsOneWidget);
       expect(find.text('Devenir prestataire Sopi'), findsOneWidget);

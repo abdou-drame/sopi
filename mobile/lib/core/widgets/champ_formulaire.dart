@@ -27,7 +27,14 @@ class ChampFormulaire extends StatefulWidget {
     this.erreurSansTexte = false,
     this.tailleTexte = 15,
     this.poidsTexte = FontWeight.w400,
+    this.icone,
+    this.suffixe,
   });
+
+  /// Présentation « carte » (connexion) : si [icone] est fourni, le libellé devient l'indication du champ,
+  /// sur fond blanc cerclé, avec l'icône à gauche et [suffixe] à droite (hors mot de passe).
+  final IconData? icone;
+  final Widget? suffixe;
 
   final String libelle;
   final TextEditingController? controleur;
@@ -60,10 +67,14 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
 
   /// Sans bordure ; seule une erreur dessine un liseré rouge.
   OutlineInputBorder _bordure({bool erreur = false}) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(DimensionsSopi.rayonChamp),
+    borderRadius: BorderRadius.circular(
+      widget.icone != null ? 28 : DimensionsSopi.rayonChamp,
+    ),
     borderSide: erreur
         ? const BorderSide(color: CouleursSopi.erreurTexte, width: 1.5)
-        : BorderSide.none,
+        : (widget.icone != null
+              ? const BorderSide(color: Color(0xFFE3E7EF))
+              : BorderSide.none),
   );
 
   @override
@@ -71,19 +82,22 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
     final theme = Theme.of(context);
     final aTexteErreur = widget.erreur != null && widget.erreur!.isNotEmpty;
     final enErreur = aTexteErreur || widget.erreurSansTexte;
+    final carte = widget.icone != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.libelle,
-          style: theme.textTheme.labelMedium?.copyWith(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: CouleursSopi.texteSecondaire,
+        if (!carte) ...[
+          Text(
+            widget.libelle,
+            style: theme.textTheme.labelMedium?.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: CouleursSopi.texteSecondaire,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
+          const SizedBox(height: 6),
+        ],
         SizedBox(
           height: widget.hauteur,
           child: TextField(
@@ -106,8 +120,18 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
             ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: CouleursSopi.champ,
-              hintText: widget.indication,
+              fillColor: carte ? CouleursSopi.blanc : CouleursSopi.champ,
+              hintText: carte ? widget.libelle : widget.indication,
+              hintStyle: carte
+                  ? const TextStyle(color: CouleursSopi.texteSecondaire)
+                  : null,
+              prefixIcon: carte
+                  ? Icon(
+                      widget.icone,
+                      size: 22,
+                      color: CouleursSopi.texteSecondaire,
+                    )
+                  : null,
               isDense: true,
               contentPadding: EdgeInsets.symmetric(
                 horizontal: widget.margeInterne,
@@ -129,7 +153,7 @@ class _ChampFormulaireState extends State<ChampFormulaire> {
                       ),
                       onPressed: () => setState(() => _masque = !_masque),
                     )
-                  : null,
+                  : widget.suffixe,
             ),
           ),
         ),

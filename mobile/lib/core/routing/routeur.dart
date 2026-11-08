@@ -7,6 +7,7 @@ import '../../features/auth/compte_restreint_page.dart';
 import '../../features/auth/connexion_page.dart';
 import '../../features/auth/inscription_page.dart';
 import '../../features/auth/mot_de_passe_oublie_page.dart';
+import '../../features/auth/demarrage_page.dart';
 import '../../features/auth/orientation_page.dart';
 import '../../features/auth/session.dart';
 import '../../features/compte/aide_page.dart';
@@ -134,22 +135,29 @@ GoRouter creerRouteur({
   String? Function()? jetonSuivi,
   required Listenable rafraichir,
   String? cheminInitial,
+  bool Function()? demarrageFini,
 }) {
   return GoRouter(
     initialLocation: cheminInitial ?? Chemins.demarrage,
     refreshListenable: rafraichir,
-    redirect: (_, etat) => redirectionSopi(
-      session(),
-      etat.uri.path,
-      jetonSuivi: jetonSuivi?.call(),
-    ),
+    redirect: (_, etat) {
+      // L'écran de démarrage reste affiché jusqu'à la fin de son animation.
+      if (etat.uri.path == Chemins.demarrage &&
+          !(demarrageFini?.call() ?? true)) {
+        return null;
+      }
+      return redirectionSopi(
+        session(),
+        etat.uri.path,
+        jetonSuivi: jetonSuivi?.call(),
+      );
+    },
     routes: [
       // La racine ne s'affiche jamais : elle renvoie au démarrage, puis la redirection globale choisit la destination.
       GoRoute(path: '/', redirect: (_, _) => Chemins.demarrage),
       GoRoute(
         path: Chemins.demarrage,
-        builder: (_, _) =>
-            const Scaffold(body: Center(child: CircularProgressIndicator())),
+        builder: (_, _) => const DemarragePage(),
       ),
       GoRoute(path: Chemins.etatApi, builder: (_, _) => const AccueilPage()),
 
@@ -363,7 +371,9 @@ final routeurProvider = Provider<GoRouter>((ref) {
   final changement = ValueNotifier<int>(0);
   ref.listen(sessionProvider, (_, _) => changement.value++);
   ref.listen(jetonSuiviProvider, (_, _) => changement.value++);
+  ref.listen(demarrageFiniProvider, (_, _) => changement.value++);
   final routeur = creerRouteur(
+    demarrageFini: () => ref.read(demarrageFiniProvider),
     session: () => ref.read(sessionProvider),
     jetonSuivi: () => ref.read(jetonSuiviProvider),
     rafraichir: changement,

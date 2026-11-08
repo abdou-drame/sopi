@@ -44,6 +44,7 @@ void main() {
         await tester.pumpWidget(
           enrober(fabrique('Valider', () => appuis++, true)),
         );
+        await tester.pump(const Duration(milliseconds: 300));
         expect(
           find.text('Valider'),
           findsNothing,
